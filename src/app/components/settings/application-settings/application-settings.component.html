@@ -1,0 +1,363 @@
+<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#general" role="tab">
+      <i class="fa fa-cog" aria-hidden="true"></i> Genel Ayarlar</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#printer" role="tab">
+      <i class="fa fa-print" aria-hidden="true"></i> Yazıcı Ayarları</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#account" role="tab">
+      <i class="fa fa-user" aria-hidden="true"></i> Hesap Ayarları</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="general" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Genel Ayarlar</h5>
+      </div>
+      <div class="card-block tab-height">
+        <form #settingsForm="ngForm" (ngSubmit)="saveSettings(settingsForm)">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group text-center">
+                  <div class="input-group-addon">
+                    Zaman Aşımı (Sn)
+                  </div>
+                  <input name="timeout" type="number" class="form-control form-control-lg" ngModel/>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Ekran Klavyesi
+                  </div>
+                  <select name="keyboard" class="form-control form-control-lg" id="" ngModel>
+                    <option>Açık</option>
+                    <option>Kapalı</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Hızlı Satış
+                  </div>
+                  <select name="takeaway" class="form-control form-control-lg" id="" ngModel>
+                    <option>Açık</option>
+                    <option>Kapalı</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12 mt-3">
+              <button type="submit" class="btn btn-danger btn-lg pull-right"> Ayarları Kaydet</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="printer" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Yazıcı Ayarları</h5>
+          </div>
+          <div class="col-lg-4 pr-2 pl-0">
+            <button class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#printerModal">
+              <i class="fa fa-plus"></i> Yazıcı Ekle
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-block tab-height">
+        <div class="row">
+          <div class="col-lg-4 pr-0 pl-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Yazıcılar
+              </div>
+              <div class="card-block p-0 flow">
+                <div class="list-group">
+                  <button *ngFor="let item of printers" (click)="getPrinterDetail(item)" type="button" class="list-group-item list-group-item-action">
+                    {{item.name}} ({{item.type}} Yazıcı)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 pr-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Detaylar
+              </div>
+              <div class="card-block flow p-2 pt-3">
+                <section [hidden]="choosenPrinter == undefined" id="detailForm">
+                  <form #printerDetailForm="ngForm" (ngSubmit)="updatePrinter(printerDetailForm)">
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Yazıcı Adı
+                        </div>
+                        <input type="text" name="name" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Açıklama
+                        </div>
+                        <input type="text" name="note" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Tip
+                        </div>
+                        <input type="text" readonly name="type" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Adres
+                        </div>
+                        <input type="text" readonly name="device_port" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Tür
+                        </div>
+                        <input type="text" disabled class="form-control form-control-lg" value="Adisyon / Fiş Yazıcı">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 pr-1">
+                        <button type="button" (click)="removePrinter(choosenPrinter)" class="btn btn-md btn-danger btn-block ">
+                          <i class="fa fa-times" aria-hidden="true"></i> Yazıcıyı Kaldır
+                        </button>
+                      </div>
+                      <div class="col-lg-4 pr-1 pl-1">
+                        <button type="button" (click)="printTest(choosenPrinter)" class="btn btn-md btn-warning btn-block ">
+                          <i class="fa fa-print" aria-hidden="true"></i> Sınama Yazdır
+                        </button>
+                      </div>
+                      <div class="col-lg-4 pl-1">
+                        <button type="submit" class="btn btn-md btn-success btn-block">
+                          <i class="fa fa-check" aria-hidden="true"></i> Kaydet
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </section>
+                <h1 *ngIf="choosenPrinter == undefined" class="text-center mt-5">Listeden Yazıcı Seçiniz</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="account" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Hesap Ayarları</h5>
+      </div>
+      <div class="card-block tab-height flow">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-addon">
+                  İşletme Logo
+                </div>
+                <div style="width: 85%;" class="img-thumbnail">
+                  <img src="{{appLogo}}" style="height:100px;" class="img-responsive mx-auto d-block" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form #restaurantForm="ngForm" (ngSubmit)="saveRestSettings(restaurantForm)">
+          <input type="hidden" name="state" ngModel/>
+          <input type="hidden" name="city" ngModel/>
+          <input type="hidden" name="geolocation" ngModel/>
+          <input type="hidden" name="state" ngModel/>
+          <input type="hidden" name="_order" ngModel/>
+          <input type="hidden" name="timestamp" ngModel/>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Kullanıcı Adı
+                  </div>
+                  <input name="owner" type="text" class="form-control form-control-lg" readonly ngModel/>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    İşletme Adı
+                  </div>
+                  <input name="name" type="text" class="form-control form-control-lg" ngModel/>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Adres
+                  </div>
+                  <input name="address" type="text" class="form-control form-control-lg" ngModel/>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Telefon
+                  </div>
+                  <input name="phone_number" type="text" class="form-control form-control-lg" ngModel/>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    İşletme No
+                  </div>
+                  <input name="id" type="string" class="form-control form-control-lg" readonly ngModel/>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" name="logo" ngModel/>
+            <input type="hidden" name="state" ngModel/>
+            <input type="hidden" name="_order" ngModel/>
+            <input type="hidden" name="is_premium" ngModel/>
+            <div class="col-lg-12 mt-3">
+              <button type="submit" class="btn btn-danger btn-lg pull-right"> Ayarları Kaydet</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="printerModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Yazıcı Ekle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #printerForm="ngForm" (ngSubmit)="addPrinter(printerForm)">
+        <div class="modal-body">
+          <section *ngIf="printerProcess == undefined" id="selection">
+            <p class="text-muted">Lütfen eklemek istediğiniz yazıcı tipini seçiniz.</p>
+            <div class="row">
+              <div class="col-lg-6">
+                <button type="button" (click)="getPrinters('USB')" class="btn btn-primary btn-lg btn-block">
+                  <i class="fa fa-usb" aria-hidden="true"></i> USB</button>
+              </div>
+              <div class="col-lg-6">
+                <button type="button" (click)="getPrinters('LAN')" class="btn btn-info btn-lg btn-block">
+                  <i class="fa fa-sitemap" aria-hidden="true"></i> LAN</button>
+              </div>
+            </div>
+          </section>
+          <section *ngIf="printerProcess !== undefined" id="form">
+            <section *ngIf="printersFound !== undefined && selectedPrinter == undefined" id="usbPrinters">
+              <p class="text-muted">Kurulum yapmak istediğiniz yazıcıyı seçiniz.</p>
+              <div class="row">
+                <div *ngFor="let item of printersFound" class="col">
+                  <div class="card p-3 card-primary text-white">
+                    <div class="card-body">
+                      <h4 class="card-title">
+                        <i class="fa fa-print" aria-hidden="true"></i> USB Yazıcı</h4>
+                      <p class="card-text">Bulunduğu Port: {{item.portNumbers[0]}}</p>
+                      <div class="row">
+                        <div class="col-lg-6 pr-1">
+                          <button type="button" (click)="printTest(item)" class="btn btn-md btn-secondary btn-block">
+                            <i class="fa fa-print" aria-hidden="true"></i> Sınama Yazdır
+                          </button>
+                        </div>
+                        <div class="col-lg-6 pl-1">
+                          <button type="button" (click)="selectedPrinter = item" class="btn btn-md btn-success btn-block">
+                            <i class="fa fa-check" aria-hidden="true"></i> Yazıcıyı Seç
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section *ngIf="selectedPrinter !== undefined" id="printerFormHolder">
+              <h4 class="text-bold mb-3">{{printerProcess}} Yazıcı
+                <span *ngIf="printerProcess == 'USB'" class="pull-right text-muted">Bulunduğu Port: {{selectedPrinter.portNumbers[0]}}</span>
+              </h4>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Yazıcı Adı
+                  </div>
+                  <input type="text" name="name" class="form-control form-control-lg" ngModel>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Açıklama
+                  </div>
+                  <input type="text" name="note" class="form-control form-control-lg" ngModel>
+                </div>
+                <div *ngIf="printerProcess == 'LAN'" class="input-group">
+                  <div class="input-group-addon">
+                    IP Adresi
+                  </div>
+                  <input type="text" name="port_number" class="form-control form-control-lg" ngModel>
+                </div>
+              </div>
+            </section>
+          </section>
+        </div>
+        <div *ngIf="selectedPrinter !== undefined" class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">İptal</button>
+          <button type="submit" class="btn btn-danger btn-lg">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

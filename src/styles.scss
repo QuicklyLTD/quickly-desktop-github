@@ -1,0 +1,171 @@
+@import '../node_modules/animate.css/animate.min.css';
+@import '../node_modules/bootstrap/scss/bootstrap';
+$fa-font-path: "../node_modules/font-awesome/fonts/";
+@import '../node_modules/font-awesome/scss/font-awesome';
+
+html, body {
+   margin: 0;
+   padding: 0;
+   height: 100%;
+   width: 100%;
+   overflow-y: hidden;
+   touch-action: manipulation;
+}
+
+/* Preloader */
+app-root {
+   display: block;
+   position: relative;
+   height: 100%;
+   width: 100%;
+}
+
+#preloader {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+}
+
+@-webkit-keyframes uil-ring-anim {
+   0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+   }
+   100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+   }
+}
+
+@-moz-keyframes uil-ring-anim {
+   0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+   }
+   100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+   }
+}
+
+@-webkit-keyframes uil-ring-anim {
+   0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+   }
+   100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+   }
+}
+
+@-o-keyframes uil-ring-anim {
+   0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+   }
+   100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+   }
+}
+
+@keyframes uil-ring-anim {
+   0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+   }
+   100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+   }
+}
+
+.uil-ring-css {
+   background: none;
+   position: relative;
+   width: 200px;
+   height: 200px;
+}
+
+.uil-ring-css > div {
+   position: absolute;
+   display: block;
+   width: 160px;
+   height: 160px;
+   top: -80px;
+   left: -80px;
+   border-radius: 80px;
+   box-shadow: 0 3px 0 0 #f02c2c;
+   -webkit-transform-origin: 80px 81.5px;
+   transform-origin: 80px 81.5px;
+   -webkit-animation: uil-ring-anim 1s linear infinite;
+   animation: uil-ring-anim 1s linear infinite;
+}
+
+
+.full-height {
+   height: 88.4vh;
+}
+.inside-height{
+    height: 79vh;
+}
+.input-group-addon{
+    width: 150px;
+}
+.input-group-addon.normal{
+    width: auto !important;
+}
+.list-group-item{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+}
+.proCard{
+    height: 112.4px;
+    h2{
+        font-size: 3vh;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: capitalize;
+    }
+    :hover{
+        background-color: #ebcccc;
+    }
+    .long-name{
+        font-size: 2.4vh;
+    }
+    p{
+        font-weight: bold;
+        position: absolute;
+        bottom: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+.nav-tabs{
+    .nav-link{
+        font-size: 3vh;
+    }
+    .nav-link.active{
+        background-color: #f7f7f9;
+        border-bottom-color: #f7f7f9;
+    }
+}
+.ntb{
+    border-top: 0px !important;
+}
+
+.tab-height{
+    height: 61vh;
+}
+.tab-inside-height{
+    height: 56vh;
+}
+.flow{
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

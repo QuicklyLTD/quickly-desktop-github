@@ -1,0 +1,28 @@
+.flow{
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+#productHolder{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: #ebebeb;
+    padding-top:5px;
+}
+.col-card{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.inside-height{
+    height: 74.5vh;
+}
+.subCat{
+    padding:1.25em 0.5em; 
+    cursor:pointer; 
+    width:24%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.normal{
+    width: auto !important;
+}

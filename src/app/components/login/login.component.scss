@@ -1,0 +1,36 @@
+#app-logo {
+   height: 350px;
+}
+#login-holder{
+    margin-top: 17vh; 
+}
+.login-buttons-holder {
+   width: 50vh;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+.login-button {
+   height: 12vh;
+   width: 12vh;
+   margin: 5px;
+   border: none;
+}
+
+.clear-button {
+    height: 12vh;
+   width: 12vh;
+   margin: 5px;
+   border: none;
+}
+
+#pincodeHolder {
+   margin-left: auto;
+   margin-right: auto;
+   width: 39vh;
+   background: transparent;
+    input{
+        font-size: 5rem;
+        height:64px !important;
+    }
+}

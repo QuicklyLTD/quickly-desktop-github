@@ -1,0 +1,405 @@
+<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#floor" role="tab">
+      <i class="fa fa-sitemap" aria-hidden="true"></i> Bölge Ayarları</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#table" role="tab">
+      <i class="fa fa-cutlery" aria-hidden="true"></i> Masa Ayarları</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#store" role="tab">
+      <i class="fa fa-suitcase" aria-hidden="true"></i> İşletme Ayarları</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="floor" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Bölge Ayarları</h5>
+          </div>
+          <div class="col-lg-4 pr-2 pl-0">
+            <button class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#areaModal">
+              <i class="fa fa-plus"></i> Bölge Ekle
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-block tab-height">
+        <div class="row">
+          <div class="col-lg-4 pr-0 pl-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Bölgeler
+              </div>
+              <div class="card-block p-0 flow">
+                <div class="list-group">
+                  <div *ngFor="let item of floors" class="btn-group btn-group-justify">
+                    <button (click)="getFloor(item)" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 pr-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Ayrıntılar
+              </div>
+              <div class="card-block p-2 flow pt-3">
+                <h1 *ngIf="selectedFloor == undefined" class="text-center mt-5">Listeden Bölge Seçiniz</h1>
+                <div [hidden]="selectedFloor == undefined">
+                  <form #areaDetailForm="ngForm" (ngSubmit)="updateFloor(areaDetailForm)">
+                    <input type="hidden" name="_id" ngModel>
+                    <input type="hidden" name="_rev" ngModel>
+                    <input type="hidden" name="status" ngModel>
+                    <input type="hidden" name="timestamp" ngModel>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Bölge Adı
+                        </div>
+                        <input type="text" name="name" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Açıklama
+                        </div>
+                        <input type="text" name="description" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">Durum</div>
+                        <select name="special" class="form-control form-control-lg" ngModel>
+                          <option value="1">Herkese Açık</option>
+                          <option value="2">Sadece Rezervasyon</option>
+                          <option value="3">İşletmeye Özel</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <table class="table table-bordered text-center">
+                        <thead>
+                          <tr>
+                            <th width="20%" class="text-center">Rezervasyon</th>
+                            <th width="20%" class="text-center">Açık Hava</th>
+                            <th width="20%" class="text-center">Sigara</th>
+                            <th width="20%" class="text-center">Müzik</th>
+                            <th width="20%" class="text-center">Etkinlik</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="text-center">
+                            <td>
+                              <input type="checkbox" name="reservation" class="form-control" ngModel/>
+                            </td>
+                            <td>
+                              <input type="checkbox" name="air" class="form-control" ngModel/>
+                            </td>
+                            <td>
+                              <input type="checkbox" name="cigarate" class="form-control" ngModel/>
+                            </td>
+                            <td>
+                              <input type="checkbox" name="music" class="form-control" ngModel/>
+                            </td>
+                            <td>
+                              <input type="checkbox" name="events" class="form-control" ngModel/>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="form-group mt-3 mb-0">
+                      <div class="row">
+                        <div class="col pr-1">
+                          <button type="button" (click)="removeFloor()" class="btn btn-md btn-block btn-danger">
+                            <i class="fa fa-remove" aria-hidden="true"></i> Bölgeyi Sil
+                          </button>
+                        </div>
+                        <div class="col pl-1">
+                          <button type="submit" class="btn btn-md btn-block btn-success">
+                            <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="table" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Masa Ayarları</h5>
+          </div>
+          <div class="col-lg-4 pr-2 pl-0">
+            <button [disabled]="floors?.length == 0" class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal"
+              data-target="#tableModal">
+              <i class="fa fa-plus"></i> Masa Ekle
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-block tab-height">
+        <div class="row">
+          <div class="col-lg-4 pr-0 pl-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Bölgeler
+              </div>
+              <div class="card-block p-0 flow">
+                <div class="list-group">
+                  <button (click)="fillData()" type="button" class="list-group-item list-group-item-action">Bütün Masalar</button>
+                  <div *ngFor="let item of floors" class="btn-group btn-group-justify">
+                    <button (click)="getTablesByFloor(item._id)" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 pr-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                  <div class="row">
+                      <div class="col-lg-6">
+                          Masalar
+                      </div>
+                      <div class="col-lg-6 pr-2">
+                          <div class="input-group input-group-sm">
+                              <div class="input-group-addon normal">
+                                  <i class="fa fa-search" aria-hidden="true"></i>
+                              </div>
+                              <input #tableName type="text" placeholder="Masa Adı Giriniz.." (focus)="getTablesByFloor(null)" (click)="tableName.value = '';" (keydown)="filterTables(tableName.value)" class="form-control form-contol-sm">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div id="productHolder" class="card-block flow">
+                <div *ngIf="tables?.length == 0" class="row mt-5">
+                  <div class="col-lg-12 mt-5">
+                    <h2  class="text-center mt3">Eşleşen Masa Bulunamadı</h2>
+                  </div>
+                </div>
+                <div *ngIf="tables?.length > 0" class="row">
+                  <div *ngFor="let table of tables" class="col-lg-4 mb-2 col-card">
+                    <div (click)="updateTable(table._id)" class="card tableCard">
+                      <div class="card-block">
+                        <h2 class="card-title">{{table.name}}</h2>
+                        <p class="card-text">
+                          <i class="fa fa-user"></i> {{table.capacity}} Kişilik</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="store" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">İşletme Ayarları</h5>
+      </div>
+      <div class="card-block tab-height flow">
+
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="false" class="row">
+  <div class="col-lg-4">
+    <button class="btn btn-danger btn-lg btn-block" (click)="setDefault()" data-toggle="modal" data-target="#areaModal">
+      <i class="fa fa-plus"></i> Bölüm Ekle</button>
+    <div class="card inside-height mt-3">
+      <div class="card-header">
+        Bölümler
+      </div>
+      <div class="card-block p-0 flow">
+        <div class="list-group">
+          <button type="button" (click)="fillData()" class="list-group-item list-group-item-action">Bütün Bölümler</button>
+          <div *ngFor="let floor of floors" class="btn-group btn-group-justify">
+            <button (click)="getTablesBy(floor._id)" type="button" class="list-group-item list-group-item-action">{{floor.name}}</button>
+            <button (click)="removeFloor(floor._id)" class="btn btn-danger">
+              <i class="fa fa-remove" aria-hidden="true"></i>
+            </button>
+            <button (click)="updateData('floors',floor._id,areaForm)" class="btn btn-warning">
+              <i class="fa fa-edit" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <button class="btn btn-danger btn-lg btn-block" (click)="setDefault()" data-toggle="modal" data-target="#tableModal">
+      <i class="fa fa-plus"></i> Masa Ekle</button>
+    <div class="card inside-height mt-3">
+      <div class="card-header">
+        Masalar
+      </div>
+      <div id="productHolder" class="card-block">
+        <div class="row">
+          <div *ngFor="let table of tables" class="col-lg-4 mb-2 col-card">
+            <div (click)="updateData('tables',table._id,tableForm)" class="card tableCard">
+              <div class="card-block">
+                <h2 class="card-title">{{table.name}}</h2>
+                <p class="card-text">
+                  <i class="fa fa-user"></i> {{table.capacity}} Kişilik</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="areaModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Bölge Oluştur</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #areaForm="ngForm" (ngSubmit)="addFloor(areaForm)">
+        <div *ngIf="onUpdate">
+          <input type="hidden" name="_id" ngModel/>
+          <input type="hidden" name="_rev" ngModel/>
+          <input type="hidden" name="status" ngModel/>
+          <input type="hidden" name="timestamp" ngModel/>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">Bölüm Adı</div>
+              <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon">Durum</div>
+              <select name="special" class="form-control form-control-lg" ngModel>
+                <option value="1">Herkese Açık</option>
+                <option value="2">Sadece Rezervasyon</option>
+                <option value="3">İşletmeye Özel</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon">Açıklama</div>
+              <input type="text" name="description" class="form-control form-control-lg" ngModel/>
+            </div>
+          </div>
+          <h5 class="mt-3">Bölge Özellikleri</h5>
+          <table class="table table-bordered text-center">
+            <thead>
+              <tr>
+                <th width="20%" class="text-center">Rezervasyon</th>
+                <th width="20%" class="text-center">Açık Hava</th>
+                <th width="20%" class="text-center">Sigara</th>
+                <th width="20%" class="text-center">Müzik</th>
+                <th width="20%" class="text-center">Etkinlik</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center">
+                <td>
+                  <input type="checkbox" name="reservation" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="air" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="cigarate" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="music" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="events" class="form-control" ngModel/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-primary btn-lg">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="tableModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Masa</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #tableForm="ngForm" (ngSubmit)="addTable(tableForm)">
+        <div *ngIf="onUpdate">
+          <input type="hidden" name="_id" ngModel/>
+          <input type="hidden" name="_rev" ngModel/>
+          <input type="hidden" name="status" ngModel/>
+          <input type="hidden" name="timestamp" ngModel/>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">Masa Adı</div>
+              <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon">Bağlı Bölüm</div>
+              <select type="text" name="floor_id" class="form-control form-control-lg" ngModel>
+                <option *ngFor="let item of floors" value="{{item._id}}">{{item.name}}</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon">Kişi Sayısı</div>
+              <input type="number" name="capacity" class="form-control form-control-lg" ngModel/>
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon">Masa Açıklaması</div>
+              <input type="text" name="description" class="form-control form-control-lg" ngModel/>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button *ngIf="onUpdate" type="button" (click)="removeTable(id)" class="btn btn-danger btn-lg">Masayı Sil</button>
+          <button type="button" type="submit" class="btn btn-primary btn-lg">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

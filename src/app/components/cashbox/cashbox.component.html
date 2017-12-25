@@ -1,0 +1,142 @@
+<div class="row">
+  <div class="col-lg-10 pr-0">
+    <div class="card full-height">
+      <div class="card-header">Kasa Durumu</div>
+      <div class="card-header p-0">
+        <table class="table table-bordered table-hover mb-0">
+          <thead class="thead-inverse">
+            <tr class="table-info">
+              <td width="4%">
+                <i class="fa fa-diamond"></i>
+              </td>
+              <td width="30%">
+                <b>Faliyet Gelirleri</b>
+              </td>
+              <td colspan="5">
+                <b>
+                  <span class="pull-right">Toplam: {{sellingIncomes}} TL</span>
+                </b>
+              </td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="card-block p-0 flow">
+        <table class="table table-bordered table-hover">
+          <thead class="thead-inverse">
+            <tr>
+              <th width="4%">#</th>
+              <th width="20%"><i class="fa fa-sticky-note" aria-hidden="true"></i> Açıklama</th>
+              <th width="14%"><i class="fa fa-user" aria-hidden="true"></i> Kullanıcı</th>
+              <th width="14%"><i class="fa fa-clock-o" aria-hidden="true"></i> Saat</th>
+              <th width="16%"><i class="fa fa-money" aria-hidden="true"></i> Nakit</th>
+              <th width="16%"><i class="fa fa-credit-card" aria-hidden="true"></i> Kredi Kartı</th>
+              <th width="16%"><i class="fa fa-ticket" aria-hidden="true"></i> Kupon</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cash of cashboxData; let i=index" (click)="updateData(cash)" [ngClass]="{'table-danger': cash.type == 'Gider', 'table-success': cash.type == 'Gelir'}">
+              <td>
+                <i class="fa" [ngClass]="{'fa-arrow-up': cash.type == 'Gider' , 'fa-arrow-down': cash.type == 'Gelir'}"></i>
+              </td>
+              <td>{{cash.description}}</td>
+              <td>{{cash.user}}</td>
+              <td>{{cash.time | date:'HH:mm'}}</td>
+              <td>{{cash.cash}} TL</td>
+              <td>{{cash.card}} TL</td>
+              <td>{{cash.coupon}} TL</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-lg-4">
+            <h4 class="text-success">Gelir: {{incomes}} TL</h4>
+          </div>
+          <div class="col-lg-4 text-center">
+            <h4 class="text-danger">Gider: {{outcomes}} TL</h4>
+          </div>
+          <div class="col-lg-4">
+            <h4 class="pull-right text-primary">Toplam: {{leftTotal}} TL</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="sidebarHolder" class="col-lg-2">
+    <button (click)="type = 'Gelir'; setDefault();" data-toggle="modal" data-target="#cashboxModal" class="btn btn-lg btn-success btn-block pt-5 pb-5">Gelir Ekle</button>
+    <button (click)="type = 'Gider'; setDefault();" data-toggle="modal" data-target="#cashboxModal" class="btn btn-lg btn-danger btn-block pt-5 pb-5">Gider Ekle</button>
+  </div>
+</div>
+
+<div id="cashboxModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{type}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #cashboxForm="ngForm" (ngSubmit)="addData(cashboxForm)">
+        <div class="modal-body">
+          <div *ngIf="onUpdate">
+            <input type="hidden" name="_id" ngModel/>
+            <input type="hidden" name="_rev" ngModel/>
+          </div>
+          <input type="hidden" name="time" class="form-control form-control-lg" ngModel>
+          <input type="hidden" name="user" class="form-control form-control-lg" ngModel>
+          <input id="type" type="hidden" name="type"  ngModel>
+          <div class="form-group mb-2">
+            <div class="input-group">
+              <div class="input-group-addon">
+                Açıklama
+              </div>
+              <input type="text" name="description" class="form-control form-control-lg" ngModel>
+            </div>
+          </div>
+          <div class="form-group mb-2">
+            <div class="input-group">
+              <div class="input-group-addon">
+                Nakit
+              </div>
+              <input type="number" min="0" name="cash" class="form-control form-control-lg" ngModel>
+              <div class="input-group-addon">
+                TL
+              </div>
+            </div>
+          </div>
+          <div class="form-group mb-2">
+            <div class="input-group">
+              <div class="input-group-addon">
+                Kart
+              </div>
+              <input type="number" min="0" name="card" class="form-control form-control-lg" ngModel>
+              <div class="input-group-addon">
+                TL
+              </div>
+            </div>
+          </div>
+          <div class="form-group mb-2">
+            <div class="input-group">
+              <div class="input-group-addon">
+                Kupon
+              </div>
+              <input type="number" min="0" name="coupon" class="form-control form-control-lg" ngModel>
+              <div class="input-group-addon">
+                TL
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button *ngIf="onUpdate" type="button" (click)="removeData(selectedData._id)" class="btn btn-danger btn-lg" data-dismiss="modal"> <i class="fa fa-times" aria-hidden="true"></i> Kaydı Sil</button>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fa fa-check" aria-hidden="true"></i> Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

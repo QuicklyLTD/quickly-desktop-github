@@ -1,0 +1,23 @@
+/* Layout */
+#appHolder {
+   height: 100vh;
+   background-color: #ebebeb;
+   background-image: url(../assets/pattern.png);
+}
+#mainHolder {
+   position: relative;
+   bottom: 0;
+}
+#sidebarHolder {
+   position: fixed;
+   bottom: 0;
+   right: 0;
+   z-index: 1000;
+   padding: 20px;
+   overflow-x: hidden;
+   overflow-y: auto;
+   background-color: grey;
+}
+#routerHolder {
+   margin-top: 20px;
+}

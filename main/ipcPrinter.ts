@@ -1,0 +1,253 @@
+import { ipcMain } from 'electron';
+import * as escpos from 'escpos';
+
+const line = '------------------------------------------------';
+
+ipcMain.on('printTest', (event, device) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer
+          .align('ct')
+          .size(1, 1)
+          .control('LF')
+          .text('Quickly', '857')
+          .size(2, 2)
+          .control('LF')
+          .text('Quickly', '857')
+          .size(3, 3)
+          .control('LF')
+          .text('Quickly', '857')
+          .size(2, 2)
+          .control('LF')
+          .text('Quickly', '857')
+          .size(1, 1)
+          .control('LF')
+          .text('Quickly', '857')
+          .control('LF')
+          .control('LF')
+          .cut()
+          .close();
+      }
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+ipcMain.on('printOrder', (event, device, table, orders, owner) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    let date = new Date();
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer
+          .align('lt')
+          .size(2, 2)
+          .text('Masa No: ' + table, '857')
+          .size(1, 1)
+          .text(line)
+          .align('lt');
+        for (let prop in orders) {
+          let text = fitText(orders[prop].count + 'x ' + orders[prop].name, '', 2);
+          printer.size(2, 2).text(text, '857');
+          if (orders[prop].note !== '') {
+            printer.size(1, 1).text('      Not: ' + orders[prop].note, '857');
+          }
+        }
+        printer.size(1, 1).text(line);
+        printer
+          .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+          .control('LF')
+          .cut()
+          .close();
+      }
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
+  // .text(storeInfo.name, '857')
+  // .text(storeInfo.address.replace(/ş/g,'s'), '857')
+  // .text(storeInfo.state.replace(/ş/g,'s') + '/' + storeInfo.city.replace(/ş/g,'s'), '857')
+  // .text(storeInfo.phone_number)
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    let date = new Date();
+    const printer = new escpos.Printer(deviceToPrint);
+    new escpos.Image.load(logo, function (image) {
+      deviceToPrint.open((err) => {
+        if (err) {
+          event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+        } else {
+          printer
+            .align('ct')
+            .size(1, 1)
+            .image(image, 'd24')
+            .text('Quickly')
+            .text('www.quickly.com.tr')
+            .align('lt')
+            .control('LF')
+            .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
+            .text(line);
+          for (let prop in check.products) {
+            if (check.products[prop].status !== 3) {
+              let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name + (check.products[prop].note != '' ? ' (' + check.products[prop].note + ') ' : ''), check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price >= 100 ? check.products[prop].total_price : (check.products[prop].total_price >= 10 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
+              printer.text(text, '857');
+            }
+          }
+          printer.text(line);
+          printer
+            .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
+            .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+            .align('ct')
+            .size(2, 2)
+            .control('LF')
+            .text('Toplam:  ' + check.total_price + ' TL')
+            .control('LF')
+            .size(1, 1)
+            .text('Mali degeri yoktur.', '857')
+            .control('LF')
+            .cut()
+            .close();
+        }
+      });
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+ipcMain.on('printReport', (event, device, data, logo) => {
+  let deviceToPrint = findDevice(device);
+  const printer = new escpos.Printer(deviceToPrint);
+  let date = new Date();
+  try {
+    if (deviceToPrint) {
+      new escpos.Image.load(logo, function (image) {
+        deviceToPrint.open((err) => {
+          if (err) {
+            event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+          } else {
+            printer
+              .align('ct')
+              .image(image, 'd24')
+              .size(2, 2)
+              .text('Gün Sonu Raporu', '857')
+              .control('LF')
+              .align('lt')
+              .size(1, 1)
+              .text(line)
+              .size(2, 2)
+              .text('Satis Raporu', '857')
+              .size(1, 1)
+              .text(line)
+              .text(fitText('Nakit Satis Toplam:', data.cash_total + ' TL', 1), '857')
+              .text(fitText('Kart  Satis Toplam:', data.card_total + ' TL', 1), '857')
+              .text(fitText('Kupon Satis Toplam:', data.coupon_total + ' TL', 1), '857')
+              .text(fitText('Ikram Hesap Toplam:', data.free_total + ' TL', 1), '857')
+              .text(fitText('Iptal Hesap Toplam:', data.canceled_total + ' TL', 1), '857')
+              .text(line)
+              .text(fitText('Toplam Satis:', data.total_income + ' TL', 1), '857')
+              .text(fitText('Toplam Hesap Sayisi:', data.check_count + ' Adet', 1), '857')
+              .text(line)
+              .control('LF')
+              .control('LF')
+              .text(line)
+              .size(2, 2)
+              .text('Kasa Hareketleri')
+              .size(1, 1)
+              .text(line)
+              .text(fitText('Kasa Gelir Toplam:', data.incomes + ' TL', 1))
+              .text(fitText('Kasa Gider Toplam:', data.outcomes + ' TL', 1))
+              .text(line)
+              .text(fitText('Kasa Genel Toplam:', (data.incomes - data.outcomes) + ' TL', 1))
+              .text(line)
+              .control('LF')
+              .control('LF')
+              .text(line)
+              .size(2, 2)
+              .text('Son Toplam')
+              .size(1, 1)
+              .text(line)
+              .size(2, 2)
+              .control('LF')
+              .align('ct')
+              .text((data.total_income - data.canceled_total) + (data.incomes - data.outcomes) + ' TL')
+              .control('LF')
+              .align('lt')
+              .size(1, 1)
+              .text(line)
+              .control('LF')
+              .text(fitText('Tarih:', date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
+              .text(fitText('Saat:', date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+              .control('LF')
+              .cut()
+              .close();
+          }
+        });
+      });
+    } else {
+      event.sender.send('error', 'Yazıcı Bulunamadı');
+    }
+  } catch (error) {
+    console.log(error)
+  }
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function repeat(pattern, count) {
+  if (count < 1) return '';
+  var result = '';
+  while (count > 1) {
+    if (count & 1) result += pattern;
+    count >>= 1, pattern += pattern;
+  }
+  return result + pattern;
+}
+
+function fitText(header, text, number) {
+  let space = 48 / number;
+  let middleSpace = repeat(' ', space - text.toString().length - header.toString().length);
+  let fixed = header + middleSpace + text;
+  return fixed;
+}
+
+function findDevice(printer) {
+  let device;
+  switch (printer.type) {
+    case 'USB':
+      let devices = escpos.USB.findPrinter();
+      printer = devices.filter(obj => obj.portNumbers[0] === printer.device_port);
+      try {
+        device = new escpos.USB(printer[0]);
+      } catch (error) {
+        device = undefined;
+      }
+      break;
+    case 'LAN':
+      device = new escpos.Network(printer.device_port);
+      break;
+    case 'SERIAL':
+      device = new escpos.Serial(printer.device_port);
+      break;
+    default:
+      try {
+        device = new escpos.USB();
+      } catch (error) {
+        device = undefined;
+      }
+      break;
+  }
+  return device;
+}

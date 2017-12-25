@@ -1,0 +1,25 @@
+#floorHolder{
+    h2{
+        font-size: 3vh;
+    }
+}
+.tableCard{
+    height: 15vh;
+    h1{
+        font-size: 4vh;
+    }
+    .long-name{
+        font-size: 3.2vh;
+    }
+    .card-text{
+        position: absolute;
+        bottom: 1rem;
+    }
+}
+.col-card{
+    padding-right: 5px;
+    padding-left:5px;
+}
+.normal{
+    width: auto !important;
+}

@@ -1,0 +1,123 @@
+<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#general" role="tab">
+      <i class="fa fa-bar-chart" aria-hidden="true"></i> Aktivite Grafiği</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#list" role="tab">
+      <i class="fa fa-th" aria-hidden="true"></i> Kullanıcı Listesi</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#notifications" role="tab">
+      <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="general" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Haftalık Kullanıcı Aktivite Grafiği</h5>
+          </div>
+          <div class="col-lg-4 pr-2 pl-0">
+            <div class="input-group">
+              <div class="input-group-addon normal">Filtre</div>
+              <select class="form-control" (change)="changeFilter($event.target.value)">
+                <option>Satış Tutarı</option>
+                <option>Sipariş Adedi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-block tab-height p-0">
+        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:67vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels" [options]="ChartOptions"
+        [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="list" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Kullanıcı Listesi</h5>
+          </div>
+          <div class="col-lg-4 r-2 pl-0">
+            <div class="input-group">
+              <div class="input-group-addon normal">Filtre</div>
+              <select class="form-control" (change)="changeListFilter($event.target.value)">
+                <option>Genel</option>
+                <option>Haftalık</option>
+                <option>Günlük</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-block tab-height p-0 flow">
+        <table class="table table-bordered table-striped table-hover">
+          <thead class="thead-inverse">
+            <tr>
+              <th width="5%"><i class="fa fa-user" aria-hidden="true"></i></th>
+              <th width="30%">Kullanıcı</th>
+              <th width="20%">Sipariş Adedi</th>
+              <th width="20%">Satış Tutarı</th>
+              <th width="25%">Son Satış</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of usersList; let i = index" (click)="getItemReport(item)">
+              <td>{{i+1}}</td>
+              <td>{{item.connection_id | general: 'users' | async}}</td>
+              <td>{{item.count}} Adet</td>
+              <td>{{item.amount}} TL</td>
+              <td>{{item.update_time | date: 'd/M/y HH:mm'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="notifications" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Bildirimler</h5>
+      </div>
+      <div class="card-block tab-height">
+
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reportDetail" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">{{ItemReport?.connection_id | general:'users' | async}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:56vw; margin:auto;" [datasets]="DetailData" [labels]="ChartLabels"
+          [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>

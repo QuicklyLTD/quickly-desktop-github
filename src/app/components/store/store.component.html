@@ -1,0 +1,47 @@
+<div class="row">
+  <div class="col-lg-10 pr-0">
+    <div class="card full-height">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-8">
+            Masalar
+          </div>
+          <div class="col-lg-4 pr-2">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon normal">
+                <i class="fa fa-search" aria-hidden="true"></i>
+              </div>
+              <input #tableName type="text" placeholder="Masa Adı Giriniz.." (click)="fillData(); tableName.value = '';"
+                (keyup)="filterTables(tableName.value)" class="form-control form-contol-sm">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-block pt-0 flow">
+        <div class="row">
+          <div *ngFor="let table of tables" [routerLink]="['/selling-screen', table._id]" class="col-xl-2 col-lg-3 mt-2 col-card">
+            <div [ngClass]="{'bg-success': table.status == 2}" class="card card-warning tableCard">
+              <div class="card-block p-3">
+                <h1 [ngClass]="{'long-name': table.name.length > 8}" class="card-title">{{table.name}}</h1>
+                <p class="card-text">
+                  <i class="fa fa-user"></i> {{table.capacity}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="floorHolder" class="col-lg-2">
+    <div class="card mb-2" (click)="fillData()" [ngClass]="{'card-danger card-inverse':selected == ''}">
+      <div class="card-block">
+        <h2>Bütün Masalar</h2>
+      </div>
+    </div>
+    <div *ngFor="let floor of floors" (click)="getTablesBy(floor._id)" class="card mb-2" [ngClass]="{'card-danger card-inverse':selected == floor._id}">
+      <div class="card-block">
+        <h2>{{floor.name}}</h2>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,405 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card full-height">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-xl-6 col-lg-5">
+            Masa:
+            <b>{{id | general:'tables' | async}}</b>
+            <span *ngIf="check.note !== '' && check.note !== null" class="text-muted">( {{check.note}} )</span>
+          </div>
+          <div class="col-xl-2 col-lg-2 pl-1 pr-2">
+            <button data-toggle="modal" data-target="#splitTable" [disabled]="allTables?.length == 0 || check.products.length == 0 || check.status == 0"
+              class="btn btn-danger btn-block btn-sm">Masa Değiştir</button>
+          </div>
+          <div class="col-xl-2 col-lg-2 pl-0 pr-3">
+            <button data-toggle="modal" data-target="#checkNote" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">Hesaba Not Ekle</button>
+          </div>
+          <div class="col-xl-2 col-lg-3 pl-0">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon normal">
+                <i class="fa fa-search" aria-hidden="true"></i>
+              </div>
+              <input #productName type="text" placeholder="Ürün Adı Giriniz.." (click)="productName.value = ''" (keydown)="filterProducts(productName.value)"
+                class="form-control form-contol-sm">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-block pt-2">
+        <div class="row">
+          <div class="col-xl-1 col-lg-1 pr-1 pl-1">
+            <button (click)="sendCheck()" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sellButton">
+              <i class="fa fa-paper-plane fa-5x"></i>
+            </button>
+            <button data-toggle="modal" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1"
+              data-target="#noteModal" class="btn btn-warning btn-block sellButton">
+              <i class="fa fa-sticky-note fa-5x"></i>
+            </button>
+            <button (click)="undoChanges()" [disabled]="newOrders.length == 0" class="btn btn-primary btn-block sellButton">
+              <i class="fa fa-undo fa-5x"></i>
+            </button>
+            <button data-toggle="modal" data-target="#cancelProduct" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2"
+              class="btn btn-danger btn-block sellButton">
+              <i class="fa fa-times fa-5x"></i>
+            </button>
+            <button data-toggle="modal" [disabled]="check.products.length == 0 || check.status == 0" data-target="#paymentModal" class="btn btn-info btn-block sellButton">
+              <i class="fa fa-exchange fa-5x"></i>
+            </button>
+            <button (click)="printCheck()" [disabled]="check.products.length == 0 || check.status == 0" class="btn bg-inverse btn-block sellButton">
+              <i style="color:lightgray !important;" class="fa fa-print fa-5x"></i>
+            </button>
+          </div>
+          <div class="col-xl-3 col-lg-4 pr-0 pl-1">
+            <div class="card inside-height">
+              <div class="card-block check-flow p-2">
+                <div *ngFor="let item of check.products; let i = index" class="mb-2">
+                  <p [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning':selectedIndex == i}" style="cursor:pointer"
+                    (click)="selectProduct(i)" class="text-bold mb-0">
+                    <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
+                    {{item.name}}
+                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <span class="pull-right"> {{item.price}} TL</span>
+                  </p>
+                  <div *ngIf="selectedIndex == i && item.status !== 1">
+                    <small class="text-muted">
+                      <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
+                      <span class="pull-right">
+                        <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="check.discount > 0" class="card-footer p-1">
+                <button (click)="togglePayed()" class="btn btn-sm btn-secondary btn-block text-left">{{payedTitle}}
+                  <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa pull-right" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div *ngIf="check.discount > 0 && payedShow" class="card-block check-flow p-2">
+                <div *ngFor="let payment of check.payment_flow" class="mb-2">
+                  <p class="mb-0">{{payment.method}}
+                    <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
+                    <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
+                  </p>
+                  <p *ngIf="payment.discount > 0" class="text-muted m-0">
+                    <small>Direkt Para Ödemesi
+                      <span class="pull-right">{{payment.discount}} TL</span>
+                    </small>
+                  </p>
+                  <p *ngFor="let product of payment.payed_products" class="text-muted m-0">
+                    <small>{{product.name}}
+                      <span class="pull-right">{{product.price}} TL</span>
+                    </small>
+                  </p>
+                </div>
+              </div>
+              <div class="card-footer p-2">
+                <p *ngIf="check.discount > 0" class="text-muted mb-0"> Ödenen Miktar:
+                  <span class="pull-right">{{check.discount}} TL</span>
+                </p>
+                <p *ngIf="check.discount > 0" class="mb-0">
+                  <strong>Kalan Toplam:
+                    <span class="pull-right">{{check.total_price}} TL</span>
+                  </strong>
+                </p>
+                <p class="text-primary mb-2">
+                  <strong>Hesap Toplamı:
+                    <span class="pull-right">{{check.discount + check.total_price}} TL</span>
+                  </strong>
+                </p>
+                <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-8 col-lg-7">
+            <div class="row">
+              <div class="col-xl-3 col-lg-4 inside-height check-flow col-card">
+                <div class="btn-group-vertical btn-block btn-group-lg">
+                  <button (click)="fillData()" class="btn btn-secondary">Bütün Ürünler</button>
+                  <button *ngFor="let cat of categories" (click)="getProductsBy(cat._id)" class="btn btn-secondary">{{cat.name}}</button>
+                </div>
+              </div>
+              <div id="productHolder" class="col-xl-9 col-lg-8 inside-height">
+                <div *ngIf="sub_categories !== undefined && sub_categories.length > 0" class="row">
+                  <div class="col-xl-12 p-0">
+                    <div class="card-header pt-1 pb-1" style="padding:0.75rem 1.17rem;">
+                      <div class="row">
+                        <div *ngFor="let item of sub_categories" class="col p-0 pr-1 pl-1">
+                          <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-secondary btn-block">{{item.name}}</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div *ngFor="let product of products" (click)="addToCheck(product)" class="col-xl-4 col-lg-6 col-card">
+                    <div class="card mb-1 mt-1 proCard">
+                      <div class="card-block">
+                        <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
+                        <p class="card-text text-danger">
+                          <i class="fa fa-money"></i>
+                          <b> {{product.price}} TL</b>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="products == undefined || products.length == 0" class="row mt-5">
+                  <div class="col-xl-12 mt-5">
+                    <h2 class="text-center mt-3">Eşleşen Ürün Bulunamadı</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedProduct !== undefined" class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Not Ekle
+          <span *ngIf="selectedProduct !== undefined">( {{selectedProduct.name}} )</span>
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #noteForm="ngForm" (ngSubmit)="addNote(noteForm)">
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-danger btn-lg">Not Ekle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="check.products.length > 0" class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Ödeme Al</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #paymentForm="ngForm">
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-xl-6 col-lg-6">
+              <div class="card">
+                <div class="card-header">Adisyon</div>
+                <div class="card-block payment-flow p-2">
+                  <div *ngFor="let item of paymentProducts; let i = index">
+                    <p *ngIf="item.status == 2" id="payment_{{i}}" (click)="payProduct(item,i,1)" class="text-bold text-danger mb-2">{{item.name}}
+                      <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                      <span class="pull-right">{{item.price}} TL</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <p class="text-bold">Toplam
+                    <span class="pull-right">{{leftPrice}} TL</span>
+                  </p>
+                  <button [disabled]="leftPrice <= 0" (click)="changePayStatus(1)" class="btn btn-block btn-info">
+                    <i class="fa fa-long-arrow-right fa-2x"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-6 col-lg-6">
+              <div class="card">
+                <div class="card-header">Ödenecek Ürünler</div>
+                <div class="card-block payment-flow p-2">
+                  <p *ngFor="let item of productsWillPay; let i = index" (click)="payProduct(item,i,2)" id="productWP_{{i}}" class="text-bold text-danger mb-2">{{item.name}}
+                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <span class="pull-right">{{item.price}} TL</span>
+                  </p>
+                </div>
+                <div class="card-footer">
+                  <p class="text-bold">Toplam
+                    <span class="pull-right">{{rightPrice}} TL</span>
+                  </p>
+                  <button [disabled]="rightPrice <= 0" (click)="changePayStatus(2)" class="btn btn-block btn-info">
+                    <i class="fa fa-long-arrow-left fa-2x"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-12">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    Direkt Ödeme
+                  </div>
+                  <input type="number" name="pDiscount" placeholder="Direkt Para Ödeme Miktarını Giriniz.." class="form-control form-control-lg"
+                    [(ngModel)]="pDiscount">
+                  <div class="input-group-addon normal">
+                    TL
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <style>
+            .btn-block+.btn-block {
+              margin-top: 0;
+            }
+          </style>
+          <div class="btn-group btn-block btn-group-justified" style="width:100%">
+            <button type="submit" (click)="payCheck('Nakit')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
+              class="btn btn-success btn-block btn-lg">Nakit</button>
+            <button type="submit" (click)="payCheck('Kart')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
+              class="btn btn-warning btn-block btn-lg">Kart</button>
+            <button type="submit" (click)="payCheck('Kupon')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
+              class="btn btn-info btn-block btn-lg">Kupon</button>
+            <button type="submit" (click)="payCheck('İkram')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
+              class="btn btn-danger btn-block btn-lg">ikram</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="paymentMethod" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Ödeme Yöntemi Seçin</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card-deck-wrapper">
+          <div class="card-deck">
+            <div (click)="closeCheck('Nakit')" class="card card-inverse card-success text-center">
+              <div class="card-block">
+                <h4 class="card-title">Nakit</h4>
+              </div>
+            </div>
+            <div (click)="closeCheck('Kart')" class="card card-inverse card-warning text-center">
+              <div class="card-block ">
+                <h4 class="card-title">Kart</h4>
+              </div>
+            </div>
+            <div (click)="closeCheck('Kupon')" class="card card-inverse card-info text-center">
+              <div class="card-block">
+                <h4 class="card-title">Kupon</h4>
+              </div>
+            </div>
+            <div (click)="closeCheck('İkram')" class="card card-inverse card-danger text-center">
+              <div class="card-block">
+                <h4 class="card-title">İkram</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="checkNote" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Hesaba Not Ekle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #checkNoteForm="ngForm" (ngSubmit)="addCheckNote(checkNoteForm)">
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-danger btn-lg">Not Ekle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cancelProduct" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">İptal Nedeni</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #cancelForm="ngForm" (ngSubmit)="cancelProduct(cancelForm)">
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" placeholder="İptal Nedeni Giriniz..." name="description" class="form-control form-control-lg" ngModel>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-danger btn-lg">Ürünü İptal Et</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="splitTable" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Masa Değiştir</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-4 tFlow pl-1 pr-1">
+            <div class="btn-group-vertical btn-block btn-group-lg">
+              <button (click)="filterTables('')" class="btn btn-secondary">Bütün Masalar</button>
+              <button *ngFor="let floor of floors" (click)="filterTables(floor._id)" class="btn btn-secondary">{{floor.name}}</button>
+            </div>
+          </div>
+          <div class="col-xl-8 tFlow pl-0 pr-2">
+            <div class="row pr-2 pl-3">
+              <div *ngFor="let item of allTables" class="col-xl-4 pl-1 pr-1 mb-2">
+                <div [ngClass]="{'card-success': item.status == 2 , 'card-warning' : item.status == 1 , 'bg-info': item._id == selectedTable}"
+                  (click)="selectTable(item._id)" class="card">
+                  <div class="card-body p-3">
+                    <h4 class="card-title" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{item.name}}</h4>
+                    <p class="card-text">
+                      <i class="fa fa-user" aria-hidden="true"></i> {{item.capacity}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa Değiştir</button>
+      </div>
+    </div>
+  </div>
+</div>

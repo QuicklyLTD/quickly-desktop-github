@@ -1,0 +1,159 @@
+<div class="row">
+  <div id="settings-holder" class="col-lg-3">
+    <div class="card">
+      <div class="card-block text-center" [ngClass]="{'card-danger card-inverse':selected == 1}" (click)="selected = 1">
+        <h3 class="card-title">
+          <i class="fa fa-try"></i>
+        </h3>
+        <p class="card-text">Satış Raporları</p>
+      </div>
+    </div>
+    <div class="card mt-3" [ngClass]="{'card-danger card-inverse':selected == 2}" (click)="selected = 2">
+      <div class="card-block text-center">
+        <h3 class="card-title">
+          <i class="fa fa-glass"></i>
+        </h3>
+        <p class="card-text">Ürün Raporları</p>
+      </div>
+    </div>
+    <div class="card mt-3" [ngClass]="{'card-danger card-inverse':selected == 3}" (click)="selected = 3">
+      <div class="card-block text-center">
+        <h3 class="card-title">
+          <i class="fa fa-cutlery"></i>
+        </h3>
+        <p class="card-text">Masa Raporları</p>
+      </div>
+    </div>
+    <div class="card mt-3" [ngClass]="{'card-danger card-inverse':selected == 4}" (click)="selected = 4">
+      <div class="card-block text-center">
+        <h3 class="card-title">
+          <i class="fa fa-truck"></i>
+        </h3>
+        <p class="card-text">Stok Raporları</p>
+      </div>
+    </div>
+    <div class="card mt-3" [ngClass]="{'card-danger card-inverse':selected == 5}" (click)="selected = 5">
+      <div class="card-block text-center">
+        <h3 class="card-title">
+          <i class="fa fa-users"></i>
+        </h3>
+        <p class="card-text">Kullanıcı Raporları</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-9">
+    <div class="card full-height">
+      <div class="card-block">
+        <div *ngIf="selected == undefined">
+          <ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#daily" role="tab">
+                <i class="fa fa-pie-chart" aria-hidden="true"></i> Günlük Rapor</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#weekly" role="tab">
+                <i class="fa fa-bar-chart" aria-hidden="true"></i> Haftalık Rapor</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#other" role="tab">
+                <i class="fa fa-area-chart" aria-hidden="true"></i> Aktivite Raporu</a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="daily" role="tabpanel">
+              <div class="card ntb">
+                <div class="card-header">
+                  <h5 class="mt-2">Günlük Satış Raporu</h5>
+                </div>
+                <div class="card-block tab-height">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <canvas *ngIf="ChartLoaded" baseChart style="height: 430px; width:33vw; margin:auto;" [data]="pieData" [colors]="pieColors"
+                        [labels]="pieLabels" [legend]="true" chartType="pie" [options]="ChartOptions"></canvas>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="card tab-inside-height">
+                        <div class="card-header">
+                          Ayrıntılar
+                        </div>
+                        <div class="card-block">
+                          <strong>
+                            <p class="text-success mt-1">Nakit Hesap Toplam:
+                              <span class="pull-right">{{pieData[0]}} TL</span>
+                            </p>
+                            <p class="text-warning mt-2">Kart Hesap Toplam:
+                              <span class="pull-right">{{pieData[2]}} TL</span>
+                            </p>
+                            <p class="text-info mt-2">Kupon Hesap Toplam:
+                              <span class="pull-right">{{pieData[1]}} TL</span>
+                            </p>
+                            <p class="text-danger mt-2">İkram Hesap Toplam:
+                              <span class="pull-right">{{freeTotal}} TL</span>
+                            </p>
+                          </strong>
+                        </div>
+                        <div class="card-footer">
+                          <p>Açık Hesap Toplam:
+                            <span class="pull-right">{{activeTotal}} TL</span>
+                          </p>
+                          <p class="mb-0">Kapalı Hesap Toplam:
+                            <span class="pull-right">{{closedTotal}} TL</span>
+                          </p>
+                        </div>
+                        <div class="card-footer">
+                          <strong>
+                            <p class="mb-0">Cari Hesap Toplam:
+                              <span class="pull-right">{{generalTotal}} TL</span>
+                            </p>
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="weekly" role="tabpanel">
+              <div class="card ntb">
+                <div class="card-header">
+                  <h5 class="mt-2">Haftalık Satış Raporu</h5>
+                </div>
+                <div class="card-block tab-height p-0">
+                  <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:67vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
+                    [options]="ChartOptions" [legend]="ChartLegend" [colors]="ChartColors" [chartType]="ChartType"></canvas>
+                </div>
+                <div class="card-footer">
+                  <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="other" role="tabpanel">
+              <div class="card ntb">
+                <div class="card-header">
+                  <h5 class="mt-2">Zaman Bazlı Satış Aktivitesi</h5>
+                </div>
+                <div class="card-block tab-height p-0 pt-3">
+                  <canvas *ngIf="ChartLoaded" baseChart style="height: 455px; width:67vw; margin:auto;" [data]="activityData" [labels]="activityLabels"
+                    [options]="ChartOptions" [legend]="activityLegend" chartType="line"></canvas>
+                </div>
+                <div class="card-footer">
+                  <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <app-store-reports *ngIf="selected == 1"></app-store-reports>
+        <app-product-reports *ngIf="selected == 2"></app-product-reports>
+        <app-table-reports *ngIf="selected == 3"></app-table-reports>
+        <app-stock-reports *ngIf="selected == 4"></app-stock-reports>
+        <app-user-reports *ngIf="selected == 5"></app-user-reports>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+export class Check {
+    constructor(
+        public table_id: string,
+        public total_price: number,
+        public discount: number,
+        public owner: string,
+        public note: string,
+        public status: number,
+        public products: Array<CheckProduct>,
+        public timestamp: number,
+        public type: number,
+        public payment_flow?: Array<PaymentStatus>,
+        public _id?:string,
+        public _rev?:string
+    ) { }
+}
+export class ClosedCheck {
+    constructor(
+        public table_id: string,
+        public total_price: number,
+        public discount: number,
+        public owner: string,
+        public note: string,
+        public status: number,
+        public products: Array<CheckProduct>,
+        public timestamp: number,
+        public type: number,
+        public payment_method: string,
+        public payment_flow?: Array<PaymentStatus>,
+        public _id?:string,
+        public _rev?:string
+    ) { }
+}
+export class PaymentStatus {
+    constructor(
+        public owner: string,
+        public method: string,
+        public amount: number,
+        public discount: number,
+        public timestamp: number,
+        public payed_products: Array<CheckProduct>
+    ) { }
+}
+export class CheckProduct {
+    constructor(
+        public id: string,
+        public cat_id:string,
+        public name: string,
+        public price: number,
+        public note: string,
+        public status: number,
+        public owner: string,
+        public timestamp: number
+    ) { }
+}

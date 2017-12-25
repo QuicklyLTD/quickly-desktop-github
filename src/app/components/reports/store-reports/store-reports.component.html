@@ -1,0 +1,316 @@
+<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#normal" role="tab">
+      <i class="fa fa-th" aria-hidden="true"></i> Normal Satış</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#fast" role="tab">
+      <i class="fa fa-clock-o" aria-hidden="true"></i> Hızlı Satış</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#gift" role="tab">
+      <i class="fa fa-trash-o" aria-hidden="true"></i> İptal</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="normal" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Normal Satış</h5>
+      </div>
+      <div class="card-block tab-height">
+        <div class="row">
+          <div class="col-lg-4 pr-0 pl-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">Filtreleme</div>
+              <div class="card-block p-0">
+                <div class="list-group">
+                  <button type="button" (click)="fillData()" class="list-group-item list-group-item-action list-eq">Bütün Masalar</button>
+                  <button type="button" (click)="getNormalChecksBy('Parçalı')" class="list-group-item list-group-item-action bg-primary text-white list-eq">Parçalı</button>
+                  <button type="button" (click)="getNormalChecksBy('Nakit')" class="list-group-item list-group-item-action list-group-item-success list-eq">Nakit</button>
+                  <button type="button" (click)="getNormalChecksBy('Kart')" class="list-group-item list-group-item-action list-group-item-warning list-eq">Kart</button>
+                  <button type="button" (click)="getNormalChecksBy('Kupon')" class="list-group-item list-group-item-action list-group-item-info list-eq">Kupon</button>
+                  <button type="button" (click)="getNormalChecksBy('İkram')" class="list-group-item list-group-item-action list-group-item-danger list-eq">İkram</button>
+                </div>
+              </div>
+              <div class="card-footer">
+                <strong>
+                  Normal Hesap Toplamı:
+                  <span class="pull-right">{{NormalTotal}} TL</span>
+                </strong>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 pr-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                <div class="row">
+                  <div class="col-lg-6">
+                    Masalar
+                  </div>
+                  <div class="col-lg-6 pr-2">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-addon normal">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                      </div>
+                      <input #tableName type="text" placeholder="Masa Adı Giriniz.." (click)="fillData(); tableName.value = '';" (keyup)="filterTables(tableName.value)"
+                        class="form-control form-contol-sm">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-block p-0 flow">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="thead-inverse">
+                    <tr>
+                      <th width="5%">#</th>
+                      <th width="25%">Masa</th>
+                      <th width="20%">Tutar</th>
+                      <th width="20%">Saat</th>
+                      <th width="20%">Ödeme Tipi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let check of NormalChecks let i = index;" (click)="getDetail(check)">
+                      <td>{{i+1}}</td>
+                      <td>{{check.table_id | general:'tables' | async}}</td>
+                      <td>{{check.total_price}} TL</td>
+                      <td>{{check.timestamp | date:"HH:mm" }}</td>
+                      <td>{{check.payment_method}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <h3 *ngIf="NormalChecks == undefined || NormalChecks.length == 0" class="text-center mt-5">Eşleşen Hesap Bulunamadı</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="fast" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Hızlı Satış</h5>
+      </div>
+      <div class="card-block tab-height">
+        <div class="row">
+          <div class="col-lg-4 pl-2 pr-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">Filtreleme</div>
+              <div class="card-block p-0">
+                <div class="list-group">
+                  <button type="button" (click)="fillData()" class="list-group-item list-group-item-action list-eq">Bütün Hesaplar</button>
+                  <button type="button" (click)="getFastChecksBy('Nakit')" class="list-group-item list-group-item-action list-group-item-success list-eq">Nakit</button>
+                  <button type="button" (click)="getFastChecksBy('Kart')" class="list-group-item list-group-item-action list-group-item-warning list-eq">Kart</button>
+                  <button type="button" (click)="getFastChecksBy('Kupon')" class="list-group-item list-group-item-action list-group-item-info list-eq">Kupon</button>
+                  <button type="button" (click)="getFastChecksBy('İkram')" class="list-group-item list-group-item-action list-group-item-danger list-eq">İkram</button>
+                </div>
+              </div>
+              <div class="card-footer">
+                <strong>
+                  Hızlı Hesap Toplamı:
+                  <span class="pull-right">{{FastTotal}} TL</span>
+                </strong>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 pr-2">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                <div class="row">
+                  <div class="col-lg-6">
+                    Hesaplar
+                  </div>
+                  <div class="col-lg-6 pr-2">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-addon normal">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                      </div>
+                      <input #ownerName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="fillData(); ownerName.value = '';"
+                        (keyup)="filterChecks(ownerName.value)" class="form-control form-contol-sm">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-block p-0 flow">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="thead-inverse">
+                    <tr>
+                      <th width="5%">#</th>
+                      <th width="25%">Hesap Türü</th>
+                      <th width="20%">Tutar</th>
+                      <th width="20%">Saat</th>
+                      <th width="20%">Kullanıcı</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let check of FastChecks let i = index;" (click)="getDetail(check)">
+                      <td>{{i+1}}</td>
+                      <td>{{check.table_id}}</td>
+                      <td>{{check.total_price}} TL</td>
+                      <td>{{check.timestamp | date:"HH:mm" }}</td>
+                      <td>{{check.owner}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <h3 *ngIf="FastChecks == undefined || FastChecks.length == 0" class="text-center mt-5">Eşleşen Hesap Bulunamadı</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="gift" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">İptal Edilen Hesaplar</h5>
+      </div>
+      <div class="card-block p-0 tab-height full-flow">
+        <div class="row">
+          <div class="col-lg-12">
+            <table class="table table-bordered table-striped table-hover">
+              <thead>
+                <tr class="thead-inverse">
+                  <th width="5%">#</th>
+                  <th width="15%">Masa</th>
+                  <th width="25%">Açıklama</th>
+                  <th width="10%">Tür</th>
+                  <th width="10%">Tutar</th>
+                  <th width="10%">Saat</th>
+                  <th width="10%">Kullanıcı</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let check of NotPayedChecks let i = index;" (click)="getDetail(check)">
+                  <td>{{i+1}}</td>
+                  <td>{{check.table_id | general:'tables' | async}}</td>
+                  <td>{{check.description}}</td>
+                  <td>{{check.payment_method}}</td>
+                  <td>{{check.total_price}} TL</td>
+                  <td>{{check.timestamp | date:"HH:mm" }}</td>
+                  <td>{{check.owner}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reportDetail" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Hesap Detayı
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="card tab-inside-height">
+          <div class="card-header">
+            <b>{{checkDetail?.table_id | general:'tables' | async}}
+              <small class="text-muted"> ({{checkDetail?.timestamp | date:'dd/M/y HH:mm'}})</small>
+            </b>
+            <span class="pull-right text-muted"> Hesap Türü : {{checkDetail?.payment_method}}</span>
+          </div>
+          <div class="card-block flow p-0">
+            <table *ngIf="checkDetail?.payment_method != 'Parçalı'" class="table table-striped table-bordered mb-0">
+              <tbody>
+                <tr *ngFor="let item of checkDetail?.products; let i = index;" [ngClass]="{'table-danger': item.status == 3}">
+                  <td width="4%">{{i+1}}</td>
+                  <td width="50%">{{item.name}}
+                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                  </td>
+                  <td width="14%">{{item.owner}}</td>
+                  <td width="14%">{{item.timestamp |date:'HH:mm'}}</td>
+                  <td width="17%">{{item.price}} TL</td>
+                </tr>
+              </tbody>
+            </table>
+            <section *ngIf="checkDetail?.payment_method == 'Parçalı'">
+              <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-striped mb-0">
+                <thead class="thead-inverse">
+                  <th colspan="2">{{item.owner}}</th>
+                  <th>{{item.method}}</th>
+                  <th>{{item.timestamp | date:'HH:mm'}}</th>
+                  <th>{{item.amount + item.discount}} TL</th>
+                </thead>
+                <tbody>
+                  <tr *ngIf="item.discount > 0" class="table-info">
+                    <td width="4%">
+                      <i class="fa fa-diamond" aria-hidden="true"></i>
+                    </td>
+                    <td width="48%">Direkt Para Ödemesi</td>
+                    <td width="15%"></td>
+                    <td width="15%"></td>
+                    <td width="17%">{{item.discount}} TL</td>
+                  </tr>
+                  <tr *ngFor="let product of item.payed_products; let i = index;" [ngClass]="{'table-danger': product.status == 3}">
+                    <td width="4%">{{i+1}}</td>
+                    <td width="48%">{{product.name}}
+                      <small *ngIf="product.note !== ''" class="text-muted">({{product.note}})</small>
+                    </td>
+                    <td width="15%">{{product.owner}}</td>
+                    <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
+                    <td width="17%">{{product.price}} TL</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+          </div>
+          <div class="card-footer">
+            <b>
+              <i class="fa fa-user" aria-hidden="true"></i> {{checkDetail?.owner}}
+              <span class="pull-right">{{checkDetail?.total_price}} TL</span>
+            </b>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button *ngIf="checkDetail?.type !== 3" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">Hesabı İptal Et</button>
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="checkDetail" class="modal fade" id="cancelDetail" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Hesap İptal Detayı</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <div class="input-group-addon">
+            İptal Nedeni
+          </div>
+          <input #cancelNote type="text" class="form-control form-control-lg" placeholder="Açıklama Giriniz">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button (click)="cancelCheck(checkDetail._id,cancelNote.value)" class="btn btn-danger btn-lg">İptal Et</button>
+      </div>
+    </div>
+  </div>
+</div>
