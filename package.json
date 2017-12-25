@@ -40,7 +40,7 @@
     "@angular/platform-browser-dynamic": "5.0.3",
     "@angular/router": "5.0.3",
     "animate.css": "^3.5.2",
-    "bootstrap": "^4.0.0-beta",
+    "bootstrap": "^4.0.0-alpha.6",
     "core-js": "2.4.1",
     "enhanced-resolve": "3.3.0",
     "escpos": "^2.4.5",

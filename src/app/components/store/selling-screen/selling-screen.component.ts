@@ -212,7 +212,8 @@ export class SellingScreenComponent implements OnInit {
     }
     this.check.payment_flow.push(pFlow);
     this.check.type = 3;
-    this.mainService.updateData('checks', this.check_id, this.check).then(() => {
+    this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
+      this.check._rev = res.rev;
       this.deProducts = [];
       this.productsWillPay = [];
       this.productsWillBack = [];
