@@ -18,8 +18,13 @@ export class KeyboardService {
     return this.signal.asObservable();
   }
 
-  listenInput(): Observable<ElementRef>{
+  listenInput(): Observable<ElementRef> {
     return this.input.asObservable();
+  }
+
+  syncInputs(element: ElementRef) {
+    this.input.next(element);
+    console.log('changed');
   }
 
 }

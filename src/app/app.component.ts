@@ -14,7 +14,7 @@ import { ApplicationService } from './services/application.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '0.2.0';
+  version = '0.3.0';
   date: number;
   windowStatus: boolean;
   connectionStatus: boolean;
@@ -33,7 +33,11 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     if(new Date().getDay() !== this.settingsService.getDay().day){
-      alert('Gün Sonu Yapılmamış.')
+      if(this.settingsService.getDay().started){
+        alert('Gün Sonu Yapılmamış.');
+      }else{
+        alert('Gün Başlangıcı Yapmalısınız.');
+      }
     }
     setInterval(() => {
       this.connectionStatus = this.aplicationService.connectionStatus();
