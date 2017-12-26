@@ -104,7 +104,7 @@ export class MainService {
     });
   }
 
-  removeDoc(db,doc){
+  removeDoc(db, doc) {
     return this.LocalDB[db].remove(doc);
   }
 
@@ -156,8 +156,7 @@ export class MainService {
     return PouchDB.sync(this.LocalDB[db], this.RemoteDB, {
       live: true,
       retry: true
-    })
-      .on('change', (sync) => {
+    }).on('change', (sync) => {
         console.warn(sync);
         // switch (sync.direction) {
         //   case 'push':
@@ -179,14 +178,17 @@ export class MainService {
         // }
       })
       .on('paused', function (err) {
+        console.log('Sync Paused..');
       })
       .on('active', function () {
+        console.log('Syncing...');
       }).on('denied', function (err) {
         console.warn(err);
+        console.log('Sync Denied..');
       }).on('complete', function (info) {
         console.log('Sync Complate', info);
       }).on('error', function (err) {
-        console.warn(err);
+        console.error(err);
       });
   }
 }
