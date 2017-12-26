@@ -6,6 +6,12 @@
     "baseUrl": "",
     "types": []
   },
+  "files": [
+      "typings.d.ts",
+      "polyfills.ts",
+      "app/app.module.ts",
+      "main.ts"
+  ],
   "exclude": [
     "test.ts",
     "**/*.spec.ts"

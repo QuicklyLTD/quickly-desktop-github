@@ -224,9 +224,10 @@ function getPlugins() {
       "exclude": []
     }));
 
-    plugins.push(new UglifyJsPlugin({
-      "sourceMap": false
-    }));
+    //// ERROR !!
+    // plugins.push(new UglifyJsPlugin({
+    //   "sourceMap": false
+    // }));
 
   } else {
     plugins.push(new AngularCompilerPlugin({
@@ -539,9 +540,9 @@ module.exports = {
         ]
       },
       {
-        "test": /\.ts$/,
-        "use": "@ngtools/webpack"
-      }
+        "test": /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+        "loader": "@ngtools/webpack"
+      },
     ]
   },
   "plugins": getPlugins(),

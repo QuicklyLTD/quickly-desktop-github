@@ -24,7 +24,6 @@ export class KeyboardService {
 
   syncInputs(element: ElementRef) {
     this.input.next(element);
-    console.log('changed');
   }
 
 }

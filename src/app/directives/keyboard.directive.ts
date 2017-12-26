@@ -13,7 +13,7 @@ export class KeyboardDirective {
 
   @HostListener('click') onClick() {
     this.keyboardService.triggerKeyboard('Open', this.element);
-    this.keyboardService.syncInputs(this.element);
+   // this.keyboardService.syncInputs(this.element);
   }
   @HostListener('input') onInput() {
     this.element.nativeElement.focus();

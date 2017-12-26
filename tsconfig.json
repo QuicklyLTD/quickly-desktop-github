@@ -9,8 +9,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowJs": false,
-    "module": "esnext",
-    "target": "es2016",
+    "target": "es2017",
     "paths": {
       "environments": [
         "./environments"
@@ -24,8 +23,9 @@
       "node_modules/@types"
     ],
     "lib": [
-      "es2016",
-      "dom"
+      "es2017",
+      "dom",
+      "esnext"
     ]
   },
   "exclude": [
