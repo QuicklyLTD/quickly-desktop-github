@@ -107,7 +107,8 @@
                     <span class="pull-right">{{check.discount + check.total_price}} TL</span>
                   </strong>
                 </p>
-                <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button>
+                <button [routerLink]="['/payment', id]" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button>
+                <!-- <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button> -->
               </div>
             </div>
           </div>
@@ -119,34 +120,36 @@
                   <button *ngFor="let cat of categories" (click)="getProductsBy(cat._id)" class="btn btn-secondary">{{cat.name}}</button>
                 </div>
               </div>
-              <div id="productHolder" class="col-xl-9 col-lg-8 inside-height">
-                <div *ngIf="sub_categories !== undefined && sub_categories.length > 0" class="row">
-                  <div class="col-xl-12 p-0">
-                    <div class="card-header pt-1 pb-1" style="padding:0.75rem 1.17rem;">
-                      <div class="row">
+              <div class="col-xl-9 col-lg-8  pr-0 pl-0">
+                <div class="card inside-height">
+                  <div *ngIf="sub_categories !== undefined && sub_categories.length > 0">
+                    <div class="card-header pt-1 pb-1 pr-4 pl-1">
+                      <div class="row ml-1 mr-0">
                         <div *ngFor="let item of sub_categories" class="col p-0 pr-1 pl-1">
-                          <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-secondary btn-block">{{item.name}}</button>
+                          <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning btn-block">{{item.name}}</button>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div *ngFor="let product of products" (click)="addToCheck(product)" class="col-xl-4 col-lg-6 col-card">
-                    <div class="card mb-1 mt-1 proCard">
-                      <div class="card-block">
-                        <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
-                        <p class="card-text text-danger">
-                          <i class="fa fa-money"></i>
-                          <b> {{product.price}} TL</b>
-                        </p>
+                  <div id="productHolder" class="card-block pt-0 flow">
+                    <div class="row">
+                      <div *ngFor="let product of products" (click)="addToCheck(product)" class="col-xl-4 col-lg-6 col-card">
+                        <div class="card mb-1 mt-1 proCard">
+                          <div class="card-block">
+                            <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
+                            <p class="card-text text-danger">
+                              <i class="fa fa-money"></i>
+                              <b> {{product.price}} TL</b>
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div *ngIf="products == undefined || products.length == 0" class="row mt-5">
-                  <div class="col-xl-12 mt-5">
-                    <h2 class="text-center mt-3">Eşleşen Ürün Bulunamadı</h2>
+                    <div *ngIf="products == undefined || products.length == 0" class="row mt-5">
+                      <div class="col-xl-12 mt-5">
+                        <h2 class="text-center mt-3">Eşleşen Ürün Bulunamadı</h2>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

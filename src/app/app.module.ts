@@ -19,6 +19,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 //Store Child Components
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { FastSellingComponent } from './components/store/fast-selling/fast-selling.component';
+import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
 //Settings Child Components
 import { UserSettingsComponent } from './components/settings/user-settings/user-settings.component';
 import { MenuSettingsComponent } from './components/settings/menu-settings/menu-settings.component';
@@ -52,7 +53,7 @@ import { KeyboardComponent } from './components/helpers/keyboard/keyboard.compon
 import { MessageComponent } from './components/helpers/message/message.component';
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
-import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
+
 
 // Error Handler Sentry
 // import * as Raven from 'raven-js';
@@ -83,6 +84,7 @@ import { PaymentScreenComponent } from './components/store/payment-screen/paymen
     MessageComponent,
     KeyboardComponent,
     FastSellingComponent,
+    PaymentScreenComponent,
     StockSettingsComponent,
     StoreReportsComponent,
     ProductReportsComponent,
@@ -91,7 +93,6 @@ import { PaymentScreenComponent } from './components/store/payment-screen/paymen
     UserReportsComponent,
     GeneralPipe,
     KeyboardDirective,
-    PaymentScreenComponent
   ],
   imports: [
     BrowserModule,
