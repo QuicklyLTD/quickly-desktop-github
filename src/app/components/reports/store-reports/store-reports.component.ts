@@ -1,12 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
+import { PrinterService } from '../../../providers/printer.service';
 import { ClosedCheck, Check } from '../../../mocks/check.mock';
+import { SettingsService } from 'app/services/settings.service';
 
 @Component({
   selector: 'app-store-reports',
   templateUrl: './store-reports.component.html',
-  styleUrls: ['./store-reports.component.scss']
+  styleUrls: ['./store-reports.component.scss'],
+  providers: [SettingsService]
 })
+
 export class StoreReportsComponent implements OnInit {
   AllChecks: Array<ClosedCheck>;
   FastChecks: Array<ClosedCheck>;
@@ -16,9 +21,13 @@ export class StoreReportsComponent implements OnInit {
   selectedCat: any;
   NormalTotal: number = 0;
   FastTotal: number = 0;
+  printers: Array<any>;
 
-  constructor(private mainService: MainService) {
+  constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService) {
     this.fillData();
+    this.settingsService.getPrinters().subscribe(res => {
+      this.printers = res.value;
+    });
   }
 
   ngOnInit() {
@@ -63,6 +72,23 @@ export class StoreReportsComponent implements OnInit {
     }
   }
 
+  rePrintCheck(check) {
+    this.mainService.getData('tables', check.table_id).then(res => {
+      if (check.products.length > 0) {
+        this.printerService.printCheck(this.printers[0], res.name, check);
+      } else {
+        check.products = check.payment_flow.reduce((a, b) => a.payed_products.concat(b.payed_products));
+        this.printerService.printCheck(this.printers[0], res.name, check);
+      }
+    }).catch(err => {
+      this.printerService.printCheck(this.printers[0], check.table_id, check);
+    });
+  }
+
+  editCheck(form:NgForm) {
+    console.log(form.value);
+  }
+
   cancelCheck(id, note) {
     let isOK = confirm('Kapanmış Hesap İptal Edilecek. Bu İşlem Geri Alınamaz!');
     if (isOK) {
@@ -72,7 +98,6 @@ export class StoreReportsComponent implements OnInit {
       });
     }
   }
-
 
   fillData() {
     this.mainService.getAllBy('closed_checks', {}).then(res => {

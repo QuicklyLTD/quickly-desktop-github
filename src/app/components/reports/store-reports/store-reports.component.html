@@ -131,8 +131,8 @@
                       <div class="input-group-addon normal">
                         <i class="fa fa-search" aria-hidden="true"></i>
                       </div>
-                      <input #ownerName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="fillData(); ownerName.value = '';"
-                        (keyup)="filterChecks(ownerName.value)" class="form-control form-contol-sm">
+                      <input #ownerName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="fillData(); ownerName.value = '';" (keyup)="filterChecks(ownerName.value)"
+                        class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
@@ -282,9 +282,13 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button *ngIf="checkDetail?.type !== 3" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">Hesabı İptal Et</button>
-        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+      <div class="modal-footer pr-2 text-center">
+        <button *ngIf="checkDetail?.type !== 3" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">
+          <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
+        <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
+          <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
+        <button type="button" class="btn btn-success btn-lg mr-1" data-toggle="modal" data-dismiss="modal" data-target="#editCheck">
+          <i class="fa fa-edit" aria-hidden="true"></i> Hesap Düzelt</button>
       </div>
     </div>
   </div>
@@ -311,6 +315,34 @@
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
         <button (click)="cancelCheck(checkDetail._id,cancelNote.value)" class="btn btn-danger btn-lg">İptal Et</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="checkDetail" class="modal fade" id="editCheck" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Hesap Düzenle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #checkEdit="ngForm" (ngSubmit)="editCheck(checkEdit)">
+        <div class="modal-body">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">TEST</div>
+              <input type="text" class="form-control" name="price" ngModel>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-success btn-lg">
+            <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

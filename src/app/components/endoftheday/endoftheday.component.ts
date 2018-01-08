@@ -90,6 +90,9 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepChecks() {
+    // this.mainService.compactBeforeSync('closed_checks');
+    // this.mainService.compactBeforeSync('reports');
+    // this.mainService.compactBeforeSync('cashbox');
     this.mainService.getAllBy('closed_checks', {}).then(res => {
       this.checks = res.docs;
       const checksBackup = new BackupData('closed_checks', this.checks);
@@ -181,9 +184,6 @@ export class EndofthedayComponent implements OnInit {
     this.mainService.addData('endday', this.endDayReport).then(res => {
       this.electronService.backupData(this.backupData, this.endDayReport.time);
       this.printerService.printReport(this.printers[0], this.endDayReport);
-      // this.mainService.compactBeforeSync('closed_checks');
-      // this.mainService.compactBeforeSync('reports');
-      // this.mainService.compactBeforeSync('cashbox');
       localStorage.setItem('DayStatus', '{"started":false, "day":' + this.settings.getDay().day + ', "time": ' + Date.now() + '}');
       this.fillData();
       this.messageService.sendMessage('Program Tekrar Başlatılıyor...');
