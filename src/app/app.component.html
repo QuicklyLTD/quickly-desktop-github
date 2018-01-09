@@ -40,7 +40,7 @@
         <form class="form-inline my-2 my-lg-0 text-white">
           <span class="mr-3">{{date | date:'d / M / y'}}</span>
           <i class="fa fa-circle mr-3" [ngClass]="connectionStatus ? 'text-success': 'text-warning'"></i>
-          <span class="mr-3" (click)="makeAdmin()">{{description}} v{{version}} </span>
+          <span class="mr-3" data-toggle="modal" data-dismiss="modal" data-target="#adminModal">{{description}} v{{version}} </span>
           <i class="fa fa-arrows-alt mr-3" (click)="changeWindow()" aria-hidden="true"></i>
           <i class="fa fa-sign-out" (click)="exitProgram()"> Çıkış</i>
         </form>
@@ -56,4 +56,24 @@
   </section>
   <app-message></app-message>
   <app-keyboard></app-keyboard>
+
+  <div class="modal fade" id="adminModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modelTitleId">Uygulama Konsolu</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input #adminPass type="password" placeholder="Şifre Giriniz" class="form-control form-control-lg">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="button" (click)="makeAdmin(adminPass.value); adminPass.value = '';"  class="btn btn-primary btn-lg">Giriş Yap</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>

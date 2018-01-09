@@ -11,6 +11,7 @@ import { EndofthedayComponent } from './components/endoftheday/endoftheday.compo
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { FastSellingComponent } from './components/store/fast-selling/fast-selling.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
+import { AdminComponent } from './components/admin/admin.component';
 import { CanActivateViaAuthGuard, AnonymousCanActivate, SetupFinished, DayStarted } from './guards/auth.guard.service';
 import { AuthService } from "./services/auth.service";
 
@@ -48,6 +49,10 @@ const routes: Routes = [
     path: 'settings',
     component: SettingsComponent,
     canActivate: [CanActivateViaAuthGuard]
+  },
+    {
+    path: 'admin',
+    component: AdminComponent
   },
   {
     path: 'selling-screen/:id',

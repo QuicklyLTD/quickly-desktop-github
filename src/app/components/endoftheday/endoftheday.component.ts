@@ -90,9 +90,8 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepChecks() {
-    // this.mainService.compactBeforeSync('closed_checks');
-    // this.mainService.compactBeforeSync('reports');
-    // this.mainService.compactBeforeSync('cashbox');
+    
+
     this.mainService.getAllBy('closed_checks', {}).then(res => {
       this.checks = res.docs;
       const checksBackup = new BackupData('closed_checks', this.checks);
@@ -103,6 +102,7 @@ export class EndofthedayComponent implements OnInit {
       } catch (error) {
         console.log('İptal Hesap Bulunamadı..')
       }
+      this.mainService.compactBeforeSync('closed_checks');
       this.checks.forEach(element => {
         this.mainService.removeDoc('closed_checks', element);
       });
@@ -117,6 +117,7 @@ export class EndofthedayComponent implements OnInit {
       this.cashbox = res.docs;
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
+      this.mainService.compactBeforeSync('cashbox');
       this.cashbox.forEach(element => {
         this.mainService.removeDoc('cashbox', element);
       });
@@ -135,6 +136,7 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepReports() {
+    console.log(this.settings.getDay().day)
     this.mainService.getAllBy('reports', {}).then(res => {
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);
@@ -142,6 +144,7 @@ export class EndofthedayComponent implements OnInit {
       ////////////////////////////////////////////////////////////////////
       const activities = res.docs.filter(obj => obj.type == 'Activity');
       const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
+      this.mainService.compactBeforeSync('reports');
       activities.forEach(element => {
         this.mainService.changeData('reports', element._id, (doc) => {
           doc.activity = [];

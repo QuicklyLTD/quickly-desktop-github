@@ -156,8 +156,11 @@ export class MainService {
     return PouchDB.sync(this.LocalDB[db], this.RemoteDB, {
       live: true,
       retry: true
-    }).on('change', (sync) => {
-        console.warn(sync);
+      }).on('change', (sync) => {
+        // if(sync.direction == 'pull'){
+        //
+        // }
+
         // switch (sync.direction) {
         //   case 'push':
         //     break;
@@ -179,8 +182,7 @@ export class MainService {
       })
       .on('paused', function (err) {
         console.log('Sync Paused..');
-      })
-      .on('active', function () {
+      }).on('active', function () {
         console.log('Syncing...');
       }).on('denied', function (err) {
         console.warn(err);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { PrinterService } from '../../../providers/printer.service';
@@ -22,6 +22,7 @@ export class StoreReportsComponent implements OnInit {
   NormalTotal: number = 0;
   FastTotal: number = 0;
   printers: Array<any>;
+  @ViewChild('checkEdit') editForm: NgForm;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService) {
     this.fillData();
@@ -85,7 +86,7 @@ export class StoreReportsComponent implements OnInit {
     });
   }
 
-  editCheck(form:NgForm) {
+  editCheck(form: NgForm) {
     console.log(form.value);
   }
 

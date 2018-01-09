@@ -53,6 +53,7 @@ import { KeyboardComponent } from './components/helpers/keyboard/keyboard.compon
 import { MessageComponent } from './components/helpers/message/message.component';
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
+import { AdminComponent } from './components/admin/admin.component';
 
 
 // Error Handler Sentry
@@ -93,6 +94,7 @@ import { KeyboardDirective } from './directives/keyboard.directive';
     UserReportsComponent,
     GeneralPipe,
     KeyboardDirective,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,

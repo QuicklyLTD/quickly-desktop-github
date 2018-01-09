@@ -67,8 +67,14 @@ export class AppComponent implements OnInit {
     }
   }
 
-  makeAdmin() {
-    this.electronService.openDevTools();
+  makeAdmin(pass) {
+    if(pass === 'asdtd155+1'){
+      this.router.navigate(['/admin']);
+      this.electronService.openDevTools();
+    }else{
+      alert('Yanlış Şifre');
+    }
+    $('#adminModal').modal('hide');
   }
 
   changeWindow() {
