@@ -4,6 +4,7 @@ import { MainService } from '../../../services/main.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { ClosedCheck, Check } from '../../../mocks/check.mock';
 import { SettingsService } from 'app/services/settings.service';
+import { MessageService } from 'app/providers/message.service';
 
 @Component({
   selector: 'app-store-reports',
@@ -24,7 +25,7 @@ export class StoreReportsComponent implements OnInit {
   printers: Array<any>;
   @ViewChild('checkEdit') editForm: NgForm;
 
-  constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService) {
+  constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService, private messageService: MessageService) {
     this.fillData();
     this.settingsService.getPrinters().subscribe(res => {
       this.printers = res.value;
@@ -87,7 +88,46 @@ export class StoreReportsComponent implements OnInit {
   }
 
   editCheck(form: NgForm) {
-    console.log(form.value);
+    let Form = form.value;
+    if (this.checkDetail.payment_method !== Form.payment_method) {
+      this.mainService.getAllBy('reports', { connection_id: this.checkDetail.payment_method }).then(res => {
+        let docReport = res.docs[0];
+        this.mainService.changeData('reports', docReport._id, (doc) => {
+          doc.weekly[this.settingsService.getDay().day] -= this.checkDetail.total_price;
+          doc.weekly_count[this.settingsService.getDay().day]--
+          return doc;
+        });
+      });
+      this.mainService.getAllBy('reports', { connection_id: Form.payment_method }).then(res => {
+        let docReport = res.docs[0];
+        this.mainService.changeData('reports', docReport._id, (doc) => {
+          doc.weekly[this.settingsService.getDay().day] += Form.total_price;
+          doc.weekly_count[this.settingsService.getDay().day]++
+          return doc;
+        });
+      });
+      this.mainService.updateData('closed_checks', this.checkDetail._id, { total_price: Form.total_price, payment_method: Form.payment_method }).then(res => {
+        this.messageService.sendMessage('Hesap Düzenlendi!');
+        $('#editCheck').modal('hide');
+      });
+    } else {
+      if (this.checkDetail.total_price !== Form.total_price) {
+        this.mainService.getAllBy('reports', { connection_id: this.checkDetail.payment_method }).then(res => {
+          let docReport = res.docs[0];
+          this.mainService.changeData('reports', docReport._id, (doc) => {
+            doc.weekly[this.settingsService.getDay().day] -= this.checkDetail.total_price;
+            doc.weekly[this.settingsService.getDay().day] += Form.total_price;
+            return doc;
+          });
+        });
+        this.mainService.updateData('closed_checks', this.checkDetail._id, { total_price: Form.total_price }).then(res => {
+          this.messageService.sendMessage('Hesap Düzenlendi!');
+          $('#editCheck').modal('hide');
+        });
+      } else {
+        return false;
+      }
+    }
   }
 
   cancelCheck(id, note) {

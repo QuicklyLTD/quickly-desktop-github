@@ -2,13 +2,52 @@
   <div class="card-header">Uygulama Konsolu</div>
   <div class="card-body p-2">
     <div class="row">
-      <div class="col-lg-3">
+      <div class="col-lg-3 pr-1">
         <div class="card inside-height">
           <div class="card-header">Veritabanı</div>
-          <div class="card-body">
- 
+          <div class="card-body flow">
+            <div class="list-group">
+              <button *ngFor="let db of databases" type="button" [ngClass]="{'list-group-item-warning': selectedDB == db}" (click)="showDatabase(db)" class="list-group-item list-group-item-action list-eq">{{db}}</button>
+            </div>
           </div>
         </div>
+      </div>
+      <div class="col-lg-6 pl-0">
+        <div class="card inside-height">
+          <div class="card-header">Dökümanlar
+            <span class="pull-right badge badge-warning">{{documents?.total_rows}}</span>
+          </div>
+          <div class="card-block p-0 flow">
+            <table class="table table-hover table-striped">
+              <tbody>
+                <tr *ngFor="let item of documents?.rows" (click)="showDocument(item.doc)">
+                  <td>{{item.doc | json}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="docModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">Döküman Düzenle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea #editArea rows="25" class="form-control">{{selectedDoc | json }}</textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button type="button" (click)="removeDocument(selectedDoc?._id)" class="btn btn-danger btn-lg">Sil</button>
+        <button type="button" (click)="editDocument(editArea.value)" class="btn btn-success btn-lg">Kaydet</button>
       </div>
     </div>
   </div>

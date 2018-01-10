@@ -136,7 +136,6 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepReports() {
-    console.log(this.settings.getDay().day)
     this.mainService.getAllBy('reports', {}).then(res => {
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);

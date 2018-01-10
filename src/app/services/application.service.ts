@@ -48,7 +48,7 @@ export class ApplicationService {
         this.timer = this.appLockTime;
         this.countDown = setInterval(() => {
           if (this.timer == 0) {
-            if (this.router.url === '/' || this.router.url === '/settings' || this.router.url === '/reports' || this.router.url === '/setup') {
+            if (this.router.url === '/' || this.router.url === '/settings' || this.router.url === '/reports' || this.router.url === '/setup' || this.router.url === '/admin') {
               this.timer = this.appLockTime;
             } else {
               this.timer = this.appLockTime;
