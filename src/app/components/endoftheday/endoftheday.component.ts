@@ -29,8 +29,10 @@ export class EndofthedayComponent implements OnInit {
   reports: Array<Report>;
   cashbox: Array<Cashbox>;
   selectedEndDay: EndDay;
+  progress:string;
 
   constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settings: SettingsService) {
+    this.progress = '100%';
     this.isStarted = this.settings.getDay().started;
     this.day = this.settings.getDay().day;
     this.owner = this.settings.getUser('id');
@@ -66,6 +68,16 @@ export class EndofthedayComponent implements OnInit {
       });
       this.messageService.sendMessage('Gün Başlatıldı.');
       if (this.settings.getDay().day == 1) {
+        this.mainService.getAllBy('reports', {}).then(res => {
+          let reports = res.docs.filter(obj => obj.type !== 'Activity');
+          reports.forEach(element => {
+            this.mainService.changeData('reports', element._id, (doc) => {
+              doc.weekly = [0, 0, 0, 0, 0, 0, 0];
+              doc.weekly_count = [0, 0, 0, 0, 0, 0, 0];
+              return doc;
+            });
+          });
+        });
         localStorage.setItem('WeekStatus', '{"started": true, "time": ' + Date.now() + '}');
       }
       this.isStarted = true;
@@ -78,6 +90,7 @@ export class EndofthedayComponent implements OnInit {
       this.mainService.getAllBy('checks', {}).then((res) => {
         let date = Date.now();
         if (res.docs.length == 0) {
+          $('#endDayModal').modal('show');
           this.stepChecks();
         } else {
           alert('Ödemesi Alınmamış Hesaplar Var..!');
@@ -90,8 +103,6 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepChecks() {
-    
-
     this.mainService.getAllBy('closed_checks', {}).then(res => {
       this.checks = res.docs;
       const checksBackup = new BackupData('closed_checks', this.checks);
@@ -143,7 +154,6 @@ export class EndofthedayComponent implements OnInit {
       ////////////////////////////////////////////////////////////////////
       const activities = res.docs.filter(obj => obj.type == 'Activity');
       const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
-      this.mainService.compactBeforeSync('reports');
       activities.forEach(element => {
         this.mainService.changeData('reports', element._id, (doc) => {
           doc.activity = [];
@@ -170,7 +180,6 @@ export class EndofthedayComponent implements OnInit {
       let cardTotal = this.reports.filter(obj => obj.connection_id == 'Kart')[0].weekly[this.day];
       let couponTotal = this.reports.filter(obj => obj.connection_id == 'Kupon')[0].weekly[this.day];
       let freeTotal = this.reports.filter(obj => obj.connection_id == 'İkram')[0].weekly[this.day];
-
       this.endDayReport.cash_total = cashTotal;
       this.endDayReport.card_total = cardTotal;
       this.endDayReport.coupon_total = couponTotal;
@@ -192,7 +201,7 @@ export class EndofthedayComponent implements OnInit {
       this.isStarted = false;
       setTimeout(() => {
         this.electronService.reloadProgram();
-      }, 3000);
+      }, 5000);
     });
   }
 

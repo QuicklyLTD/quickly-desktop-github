@@ -108,6 +108,7 @@ export class StoreReportsComponent implements OnInit {
       });
       this.mainService.updateData('closed_checks', this.checkDetail._id, { total_price: Form.total_price, payment_method: Form.payment_method }).then(res => {
         this.messageService.sendMessage('Hesap Düzenlendi!');
+        this.fillData();
         $('#editCheck').modal('hide');
       });
     } else {
@@ -122,6 +123,7 @@ export class StoreReportsComponent implements OnInit {
         });
         this.mainService.updateData('closed_checks', this.checkDetail._id, { total_price: Form.total_price }).then(res => {
           this.messageService.sendMessage('Hesap Düzenlendi!');
+          this.fillData();
           $('#editCheck').modal('hide');
         });
       } else {
