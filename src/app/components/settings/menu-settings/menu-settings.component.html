@@ -179,7 +179,7 @@
                             <div *ngIf="sub_categories !== undefined && sub_categories.length > 0" class="card-header pt-1 pb-1">
                                 <div class="row">
                                     <div *ngFor="let item of sub_categories" class="col p-0 pr-1 pl-1">
-                                        <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-secondary btn-block">{{item.name}}</button>
+                                        <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning btn-block"><b>{{item.name}}</b></button>
                                     </div>
                                 </div>
                             </div>

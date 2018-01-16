@@ -35,6 +35,7 @@ export class SellingScreenComponent implements OnInit {
   allTables: Array<any>;
   check: Check;
   check_id: string;
+  selectedCat: string;
   selectedProduct: CheckProduct;
   selectedIndex: number;
   noteForm: NgForm;
@@ -74,6 +75,7 @@ export class SellingScreenComponent implements OnInit {
         }
       });
     });
+    this.settings.getPrinters().subscribe(res => this.printers = res.value);
   }
 
   ngOnInit() {
@@ -213,7 +215,7 @@ export class SellingScreenComponent implements OnInit {
     this.check.payment_flow.push(pFlow);
     this.check.type = 3;
     this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
-      if(res.ok){
+      if (res.ok) {
         this.check._rev = res.rev;
         this.deProducts = [];
         this.productsWillPay = [];
@@ -273,7 +275,7 @@ export class SellingScreenComponent implements OnInit {
       this.check.products[this.selectedIndex].timestamp = Date.now();
       this.check.total_price -= this.selectedProduct.price;
       this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
-        if(res.ok){
+        if (res.ok) {
           this.check._rev = res.rev;
           this.message.sendMessage('Ürün İptal Edildi');
           this.selectedProduct = undefined;
@@ -468,6 +470,7 @@ export class SellingScreenComponent implements OnInit {
   }
 
   getProductsBy(id) {
+    this.selectedCat = id;
     this.mainService.getAllBy('sub_categories', { cat_id: id }).then(res => {
       this.sub_categories = res.docs;
     });
@@ -525,6 +528,7 @@ export class SellingScreenComponent implements OnInit {
   }
 
   fillData() {
+    this.selectedCat = undefined;
     this.mainService.getAllBy('categories', {}).then(result => {
       this.sub_categories = undefined;
       this.categories = result.docs;
@@ -542,6 +546,5 @@ export class SellingScreenComponent implements OnInit {
     this.mainService.getAllBy('floors', {}).then(res => {
       this.floors = res.docs;
     });
-    this.settings.getPrinters().subscribe(res => this.printers = res.value);
   }
 }

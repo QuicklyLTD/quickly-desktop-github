@@ -32,16 +32,18 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    if(new Date().getDay() !== this.settingsService.getDay().day){
-      if(this.settingsService.getDay().started){
-        alert('Gün Sonu Yapılmamış.');
-      }else{
-        alert('Gün Başlangıcı Yapmalısınız.');
+    if(this.setupFinished){
+      if(new Date().getDay() !== this.settingsService.getDay().day){
+        if(this.settingsService.getDay().started){
+          alert('Gün Sonu Yapılmamış.');
+        }else{
+          alert('Gün Başlangıcı Yapmalısınız.');
+        }
       }
+      setInterval(() => {
+        this.connectionStatus = this.aplicationService.connectionStatus();
+      }, 3000)
     }
-    setInterval(() => {
-      this.connectionStatus = this.aplicationService.connectionStatus();
-    }, 3000)
   }
 
   startApp() {

@@ -2,29 +2,49 @@
   <div class="card-header">Uygulama Konsolu</div>
   <div class="card-body p-2">
     <div class="row">
-      <div class="col-lg-3 pr-1">
+      <div class="col-lg-2 pr-1">
         <div class="card inside-height">
           <div class="card-header">Veritabanı</div>
           <div class="card-body flow">
             <div class="list-group">
-              <button *ngFor="let db of databases" type="button" [ngClass]="{'list-group-item-warning': selectedDB == db}" (click)="showDatabase(db)" class="list-group-item list-group-item-action list-eq">{{db}}</button>
+              <button *ngFor="let db of databases" type="button" [ngClass]="{'list-group-item-warning': selectedDB == db}" (click)="showDatabase(db)"
+                class="list-group-item list-group-item-action list-eq">{{db}}</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-lg-6 pl-0">
+      <div class="col-lg-8 pl-0 pr-1">
         <div class="card inside-height">
-          <div class="card-header">Dökümanlar
-            <span class="pull-right badge badge-warning">{{documents?.total_rows}}</span>
-          </div>
+          <div class="card-header">Dökümanlar</div>
           <div class="card-block p-0 flow">
             <table class="table table-hover table-striped">
               <tbody>
-                <tr *ngFor="let item of documents?.rows" (click)="showDocument(item.doc)">
-                  <td>{{item.doc | json}}</td>
+                <tr *ngFor="let item of documents" (click)="showDocument(item)">
+                  <td>{{item| json}}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="card-footer">
+            <div class="input-group">
+              <input #filterKey type="text" placeholder="Key" class="form-control form-control-sm">
+              <input #filterValue type="text" placeholder="Value" class="form-control form-control-sm">
+              <span class="input-group-btn">
+                <button class="btn btn-secondary" (click)="getByFilter(filterKey.value,filterValue.value)" type="button">Sorgula</button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-2 pl-0">
+        <div class="card">
+          <div class="card-header">
+            Satış Raporları
+          </div>
+          <div class="card-body">
+            <div class="list-group">
+              <button *ngFor="let item of storeReports" type="button" (click)="selectedDB = 'Reports';showDocument(item);" class="list-group-item list-group-item-action list-eq">{{item.connection_id}}</button>
+            </div>
           </div>
         </div>
       </div>

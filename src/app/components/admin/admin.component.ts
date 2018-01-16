@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MainService } from 'app/services/main.service';
 
 @Component({
@@ -8,9 +8,11 @@ import { MainService } from 'app/services/main.service';
 })
 export class AdminComponent implements OnInit {
   databases: Array<string>;
-  documents: object;
+  documents: any;
   selectedDoc: object;
   selectedDB: string;
+  storeReports: Array<any>;
+  @ViewChild('editArea') editArea: ElementRef;
 
   constructor(private mainService: MainService) {
     this.databases = [
@@ -37,12 +39,15 @@ export class AdminComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
+      this.storeReports = res.docs;
+    })
   }
 
   showDatabase(db_name) {
     this.selectedDB = db_name;
-    this.mainService.getAllData(db_name, 250).then(res => {
-      this.documents = res;
+    this.mainService.getAllBy(db_name, {}).then(res => {
+      this.documents = res.docs;
     });
   }
 
@@ -51,18 +56,32 @@ export class AdminComponent implements OnInit {
     $('#docModal').modal('show');
   }
 
-  editDocument(document){
+  editDocument(document) {
     let newDocument = JSON.parse(document);
-    this.mainService.updateData(this.selectedDB,newDocument._id,newDocument).then(res => {
+    this.mainService.updateData(this.selectedDB, newDocument._id, newDocument).then(res => {
       $('#docModal').modal('hide');
       console.log('Döküman Güncellendi');
+      this.editArea.nativeElement.value == '';
+      this.selectedDoc = undefined;
     });
   }
 
-  removeDocument(id){
-    this.mainService.removeData(this.selectedDB,id).then(res => {
+  getByFilter(key, value) {
+    let filter = new Object();
+    filter[key] = value;
+    if (this.selectedDB) {
+      this.mainService.getAllBy(this.selectedDB, filter).then(res => {
+        this.documents = res.docs;
+      });
+    }
+  }
+
+  removeDocument(id) {
+    this.mainService.removeData(this.selectedDB, id).then(res => {
       $('#docModal').modal('hide');
       console.log('Döküman Silindi');
+      this.selectedDB = undefined;
+      this.selectedDoc = undefined;
     });
   }
 

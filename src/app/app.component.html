@@ -5,7 +5,10 @@
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a *ngIf="setupFinished" routerLink="" class="navbar-brand">{{title}}</a>
+      <a *ngIf="setupFinished" routerLink="" class="navbar-brand">
+        <!-- <img src="../assets/brand-logo.png" style="height:30px;" alt=""> -->
+        {{title}}
+      </a>
       <a *ngIf="!setupFinished" class="navbar-brand text-white">Quickly v{{version}}</a>
       <div *ngIf="setupFinished" class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
