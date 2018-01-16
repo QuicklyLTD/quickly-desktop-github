@@ -107,8 +107,8 @@
                     <span class="pull-right">{{check.discount + check.total_price}} TL</span>
                   </strong>
                 </p>
-                <!-- <button [routerLink]="['/payment', id]" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button> -->
-                <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button>
+                <button [routerLink]="['/payment', check_id]" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
+                <!-- <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button> -->
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@
 </div>
 
 <div *ngIf="check.products.length > 0" class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-big" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modelTitleId">Ödeme Al</h4>
@@ -201,7 +201,7 @@
       <form #paymentForm="ngForm">
         <div class="modal-body">
           <div class="row mb-3">
-            <div class="col-xl-6 col-lg-6">
+            <div class="col-xl-3 col-lg-3">
               <div class="card">
                 <div class="card-header">Adisyon</div>
                 <div class="card-block payment-flow p-2">
@@ -222,7 +222,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-xl-6 col-lg-6">
+            <div class="col-xl-3 col-lg-3">
               <div class="card">
                 <div class="card-header">Ödenecek Ürünler</div>
                 <div class="card-block payment-flow p-2">

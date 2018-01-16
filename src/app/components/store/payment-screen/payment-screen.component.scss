@@ -1,0 +1,116 @@
+.sellButton{
+    height: 145px;
+    width: 102.58px;
+    margin-bottom: 3.8px;
+    padding-top:20px;
+    padding-bottom: 20px;
+    padding-right: 0px;
+    padding-left: 0px;
+    font-size: 3.5vh;
+    font-weight: bold;
+}
+.cashButton{
+    height: 94.3px;
+    width: 102.58px;
+    margin-bottom: 3.8px;
+    padding-top:20px;
+    padding-bottom: 20px;
+    padding-right: 0px;
+    padding-left: 0px;
+    color: #000;
+    font-size: 5.3vh;
+    font-weight: bold;
+}
+.check-flow{
+    overflow-y: scroll;
+    overflow-x: hidden; 
+    p{
+        font-weight: bolder;
+    }
+    .btn{
+        padding-left: 5px;
+        padding-right: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: capitalize;
+    }
+}
+.payment-flow{
+    height:35vh;
+    overflow: hidden;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    p{
+        font-weight: bolder;
+    }
+}
+#productHolder{
+    overflow-y: scroll;
+    background-color: #ebebeb;
+}
+.col-card{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.proCard{
+    height: 112.4px;
+    h2{
+        font-size: 3vh;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: capitalize;
+    }
+    :hover{
+        background-color: #ebcccc;
+    }
+    .long-name{
+        font-size: 2.4vh;
+    }
+    p{
+        position: absolute;
+        bottom: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+.normal{
+    width: auto !important;
+}
+.tFlow{
+    height: 60vh;
+    overflow-y: scroll;
+    overflow-x: hidden; 
+}
+.ikiyuzTL{
+    background-color:#d65f84;
+    color:#162c5b;
+    -webkit-text-stroke: #ebebeb 1px;
+}
+.yuzTL{
+    background-color:#83a8d4;
+    color:#163d82;
+    -webkit-text-stroke: #ebebeb 1px;
+}
+.elliTL{
+    background-color:#f7d0a7;
+    color:#e04e3c;
+    -webkit-text-stroke: #ebebeb 1px;
+}
+.yirmiTL{
+    background-color:#bfcbab;
+    color:#3c5c1d;
+    -webkit-text-stroke: #ebebeb 1px;
+}
+.onTL{
+    background-color:#efa2b6;
+    color:#d84861;
+    -webkit-text-stroke: #ebebeb 1px;
+}
+.besTL{
+    background-color:#eed9c1;
+    color:#85453b;
+    -webkit-text-stroke: #ebebeb 1px;
+}
