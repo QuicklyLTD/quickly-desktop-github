@@ -2,7 +2,7 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 import { KeyboardService } from '../providers/keyboard.service';
 
 @Directive({
-  selector: 'input:not([type="checkbox"]):not([id="keyboardElement"])'
+  selector: 'input:not([type="checkbox"]):not([id="keyboardElement"]):not([readonly])'
 })
 export class KeyboardDirective {
   onAir: boolean;

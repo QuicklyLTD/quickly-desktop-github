@@ -52,7 +52,9 @@ export class ApplicationService {
               this.timer = this.appLockTime;
             } else {
               this.timer = this.appLockTime;
-              $('*').modal('hide');
+                if($('body').hasClass('modal-open')){
+                  $('*').modal('hide');
+                }
               this.router.navigate(['']);
               this.messageService.sendMessage('Zaman aşımına uğrandı.');
             }

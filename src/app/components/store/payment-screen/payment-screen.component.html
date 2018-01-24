@@ -22,31 +22,21 @@
               <div class="card-header">Adisyon</div>
               <div class="card-block p-2 check-flow">
                 <div *ngFor="let item of check?.products; let i = index" class="mb-2">
-                  <p [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning':selectedIndex == i}" style="cursor:pointer"
-                    (click)="selectProduct(i)" class="text-bold mb-0">
-                    <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
+                  <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="text-bold text-danger mb-0">
                     {{item.name}}
                     <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
                     <span class="pull-right"> {{item.price}} TL</span>
                   </p>
-                  <div *ngIf="selectedIndex == i && item.status !== 1">
-                    <small class="text-muted">
-                      <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
-                      <span class="pull-right">
-                        <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
-                    </small>
-                  </div>
                 </div>
               </div>
-
               <div class="card-footer p-1">
-                <p *ngIf="check?.discount > 0" class="pr-1 pl-1 mt-2">
+                <p class="pr-1 pl-1 mt-2">
                   <strong>
                     Kalan Toplam:
                     <span class="pull-right">{{check?.total_price}} TL</span>
                   </strong>
                 </p>
-                <button (click)="togglePayed()" class="btn btn-lg btn-info btn-block text-left">Hepsini Geçir
+                <button (click)="sendAllProducts()" [disabled]="check?.products.length == 0" class="btn btn-lg btn-danger btn-block text-left">Hepsini Geçir
                   <i class="fa fa-arrow-right pull-right" aria-hidden="true"></i>
                 </button>
               </div>
@@ -56,7 +46,13 @@
             <div class="card inside-height">
               <div class="card-header">Ödenecek Ürünler</div>
               <div class="card-block p-2 check-flow">
-
+                <div *ngFor="let item of productsWillPay" class="mb-2">
+                  <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="text-bold text-danger mb-0">
+                    {{item.name}}
+                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <span class="pull-right"> {{item.price}} TL</span>
+                  </p>
+                </div>
               </div>
               <div *ngIf="check?.discount > 0" class="card-footer p-1">
                 <p *ngIf="check?.discount > 0" class="pr-1 pl-1 mt-2">
@@ -90,58 +86,113 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button (click)="sendCheck()" class="btn btn-block cashButton ikiyuzTL">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(200)" class="btn btn-block cashButton ikiyuzTL">
               200
             </button>
-            <button (click)="sendCheck()" class="btn btn-block cashButton yuzTL">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(100)" class="btn btn-block cashButton yuzTL">
               100
             </button>
-            <button (click)="sendCheck()" class="btn btn-block cashButton elliTL">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(50)" class="btn btn-block cashButton elliTL">
               50
             </button>
-            <button (click)="sendCheck()" class="btn btn-block cashButton yirmiTL">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(20)" class="btn btn-block cashButton yirmiTL">
               20
             </button>
-            <button (click)="sendCheck()" class="btn btn-block cashButton onTL">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(10)" class="btn btn-block cashButton onTL">
               10
             </button>
-            <button (click)="sendCheck()" class="btn btn-block cashButton besTL">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(5)" class="btn btn-block cashButton besTL">
               5
             </button>
           </div>
           <div class="col-lg-4 pl-1 pr-0">
             <div class="card inside-height">
-              <div class="card-block">
-        
+              <div class="card-header p-2">
+                <h3 class="mb-1 mt-1">Ödenecek Miktar:
+                  <span class="text-primary pull-right">
+                    <strong>{{priceWillPay}} TL</strong>
+                  </span>
+                </h3>
               </div>
-              <div class="card-footer">
-                  <div *ngFor="let keys of numboard;" class="row mb-1">
-                      <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1">
-                        <button type="button" class="btn btn-secondary btn-lg btn-block">{{key}}</button>
-                      </div>
-                    </div>
+              <div class="card-block p-2">
+                <h4 *ngIf="payedPrice > 0" class="mt-1">Alınan Miktar:
+                  <span class="text-success pull-right">
+                    <b>{{payedPrice}} TL</b>
+                  </span>
+                </h4>
+                <h4 *ngIf="payedPrice > 0 && changePrice !== 0">{{changeMessage}}:
+                  <span class="text-danger pull-right">
+                    <b>{{(changePrice
+                      < 0 ? changePrice*-1 : changePrice)}} TL </b>
+                  </span>
+                </h4>
               </div>
               <div class="card-footer p-1">
-                <p class="text-primary pr-1 pl-1 mt-2">
-                  <strong>Hesap Toplamı:
-                    <span class="pull-right">{{check?.discount + check?.total_price}} TL</span>
+                <button [disabled]="payedPrice == 0" (click)="resetPayment()" class="btn btn-block btn-secondary">
+                  <span class="text-primary">
+                    <strong>Sıfırla
+                      <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </strong>
+                  </span>
+                </button>
+              </div>
+              <div class="card-footer p-1">
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg text-right" readonly [ngModel]="numpad">
+                  <div class="input-group-addon normal">
+                    <i class="fa fa-turkish-lira" aria-hidden="true"></i>
+                  </div>
+                  <span class="input-group-btn">
+                    <button class="btn btn-secondary" (click)="cleanPad()" type="button">
+                      <i class="fa fa-arrow-left" aria-hidden="true"></i> Temizle
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <div *ngFor="let keys of numboard;" class="row mb-1">
+                  <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1">
+                    <button type="button" [disabled]="key == '✔' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == ''"
+                      (click)="pushKey(key)" class="btn btn-secondary btn-lg btn-block numpad">{{key}}</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer p-1">
+                <p class="pr-1 pl-1 mt-2">
+                  <strong>Hesap Genel Toplamı:
+                    <span class="pull-right">{{check?.discount + check?.total_price + priceWillPay}} TL</span>
                   </strong>
                 </p>
-                <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button>
+                <div class="btn-group btn-block btn-group-justified" role="group">
+                  <button type="button" style="flex: 2 1 auto;" class="btn btn-secondary btn-lg">İndirim Yap
+                    <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i>
+                  </button>
+                  <button (click)="printCheck()" type="button" style="flex: 2 1 auto;" class="btn btn-secondary btn-lg">Adisyon Yazdır
+                    <i class="fa fa-print pull-right " aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button (click)="sendCheck()" class="btn btn-block sellButton btn-success">
+            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('Nakit')" class="btn btn-block text-success sellButton btn-secondary">
+              <i class="fa fa-money ml-1"></i>
+              <br>
               Nakit
             </button>
-            <button (click)="sendCheck()" class="btn btn-block sellButton btn-warning">
+            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('Kart')" class="btn btn-block text-warning sellButton btn-secondary">
+              <i class="fa fa-credit-card ml-1"></i>
+              <br>
               Kart
             </button>
-            <button (click)="sendCheck()" class="btn btn-block sellButton btn-info">
+            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('Kupon')" class="btn btn-block text-info sellButton btn-secondary">
+             <i class="fa fa-bookmark ml-1"></i>
+             <br>
               Kupon
             </button>
-            <button (click)="sendCheck()" class="btn btn-block sellButton btn-danger">
+            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
+              <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
+              <br>
               İkram
             </button>
           </div>

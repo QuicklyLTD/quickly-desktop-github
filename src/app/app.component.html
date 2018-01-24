@@ -43,7 +43,7 @@
         <form class="form-inline my-2 my-lg-0 text-white">
           <span class="mr-3">{{date | date:'d / M / y'}}</span>
           <i class="fa fa-circle mr-3" [ngClass]="connectionStatus ? 'text-success': 'text-warning'"></i>
-          <span class="mr-3" data-toggle="modal" data-dismiss="modal" data-target="#adminModal">{{description}} v{{version}} </span>
+          <span class="mr-3" data-toggle="modal" data-target="#adminModal">{{description}} v{{version}} </span>
           <i class="fa fa-arrows-alt mr-3" (click)="changeWindow()" aria-hidden="true"></i>
           <i class="fa fa-sign-out" (click)="exitProgram()"> Çıkış</i>
         </form>
@@ -60,7 +60,7 @@
   <app-message></app-message>
   <app-keyboard></app-keyboard>
 
-  <div class="modal fade" id="adminModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+  <div class="modal fade" id="adminModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
