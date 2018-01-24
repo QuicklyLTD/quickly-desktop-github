@@ -31,6 +31,7 @@ export class PaymentScreenComponent implements OnInit {
   changePrice: number;
   changeMessage: string;
   printers: Array<Printer>;
+  discounts: Array<number>;
 
   constructor(private route: ActivatedRoute, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
     this.route.params.subscribe(params => {
@@ -39,8 +40,9 @@ export class PaymentScreenComponent implements OnInit {
     });
     this.settings.getPrinters().subscribe(res => this.printers = res.value);
   }
-  
+
   ngOnInit() {
+    this.discounts = [5,10,15,20,25];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "✔"]];
     this.setDefault();
     this.payedShow = false;
@@ -56,8 +58,9 @@ export class PaymentScreenComponent implements OnInit {
       this.check.type = 3;
     }
     this.check.payment_flow.push(newPayment);
-    this.check.discount += this.priceWillPay; 
+    this.check.discount += this.priceWillPay;
     this.mainService.updateData('checks', this.id, this.check).then(res => {
+      this.printerService.printPayment(this.printers[0], this.table, newPayment);
       this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
       this.fillData();
       this.setDefault();
@@ -135,7 +138,7 @@ export class PaymentScreenComponent implements OnInit {
   printCheck() {
     this.printerService.printCheck(this.printers[0], this.table, this.check);
   }
-  setDefault(){
+  setDefault() {
     this.numpad = '';
     this.isFirstTime = true;
     this.productsWillPay = [];

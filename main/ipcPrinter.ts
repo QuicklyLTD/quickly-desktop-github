@@ -128,6 +128,52 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
   }
 });
 
+ipcMain.on('printPayment', (event, device, payment, table, logo) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    let date = new Date();
+    const printer = new escpos.Printer(deviceToPrint);
+    new escpos.Image.load(logo, function (image) {
+      deviceToPrint.open((err) => {
+        if (err) {
+          event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+        } else {
+          printer
+            .align('ct')
+            .size(1, 1)
+            .image(image, 'd24')
+            .text('Quickly')
+            .text('www.quickly.com.tr')
+            .align('lt')
+            .control('LF')
+            .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
+            .text(line);
+          // for (let prop in payment.products) {
+          //   let text = fitText((payment.products[prop].count >= 10 ? payment.products[prop].count : ' ' + payment.products[prop].count) + ' x  ' + payment.products[prop].name + (payment.products[prop].note != '' ? ' (' + payment.products[prop].note + ') ' : ''), payment.products[prop].price + ' TL' + '   ' + (payment.products[prop].total_price >= 100 ? payment.products[prop].total_price : (payment.products[prop].total_price >= 10 ? ' ' : '  ') + payment.products[prop].total_price) + ' TL', 1);
+          //   printer.text(text, '857');
+          // }
+          printer.text(line);
+          printer
+            .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
+            .text(fitText('Yetkili: ' + payment.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+            .align('ct')
+            .size(2, 2)
+            .control('LF')
+            .text('Toplam:  ' + payment.amount + ' TL')
+            .control('LF')
+            .size(1, 1)
+            .text('Mali degeri yoktur.', '857')
+            .control('LF')
+            .cut()
+            .close();
+        }
+      });
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
 ipcMain.on('printReport', (event, device, data, logo) => {
   let deviceToPrint = findDevice(device);
   const printer = new escpos.Printer(deviceToPrint);

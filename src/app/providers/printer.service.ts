@@ -59,6 +59,10 @@ export class PrinterService {
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, this.storeInfo);
   }
 
+  printPayment(device, table, payment){
+    this.electron.ipcRenderer.send('printPayment', device, payment, table, this.storeLogo);
+  }
+
   printReport(device, EndDayData) {
     this.electron.ipcRenderer.send('printReport', device, EndDayData, this.quicklyLogo);
   }
