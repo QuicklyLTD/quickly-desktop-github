@@ -148,10 +148,10 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .control('LF')
             .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
             .text(line);
-          // for (let prop in payment.products) {
-          //   let text = fitText((payment.products[prop].count >= 10 ? payment.products[prop].count : ' ' + payment.products[prop].count) + ' x  ' + payment.products[prop].name + (payment.products[prop].note != '' ? ' (' + payment.products[prop].note + ') ' : ''), payment.products[prop].price + ' TL' + '   ' + (payment.products[prop].total_price >= 100 ? payment.products[prop].total_price : (payment.products[prop].total_price >= 10 ? ' ' : '  ') + payment.products[prop].total_price) + ' TL', 1);
-          //   printer.text(text, '857');
-          // }
+          for (let prop in payment.payed_products) {
+            let text = fitText((payment.payed_products[prop].count >= 10 ? payment.payed_products[prop].count : ' ' + payment.payed_products[prop].count) + ' x  ' + payment.payed_products[prop].name + (payment.payed_products[prop].note != '' ? ' (' + payment.payed_products[prop].note + ') ' : ''), payment.payed_products[prop].price + ' TL' + '   ' + (payment.payed_products[prop].total_price >= 100 ? payment.payed_products[prop].total_price : (payment.payed_products[prop].total_price >= 10 ? ' ' : '  ') + payment.payed_products[prop].total_price) + ' TL', 1);
+            printer.text(text, '857');
+          }
           printer.text(line);
           printer
             .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
