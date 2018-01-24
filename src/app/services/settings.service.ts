@@ -95,9 +95,6 @@ export class SettingsService {
       res.docs[0].value = res.docs[0].value.filter(obj => obj.name !== printer.name);
       this.mainService.updateData('settings', res.docs[0]._id, res.docs[0]);
       this.Printers.next(res.docs[0]);
-      if (res.docs[0].value.length == 0) {
-        this.mainService.removeData('settings', res.docs[0]._id);
-      }
     });
   }
 
