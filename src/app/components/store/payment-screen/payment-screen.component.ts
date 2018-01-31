@@ -4,7 +4,7 @@ import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
 import { MessageService } from '../../../providers/message.service';
-import { Check, CheckProduct, PaymentStatus } from '../../../mocks/check.mock';
+import { Check, CheckProduct, PaymentStatus, ClosedCheck } from '../../../mocks/check.mock';
 import { PrinterService } from '../../../providers/printer.service';
 import { Printer } from '../../../mocks/settings.mock';
 
@@ -32,8 +32,11 @@ export class PaymentScreenComponent implements OnInit {
   changeMessage: string;
   printers: Array<Printer>;
   discounts: Array<number>;
+  discount: number;
+  discountAmount: number;
+  currentAmount: number;
 
-  constructor(private route: ActivatedRoute, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
+  constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.fillData();
@@ -42,7 +45,7 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.discounts = [5,10,15,20,25];
+    this.discounts = [5, 10, 15, 20, 25];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "✔"]];
     this.setDefault();
     this.payedShow = false;
@@ -52,20 +55,63 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   payProducts(method: string) {
-    let newPayment = new PaymentStatus(this.userName, method, this.priceWillPay, 0, Date.now(), this.productsWillPay);
-    if (this.check.payment_flow == undefined) {
-      this.check.payment_flow = [];
-      this.check.type = 3;
+    if (this.check.total_price == 0) {
+      this.closeCheck(method);
+    } else {
+      let newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
+      if (this.check.payment_flow == undefined) {
+        this.check.payment_flow = [];
+        this.check.type = 3;
+      }
+      this.check.payment_flow.push(newPayment);
+      this.check.discount += this.priceWillPay;
+      this.mainService.updateData('checks', this.id, this.check).then(res => {
+        this.printerService.printPayment(this.printers[0], this.table, newPayment);
+        this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
+        this.fillData();
+        this.setDefault();
+        this.togglePayed();
+      });
     }
-    this.check.payment_flow.push(newPayment);
-    this.check.discount += this.priceWillPay;
-    this.mainService.updateData('checks', this.id, this.check).then(res => {
-      this.printerService.printPayment(this.printers[0], this.table, newPayment);
-      this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
-      this.fillData();
-      this.setDefault();
-      this.togglePayed();
+  }
+
+  closeCheck(method: string) {
+    let total_discounts = 0;
+    let checkWillClose;
+    if (this.check.type == 3) {
+      let realMethod = method;
+      method = 'Parçalı';
+      let lastPayment = new PaymentStatus(this.userName, realMethod, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
+      this.check.payment_flow.push(lastPayment);
+      this.check.discount += this.priceWillPay;
+      total_discounts = this.check.payment_flow.map(obj => obj.discount).reduce((a, b) => a + b);
+      checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), 1, method, this.check.payment_flow);
+    } else {
+      total_discounts = this.discountAmount;
+      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), 1, method);
+    }
+    this.mainService.addData('closed_checks', checkWillClose).then(res => {
+      if (res.ok) {
+        this.printerService.printCheck(this.printers[0],this.table,this.check);
+        this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
+          if (res.ok) {
+            this.mainService.removeData('checks', this.check._id).then(res => {
+              this.router.navigate(['/store']);
+              this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
+            });
+          }
+        });
+      }
     });
+  }
+
+  setDiscount(discount: number) {
+    this.discount = discount;
+    if (this.payedPrice == 0) {
+      this.payedPrice = this.priceWillPay;
+    }
+    this.setChange();
+    $('#discount').modal('hide');
   }
 
   togglePayed() {
@@ -77,6 +123,7 @@ export class PaymentScreenComponent implements OnInit {
       this.payedTitle = 'Alınan Ödemeleri Gizle';
     }
   }
+
   addProductToList(product: CheckProduct) {
     this.check.products = this.check.products.filter(obj => obj !== product);
     this.productsWillPay.push(product);
@@ -85,6 +132,7 @@ export class PaymentScreenComponent implements OnInit {
     this.numpad = this.priceWillPay.toString();
     this.setChange();
   }
+
   addProductToCheck(product: CheckProduct) {
     this.productsWillPay = this.productsWillPay.filter(obj => obj !== product);
     this.check.products.push(product);
@@ -92,6 +140,7 @@ export class PaymentScreenComponent implements OnInit {
     this.priceWillPay -= product.price;
     this.setChange();
   }
+
   sendAllProducts() {
     this.check.products.forEach(element => {
       this.productsWillPay.push(element);
@@ -103,22 +152,27 @@ export class PaymentScreenComponent implements OnInit {
     this.check.total_price = 0;
     this.setChange();
   }
+
   getPayment(number: number) {
     this.payedPrice += number;
     this.setChange();
   }
-  resetPayment() {
-    this.payedPrice = 0;
-    this.setChange();
-  }
+
   setChange() {
+    if (this.discount) {
+      this.discountAmount = ((this.priceWillPay * this.discount) / 100);
+      this.discountAmount = Math.round(this.discountAmount);
+    }
+    this.currentAmount = this.priceWillPay - this.discountAmount;
     this.changePrice = this.payedPrice - this.priceWillPay;
+    this.changePrice += this.discountAmount;
     if (this.changePrice > 0) {
       this.changeMessage = 'Para Üstü';
     } else {
       this.changeMessage = 'Kalan Ödeme';
     }
   }
+
   pushKey(key: any) {
     if (key === "✔") {
       this.payedPrice = parseFloat(this.numpad);
@@ -132,20 +186,32 @@ export class PaymentScreenComponent implements OnInit {
       this.numpad += key;
     }
   }
+
   cleanPad() {
     this.numpad = '';
+    this.payedPrice = 0;
+    this.discount = undefined;
+    this.discountAmount = 0;
+    this.currentAmount = 0;
+    this.setChange();
   }
+
   printCheck() {
     this.printerService.printCheck(this.printers[0], this.table, this.check);
   }
+
   setDefault() {
     this.numpad = '';
     this.isFirstTime = true;
     this.productsWillPay = [];
+    this.currentAmount = 0;
     this.priceWillPay = 0;
     this.changePrice = 0;
     this.payedPrice = 0;
+    this.discountAmount = 0;
+    this.discount = undefined;
   }
+
   fillData() {
     this.mainService.getData('checks', this.id).then(res => {
       this.check = res;

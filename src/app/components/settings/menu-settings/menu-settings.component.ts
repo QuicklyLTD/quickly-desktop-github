@@ -211,7 +211,7 @@ export class MenuSettingsComponent implements OnInit {
           this.mainService.addData('recipes', schema);
         } else {
           this.productRecipe = this.productRecipe.concat(this.recipe);
-          let schema = new Recipe(form._id, this.productRecipe);
+          let schema = new Recipe(form._id, this.productRecipe,this.recipeId);
           this.mainService.updateData('recipes', this.recipeId, schema);
         }
       }

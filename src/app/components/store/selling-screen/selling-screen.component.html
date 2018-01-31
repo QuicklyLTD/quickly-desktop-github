@@ -75,20 +75,27 @@
                   <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa pull-right" aria-hidden="true"></i>
                 </button>
               </div>
-              <div *ngIf="check.discount > 0 && payedShow" class="card-block check-flow p-2">
-                <div *ngFor="let payment of check.payment_flow" class="mb-2">
+              <div *ngIf="check.discount > 0 && payedShow" class="card-block check-flow p-2 payed-things">
+                <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
                   <p class="mb-0">{{payment.method}}
                     <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
                     <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
                   </p>
-                  <p *ngIf="payment.discount > 0" class="text-muted m-0">
-                    <small>Direkt Para Ödemesi
+                  <p *ngFor="let product of payment.payed_products" class="text-muted m-0  pl-3">
+                    <small>{{product.name}}
+                      <span class="pull-right">{{product.price}} TL</span>
+                    </small>
+                  </p>
+                  <p *ngIf="payment.discount > 0" class="text-danger m-0">
+                    <small>
+                      <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Miktarı
                       <span class="pull-right">{{payment.discount}} TL</span>
                     </small>
                   </p>
-                  <p *ngFor="let product of payment.payed_products" class="text-muted m-0">
-                    <small>{{product.name}}
-                      <span class="pull-right">{{product.price}} TL</span>
+                  <p class="m-0 text-bold">
+                    <small>
+                      <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
+                      <span class="pull-right">{{payment.amount}} TL</span>
                     </small>
                   </p>
                 </div>
@@ -117,7 +124,8 @@
               <div class="col-xl-3 col-lg-4 inside-height check-flow col-card">
                 <div class="btn-group-vertical btn-block btn-group-lg">
                   <button (click)="fillData()" [ngClass]="{'list-group-item-warning':selectedCat == undefined}" class="btn btn-secondary">Bütün Ürünler</button>
-                  <button *ngFor="let cat of categories" [ngClass]="{'list-group-item-warning':selectedCat == cat._id}" (click)="getProductsBy(cat._id)"  class="btn btn-secondary">{{cat.name}}</button>
+                  <button *ngFor="let cat of categories" [ngClass]="{'list-group-item-warning':selectedCat == cat._id}" (click)="getProductsBy(cat._id)"
+                    class="btn btn-secondary">{{cat.name}}</button>
                 </div>
               </div>
               <div class="col-xl-9 col-lg-8  pr-0 pl-0">
@@ -190,7 +198,7 @@
 </div>
 
 <div *ngIf="check.products.length > 0" class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-big" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modelTitleId">Ödeme Al</h4>

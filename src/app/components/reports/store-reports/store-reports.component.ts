@@ -37,6 +37,7 @@ export class StoreReportsComponent implements OnInit {
 
   getDetail(check) {
     this.checkDetail = check;
+    console.log(check);
     $('#reportDetail').modal('show');
   }
 

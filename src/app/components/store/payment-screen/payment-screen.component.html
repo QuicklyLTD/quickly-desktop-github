@@ -65,20 +65,26 @@
                   <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa pull-right" aria-hidden="true"></i>
                 </button>
               </div>
-              <div *ngIf="check?.discount > 0 && payedShow" class="card-block check-flow p-2">
-                <div *ngFor="let payment of check.payment_flow" class="mb-2">
+              <div *ngIf="check?.discount > 0 && payedShow" class="card-block check-flow p-2 payed-things">
+                <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
                   <p class="mb-0">{{payment.method}}
                     <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
                     <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
                   </p>
-                  <p *ngIf="payment.discount > 0" class="text-muted m-0">
-                    <small>Direkt Para Ödemesi
-                      <span class="pull-right">{{payment.discount}} TL</span>
-                    </small>
-                  </p>
-                  <p *ngFor="let product of payment.payed_products" class="text-muted m-0">
+                  <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3">
                     <small>{{product.name}}
                       <span class="pull-right">{{product.price}} TL</span>
+                    </small>
+                  </p>
+                  <p *ngIf="payment.discount > 0" class="text-danger m-0">
+                      <small>
+                        <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
+                        <span class="pull-right">{{payment.discount}} TL</span>
+                      </small>
+                    </p>
+                  <p class="m-0 text-bold">
+                    <small><i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
+                      <span class="pull-right">{{payment.amount}} TL</span>
                     </small>
                   </p>
                 </div>
@@ -108,33 +114,35 @@
           <div class="col-lg-4 pl-1 pr-0">
             <div class="card inside-height">
               <div class="card-header p-2">
-                <h3 class="mb-1 mt-1">Ödenecek Miktar:
+                <h3 class="mb-1 mt-1"><b>Ödenecek Miktar:</b>
                   <span class="text-primary pull-right">
-                    <strong>{{priceWillPay}} TL</strong>
+                    <strong>{{currentAmount}} TL</strong>
                   </span>
                 </h3>
               </div>
               <div class="card-block p-2">
-                <h4 *ngIf="payedPrice > 0" class="mt-1">Alınan Miktar:
+                <h4 *ngIf="currentAmount > 0" class="mb-0">Ürünlerin Toplamı:
+                  <span class="text-primary pull-right">
+                    <b>{{priceWillPay}} TL</b>
+                  </span>
+                </h4>
+                <h4 *ngIf="payedPrice > 0" class="mt-0 mb-1">Alınan Miktar:
                   <span class="text-success pull-right">
                     <b>{{payedPrice}} TL</b>
                   </span>
                 </h4>
-                <h4 *ngIf="payedPrice > 0 && changePrice !== 0">{{changeMessage}}:
+                <h4 *ngIf="discount !== undefined" class="mb-1">İndirim Tutarı:
                   <span class="text-danger pull-right">
+                    <small>{{discount}} %</small> -
+                    <b>{{discountAmount}} TL</b>
+                  </span>
+                </h4>
+                <h4 *ngIf="payedPrice > 0 && changePrice !== 0" class="mb-1">{{changeMessage}}:
+                  <span class="text-warning pull-right">
                     <b>{{(changePrice
                       < 0 ? changePrice*-1 : changePrice)}} TL </b>
                   </span>
                 </h4>
-              </div>
-              <div class="card-footer p-1">
-                <button [disabled]="payedPrice == 0" (click)="resetPayment()" class="btn btn-block btn-secondary">
-                  <span class="text-primary">
-                    <strong>Sıfırla
-                      <i class="fa fa-refresh" aria-hidden="true"></i>
-                    </strong>
-                  </span>
-                </button>
               </div>
               <div class="card-footer p-1">
                 <div class="input-group">
@@ -164,10 +172,11 @@
                   </strong>
                 </p>
                 <div class="btn-group btn-block btn-group-justified" role="group">
-                  <button type="button" style="flex: 2 1 auto;"  data-toggle="modal" data-target="#discount" class="btn btn-secondary btn-lg">İndirim Yap
+                  <button [disabled]="productsWillPay.length == 0" type="button" style="flex: 2 1 auto;" data-toggle="modal" data-target="#discount"
+                    class="btn btn-secondary btn-lg">İndirim Yap
                     <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i>
                   </button>
-                  <button (click)="printCheck()" type="button" style="flex: 2 1 auto;" class="btn btn-secondary btn-lg">Adisyon Yazdır
+                  <button [disabled]="productsWillPay" (click)="printCheck()" type="button" style="flex: 2 1 auto;" class="btn btn-secondary btn-lg">Adisyon Yazdır
                     <i class="fa fa-print pull-right " aria-hidden="true"></i>
                   </button>
                 </div>
@@ -175,25 +184,21 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('Nakit')" class="btn btn-block text-success sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('Nakit')" class="btn btn-block text-success sellButton btn-secondary">
               <i class="fa fa-money ml-1"></i>
-              <br>
-              Nakit
+              <br> Nakit
             </button>
-            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('Kart')" class="btn btn-block text-warning sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('Kart')" class="btn btn-block text-warning sellButton btn-secondary">
               <i class="fa fa-credit-card ml-1"></i>
-              <br>
-              Kart
+              <br> Kart
             </button>
-            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('Kupon')" class="btn btn-block text-info sellButton btn-secondary">
-             <i class="fa fa-bookmark ml-1"></i>
-             <br>
-              Kupon
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('Kupon')" class="btn btn-block text-info sellButton btn-secondary">
+              <i class="fa fa-bookmark ml-1"></i>
+              <br> Kupon
             </button>
-            <button [disabled]="payedPrice < priceWillPay || payedPrice == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
-              <br>
-              İkram
+              <br> İkram
             </button>
           </div>
         </div>
@@ -207,14 +212,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">İndirim Yap</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body">
         <div class="row">
           <div *ngFor="let item of discounts;" class="col">
-            <button type="button" class="btn btn-secondary btn-block btn-lg">{{item}} %</button>
+            <button type="button" (click)="setDiscount(item)" class="btn btn-primary btn-block btn-lg btn-discount">{{item}} %</button>
           </div>
         </div>
       </div>
