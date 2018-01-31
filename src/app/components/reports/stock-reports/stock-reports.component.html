@@ -23,7 +23,7 @@
         <div class="row">
           <div class="col-lg-12">
             <blockquote *ngFor="let stock of allStocks" class="blockquote">
-              <p class="mb-2"><strong>{{stock.name}}</strong> <small>({{stock.cat_id | general:'stocks_cat' | async}})</small> <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.quantity))*100}}%</span></p>
+              <p class="mb-2"><strong>{{stock.name}}</strong> <small>({{stock.cat_id | general:'stocks_cat' | async}})</small> <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.quantity))*100 | number: '1.0-0'}}%</span></p>
               <div class="progress">
                 <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.quantity) | percent:'1.0-1'}" [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
               </div>
@@ -50,10 +50,10 @@
             <tr>
               <th width="5%"><i class="fa fa-truck" aria-hidden="true"></i></th>
               <th width="20%">Stok Adı</th>
-              <th width="15%">Kategori</th>
+              <th width="20%">Kategori</th>
               <th width="20%">Son Toplam</th>
-              <th width="20%">Harcanan</th>
-              <th width="20%">Kalan</th>
+              <th width="17%">Harcanan</th>
+              <th width="17%">Kalan</th>
             </tr>
           </thead>
           <tbody>
