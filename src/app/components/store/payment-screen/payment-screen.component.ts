@@ -92,6 +92,8 @@ export class PaymentScreenComponent implements OnInit {
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
+        this.updateSellingReport(method);
+        this.updateTableReport(this.check)
         this.printerService.printCheck(this.printers[0],this.table,this.check);
         this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
           if (res.ok) {
@@ -211,6 +213,55 @@ export class PaymentScreenComponent implements OnInit {
     this.discountAmount = 0;
     this.discount = undefined;
   }
+
+  updateSellingReport(method: string) {
+    if (method !== 'Parçalı') {
+      this.mainService.getAllBy('reports', { connection_id: method }).then(res => {
+        if (res.docs.length > 0) {
+          let doc = res.docs[0];
+          doc.count++;
+          doc.weekly_count[this.settings.getDay().day]++;
+          doc.amount += this.check.discount + this.currentAmount;
+          doc.weekly[this.settings.getDay().day] += this.check.discount + this.currentAmount;
+          doc.update_time = Date.now();
+          this.mainService.updateData('reports', doc._id, doc);
+        }
+      });
+    } else {
+      this.check.payment_flow.forEach((obj, index) => {
+        this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
+          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+            doc.count++;
+            doc.weekly_count[this.settings.getDay().day]++;
+            doc.amount += obj.amount + obj.discount;
+            doc.weekly[this.settings.getDay().day] += obj.amount + obj.discount;
+            doc.update_time = Date.now();
+            return doc;
+          });
+        });
+      });
+    }
+    this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+      let sellingAct = res.docs[0];
+      let date = new Date();
+      sellingAct.activity.push(this.check.total_price + this.check.discount);
+      sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+      this.mainService.updateData('reports', sellingAct._id, sellingAct);
+    })
+  }
+
+  updateTableReport(check: Check) {
+    this.mainService.getAllBy('reports', { connection_id: check.table_id }).then(res => {
+      let report = res.docs[0];
+      report.count++;
+      report.amount += this.currentAmount;
+      report.update_time = Date.now();
+      report.weekly[this.settings.getDay().day] += this.currentAmount;
+      report.weekly_count[this.settings.getDay().day]++;
+      this.mainService.updateData('reports', report._id, report);
+    });
+  }
+
 
   fillData() {
     this.mainService.getData('checks', this.id).then(res => {

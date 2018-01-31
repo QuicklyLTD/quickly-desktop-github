@@ -1,6 +1,7 @@
 .sellButton{
     font-family: Quickly;
     margin-bottom: 3.8px;
+    margin-top:0px;
     padding-top:20px;
     padding-bottom: 20px;
     padding-right: 0px;
@@ -44,6 +45,9 @@
 }
 .proCard{
     height: 112.4px;
+    .card-block{
+        padding: 1rem;
+    }
     h2{
         font-size: 3vh;
         white-space: nowrap;

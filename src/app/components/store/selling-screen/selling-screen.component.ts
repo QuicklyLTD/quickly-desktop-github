@@ -24,10 +24,6 @@ export class SellingScreenComponent implements OnInit {
   categories: Array<Category>;
   sub_categories: Array<SubCategory>;
   products: Array<Product>;
-  deProducts: Array<CheckProduct>;
-  productsWillPay: Array<CheckProduct>;
-  productsWillBack: Array<CheckProduct>;
-  paymentProducts: Array<CheckProduct>;
   checks: Array<any>;
   floors: Array<Floor>;
   table: Table;
@@ -40,28 +36,19 @@ export class SellingScreenComponent implements OnInit {
   selectedIndex: number;
   noteForm: NgForm;
   paymentForm: NgForm;
-  toRight: boolean;
   owner: string;
   ownerRole: string;
   ownerId: string;
-  rightPrice: number;
-  leftPrice: number;
   newOrders: Array<CheckProduct> = [];
   countData: Array<any> = [];
-  pDiscount: number;
   payedShow: boolean = false;
   payedTitle: string = 'Alınan Ödemeleri Görüntüle';
   printers: Array<Printer>;
-
 
   constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService) {
     this.owner = this.settings.getUser('name');
     this.ownerRole = this.settings.getUser('type');
     this.ownerId = this.settings.getUser('id');
-    this.deProducts = [];
-    this.toRight = false;
-    this.productsWillPay = [];
-    this.productsWillBack = [];
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.check = new Check(this.id, 0, 0, this.owner, '', 0, [], Date.now(), 1);
@@ -69,9 +56,6 @@ export class SellingScreenComponent implements OnInit {
         if (result.docs.length > 0) {
           this.check = result.docs[0];
           this.check_id = result.docs[0]._id;
-          this.paymentProducts = this.check.products.slice();
-          this.leftPrice = this.check.total_price;
-          this.rightPrice = 0;
         }
       });
     });
@@ -107,125 +91,6 @@ export class SellingScreenComponent implements OnInit {
     }
     this.mainService.updateData('tables', this.id, { status: 2 });
     this.router.navigate(['/store']);
-  }
-
-  changePayStatus(status) {
-    if (status == 1) {
-      if (this.productsWillPay.length == 0) {
-        this.productsWillPay = this.deProducts.slice();
-      } else {
-        this.productsWillPay = this.productsWillPay.concat(this.deProducts.slice());
-      }
-      for (let index in this.productsWillPay) {
-        this.paymentProducts = this.paymentProducts.filter(obj => obj !== this.productsWillPay[index]);
-      }
-      for (let index in this.deProducts) {
-        this.rightPrice += this.deProducts[index].price;
-        this.leftPrice -= this.deProducts[index].price;
-      }
-      this.deProducts = [];
-    } else {
-      if (this.paymentProducts.length == 0) {
-        this.paymentProducts = this.productsWillBack.slice();
-      } else {
-        this.paymentProducts = this.paymentProducts.concat(this.productsWillBack.slice());
-      }
-      for (let index in this.productsWillBack) {
-        this.productsWillPay = this.productsWillPay.filter(obj => obj !== this.productsWillBack[index]);
-      }
-      for (let index in this.productsWillBack) {
-        this.rightPrice -= this.productsWillBack[index].price;
-        this.leftPrice += this.productsWillBack[index].price;
-      }
-      this.productsWillBack = [];
-    }
-  }
-
-  payProduct(item, index, status) {
-    if (status == 1) {
-      let have = $('#payment_' + index + '').hasClass('selected');
-      if (have) {
-        $('#payment_' + index + '').removeClass('bg-warning selected');
-        this.deProducts = this.deProducts.filter(product => product !== item);
-      } else {
-        $('#payment_' + index + '').addClass('bg-warning selected');
-        this.deProducts.push(item);
-      }
-    } else {
-      let have = $('#productWP_' + index + '').hasClass('selected2');
-      if (have) {
-        $('#productWP_' + index + '').removeClass('bg-warning selected2');
-        this.productsWillBack = this.productsWillBack.filter(product => product !== item);
-      } else {
-        $('#productWP_' + index + '').addClass('bg-warning selected2');
-        this.productsWillBack.push(item);
-      }
-    }
-  }
-
-  closeCheck(method) {
-    let realMethod = method;
-    if (this.check.type == 3) {
-      method = 'Parçalı';
-      let leftToFlow = new PaymentStatus(this.owner, realMethod, this.check.total_price, 0, Date.now(), this.check.products);
-      this.check.total_price += this.check.discount;
-      this.check.payment_flow.push(leftToFlow);
-      this.check.products = [];
-    }
-    let closed_check = new ClosedCheck(this.check.table_id, this.check.total_price, this.check.discount, this.check.owner, '', this.check.status, this.check.products, Date.now(), 1, method, this.check.payment_flow);
-    this.mainService.addData('closed_checks', closed_check).then(() => {
-      this.updateProductReport(this.countData);
-      this.updateTableReport(this.check);
-    });
-    this.mainService.updateData('tables', this.check.table_id, { status: 1 });
-    if (this.check.status > 0) {
-      this.mainService.removeData('checks', this.check_id);
-    }
-    this.updateSellingReport(method);
-    $('#paymentMethod').modal('hide');
-    this.router.navigate(['/store']);
-  }
-
-  payCheck(method) {
-    if (this.pDiscount == undefined) {
-      this.pDiscount = 0;
-    }
-    if (this.pDiscount + this.rightPrice >= this.check.total_price) {
-      alert('Toplam Adisyon Hesabı ' + this.check.total_price + ' TL dir.');
-      return false;
-    }
-    let pFlow = new PaymentStatus(this.owner, method, this.rightPrice, this.pDiscount, Date.now(), []);
-    if (this.productsWillPay.length > 0) {
-      this.check.total_price -= this.rightPrice;
-      for (let index in this.productsWillPay) {
-        this.check.products = this.check.products.filter(obj => obj !== this.productsWillPay[index]);
-        pFlow.payed_products.push(this.productsWillPay[index]);
-      }
-    }
-    if (this.check.discount == 0) {
-      this.check.discount = this.pDiscount + this.rightPrice;
-      this.check.total_price -= this.pDiscount;
-    } else {
-      this.check.discount += this.pDiscount + this.rightPrice;
-      this.check.total_price -= this.pDiscount;
-    }
-    if (this.check.payment_flow == undefined) {
-      this.check.payment_flow = [];
-    }
-    this.check.payment_flow.push(pFlow);
-    this.check.type = 3;
-    this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
-      if (res.ok) {
-        this.check._rev = res.rev;
-        this.deProducts = [];
-        this.productsWillPay = [];
-        this.productsWillBack = [];
-        this.rightPrice = 0;
-        this.pDiscount = undefined;
-        this.message.sendMessage('Ürünler ' + method + ' olarak ödendi.');
-        $('#paymentModal').modal('hide');
-      }
-    });
   }
 
   togglePayed() {
@@ -343,42 +208,6 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
-  updateSellingReport(method: string) {
-    if (method !== 'Parçalı') {
-      this.mainService.getAllBy('reports', { connection_id: method }).then(res => {
-        if (res.docs.length > 0) {
-          let doc = res.docs[0];
-          doc.count++;
-          doc.weekly_count[this.settings.getDay().day]++;
-          doc.amount += this.check.discount + this.check.total_price;
-          doc.weekly[this.settings.getDay().day] += this.check.discount + this.check.total_price;
-          doc.update_time = Date.now();
-          this.mainService.updateData('reports', doc._id, doc);
-        }
-      });
-    } else {
-      this.check.payment_flow.forEach((obj, index) => {
-        this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
-          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
-            doc.count++;
-            doc.weekly_count[this.settings.getDay().day]++;
-            doc.amount += obj.amount + obj.discount;
-            doc.weekly[this.settings.getDay().day] += obj.amount + obj.discount;
-            doc.update_time = Date.now();
-            return doc;
-          });
-        });
-      });
-    }
-    this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
-      let sellingAct = res.docs[0];
-      let date = new Date();
-      sellingAct.activity.push(this.check.total_price + this.check.discount);
-      sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
-      this.mainService.updateData('reports', sellingAct._id, sellingAct);
-    })
-  }
-
   updateUserReport() {
     let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
     this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
@@ -415,18 +244,6 @@ export class SellingScreenComponent implements OnInit {
           });
         }
       });
-    });
-  }
-
-  updateTableReport(check: Check) {
-    this.mainService.getAllBy('reports', { connection_id: check.table_id }).then(res => {
-      let report = res.docs[0];
-      report.count++;
-      report.amount += check.total_price;
-      report.update_time = Date.now();
-      report.weekly[this.settings.getDay().day] += check.total_price;
-      report.weekly_count[this.settings.getDay().day]++;
-      this.mainService.updateData('reports', report._id, report);
     });
   }
 

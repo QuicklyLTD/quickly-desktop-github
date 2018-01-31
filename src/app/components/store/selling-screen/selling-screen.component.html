@@ -114,8 +114,7 @@
                     <span class="pull-right">{{check.discount + check.total_price}} TL</span>
                   </strong>
                 </p>
-                <button [routerLink]="['/payment', check_id]" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
-                <!-- <button data-toggle="modal" data-target="#paymentMethod" (click)="printCheck()" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Hesabı Kapat</button> -->
+                <button [routerLink]="['/payment', check_id]" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
               </div>
             </div>
           </div>
@@ -193,137 +192,6 @@
           <button type="submit" class="btn btn-danger btn-lg">Not Ekle</button>
         </div>
       </form>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="check.products.length > 0" class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">Ödeme Al</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form #paymentForm="ngForm">
-        <div class="modal-body">
-          <div class="row mb-3">
-            <div class="col-xl-3 col-lg-3">
-              <div class="card">
-                <div class="card-header">Adisyon</div>
-                <div class="card-block payment-flow p-2">
-                  <div *ngFor="let item of paymentProducts; let i = index">
-                    <p *ngIf="item.status == 2" id="payment_{{i}}" (click)="payProduct(item,i,1)" class="text-bold text-danger mb-2">{{item.name}}
-                      <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
-                      <span class="pull-right">{{item.price}} TL</span>
-                    </p>
-                  </div>
-                </div>
-                <div class="card-footer">
-                  <p class="text-bold">Toplam
-                    <span class="pull-right">{{leftPrice}} TL</span>
-                  </p>
-                  <button [disabled]="leftPrice <= 0" (click)="changePayStatus(1)" class="btn btn-block btn-info">
-                    <i class="fa fa-long-arrow-right fa-2x"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-3">
-              <div class="card">
-                <div class="card-header">Ödenecek Ürünler</div>
-                <div class="card-block payment-flow p-2">
-                  <p *ngFor="let item of productsWillPay; let i = index" (click)="payProduct(item,i,2)" id="productWP_{{i}}" class="text-bold text-danger mb-2">{{item.name}}
-                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
-                    <span class="pull-right">{{item.price}} TL</span>
-                  </p>
-                </div>
-                <div class="card-footer">
-                  <p class="text-bold">Toplam
-                    <span class="pull-right">{{rightPrice}} TL</span>
-                  </p>
-                  <button [disabled]="rightPrice <= 0" (click)="changePayStatus(2)" class="btn btn-block btn-info">
-                    <i class="fa fa-long-arrow-left fa-2x"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xl-12">
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">
-                    Direkt Ödeme
-                  </div>
-                  <input type="number" name="pDiscount" placeholder="Direkt Para Ödeme Miktarını Giriniz.." class="form-control form-control-lg"
-                    [(ngModel)]="pDiscount">
-                  <div class="input-group-addon normal">
-                    TL
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <style>
-            .btn-block+.btn-block {
-              margin-top: 0;
-            }
-          </style>
-          <div class="btn-group btn-block btn-group-justified" style="width:100%">
-            <button type="submit" (click)="payCheck('Nakit')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
-              class="btn btn-success btn-block btn-lg">Nakit</button>
-            <button type="submit" (click)="payCheck('Kart')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
-              class="btn btn-warning btn-block btn-lg">Kart</button>
-            <button type="submit" (click)="payCheck('Kupon')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
-              class="btn btn-info btn-block btn-lg">Kupon</button>
-            <button type="submit" (click)="payCheck('İkram')" [disabled]="pDiscount == 0 || pDiscount == undefined  && rightPrice == 0"
-              class="btn btn-danger btn-block btn-lg">ikram</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="paymentMethod" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">Ödeme Yöntemi Seçin</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="card-deck-wrapper">
-          <div class="card-deck">
-            <div (click)="closeCheck('Nakit')" class="card card-inverse card-success text-center">
-              <div class="card-block">
-                <h4 class="card-title">Nakit</h4>
-              </div>
-            </div>
-            <div (click)="closeCheck('Kart')" class="card card-inverse card-warning text-center">
-              <div class="card-block ">
-                <h4 class="card-title">Kart</h4>
-              </div>
-            </div>
-            <div (click)="closeCheck('Kupon')" class="card card-inverse card-info text-center">
-              <div class="card-block">
-                <h4 class="card-title">Kupon</h4>
-              </div>
-            </div>
-            <div (click)="closeCheck('İkram')" class="card card-inverse card-danger text-center">
-              <div class="card-block">
-                <h4 class="card-title">İkram</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
