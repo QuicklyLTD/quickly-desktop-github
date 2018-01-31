@@ -35,7 +35,6 @@ export class SellingScreenComponent implements OnInit {
   selectedProduct: CheckProduct;
   selectedIndex: number;
   noteForm: NgForm;
-  paymentForm: NgForm;
   owner: string;
   ownerRole: string;
   ownerId: string;
@@ -44,6 +43,7 @@ export class SellingScreenComponent implements OnInit {
   payedShow: boolean = false;
   payedTitle: string = 'Alınan Ödemeleri Görüntüle';
   printers: Array<Printer>;
+  cancelReasons:Array<string>;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService) {
     this.owner = this.settings.getUser('name');
@@ -64,6 +64,11 @@ export class SellingScreenComponent implements OnInit {
 
   ngOnInit() {
     this.fillData();
+    this.cancelReasons = [
+      'Zayi',
+      'Yanlış Sipariş',
+      'Müşteriden Geri Döndü'
+    ]
   }
 
   addToCheck(product) {
@@ -217,7 +222,7 @@ export class SellingScreenComponent implements OnInit {
       doc.weekly[this.settings.getDay().day] += pricesTotal;
       doc.weekly_count[this.settings.getDay().day]++;
       doc.update_time = Date.now();
-      this.mainService.updateData('reports', doc._id, doc);
+      this.mainService.updateData('reports', doc._id, doc).then();
     });
   }
 
