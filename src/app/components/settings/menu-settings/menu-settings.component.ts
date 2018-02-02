@@ -97,7 +97,7 @@ export class MenuSettingsComponent implements OnInit {
       this.messageService.sendMessage('Kategori Adı Belirtmelisiniz');
       return false;
     }
-    if(!form.printer){
+    if (!form.printer) {
       form.printer = '';
     }
     let schema = new Category(form.name, form.description, 1, form.printer, 0);
@@ -128,7 +128,7 @@ export class MenuSettingsComponent implements OnInit {
             this.mainService.removeData('products', data[prop]._id);
             this.mainService.getAllBy('reports', { connection_id: data[prop]._id }).then(res => {
               if (res.docs.length > 0)
-              this.mainService.removeData('reports', res.docs[0]._id);
+                this.mainService.removeData('reports', res.docs[0]._id);
             });
             this.mainService.getAllBy('recipes', { product_id: data[prop]._id }).then(res => {
               if (res.docs.length > 0)
@@ -201,20 +201,21 @@ export class MenuSettingsComponent implements OnInit {
         this.messageService.sendMessage('Ürün Oluşturuldu');
       })
     } else {
-      this.mainService.updateData('products', form._id, schema).then(() => {
-        this.fillData();
-        this.messageService.sendMessage('Ürün Düzenlendi');
-      });
-      if (this.productRecipe.length > 0) {
-        if (this.recipe.length == 0) {
-          let schema = new Recipe(form._id, this.productRecipe);
-          this.mainService.addData('recipes', schema);
-        } else {
-          this.productRecipe = this.productRecipe.concat(this.recipe);
-          let schema = new Recipe(form._id, this.productRecipe,this.recipeId);
-          this.mainService.updateData('recipes', this.recipeId, schema);
+      this.mainService.updateData('products', form._id, schema).then((res) => {
+        if (res.ok) {
+          if (this.productRecipe.length > 0) {
+            if (this.recipe.length == 0) {
+              let schema = new Recipe(form._id, this.productRecipe);
+              this.mainService.addData('recipes', schema);
+            } else {
+              this.productRecipe = this.productRecipe.concat(this.recipe);
+              this.mainService.updateData('recipes', this.recipeId, { recipe: this.productRecipe });
+            }
+          }
+          this.fillData();
+          this.messageService.sendMessage('Ürün Düzenlendi');
         }
-      }
+      });
     }
     this.productForm.reset();
     $('#productModal').modal('hide');
@@ -264,7 +265,7 @@ export class MenuSettingsComponent implements OnInit {
       this.mainService.removeData('products', this.selectedId).then((result) => {
         this.mainService.getAllBy('reports', { connection_id: result.id }).then(res => {
           if (res.docs.length > 0)
-          this.mainService.removeData('reports', res.docs[0]._id);
+            this.mainService.removeData('reports', res.docs[0]._id);
         });
         this.mainService.getAllBy('recipes', { product_id: result.id }).then(res => {
           if (res.docs.length > 0)
@@ -318,6 +319,7 @@ export class MenuSettingsComponent implements OnInit {
         break;
       case 'old':
         this.recipe = this.recipe.filter(item => item.stock_id != id);
+        this.productRecipe = this.productRecipe.filter(item => item.stock_id != id);
         this.oldRecipes = this.oldRecipes.filter(item => item.id != id);
         if (this.oldRecipes.length == 0) {
           if (this.recipesTable.length == 0) {
@@ -325,8 +327,7 @@ export class MenuSettingsComponent implements OnInit {
           }
           this.mainService.removeData('recipes', this.recipeId);
         } else {
-          let schema = new Recipe(this.selectedId, this.recipe);
-          this.mainService.updateData('recipes', this.recipeId, schema);
+          this.mainService.updateData('recipes', this.recipeId, { recipe: this.recipe });
         }
         break;
       default:
