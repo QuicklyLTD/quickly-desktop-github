@@ -201,7 +201,7 @@ export class EndofthedayComponent implements OnInit {
       this.isStarted = false;
       setTimeout(() => {
         this.electronService.reloadProgram();
-      }, 5000);
+      }, 10000);
     });
   }
 
