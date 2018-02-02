@@ -43,7 +43,8 @@ export class SellingScreenComponent implements OnInit {
   payedShow: boolean = false;
   payedTitle: string = 'Alınan Ödemeleri Görüntüle';
   printers: Array<Printer>;
-  cancelReasons:Array<string>;
+  cancelReasons: Array<string>;
+  onProductChange: boolean = false;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService) {
     this.owner = this.settings.getUser('name');
@@ -66,8 +67,9 @@ export class SellingScreenComponent implements OnInit {
     this.fillData();
     this.cancelReasons = [
       'Zayi',
+      'Stokta Yok',
       'Yanlış Sipariş',
-      'Müşteriden Geri Döndü'
+      'Müşteri İstemedi',
     ]
   }
 
@@ -136,11 +138,11 @@ export class SellingScreenComponent implements OnInit {
     $('#checkNote').modal('hide');
   }
 
-  cancelProduct(form: NgForm) {
+  cancelProduct(reason: string) {
     if (this.selectedProduct !== undefined) {
       this.decountProductsData(this.selectedProduct);
       this.check.products[this.selectedIndex].status = 3
-      this.check.products[this.selectedIndex].note = 'Iptal: ' + form.value.description;
+      this.check.products[this.selectedIndex].note = reason;
       this.check.products[this.selectedIndex].owner = this.owner;
       this.check.products[this.selectedIndex].timestamp = Date.now();
       this.check.total_price -= this.selectedProduct.price;
@@ -150,7 +152,6 @@ export class SellingScreenComponent implements OnInit {
           this.message.sendMessage('Ürün İptal Edildi');
           this.selectedProduct = undefined;
           this.selectedIndex = undefined;
-          form.reset();
           $('#cancelProduct').modal('hide');
         }
       });
@@ -313,14 +314,96 @@ export class SellingScreenComponent implements OnInit {
     this.selectedTable = id;
   }
 
-  splitTable() {
-    if (this.check.status > 0) {
-      this.mainService.updateData('tables', this.check.table_id, { status: 1 });
-      this.mainService.updateData('tables', this.selectedTable, { status: 2 });
-      this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable });
+  splitProduct() {
+    if (this.selectedTable.status == 1) {
+      let isOk = confirm(`${this.selectedProduct.name}, ${this.selectedTable.name} Masasına Aktarılacak ve Yeni Hesap Açılacak.`);
+      if (isOk) {
+        let newCheck = new Check(this.selectedTable._id, this.selectedProduct.price, 0, this.owner, '', 1, [this.selectedProduct], Date.now(), 1);
+        this.mainService.addData('checks', newCheck).then(res => {
+          if (res.ok) {
+            this.check.products.splice(this.selectedIndex, 1);
+            this.check.total_price -= this.selectedProduct.price;
+            this.mainService.updateData('tables', this.selectedTable._id, { status: 2 }).then(res => {
+              if (res.ok) {
+                this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                this.setDefault();
+                $('#splitTable').modal('hide');
+              }
+            })
+          }
+        })
+      }
+    } else {
+      this.mainService.getAllBy('checks', { table_id: this.selectedTable._id }).then(res => {
+        let otherCheck: Check = res.docs[0];
+        otherCheck.products.push(this.selectedProduct);
+        otherCheck.total_price += this.selectedProduct.price;
+        this.check.total_price -= this.selectedProduct.price;
+        this.check.products.splice(this.selectedIndex, 1);
+        this.mainService.updateData('checks', otherCheck._id, otherCheck).then(res => {
+          if (res.ok) {
+            this.mainService.updateData('checks', this.check._id, this.check).then(res => {
+              if (res.ok) {
+                this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                delete this.check._rev;
+                this.setDefault();
+                $('#splitTable').modal('hide');
+              }
+            });
+          }
+        });
+      });
     }
-    $('#splitTable').modal('hide');
-    this.router.navigate(['/store']);
+  }
+
+  splitTable() {
+    if (this.selectedTable.status == 1) {
+      if (this.check.status > 0) {
+        this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        this.mainService.updateData('tables', this.selectedTable._id, { status: 2 });
+        this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id }).then(res => {
+          if (res.ok) {
+            this.message.sendMessage(`Hesap ${this.selectedTable.name} Masasına Aktarıldı.`)
+            $('#splitTable').modal('hide');
+            this.router.navigate(['/store']);
+          }
+        });
+      }
+    } else {
+      let isOk = confirm(`Bütün Ürünler ${this.selectedTable.name} Masasına Aktarılacak.`);
+      if (isOk) {
+        this.mainService.getAllBy('checks', { table_id: this.selectedTable._id }).then(res => {
+          let otherCheck: Check = res.docs[0];
+          otherCheck.products = otherCheck.products.concat(this.check.products);
+          otherCheck.total_price += this.check.total_price;
+          otherCheck.note = `${this.table.name} Masası İle Birleştirildi`;
+          if(this.check.payment_flow){
+            if (otherCheck.payment_flow) {
+              otherCheck.payment_flow = otherCheck.payment_flow.concat(this.check.payment_flow);
+            }else{
+              otherCheck.payment_flow = this.check.payment_flow;
+            }
+            otherCheck.discount += this.check.discount;
+            otherCheck.timestamp = Date.now();
+          }
+          this.mainService.updateData('checks', otherCheck._id, otherCheck).then(res => {
+            if (res.ok) {
+              this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
+                if (res.ok) {
+                  this.mainService.removeData('checks', this.check._id).then(res => {
+                    if (res.ok) {
+                      this.message.sendMessage(`Hesap ${this.selectedTable.name} Masası ile Birleştirildi.`)
+                      $('#splitTable').modal('hide');
+                      this.router.navigate(['/store']);
+                    }
+                  });
+                }
+              });
+            }
+          })
+        });
+      }
+    }
   }
 
   filterProducts(value: string) {
@@ -337,16 +420,24 @@ export class SellingScreenComponent implements OnInit {
     if (id !== '') {
       this.mainService.getAllBy('tables', { floor_id: id }).then(res => {
         this.allTables = res.docs;
-        this.allTables = this.allTables.filter(obj => obj._id !== this.id && obj.status !== 2);
+        this.allTables = this.allTables.filter(obj => obj._id !== this.id); // && obj.status !== 2
         this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
       });
     } else {
       this.mainService.getAllBy('tables', {}).then(res => {
         this.allTables = res.docs;
-        this.allTables = this.allTables.filter(obj => obj._id !== this.id && obj.status !== 2);
+        this.allTables = this.allTables.filter(obj => obj._id !== this.id); // && obj.status !== 2
         this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
       });
     }
+  }
+  
+  setDefault(){
+    this.selectedIndex = undefined;
+    this.selectedTable = undefined;
+    this.selectedProduct = undefined;
+    this.onProductChange = false;
+    this.fillData()
   }
 
   fillData() {
@@ -362,7 +453,7 @@ export class SellingScreenComponent implements OnInit {
     this.mainService.getAllBy('tables', {}).then(res => {
       this.allTables = res.docs;
       this.table = this.allTables.filter(obj => obj._id == this.id)[0];
-      this.allTables = this.allTables.filter(obj => obj._id !== this.id && obj.status !== 2);
+      this.allTables = this.allTables.filter(obj => obj._id !== this.id); // && obj.status !== 2
       this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
     });
     this.mainService.getAllBy('floors', {}).then(res => {
