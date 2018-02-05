@@ -4,8 +4,8 @@
       <div class="card-header">
         <div class="row">
           <div class="col-xl-6 col-lg-5">
-            Masa:
-            <b>{{id | general:'tables' | async}}</b>
+            <span *ngIf="check?.type == 1">Masa:</span>
+            <b>{{check?.table_id | general:'tables' | async}}</b>
             <span *ngIf="check.note !== '' && check.note !== null" class="text-muted">( {{check.note}} )</span>
           </div>
           <div class="col-xl-2 col-lg-2 pl-1 pr-2">

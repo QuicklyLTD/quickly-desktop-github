@@ -50,18 +50,18 @@ const routes: Routes = [
     component: SettingsComponent,
     canActivate: [CanActivateViaAuthGuard]
   },
-    {
+  {
     path: 'admin',
     component: AdminComponent
   },
   {
-    path: 'selling-screen/:id',
+    path: 'selling-screen/:type/:id',
     component: SellingScreenComponent,
     canActivate: [CanActivateViaAuthGuard]
   },
   {
     path: 'payment/:id',
-    component: PaymentScreenComponent
+    component: PaymentScreenComponent,
   },
   {
     path: 'fast-selling',

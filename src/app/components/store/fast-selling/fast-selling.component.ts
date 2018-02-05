@@ -33,16 +33,18 @@ export class FastSellingComponent implements OnInit {
   method: string;
   countData: Array<any> = [];
   printers: Array<any>;
+  selectedCat: string;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private router: Router, private electron: ElectronService, private messageService: MessageService, private settings: SettingsService) {
     this.owner = this.settings.getUser('name');
     this.ownerRole = this.settings.getUser('type');
     this.ownerId = this.settings.getUser('id');
     this.check = new Check('TakeAway', 0, 0, this.owner, '', 0, [], Date.now(), 2);
-    this.fillData();
+    this.selectedCat = undefined;
   }
 
   ngOnInit() {
+    this.fillData();
   }
 
   addToCheck(product) {
@@ -69,6 +71,15 @@ export class FastSellingComponent implements OnInit {
       this.messageService.sendMessage('Hesap Kapatıldı!');
       this.router.navigate(['home']);
     });
+  }
+
+  getPayment() {
+    this.check.products.forEach((product: CheckProduct) => {
+      product.status = 2;
+    });
+    this.mainService.addData('checks', this.check).then(res => {
+      this.router.navigate(['payment', res.id]);
+    })
   }
 
   selectProduct(index) {
@@ -126,6 +137,7 @@ export class FastSellingComponent implements OnInit {
   }
 
   getProductsBy(id) {
+    this.selectedCat = id;
     this.mainService.getAllBy('sub_categories', { cat_id: id }).then(res => {
       this.sub_categories = res.docs;
     });

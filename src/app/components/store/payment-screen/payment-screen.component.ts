@@ -61,7 +61,6 @@ export class PaymentScreenComponent implements OnInit {
       let newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
       if (this.check.payment_flow == undefined) {
         this.check.payment_flow = [];
-        this.check.type = 4;
       }
       this.check.payment_flow.push(newPayment);
       this.check.discount += this.priceWillPay;
@@ -86,10 +85,10 @@ export class PaymentScreenComponent implements OnInit {
       this.check.discount += this.priceWillPay;
       total_discounts = this.check.payment_flow.map(obj => obj.discount).reduce((a, b) => a + b);
       let total_price = this.check.payment_flow.map(obj => obj.amount).reduce((a, b) => a + b);
-      checkWillClose = new ClosedCheck(this.check.table_id, total_price, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), 1, method, this.check.payment_flow);
+      checkWillClose = new ClosedCheck(this.check.table_id, total_price, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), this.check.type, method, this.check.payment_flow);
     } else {
       total_discounts = this.discountAmount;
-      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), 1, method);
+      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), this.check.type, method);
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {

@@ -34,7 +34,7 @@
             <div class="card inside-height">
               <div class="card-block check-flow p-2">
                 <p *ngFor="let item of check.products; let i = index" id="product_{{i}}" [ngClass]="{'text-danger': item.status == 2}" (click)="selectProduct(i)"
-                  class="text-bold">{{item.name}}
+                  class="text-bold mb-2">{{item.name}}
                   <small *ngIf="item.note !== ''" class="text-muted">(
                     <i class="fa fa-sticy-note"></i>{{item.note}})</small>
                   <span class="pull-right">{{item.price}} TL</span>
@@ -49,7 +49,8 @@
                     <span class="pull-right">{{check.total_price}} TL</span>
                   </strong>
                 </p>
-                <button data-toggle="modal" data-target="#paymentModal" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
+                <!-- <button data-toggle="modal" data-target="#paymentModal" [disabled]="check.products.length == 0" class="btn btn-danger btn-lg btn-block">Ödeme Al</button> -->
+                <button [disabled]="check.products.length == 0" (click)="getPayment()" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
               </div>
             </div>
           </div>
@@ -57,8 +58,8 @@
             <div class="row">
               <div class="col-lg-3 inside-height check-flow col-card">
                 <div class="btn-group-vertical btn-block btn-group-lg">
-                  <button (click)="fillData()" class="btn btn-secondary">Bütün Ürünler</button>
-                  <button *ngFor="let cat of categories" (click)="getProductsBy(cat._id)" class="btn btn-secondary">{{cat.name}}</button>
+                  <button (click)="fillData()" [ngClass]="{'list-group-item-warning':selectedCat == undefined}" class="btn btn-secondary">Bütün Ürünler</button>
+                  <button *ngFor="let cat of categories" [ngClass]="{'list-group-item-warning':selectedCat == cat._id}" (click)="getProductsBy(cat._id)" class="btn btn-secondary">{{cat.name}}</button>
                 </div>
               </div>
               <div class="col-xl-9 col-lg-8  pr-0 pl-0">
@@ -132,7 +133,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
+<!-- <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -169,4 +170,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

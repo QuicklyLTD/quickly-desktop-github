@@ -9,7 +9,11 @@
         font-size: 4vh;
     }
     .long-name{
-        font-size: 3.2vh;
+        font-size: 3vh;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: capitalize;
     }
     .card-text{
         position: absolute;

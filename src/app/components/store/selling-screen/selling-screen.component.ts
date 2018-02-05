@@ -21,6 +21,7 @@ import { SettingsService } from '../../../services/settings.service';
 
 export class SellingScreenComponent implements OnInit {
   id: string;
+  type: string;
   categories: Array<Category>;
   sub_categories: Array<SubCategory>;
   products: Array<Product>;
@@ -52,13 +53,18 @@ export class SellingScreenComponent implements OnInit {
     this.ownerId = this.settings.getUser('id');
     this.route.params.subscribe(params => {
       this.id = params['id'];
-      this.check = new Check(this.id, 0, 0, this.owner, '', 0, [], Date.now(), 1);
-      this.mainService.getAllBy('checks', { table_id: this.id }).then((result) => {
-        if (result.docs.length > 0) {
-          this.check = result.docs[0];
-          this.check_id = result.docs[0]._id;
+      this.type = params['type'];
+      if (this.type == 'Normal') {
+        this.check = new Check(this.id, 0, 0, this.owner, '', 0, [], Date.now(), 1);
+        this.getCheck({ table_id: this.id });
+      } else {
+        if (this.id == 'New') {
+          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', 0, [], Date.now(), 2);
+        } else {
+          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', 0, [], Date.now(), 2);
+          this.getCheck({ _id: this.id });
         }
-      });
+      }
     });
     this.settings.getPrinters().subscribe(res => this.printers = res.value);
   }
@@ -71,6 +77,15 @@ export class SellingScreenComponent implements OnInit {
       'Yanlış Sipariş',
       'Müşteri İstemedi',
     ]
+  }
+
+  getCheck(filter: object) {
+    this.mainService.getAllBy('checks', filter).then((result) => {
+      if (result.docs.length > 0) {
+        this.check = result.docs[0];
+        this.check_id = result.docs[0]._id;
+      }
+    });
   }
 
   addToCheck(product) {
@@ -269,8 +284,14 @@ export class SellingScreenComponent implements OnInit {
           splitPrintArray.push(splitPrintOrder);
         }
         if (index == orders.length - 1) {
+          let table_name;
+          if (this.check.type == 2) {
+            table_name = 'Hızlı Satış';
+          } else {
+            table_name = this.table.name;
+          }
           splitPrintArray.forEach(order => {
-            this.printerService.printOrder(order.printer, this.table.name, order.products);
+            this.printerService.printOrder(order.printer, table_name, order.products);
           });
         }
       });
@@ -377,10 +398,10 @@ export class SellingScreenComponent implements OnInit {
           otherCheck.products = otherCheck.products.concat(this.check.products);
           otherCheck.total_price += this.check.total_price;
           otherCheck.note = `${this.table.name} Masası İle Birleştirildi`;
-          if(this.check.payment_flow){
+          if (this.check.payment_flow) {
             if (otherCheck.payment_flow) {
               otherCheck.payment_flow = otherCheck.payment_flow.concat(this.check.payment_flow);
-            }else{
+            } else {
               otherCheck.payment_flow = this.check.payment_flow;
             }
             otherCheck.discount += this.check.discount;
@@ -431,8 +452,8 @@ export class SellingScreenComponent implements OnInit {
       });
     }
   }
-  
-  setDefault(){
+
+  setDefault() {
     this.selectedIndex = undefined;
     this.selectedTable = undefined;
     this.selectedProduct = undefined;
