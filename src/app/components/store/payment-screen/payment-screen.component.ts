@@ -61,7 +61,7 @@ export class PaymentScreenComponent implements OnInit {
       let newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
       if (this.check.payment_flow == undefined) {
         this.check.payment_flow = [];
-        this.check.type = 3;
+        this.check.type = 4;
       }
       this.check.payment_flow.push(newPayment);
       this.check.discount += this.priceWillPay;
@@ -78,14 +78,15 @@ export class PaymentScreenComponent implements OnInit {
   closeCheck(method: string) {
     let total_discounts = 0;
     let checkWillClose;
-    if (this.check.type == 3) {
+    if (this.check.payment_flow !== undefined && this.check.payment_flow.length > 0) {
       let realMethod = method;
       method = 'Parçalı';
       let lastPayment = new PaymentStatus(this.userName, realMethod, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
       this.check.payment_flow.push(lastPayment);
       this.check.discount += this.priceWillPay;
       total_discounts = this.check.payment_flow.map(obj => obj.discount).reduce((a, b) => a + b);
-      checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), 1, method, this.check.payment_flow);
+      let total_price = this.check.payment_flow.map(obj => obj.amount).reduce((a, b) => a + b);
+      checkWillClose = new ClosedCheck(this.check.table_id, total_price, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), 1, method, this.check.payment_flow);
     } else {
       total_discounts = this.discountAmount;
       checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), 1, method);
@@ -94,7 +95,7 @@ export class PaymentScreenComponent implements OnInit {
       if (res.ok) {
         this.updateSellingReport(method);
         this.updateTableReport(this.check)
-        this.printerService.printCheck(this.printers[0],this.table,this.check);
+        this.printerService.printCheck(this.printers[0], this.table, this.check);
         this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
           if (res.ok) {
             this.mainService.removeData('checks', this.check._id).then(res => {
@@ -221,8 +222,8 @@ export class PaymentScreenComponent implements OnInit {
           let doc = res.docs[0];
           doc.count++;
           doc.weekly_count[this.settings.getDay().day]++;
-          doc.amount += this.check.discount + this.currentAmount;
-          doc.weekly[this.settings.getDay().day] += this.check.discount + this.currentAmount;
+          doc.amount += this.currentAmount;
+          doc.weekly[this.settings.getDay().day] += this.currentAmount;
           doc.update_time = Date.now();
           this.mainService.updateData('reports', doc._id, doc);
         }
@@ -233,8 +234,8 @@ export class PaymentScreenComponent implements OnInit {
           this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
             doc.count++;
             doc.weekly_count[this.settings.getDay().day]++;
-            doc.amount += obj.amount + obj.discount;
-            doc.weekly[this.settings.getDay().day] += obj.amount + obj.discount;
+            doc.amount += obj.amount;
+            doc.weekly[this.settings.getDay().day] += obj.amount;
             doc.update_time = Date.now();
             return doc;
           });

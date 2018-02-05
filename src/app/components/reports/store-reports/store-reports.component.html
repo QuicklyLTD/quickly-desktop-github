@@ -66,16 +66,20 @@
                     <tr>
                       <th width="5%">#</th>
                       <th width="25%">Masa</th>
-                      <th width="20%">Tutar</th>
-                      <th width="20%">Saat</th>
-                      <th width="20%">Ödeme Tipi</th>
+                      <th width="25%">Tutar</th>
+                      <th width="13%">Saat</th>
+                      <th width="22%">Ödeme</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let check of NormalChecks let i = index;" (click)="getDetail(check)">
                       <td>{{i+1}}</td>
                       <td>{{check.table_id | general:'tables' | async}}</td>
-                      <td>{{check.total_price}} TL</td>
+                      <td>{{check.total_price}} TL
+                        <small *ngIf="check.discount > 0" class="pull-right text-danger">
+                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
+                        </small>
+                      </td>
                       <td>{{check.timestamp | date:"HH:mm" }}</td>
                       <td>{{check.payment_method}}</td>
                     </tr>
@@ -276,11 +280,11 @@
             </section>
           </div>
           <div class="card-footer">
-              <b>
-                <i class="fa fa-user mr-1" aria-hidden="true"></i> Kullanıcı:
-                <span class="pull-right">{{checkDetail?.owner}}</span>
-              </b>
-            </div>
+            <b>
+              <i class="fa fa-user mr-1" aria-hidden="true"></i> Kullanıcı:
+              <span class="pull-right">{{checkDetail?.owner}}</span>
+            </b>
+          </div>
           <div *ngIf="checkDetail?.discount > 0" class="card-footer">
             <b>
               <i class="fa fa-arrow-down" aria-hidden="true"></i> Toplam İndirim Tutarı:
@@ -290,7 +294,7 @@
           <div class="card-footer">
             <b>
               <i class="fa fa-check" aria-hidden="true"></i> Ödenen Miktar:
-              <span class="pull-right">{{checkDetail?.total_price - checkDetail?.discount}} TL</span>
+              <span class="pull-right">{{checkDetail?.total_price}} TL</span>
             </b>
           </div>
         </div>
@@ -300,7 +304,8 @@
           <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
         <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
           <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
-        <button type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1" data-toggle="modal" data-dismiss="modal" data-target="#editCheck">
+        <button type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1" data-toggle="modal"
+          data-dismiss="modal" data-target="#editCheck">
           <i class="fa fa-edit" aria-hidden="true"></i> Hesap Düzelt</button>
       </div>
     </div>
