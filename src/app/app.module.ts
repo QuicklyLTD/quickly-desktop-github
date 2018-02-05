@@ -56,15 +56,15 @@ import { KeyboardDirective } from './directives/keyboard.directive';
 import { AdminComponent } from './components/admin/admin.component';
 
 
-/// Error Handler Sentry
-import * as Raven from 'raven-js';
-Raven.config('https://8b40ef17376d472eb66f7b67bfccfd47@sentry.io/233500').install();
-export class RavenErrorHandler implements ErrorHandler {
-  handleError(err: any): void {
-    console.error(err);
-    Raven.captureException(err);
-  }
-}
+//// Error Handler Sentry
+// import * as Raven from 'raven-js';
+// Raven.config('https://8b40ef17376d472eb66f7b67bfccfd47@sentry.io/233500').install();
+// export class RavenErrorHandler implements ErrorHandler {
+//   handleError(err: any): void {
+//     console.error(err);
+//     Raven.captureException(err);
+//   }
+// }
 
 @NgModule({
   declarations: [
@@ -104,7 +104,7 @@ export class RavenErrorHandler implements ErrorHandler {
     ChartsModule
   ],
   providers: [
-    { provide: ErrorHandler, useClass: RavenErrorHandler },
+    //{ provide: ErrorHandler, useClass: RavenErrorHandler },
     ElectronService,
     MainService,
     ApplicationService,
