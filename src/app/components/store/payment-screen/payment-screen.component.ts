@@ -35,6 +35,8 @@ export class PaymentScreenComponent implements OnInit {
   discount: number;
   discountAmount: number;
   currentAmount: number;
+  check_id: string;
+  check_type: string;
 
   constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
     this.route.params.subscribe(params => {
@@ -266,10 +268,17 @@ export class PaymentScreenComponent implements OnInit {
   fillData() {
     this.mainService.getData('checks', this.id).then(res => {
       this.check = res;
+      if (this.check.type == 1) {
+        this.check_id = this.check.table_id;
+        this.check_type = 'Normal';
+        this.mainService.getData('tables', this.check.table_id).then(res => {
+          this.table = res.name;
+        });
+      } else {
+        this.check_id = this.id;
+        this.check_type = 'Fast';
+      }
       this.check.products = this.check.products.filter(obj => obj.status == 2);
-      this.mainService.getData('tables', this.check.table_id).then(res => {
-        this.table = res.name;
-      })
     });
   }
 }
