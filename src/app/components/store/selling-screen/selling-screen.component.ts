@@ -79,6 +79,22 @@ export class SellingScreenComponent implements OnInit {
     ]
   }
 
+  goPayment() {
+    if (this.check.type == 2) {
+      if (this.check.status == 0) {
+        this.check.products.map(obj => obj.status = 2);
+        this.check.status = 1;
+        this.mainService.addData('checks', this.check).then(res => {
+          this.router.navigate(['/payment', res.id]);
+        });
+      } else {
+        this.router.navigate(['/payment', this.check_id]);
+      }
+    } else {
+      this.router.navigate(['/payment', this.check_id]);
+    }
+  }
+
   getCheck(filter: object) {
     this.mainService.getAllBy('checks', filter).then((result) => {
       if (result.docs.length > 0) {
@@ -97,6 +113,17 @@ export class SellingScreenComponent implements OnInit {
   }
 
   sendCheck() {
+    if (this.check.type == 2) {
+      if (this.check.note == '' || this.check.note == undefined) {
+        let isOk = confirm('Hızlı Hesap oluşturmanız için hesaba not eklemek zorundasınız.');
+        if (isOk) {
+          $('#checkNote').modal('show');
+          return false;
+        } else {
+          return false;
+        }
+      }
+    }
     this.printOrder();
     this.updateUserReport();
     this.check.products.forEach(element => {
@@ -106,13 +133,20 @@ export class SellingScreenComponent implements OnInit {
     });
     this.updateProductReport(this.countData);
     if (this.check.status == 1) {
-      this.mainService.updateData('checks', this.check_id, this.check);
+      delete this.check._rev;
+      this.mainService.updateData('checks', this.check_id, this.check).then(res => {
+        if (res.ok) {
+          this.router.navigate(['/store']);
+        }
+      });
     } else {
+      if (this.check.type == 1) {
+        this.mainService.updateData('tables', this.id, { status: 2 });
+      }
       this.check.status = 1;
       this.mainService.addData('checks', this.check);
+      this.router.navigate(['/store']);
     }
-    this.mainService.updateData('tables', this.id, { status: 2 });
-    this.router.navigate(['/store']);
   }
 
   togglePayed() {
@@ -148,7 +182,9 @@ export class SellingScreenComponent implements OnInit {
   addCheckNote(form: NgForm) {
     let note = form.value.description;
     this.check.note = note;
-    this.mainService.updateData('checks', this.check_id, { note: note });
+    if (this.check.status !== 0) {
+      this.mainService.updateData('checks', this.check_id, { note: note });
+    }
     form.reset();
     $('#checkNote').modal('hide');
   }
@@ -380,9 +416,11 @@ export class SellingScreenComponent implements OnInit {
   splitTable() {
     if (this.selectedTable.status == 1) {
       if (this.check.status > 0) {
-        this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        if (this.check.type == 1) {
+          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        }
         this.mainService.updateData('tables', this.selectedTable._id, { status: 2 });
-        this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id }).then(res => {
+        this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id, type: 1 }).then(res => {
           if (res.ok) {
             this.message.sendMessage(`Hesap ${this.selectedTable.name} Masasına Aktarıldı.`)
             $('#splitTable').modal('hide');
@@ -397,7 +435,11 @@ export class SellingScreenComponent implements OnInit {
           let otherCheck: Check = res.docs[0];
           otherCheck.products = otherCheck.products.concat(this.check.products);
           otherCheck.total_price += this.check.total_price;
-          otherCheck.note = `${this.table.name} Masası İle Birleştirildi`;
+          if (this.check.type == 1) {
+            otherCheck.note = `${this.table.name} Masası İle Birleştirildi`;
+          } else {
+            otherCheck.note = `${this.check.note} Hesabı İle Birleştirildi`;
+          }
           if (this.check.payment_flow) {
             if (otherCheck.payment_flow) {
               otherCheck.payment_flow = otherCheck.payment_flow.concat(this.check.payment_flow);
@@ -409,15 +451,14 @@ export class SellingScreenComponent implements OnInit {
           }
           this.mainService.updateData('checks', otherCheck._id, otherCheck).then(res => {
             if (res.ok) {
-              this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
+              if (this.check.type == 1) {
+                this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+              }
+              this.mainService.removeData('checks', this.check._id).then(res => {
                 if (res.ok) {
-                  this.mainService.removeData('checks', this.check._id).then(res => {
-                    if (res.ok) {
-                      this.message.sendMessage(`Hesap ${this.selectedTable.name} Masası ile Birleştirildi.`)
-                      $('#splitTable').modal('hide');
-                      this.router.navigate(['/store']);
-                    }
-                  });
+                  this.message.sendMessage(`Hesap ${this.selectedTable.name} Masası ile Birleştirildi.`)
+                  $('#splitTable').modal('hide');
+                  this.router.navigate(['/store']);
                 }
               });
             }

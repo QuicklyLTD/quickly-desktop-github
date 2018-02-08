@@ -114,7 +114,7 @@
                     <span class="pull-right">{{check.discount + check.total_price}} TL</span>
                   </strong>
                 </p>
-                <button [routerLink]="['/payment', check_id]" [disabled]="check.products.length == 0 || check.products[0]?.status == 1" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
+                <button (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 " class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
               </div>
             </div>
           </div>
