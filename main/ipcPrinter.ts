@@ -12,7 +12,6 @@ ipcMain.on('printTest', (event, device) => {
         event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
       } else {
         printer
-          .beep()
           .align('ct')
           .size(1, 1)
           .control('LF')
