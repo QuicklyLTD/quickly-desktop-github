@@ -18,7 +18,6 @@ import { StoreComponent } from './components/store/store.component';
 import { SettingsComponent } from './components/settings/settings.component';
 //Store Child Components
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
-import { FastSellingComponent } from './components/store/fast-selling/fast-selling.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
 //Settings Child Components
 import { UserSettingsComponent } from './components/settings/user-settings/user-settings.component';
@@ -84,7 +83,6 @@ import { AdminComponent } from './components/admin/admin.component';
     RestaurantSettingsComponent,
     MessageComponent,
     KeyboardComponent,
-    FastSellingComponent,
     PaymentScreenComponent,
     StockSettingsComponent,
     StoreReportsComponent,

@@ -9,7 +9,6 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { StoreComponent } from './components/store/store.component';
 import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
-import { FastSellingComponent } from './components/store/fast-selling/fast-selling.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { CanActivateViaAuthGuard, AnonymousCanActivate, SetupFinished, DayStarted } from './guards/auth.guard.service';
@@ -62,11 +61,6 @@ const routes: Routes = [
   {
     path: 'payment/:id',
     component: PaymentScreenComponent,
-  },
-  {
-    path: 'fast-selling',
-    component: FastSellingComponent,
-    canActivate: [CanActivateViaAuthGuard, DayStarted]
   },
   {
     path: 'setup',
