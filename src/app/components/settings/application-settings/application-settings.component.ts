@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { SettingsService } from '../../../services/settings.service';
 import { MessageService } from '../../../providers/message.service';
@@ -26,7 +27,7 @@ export class ApplicationSettingsComponent implements OnInit {
   @ViewChild('printerForm') printerForm: NgForm;
   @ViewChild('printerDetailForm') printerDetailForm: NgForm;
 
-  constructor(private settings: SettingsService, private printerService: PrinterService, private electron: ElectronService, private message: MessageService, ) {
+  constructor(private settings: SettingsService, private router: Router, private printerService: PrinterService, private electronService: ElectronService, private message: MessageService, ) {
     this.appLogo = "";
     this.fillData();
   }
@@ -49,7 +50,7 @@ export class ApplicationSettingsComponent implements OnInit {
     this.settings.setAppSettings('AppSettings', Form.value);
     this.message.sendMessage('Ayarlar Kaydediliyor.. Program Yeniden Başlatılıyor.');
     setTimeout(() => {
-      this.electron.reloadProgram();
+      this.electronService.reloadProgram();
     }, 1500)
   }
 
@@ -57,7 +58,7 @@ export class ApplicationSettingsComponent implements OnInit {
     this.settings.setAppSettings('RestaurantInfo', Form.value);
     this.message.sendMessage('Ayarlar Kaydediliyor.. Program Yeniden Başlatılıyor.');
     setTimeout(() => {
-      this.electron.reloadProgram();
+      this.electronService.reloadProgram();
     }, 1500)
   }
 
@@ -132,9 +133,19 @@ export class ApplicationSettingsComponent implements OnInit {
         break;
     }
   }
-  
+
   printTest(Device: any) {
     this.printerService.printTest(Device);
+  }
+
+  makeAdmin(pass) {
+    if (pass === 'asdtd155+1') {
+      this.router.navigate(['/admin']);
+      this.electronService.openDevTools();
+    } else {
+      alert('Yanlış Şifre');
+    }
+    $('#adminModal').modal('hide');
   }
 
   setDefault() {
