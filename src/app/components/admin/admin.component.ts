@@ -52,6 +52,7 @@ export class AdminComponent implements OnInit {
   }
 
   showDocument(doc) {
+    this.editArea.nativeElement.value == '';
     this.selectedDoc = doc;
     $('#docModal').modal('show');
   }
@@ -63,6 +64,7 @@ export class AdminComponent implements OnInit {
       console.log('Döküman Güncellendi');
       this.editArea.nativeElement.value == '';
       this.selectedDoc = undefined;
+      this.showDatabase(this.selectedDB);
     });
   }
 
@@ -80,8 +82,8 @@ export class AdminComponent implements OnInit {
     this.mainService.removeData(this.selectedDB, id).then(res => {
       $('#docModal').modal('hide');
       console.log('Döküman Silindi');
-      this.selectedDB = undefined;
       this.selectedDoc = undefined;
+      this.showDatabase(this.selectedDB);
     });
   }
 
