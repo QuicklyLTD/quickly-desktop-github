@@ -1,9 +1,21 @@
 <div class="row">
   <div class="col-lg-10 pr-0">
     <div class="card full-height">
-      <div class="card-header">Gün Sonu</div>
-      <div class="card-block p-0 flow">
-        <table class="table table-striped table-bordered table-hover">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-9">
+            Gün Sonu
+          </div>
+          <div class="col-lg-3 pr-2 pl-0">
+            <button *ngIf="selectedEndDay !== undefined" (click)="selectedEndDay = undefined;" class="btn btn-danger btn-sm btn-block">
+              <i class="fa fa-backward" aria-hidden="true"></i> Geri Dön
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-block p-0" [ngClass]="{'flow': selectedEndDay == undefined}">
+        <app-day-detail *ngIf="selectedEndDay !== undefined" [data]="selectedEndDay"></app-day-detail>
+        <table *ngIf="selectedEndDay == undefined" class="table table-striped table-bordered table-hover">
           <thead class="thead-inverse">
             <tr>
               <th width="5%">#</th>
@@ -40,53 +52,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="endDetail" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">{{selectedEndDay?.time | date:'dd/M/y HH:mm'}}</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <h3>Satış Durumu</h3>
-        <p>Nakit Toplamı:
-          <span class="pull-right">{{selectedEndDay?.cash_total}} TL</span>
-        </p>
-        <p>Kart Toplamı:
-          <span class="pull-right">{{selectedEndDay?.card_total}} TL</span>
-        </p>
-        <p>Kupon Toplamı:
-          <span class="pull-right">{{selectedEndDay?.coupon_total}} TL</span>
-        </p>
-        <p>İkram Hesap Toplamı:
-          <span class="pull-right">{{selectedEndDay?.free_total}} TL</span>
-        </p>
-        <p>İptal Hesap Toplamı:
-          <span class="pull-right">{{selectedEndDay?.canceled_total}} TL</span>
-        </p>
-        <p>Toplam Gelir:
-          <span class="pull-right">{{selectedEndDay?.total_income}} TL</span>
-        </p>
-        <p>Hesap Adedi:
-          <span class="pull-right">{{selectedEndDay?.check_count}} Adet</span>
-        </p>
-        <h3>Kasa Hareketleri</h3>
-        <p>Kasa Geliri:
-          <span class="pull-right">{{selectedEndDay?.outcomes}} TL</span>
-        </p>
-        <p>Kasa Gideri:
-          <span class="pull-right">{{selectedEndDay?.incomes}} TL</span>
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="modal fade" id="endDayModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -96,7 +61,8 @@
       <div class="modal-body">
         <h3 class="text-muted mb-3">Gün Sonu Yapılıyor..</h3>
         <div class="progress" style="height: 35px;">
-          <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="height: 35px;" role="progressbar" [ngStyle]="{'width': progress}"></div>
+          <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="height: 35px;" role="progressbar"
+            [ngStyle]="{'width': progress}"></div>
         </div>
       </div>
     </div>

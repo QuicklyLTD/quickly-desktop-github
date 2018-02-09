@@ -48,7 +48,6 @@ export class EndofthedayComponent implements OnInit {
 
   getDetail(data: EndDay) {
     this.selectedEndDay = data;
-    $('#endDetail').modal('show');
   }
 
   startDay() {

@@ -53,6 +53,7 @@ import { MessageComponent } from './components/helpers/message/message.component
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
 import { AdminComponent } from './components/admin/admin.component';
+import { DayDetailComponent } from './components/endoftheday/day-detail/day-detail.component';
 
 
 //// Error Handler Sentry
@@ -93,6 +94,7 @@ import { AdminComponent } from './components/admin/admin.component';
     GeneralPipe,
     KeyboardDirective,
     AdminComponent,
+    DayDetailComponent,
   ],
   imports: [
     BrowserModule,
