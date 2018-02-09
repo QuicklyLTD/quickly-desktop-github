@@ -74,6 +74,7 @@ export class PaymentScreenComponent implements OnInit {
         this.togglePayed();
       });
     }
+    this.updateActivityReport();
   }
 
   closeCheck(method: string) {
@@ -95,15 +96,14 @@ export class PaymentScreenComponent implements OnInit {
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
         this.updateSellingReport(method);
-        this.updateTableReport(this.check)
         this.printerService.printCheck(this.printers[0], this.table, this.check);
-        this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
-          if (res.ok) {
-            this.mainService.removeData('checks', this.check._id).then(res => {
-              this.router.navigate(['/store']);
-              this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
-            });
-          }
+        if (this.check.type == 1) {
+          this.updateTableReport(this.check);
+          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        }
+        this.mainService.removeData('checks', this.check._id).then(res => {
+          this.router.navigate(['/store']);
+          this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
         });
       }
     });
@@ -243,13 +243,21 @@ export class PaymentScreenComponent implements OnInit {
         });
       });
     }
-    this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
-      let sellingAct = res.docs[0];
-      let date = new Date();
-      sellingAct.activity.push(this.check.total_price + this.check.discount);
-      sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
-      this.mainService.updateData('reports', sellingAct._id, sellingAct);
-    })
+  }
+
+  updateActivityReport() {
+    this.mainService.getAllBy('checks', {}).then(res => {
+      let checks_total_amount = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
+      let checks_total_count = res.docs.length;
+      let activity_value = checks_total_amount / checks_total_count;
+      this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+        let sellingAct = res.docs[0];
+        let date = new Date();
+        sellingAct.activity.push(Math.round(activity_value));
+        sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+        this.mainService.updateData('reports', sellingAct._id, sellingAct);
+      });
+    });
   }
 
   updateTableReport(check: Check) {
@@ -277,6 +285,7 @@ export class PaymentScreenComponent implements OnInit {
       } else {
         this.check_id = this.id;
         this.check_type = 'Fast';
+        this.table = (this.check.note == '' ? 'Hızlı Satış' : this.check.note);
       }
       this.check.products = this.check.products.filter(obj => obj.status == 2);
     });
