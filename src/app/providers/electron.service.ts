@@ -76,6 +76,26 @@ export class ElectronService {
     });
   }
 
+  readBackupData(filename) {
+    return new Promise((resolve, reject) => {
+      fs.exists(this.appRealPath + '/data/backup/' + filename, (exists) => {
+        if (exists) {
+          fs.readFile(this.appRealPath + '/data/backup/' + filename, (err, data) => {
+            if (!err) {
+              let buffer = data.toString('utf8');
+              let backup = JSON.parse(buffer);
+              resolve(backup);
+            } else {
+              reject('Dosya Okunurken Hata Oluştu.');
+            }
+          });
+        } else {
+          reject('Dosya Bulunamadı');
+        }
+      });
+    });
+  }
+
   reloadProgram() {
     this.appWindow.reload();
   }
