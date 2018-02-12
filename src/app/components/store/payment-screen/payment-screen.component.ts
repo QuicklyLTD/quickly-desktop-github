@@ -254,6 +254,7 @@ export class PaymentScreenComponent implements OnInit {
         let sellingAct = res.docs[0];
         let date = new Date();
         sellingAct.activity.push(Math.round(activity_value));
+        sellingAct.activity_count.push(checks_total_count);
         sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
         this.mainService.updateData('reports', sellingAct._id, sellingAct);
       });

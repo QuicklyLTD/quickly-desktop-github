@@ -18,6 +18,7 @@ export class Activity {
         public type:string,
         public name:string,
         public activity:Array<number>,
-        public activity_time:Array<any>
+        public activity_time:Array<any>,
+        public activity_count:Array<number>
     ) { }
 }
