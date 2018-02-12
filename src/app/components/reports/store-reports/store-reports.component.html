@@ -65,8 +65,8 @@
                   <thead class="thead-inverse">
                     <tr>
                       <th width="5%">#</th>
-                      <th width="25%">Masa</th>
-                      <th width="25%">Tutar</th>
+                      <th width="30%">Masa</th>
+                      <th width="20%">Tutar</th>
                       <th width="13%">Saat</th>
                       <th width="22%">Ödeme</th>
                     </tr>
@@ -74,7 +74,9 @@
                   <tbody>
                     <tr *ngFor="let check of NormalChecks let i = index;" (click)="getDetail(check)">
                       <td>{{i+1}}</td>
-                      <td>{{check.table_id | general:'tables' | async}}</td>
+                      <td>{{check.table_id | general:'tables' | async}}
+                        <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
+                      </td>
                       <td>{{check.total_price}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
@@ -147,17 +149,23 @@
                   <thead class="thead-inverse">
                     <tr>
                       <th width="5%">#</th>
-                      <th width="25%">Hesap Türü</th>
+                      <th width="30%">Hesap Türü</th>
                       <th width="20%">Tutar</th>
-                      <th width="20%">Saat</th>
-                      <th width="20%">Kullanıcı</th>
+                      <th width="13%">Saat</th>
+                      <th width="22%">Kullanıcı</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let check of FastChecks let i = index;" (click)="getDetail(check)">
                       <td>{{i+1}}</td>
-                      <td>{{check.table_id}}</td>
-                      <td>{{check.total_price}} TL</td>
+                      <td>{{check.table_id}}
+                        <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
+                      </td>
+                      <td>{{check.total_price}} TL
+                        <small *ngIf="check.discount > 0" class="pull-right text-danger">
+                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
+                        </small>
+                      </td>
                       <td>{{check.timestamp | date:"HH:mm" }}</td>
                       <td>{{check.owner}}</td>
                     </tr>
@@ -197,7 +205,9 @@
               <tbody>
                 <tr *ngFor="let check of NotPayedChecks let i = index;" (click)="getDetail(check)">
                   <td>{{i+1}}</td>
-                  <td>{{check.table_id | general:'tables' | async}}</td>
+                  <td>{{check.table_id | general:'tables' | async}}
+                    <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
+                  </td>
                   <td>{{check.description}}</td>
                   <td>{{check.payment_method}}</td>
                   <td>{{check.total_price}} TL</td>
