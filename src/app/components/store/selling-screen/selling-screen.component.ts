@@ -24,7 +24,9 @@ export class SellingScreenComponent implements OnInit {
   type: string;
   categories: Array<Category>;
   sub_categories: Array<SubCategory>;
+  subCatsView:Array<SubCategory>;
   products: Array<Product>;
+  productsView:Array<Product>;
   checks: Array<any>;
   floors: Array<Floor>;
   table: Table;
@@ -351,20 +353,12 @@ export class SellingScreenComponent implements OnInit {
 
   getProductsBy(id) {
     this.selectedCat = id;
-    this.mainService.getAllBy('sub_categories', { cat_id: id }).then(res => {
-      this.sub_categories = res.docs;
-    });
-    this.mainService.getAllBy('products', { cat_id: id }).then(result => {
-      this.products = result.docs;
-      this.products = this.products.sort((a, b) => a.price - b.price);
-    });
+    this.subCatsView = this.sub_categories.filter(obj => obj.cat_id == id);
+    this.productsView = this.products.filter(obj => obj.cat_id == id);
   }
 
   getProductsBySubCat(id) {
-    this.mainService.getAllBy('products', { subcat_id: id }).then(result => {
-      this.products = result.docs;
-      this.products = this.products.sort((a, b) => a.price - b.price);
-    });
+    this.productsView = this.products.filter(obj => obj.subcat_id == id);
   }
 
   selectTable(id) {
@@ -469,12 +463,8 @@ export class SellingScreenComponent implements OnInit {
   }
 
   filterProducts(value: string) {
-    this.sub_categories = undefined;
     let regexp = new RegExp(value, 'i');
-    this.mainService.getAllBy('products', { name: { $regex: regexp } }).then(res => {
-      this.products = res.docs;
-      this.products = this.products.sort((a, b) => a.price - b.price);
-    });
+    this.productsView = this.products.filter(({name}) => name.match(regexp));
   }
 
   filterTables(id) {
@@ -482,13 +472,13 @@ export class SellingScreenComponent implements OnInit {
     if (id !== '') {
       this.mainService.getAllBy('tables', { floor_id: id }).then(res => {
         this.allTables = res.docs;
-        this.allTables = this.allTables.filter(obj => obj._id !== this.id); // && obj.status !== 2
+        this.allTables = this.allTables.filter(obj => obj._id !== this.id);
         this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
       });
     } else {
       this.mainService.getAllBy('tables', {}).then(res => {
         this.allTables = res.docs;
-        this.allTables = this.allTables.filter(obj => obj._id !== this.id); // && obj.status !== 2
+        this.allTables = this.allTables.filter(obj => obj._id !== this.id);
         this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
       });
     }
@@ -505,17 +495,20 @@ export class SellingScreenComponent implements OnInit {
   fillData() {
     this.selectedCat = undefined;
     this.mainService.getAllBy('categories', {}).then(result => {
-      this.sub_categories = undefined;
       this.categories = result.docs;
+    });
+    this.mainService.getAllBy('sub_categories', {}).then(result => {
+      this.sub_categories = result.docs;
     });
     this.mainService.getAllBy('products', {}).then(result => {
       this.products = result.docs;
       this.products = this.products.sort((a, b) => a.price - b.price);
+      this.productsView = this.products;
     });
     this.mainService.getAllBy('tables', {}).then(res => {
       this.allTables = res.docs;
       this.table = this.allTables.filter(obj => obj._id == this.id)[0];
-      this.allTables = this.allTables.filter(obj => obj._id !== this.id); // && obj.status !== 2
+      this.allTables = this.allTables.filter(obj => obj._id !== this.id);
       this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
     });
     this.mainService.getAllBy('floors', {}).then(res => {
