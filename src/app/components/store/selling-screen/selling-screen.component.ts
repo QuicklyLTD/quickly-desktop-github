@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { MessageService } from '../../../providers/message.service';
@@ -48,6 +48,7 @@ export class SellingScreenComponent implements OnInit {
   printers: Array<Printer>;
   cancelReasons: Array<string>;
   onProductChange: boolean = false;
+  @ViewChild('productName') productFilterInput : ElementRef
 
   constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService) {
     this.owner = this.settings.getUser('name');
@@ -107,6 +108,7 @@ export class SellingScreenComponent implements OnInit {
   }
 
   addToCheck(product) {
+    this.productFilterInput.nativeElement.value = '';
     this.countProductsData(product._id, product.price);
     let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now());
     this.check.total_price = this.check.total_price + product.price;
