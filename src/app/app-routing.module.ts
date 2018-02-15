@@ -56,7 +56,7 @@ const routes: Routes = [
   {
     path: 'selling-screen/:type/:id',
     component: SellingScreenComponent,
-    canActivate: [CanActivateViaAuthGuard]
+    canActivate: [CanActivateViaAuthGuard , DayStarted]
   },
   {
     path: 'payment/:id',
