@@ -11,6 +11,7 @@ import { Printer } from '../../../mocks/settings.mock';
 import { ElectronService } from '../../../providers/electron.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { SettingsService } from '../../../services/settings.service';
+import { LogService } from '../../../services/log.service';
 
 @Component({
   selector: 'app-selling-screen',
@@ -50,7 +51,7 @@ export class SellingScreenComponent implements OnInit {
   onProductChange: boolean = false;
   @ViewChild('productName') productFilterInput : ElementRef
 
-  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService) {
+  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService, private logService:LogService) {
     this.owner = this.settings.getUser('name');
     this.ownerRole = this.settings.getUser('type');
     this.ownerId = this.settings.getUser('id');

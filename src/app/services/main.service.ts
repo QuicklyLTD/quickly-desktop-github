@@ -38,6 +38,7 @@ export class MainService {
       endday: new PouchDB('local_endday'),
       reports: new PouchDB('local_reports'),
       settings: new PouchDB('local_settings'),
+      logs: new PouchDB('local_logs'),
       allData: new PouchDB('local_alldata')
     };
 
@@ -84,9 +85,7 @@ export class MainService {
   }
 
   changeData(db, id, schema: any) {
-    return this.LocalDB[db].upsert(id, schema).then(result => {
-      this.compactBeforeSync(db);
-    });
+    return this.LocalDB[db].upsert(id, schema);
   }
 
   updateData(db: string, id, schema) {
@@ -133,6 +132,7 @@ export class MainService {
 
   compactBeforeSync(local_db) {
     this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
+      console.log(local_db, change);
       if (change.deleted) {
         this.LocalDB['allData'].get(change.id).then((doc) => {
           this.LocalDB['allData'].remove(doc);
@@ -156,30 +156,30 @@ export class MainService {
     return PouchDB.sync(this.LocalDB[db], this.RemoteDB, {
       live: true,
       retry: true
-      }).on('change', (sync) => {
-        // if(sync.direction == 'pull'){
-        //
-        // }
+    }).on('change', (sync) => {
+      // if(sync.direction == 'pull'){
+      //
+      // }
 
-        // switch (sync.direction) {
-        //   case 'push':
-        //     break;
-        //   case 'pull':
-        //     const check = sync.change.docs[0];
-        //     delete check._rev;
-        //     this.updateData('checks', check._id, check)
-        //       .then((success) => {
-        //         this.pullRequestSource.next(check);
-        //         this.messageService.sendMessage('Mobil uygulamadan yeni siparişler girildi.');
-        //       })
-        //       .catch((error) => {
+      // switch (sync.direction) {
+      //   case 'push':
+      //     break;
+      //   case 'pull':
+      //     const check = sync.change.docs[0];
+      //     delete check._rev;
+      //     this.updateData('checks', check._id, check)
+      //       .then((success) => {
+      //         this.pullRequestSource.next(check);
+      //         this.messageService.sendMessage('Mobil uygulamadan yeni siparişler girildi.');
+      //       })
+      //       .catch((error) => {
 
-        //       })
-        //     return;
-        //   default:
-        //     break;
-        // }
-      })
+      //       })
+      //     return;
+      //   default:
+      //     break;
+      // }
+    })
       .on('paused', function (err) {
         console.log('Sync Paused..');
       }).on('active', function () {

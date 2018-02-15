@@ -4,6 +4,8 @@ import { Cashbox } from '../../mocks/cashbox.mock';
 import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
 import { MessageService } from '../../providers/message.service';
+import { LogService } from '../../services/log.service';
+
 
 @Component({
   selector: 'app-cashbox',
@@ -23,7 +25,7 @@ export class CashboxComponent implements OnInit {
   day: any;
   @ViewChild('cashboxForm') cashboxForm: NgForm;
 
-  constructor(private mainService: MainService, private settingsService: SettingsService, private messageService: MessageService) {
+  constructor(private mainService: MainService, private settingsService: SettingsService, private messageService: MessageService, private logService:LogService) {
     this.day = this.settingsService.getDay().day;
     this.user = this.settingsService.getUser('name');
     this.sellingIncomes = 0;
@@ -77,7 +79,7 @@ export class CashboxComponent implements OnInit {
 
   removeData(id) {
     this.mainService.removeData('cashbox', id).then(res => {
-      this.messageService.sendMessage('Kayıt Silindi')
+      this.messageService.sendMessage('Kayıt Silindi');
       this.fillData();
     });
     $('#cashboxModal').modal('hide');

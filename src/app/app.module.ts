@@ -38,6 +38,7 @@ import { MainService } from './services/main.service';
 import { ApplicationService } from './services/application.service';
 import { SettingsService } from './services/settings.service';
 import { AuthService } from './services/auth.service';
+import { LogService } from './services/log.service';
 //////  Providers
 import { KeyboardService } from './providers/keyboard.service';
 import { MessageService } from "./providers/message.service";
@@ -110,6 +111,7 @@ import { DayDetailComponent } from './components/endoftheday/day-detail/day-deta
     ApplicationService,
     SettingsService,
     AuthService,
+    LogService,
     MessageService,
     KeyboardService,
     PrinterService
