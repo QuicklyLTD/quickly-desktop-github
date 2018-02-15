@@ -45,14 +45,14 @@
             </div>
           </div>
           <div class="col-lg-8 pl-0">
-            <div class="card tab-inside-height">
-              <div class="card-header">
-                Ayrıntılar
-              </div>
-              <div class="card-block p-2 flow pt-3">
-                <h1 *ngIf="selectedFloor == undefined" class="text-center mt-5">Listeden Bölge Seçiniz</h1>
-                <div [hidden]="selectedFloor == undefined">
-                  <form #areaDetailForm="ngForm" (ngSubmit)="updateFloor(areaDetailForm)">
+            <form #areaDetailForm="ngForm" (ngSubmit)="updateFloor(areaDetailForm)">
+              <div class="card tab-inside-height">
+                <div class="card-header">
+                  Ayrıntılar
+                </div>
+                <div class="card-block p-2 flow pt-3">
+                  <h1 *ngIf="selectedFloor == undefined" class="text-center mt-5">Listeden Bölge Seçiniz</h1>
+                  <div [hidden]="selectedFloor == undefined">
                     <input type="hidden" name="_id" ngModel>
                     <input type="hidden" name="_rev" ngModel>
                     <input type="hidden" name="status" ngModel>
@@ -115,28 +115,28 @@
                         </tbody>
                       </table>
                     </div>
-                    <div class="form-group mt-3 mb-0">
-                      <div class="row">
-                        <div class="col pr-1">
-                          <button type="button" (click)="removeFloor()" class="btn btn-md btn-block btn-danger">
-                            <i class="fa fa-remove" aria-hidden="true"></i> Bölgeyi Sil
-                          </button>
-                        </div>
-                        <div class="col pl-1">
-                          <button type="submit" class="btn btn-md btn-block btn-success">
-                            <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
-                        </div>
-                      </div>
+                  </div>
+                </div>
+                <div class="card-footer" [hidden]="selectedFloor == undefined">
+                  <div class="row">
+                    <div class="col pr-1">
+                      <button type="button" (click)="removeFloor()" class="btn btn-md btn-block btn-danger">
+                        <i class="fa fa-remove" aria-hidden="true"></i> Bölgeyi Sil
+                      </button>
                     </div>
-                  </form>
+                    <div class="col pl-1">
+                      <button type="submit" class="btn btn-md btn-block btn-success">
+                        <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
       <div class="card-footer">
-        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
       </div>
     </div>
   </div>
@@ -175,24 +175,25 @@
           <div class="col-lg-8 pl-0">
             <div class="card tab-inside-height">
               <div class="card-header">
-                  <div class="row">
-                      <div class="col-lg-6">
-                          Masalar
-                      </div>
-                      <div class="col-lg-6 pr-2">
-                          <div class="input-group input-group-sm">
-                              <div class="input-group-addon normal">
-                                  <i class="fa fa-search" aria-hidden="true"></i>
-                              </div>
-                              <input #tableName type="text" placeholder="Masa Adı Giriniz.." (focus)="getTablesByFloor(null)" (click)="tableName.value = '';" (keydown)="filterTables(tableName.value)" class="form-control form-contol-sm">
-                          </div>
-                      </div>
+                <div class="row">
+                  <div class="col-lg-6">
+                    Masalar
                   </div>
+                  <div class="col-lg-6 pr-2">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-addon normal">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                      </div>
+                      <input #tableName type="text" placeholder="Masa Adı Giriniz.." (focus)="getTablesByFloor(null)" (click)="tableName.value = '';"
+                        (keydown)="filterTables(tableName.value)" class="form-control form-contol-sm">
+                    </div>
+                  </div>
+                </div>
               </div>
               <div id="productHolder" class="card-block flow">
                 <div *ngIf="tables?.length == 0" class="row mt-5">
                   <div class="col-lg-12 mt-5">
-                    <h2  class="text-center mt3">Eşleşen Masa Bulunamadı</h2>
+                    <h2 class="text-center mt3">Eşleşen Masa Bulunamadı</h2>
                   </div>
                 </div>
                 <div *ngIf="tables?.length > 0" class="row">
@@ -212,7 +213,7 @@
         </div>
       </div>
       <div class="card-footer">
-        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
       </div>
     </div>
   </div>
@@ -225,7 +226,7 @@
 
       </div>
       <div class="card-footer">
-        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
       </div>
     </div>
   </div>
