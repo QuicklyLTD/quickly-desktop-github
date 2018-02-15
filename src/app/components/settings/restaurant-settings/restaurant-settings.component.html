@@ -83,38 +83,37 @@
                         </select>
                       </div>
                     </div>
-                    <div class="form-group mb-2">
-                      <table class="table table-bordered text-center">
-                        <thead>
-                          <tr>
-                            <th width="20%" class="text-center">Rezervasyon</th>
-                            <th width="20%" class="text-center">Açık Hava</th>
-                            <th width="20%" class="text-center">Sigara</th>
-                            <th width="20%" class="text-center">Müzik</th>
-                            <th width="20%" class="text-center">Etkinlik</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="text-center">
-                            <td>
-                              <input type="checkbox" name="reservation" class="form-control" ngModel/>
-                            </td>
-                            <td>
-                              <input type="checkbox" name="air" class="form-control" ngModel/>
-                            </td>
-                            <td>
-                              <input type="checkbox" name="cigarate" class="form-control" ngModel/>
-                            </td>
-                            <td>
-                              <input type="checkbox" name="music" class="form-control" ngModel/>
-                            </td>
-                            <td>
-                              <input type="checkbox" name="events" class="form-control" ngModel/>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    <h5 class="mt-4">Bölge Özellikleri</h5>
+                    <table class="table table-bordered text-center mb-0">
+                      <thead>
+                        <tr>
+                          <th width="20%" class="text-center">Rezervasyon</th>
+                          <th width="20%" class="text-center">Açık Hava</th>
+                          <th width="20%" class="text-center">Sigara</th>
+                          <th width="20%" class="text-center">Müzik</th>
+                          <th width="20%" class="text-center">Etkinlik</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="text-center">
+                          <td>
+                            <input type="checkbox" name="reservation" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="air" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="cigarate" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="music" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="events" class="form-control" ngModel/>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <div class="card-footer" [hidden]="selectedFloor == undefined">
