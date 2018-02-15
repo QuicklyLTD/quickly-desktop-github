@@ -11,6 +11,7 @@ import { Table, Floor } from '../../mocks/table.mock';
 export class StoreComponent implements OnInit {
   floors: Array<any>;
   tables: Array<any>;
+  tableViews: Array<any>;
   checks: Array<any>;
   selected: string;
 
@@ -22,18 +23,12 @@ export class StoreComponent implements OnInit {
 
   getTablesBy(id: string) {
     this.selected = id;
-    this.mainService.getAllBy('tables', { floor_id: id }).then((result) => {
-      this.tables = result.docs
-      this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
-    });
+    this.tableViews = this.tables.filter(obj => obj.floor_id == id);
   }
 
   filterTables(value: string) {
     let regexp = new RegExp(value, 'i');
-    this.mainService.getAllBy('tables', { name: { $regex: regexp } }).then(res => {
-      this.tables = res.docs;
-      this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
-    });
+    this.tableViews = this.tables.filter(({name}) => name.match(regexp));
   }
 
   fillData() {
@@ -48,6 +43,7 @@ export class StoreComponent implements OnInit {
     this.mainService.getAllBy('tables', {}).then((result) => {
       this.tables = result.docs;
       this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
+      this.tableViews = this.tables;
     });
   }
 }

@@ -132,7 +132,6 @@ export class MainService {
 
   compactBeforeSync(local_db) {
     this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
-      console.log(local_db, change);
       if (change.deleted) {
         this.LocalDB['allData'].get(change.id).then((doc) => {
           this.LocalDB['allData'].remove(doc);
