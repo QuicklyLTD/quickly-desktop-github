@@ -25,14 +25,15 @@ export class SellingScreenComponent implements OnInit {
   type: string;
   categories: Array<Category>;
   sub_categories: Array<SubCategory>;
-  subCatsView:Array<SubCategory>;
+  subCatsView: Array<SubCategory>;
   products: Array<Product>;
-  productsView:Array<Product>;
+  productsView: Array<Product>;
   checks: Array<any>;
   floors: Array<Floor>;
   table: Table;
+  tables: Array<Table>;
   selectedTable: any;
-  allTables: Array<any>;
+  tablesView: Array<any>;
   check: Check;
   check_id: string;
   selectedCat: string;
@@ -49,9 +50,9 @@ export class SellingScreenComponent implements OnInit {
   printers: Array<Printer>;
   cancelReasons: Array<string>;
   onProductChange: boolean = false;
-  @ViewChild('productName') productFilterInput : ElementRef
+  @ViewChild('productName') productFilterInput: ElementRef
 
-  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService, private logService:LogService) {
+  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService, private logService: LogService) {
     this.owner = this.settings.getUser('name');
     this.ownerRole = this.settings.getUser('type');
     this.ownerId = this.settings.getUser('id');
@@ -467,24 +468,12 @@ export class SellingScreenComponent implements OnInit {
 
   filterProducts(value: string) {
     let regexp = new RegExp(value, 'i');
-    this.productsView = this.products.filter(({name}) => name.match(regexp));
+    this.productsView = this.products.filter(({ name }) => name.match(regexp));
   }
 
   filterTables(id) {
     this.selectedTable = undefined;
-    if (id !== '') {
-      this.mainService.getAllBy('tables', { floor_id: id }).then(res => {
-        this.allTables = res.docs;
-        this.allTables = this.allTables.filter(obj => obj._id !== this.id);
-        this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
-      });
-    } else {
-      this.mainService.getAllBy('tables', {}).then(res => {
-        this.allTables = res.docs;
-        this.allTables = this.allTables.filter(obj => obj._id !== this.id);
-        this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
-      });
-    }
+    this.tablesView = this.tables.filter(obj => obj.floor_id == id);
   }
 
   setDefault() {
@@ -509,10 +498,10 @@ export class SellingScreenComponent implements OnInit {
       this.productsView = this.products;
     });
     this.mainService.getAllBy('tables', {}).then(res => {
-      this.allTables = res.docs;
-      this.table = this.allTables.filter(obj => obj._id == this.id)[0];
-      this.allTables = this.allTables.filter(obj => obj._id !== this.id);
-      this.allTables = this.allTables.sort((a, b) => a.name.localeCompare(b.name));
+      this.tables = res.docs;
+      this.table = this.tables.filter(obj => obj._id == this.id)[0];
+      this.tables = this.tables.filter(obj => obj._id !== this.id).sort((a, b) => a.name.localeCompare(b.name));
+      this.tablesView = this.tables;
     });
     this.mainService.getAllBy('floors', {}).then(res => {
       this.floors = res.docs;
