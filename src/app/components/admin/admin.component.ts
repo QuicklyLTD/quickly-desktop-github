@@ -33,6 +33,7 @@ export class AdminComponent implements OnInit {
       'endday',
       'reports',
       'settings',
+      'logs',
       'allData'
     ];
 
@@ -87,4 +88,18 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  resetReports() {
+    this.mainService.getAllBy('reports', {}).then(res => {
+      console.warn(res.docs.length);
+      let reports = res.docs.filter(obj => obj.type !== 'Activity');
+      reports.forEach((element, index) => {
+        this.mainService.changeData('reports', element._id, (doc) => {
+          doc.weekly = [0, 0, 0, 0, 0, 0, 0];
+          doc.weekly_count = [0, 0, 0, 0, 0, 0, 0];
+          return doc;
+        });
+      });
+      this.mainService.compactBeforeSync('reports');
+    });
+  }
 }

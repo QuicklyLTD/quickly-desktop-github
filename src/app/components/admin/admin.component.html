@@ -46,6 +46,9 @@
               <button *ngFor="let item of storeReports" type="button" (click)="selectedDB = 'reports';showDocument(item);" class="list-group-item list-group-item-action list-eq">{{item.connection_id}}</button>
             </div>
           </div>
+          <div class="card-footer p-1">
+            <button (click)="resetReports()" class="btn btn-danger btn-md btn-block">Raporları Sıfırla</button>
+          </div>
         </div>
       </div>
     </div>

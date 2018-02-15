@@ -102,7 +102,11 @@ export class PaymentScreenComponent implements OnInit {
           this.mainService.updateData('tables', this.check.table_id, { status: 1 });
         }
         this.mainService.removeData('checks', this.check._id).then(res => {
-          this.router.navigate(['/store']);
+          if(this.check.type == 1){
+            this.router.navigate(['/store']);
+          }else{
+            this.router.navigate(['/home']);
+          }
           this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
         });
       }
