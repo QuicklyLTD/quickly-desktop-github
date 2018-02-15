@@ -29,10 +29,9 @@ export class EndofthedayComponent implements OnInit {
   reports: Array<Report>;
   cashbox: Array<Cashbox>;
   selectedEndDay: EndDay;
-  progress:string;
+  progress: string;
 
   constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settings: SettingsService) {
-    this.progress = '100%';
     this.isStarted = this.settings.getDay().started;
     this.day = this.settings.getDay().day;
     this.owner = this.settings.getUser('id');
@@ -40,6 +39,7 @@ export class EndofthedayComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.progress = 'Veriler Senkorinize Ediliyor...'
     this.total = 0;
     this.endDayData = [];
     this.backupData = [];
@@ -113,7 +113,7 @@ export class EndofthedayComponent implements OnInit {
         console.log('İptal Hesap Bulunamadı..')
       }
       this.mainService.compactBeforeSync('closed_checks');
-      this.checks.forEach(element => {
+      this.checks.forEach((element, index) => {
         this.mainService.removeDoc('closed_checks', element);
       });
       this.endDayReport.canceled_total = canceledTotal;
@@ -128,7 +128,7 @@ export class EndofthedayComponent implements OnInit {
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
       this.mainService.compactBeforeSync('cashbox');
-      this.cashbox.forEach(element => {
+      this.cashbox.forEach((element, index) => {
         this.mainService.removeDoc('cashbox', element);
       });
       let incomes = 0;
@@ -153,28 +153,9 @@ export class EndofthedayComponent implements OnInit {
       ////////////////////////////////////////////////////////////////////
       const activities = res.docs.filter(obj => obj.type == 'Activity');
       const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
-      activities.forEach(element => {
-        this.mainService.changeData('reports', element._id, (doc) => {
-          doc.activity = [];
-          doc.activity_time = [];
-          return doc;
-        });
-      });
       storeData.forEach(element => {
         this.total += element.weekly[this.settings.getDay().day];
       });
-      //////////////////////////////////////////////////////////////////
-      if (this.settings.getDay().day == 0) {
-        this.reports.forEach(element => {
-          this.mainService.changeData('reports', element._id, (doc) => {
-            doc.weekly = [0, 0, 0, 0, 0, 0, 0];
-            doc.weekly_count = [0, 0, 0, 0, 0, 0, 0];
-            return doc;
-          });
-        });
-        localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
-      }
-      //////////////////////////////////////////////////////////////////
       let cashTotal = this.reports.filter(obj => obj.connection_id == 'Nakit')[0].weekly[this.day];
       let cardTotal = this.reports.filter(obj => obj.connection_id == 'Kart')[0].weekly[this.day];
       let couponTotal = this.reports.filter(obj => obj.connection_id == 'Kupon')[0].weekly[this.day];
@@ -184,6 +165,28 @@ export class EndofthedayComponent implements OnInit {
       this.endDayReport.coupon_total = couponTotal;
       this.endDayReport.free_total = freeTotal;
       this.endDayReport.total_income = this.total;
+      /////////////////////////////////////////////////////////////////
+      activities.forEach(element => {
+        this.mainService.changeData('reports', element._id, (doc) => {
+          doc.activity = [];
+          doc.activity_count = [];
+          doc.activity_time = [];
+          return doc;
+        });
+      });
+      //////////////////////////////////////////////////////////////////
+      if (this.settings.getDay().day == 0) {
+        this.reports.forEach((element, index) => {
+          this.mainService.changeData('reports', element._id, (doc) => {
+            doc.weekly = [0, 0, 0, 0, 0, 0, 0];
+            doc.weekly_count = [0, 0, 0, 0, 0, 0, 0];
+            return doc;
+          });
+        });
+        this.mainService.compactBeforeSync('reports');
+        localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
+      }
+      //////////////////////////////////////////////////////////////////
       this.stepFinal()
     });
   }
@@ -196,11 +199,12 @@ export class EndofthedayComponent implements OnInit {
       this.printerService.printReport(this.printers[0], this.endDayReport);
       localStorage.setItem('DayStatus', '{"started":false, "day":' + this.settings.getDay().day + ', "time": ' + Date.now() + '}');
       this.fillData();
-      this.messageService.sendMessage('Program Tekrar Başlatılıyor...');
       this.isStarted = false;
       setTimeout(() => {
+        $('#endDayModal').modal('hide');
+        this.messageService.sendMessage('Gün Sonu Tamamlandı.');
         this.electronService.reloadProgram();
-      }, 10000);
+      }, 15000);
     });
   }
 
