@@ -45,6 +45,12 @@ export class AdminComponent implements OnInit {
     })
   }
 
+  syncData(){
+    this.mainService.syncToLocal(this.selectedDB).then(message => {
+      alert(message);
+    });
+  }
+
   showDatabase(db_name) {
     this.selectedDB = db_name;
     this.mainService.getAllBy(db_name, {}).then(res => {

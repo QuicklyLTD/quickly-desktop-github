@@ -49,6 +49,9 @@
           <div class="card-footer p-1">
             <button (click)="resetReports()" class="btn btn-danger btn-md btn-block">Raporları Sıfırla</button>
           </div>
+          <div class="card-footer p-1">
+            <button (click)="syncData()" [disabled]="selectedDB == undefined || selectedDB == 'allData'" class="btn btn-warning btn-md btn-block">Senkorinize Et</button>
+          </div>
         </div>
       </div>
     </div>
