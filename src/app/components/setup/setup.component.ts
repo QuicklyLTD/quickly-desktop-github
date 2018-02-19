@@ -77,7 +77,7 @@ export class SetupComponent implements OnInit {
     let authValue = new AuthInfo(Data.remote.host, Data.remote.port, Data.auth.database_name, Data.auth.app_id, Data.auth.app_token);
     let auth = new Settings('AuthInfo', authValue, 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
-    let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık' }, 'Uygulama Ayarları', Date.now());
+    let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order:'Sor', ask_print_check:'Sor' }, 'Uygulama Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', auth);
@@ -104,7 +104,6 @@ export class SetupComponent implements OnInit {
         localStorage.setItem('userAuth', res.id);
       });
     }).then(() => {
-      this.mainService.addData('reports', new Report('Store', 'Genel', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Genel Satış Raporu', Date.now()));
       this.mainService.addData('reports', new Report('Store', 'Nakit', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Nakit Satış Raporu', Date.now()));
       this.mainService.addData('reports', new Report('Store', 'Kart', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Kart Satış Raporu', Date.now()));
       this.mainService.addData('reports', new Report('Store', 'Kupon', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Kupon Satış Raporu', Date.now()));
