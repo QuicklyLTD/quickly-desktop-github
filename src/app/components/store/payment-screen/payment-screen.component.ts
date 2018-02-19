@@ -146,6 +146,7 @@ export class PaymentScreenComponent implements OnInit {
     this.check.products.push(product);
     this.check.total_price += product.price;
     this.priceWillPay -= product.price;
+    this.numpad = this.priceWillPay.toString();
     this.setChange();
   }
 
