@@ -14,7 +14,6 @@ export class MainService {
   ajaxOpts: object;
   LocalDB: any;
   RemoteDB: any;
-  pullRequestSource = new Subject<any>();
 
   constructor(private messageService: MessageService) {
     PouchDB.plugin(PouchDBFind);
@@ -78,33 +77,40 @@ export class MainService {
   }
 
   addData(db, schema) {
-    this.compactBeforeSync(db);
-    return this.LocalDB[db].post(schema).catch((err) => {
-      console.error(err);
-    });
+    this.LocalDB[db].post(schema);
+    delete schema._rev;
+    return this.LocalDB['allData'].put(Object.assign({ db_name: db, db_seq: 0 }, schema));
   }
 
   changeData(db, id, schema: any) {
+    this.LocalDB['allData'].upsert(id, schema);
     return this.LocalDB[db].upsert(id, schema);
   }
 
   updateData(db: string, id, schema) {
     return this.LocalDB[db].get(id).then((doc) => {
-      this.compactBeforeSync(db);
-      let uData = Object.assign(doc, schema);
-      return this.LocalDB[db].put(uData);
+      this.LocalDB['allData'].upsert(id, function (doc) {
+        return Object.assign(doc, schema);
+      });
+      return this.LocalDB[db].put(Object.assign(doc, schema));
     });
   }
 
   removeData(db: string, id: string) {
     return this.LocalDB[db].get(id).then((doc) => {
-      this.compactBeforeSync(db);
+      this.LocalDB['allData'].get(id).then((doc) => {
+        this.LocalDB['allData'].remove(doc);
+      });
       return this.LocalDB[db].remove(doc);
     });
   }
 
-  removeDoc(db, doc) {
+  removeDoc(db: string, doc: any) {
     return this.LocalDB[db].remove(doc);
+  }
+
+  putDoc(db: string, doc: any) {
+    return this.LocalDB[db].put(doc);
   }
 
   removeDB(db: string) {
@@ -126,10 +132,6 @@ export class MainService {
     });
   }
 
-  public getPullRequests() {
-    return this.pullRequestSource.asObservable();
-  }
-
   compactBeforeSync(local_db) {
     this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
       if (change.deleted) {
@@ -148,6 +150,27 @@ export class MainService {
       }
     }).on('error', (err) => {
       console.error('Change Error', err);
+    });
+  }
+
+  syncToLocal(db: string) {
+    return new Promise((resolve, reject) => {
+      this.getAllBy('allData', { db_name: db }).then(res => {
+        const docs = res.docs;
+        if (docs.length > 0) {
+          docs.forEach((element, index) => {
+            delete element.db_name;
+            delete element.db_seq;
+            delete element._rev;
+            this.LocalDB[db].put(element);
+            if (docs.length == index + 1) {
+              resolve(`Dökümanlar '${db}' Veritabınına eklendi`);
+            }
+          });
+        } else {
+          reject('Sunucuda Döküman Bulunamadı');
+        }
+      });
     });
   }
 
