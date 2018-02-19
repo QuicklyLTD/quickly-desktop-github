@@ -139,12 +139,8 @@ export class SellingScreenComponent implements OnInit {
     });
     this.updateProductReport(this.countData);
     if (this.check.status == 1) {
-      delete this.check._rev;
-      this.mainService.updateData('checks', this.check_id, this.check).then(res => {
-        if (res.ok) {
-          this.router.navigate(['/store']);
-        }
-      });
+      this.mainService.updateData('checks', this.check_id, this.check);
+      this.router.navigate(['/store']);
     } else {
       if (this.check.type == 1) {
         this.mainService.updateData('tables', this.id, { status: 2 });
@@ -288,12 +284,23 @@ export class SellingScreenComponent implements OnInit {
     data.forEach(obj => {
       this.mainService.getAllBy('reports', { connection_id: obj.product }).then(res => {
         let report = res.docs[0];
-        report.count += obj.count;
-        report.amount += obj.total;
-        report.update_time = Date.now();
-        report.weekly[this.settings.getDay().day] += obj.total;
-        report.weekly_count[this.settings.getDay().day] += obj.count;
-        this.mainService.updateData('reports', report._id, report);
+        // report.count += obj.count;
+        // report.amount += obj.total;
+        // report.update_time = Date.now();
+        // report.weekly[this.settings.getDay().day] += obj.total;
+        // report.weekly_count[this.settings.getDay().day] += obj.count;
+        // this.mainService.putDoc('reports',report);
+
+        this.mainService.changeData('reports', report._id, (doc) => {
+          doc.count += obj.count;
+          doc.amount += obj.total;
+          doc.update_time = Date.now();
+          doc.weekly[this.settings.getDay().day] += obj.total;
+          doc.weekly_count[this.settings.getDay().day] += obj.count;
+          return doc;
+        });
+
+        // this.mainService.updateData('reports', report._id, report);
       });
       this.mainService.getAllBy('recipes', { product_id: obj.product }).then(result => {
         if (result.docs.length > 0) {
@@ -311,32 +318,34 @@ export class SellingScreenComponent implements OnInit {
   }
 
   printOrder() {
-    let orders = this.check.products.filter(obj => obj.status == 1);
-    if (orders.length > 0) {
-      let splitPrintArray = [];
-      orders.forEach((obj, index) => {
-        let catPrinter = this.categories.filter(cat => cat._id == obj.cat_id)[0].printer || this.printers[0].name;
-        let contains = splitPrintArray.some(element => element.printer.name == catPrinter);
-        if (contains) {
-          let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter);
-          splitPrintArray[index].products.push(obj);
-        } else {
-          let thePrinter = this.printers.filter(obj => obj.name == catPrinter)[0];
-          let splitPrintOrder = { printer: thePrinter, products: [obj] };
-          splitPrintArray.push(splitPrintOrder);
-        }
-        if (index == orders.length - 1) {
-          let table_name;
-          if (this.check.type == 2) {
-            table_name = 'Hızlı Satış';
+    if (this.printers.length > 0) {
+      let orders = this.check.products.filter(obj => obj.status == 1);
+      if (orders.length > 0) {
+        let splitPrintArray = [];
+        orders.forEach((obj, index) => {
+          let catPrinter = this.categories.filter(cat => cat._id == obj.cat_id)[0].printer || this.printers[0].name;
+          let contains = splitPrintArray.some(element => element.printer.name == catPrinter);
+          if (contains) {
+            let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter);
+            splitPrintArray[index].products.push(obj);
           } else {
-            table_name = this.table.name;
+            let thePrinter = this.printers.filter(obj => obj.name == catPrinter)[0];
+            let splitPrintOrder = { printer: thePrinter, products: [obj] };
+            splitPrintArray.push(splitPrintOrder);
           }
-          splitPrintArray.forEach(order => {
-            this.printerService.printOrder(order.printer, table_name, order.products);
-          });
-        }
-      });
+          if (index == orders.length - 1) {
+            let table_name;
+            if (this.check.type == 2) {
+              table_name = 'Hızlı Satış';
+            } else {
+              table_name = this.table.name;
+            }
+            splitPrintArray.forEach(order => {
+              this.printerService.printOrder(order.printer, table_name, order.products);
+            });
+          }
+        });
+      }
     }
   }
 
