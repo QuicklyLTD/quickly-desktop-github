@@ -6,10 +6,10 @@
         <table class="table table-bordered table-hover mb-0">
           <thead class="thead-inverse">
             <tr class="table-info">
-              <td width="4%">
+              <td width="5%">
                 <i class="fa fa-diamond"></i>
               </td>
-              <td width="28%">
+              <td width="44.5%">
                 <b>Faliyet Gelirleri</b>
               </td>
               <td colspan="5">
@@ -25,13 +25,11 @@
         <table class="table table-bordered table-hover">
           <thead class="thead-inverse">
             <tr>
-              <th width="4%">#</th>
-              <th width="28%"><i class="fa fa-sticky-note" aria-hidden="true"></i> Açıklama</th>
-              <th width="14%"><i class="fa fa-user" aria-hidden="true"></i> Kullanıcı</th>
-              <th width="10%"><i class="fa fa-clock-o" aria-hidden="true"></i> Saat</th>
-              <th width="15%"><i class="fa fa-money" aria-hidden="true"></i> Nakit</th>
-              <th width="15%"><i class="fa fa-credit-card" aria-hidden="true"></i> Kredi Kartı</th>
-              <th width="15%"><i class="fa fa-bookmark" aria-hidden="true"></i> Kupon</th>
+              <th width="5%">#</th>
+              <th width="45%"><i class="fa fa-sticky-note" aria-hidden="true"></i> Açıklama</th>
+              <th width="15%"><i class="fa fa-user" aria-hidden="true"></i> Kullanıcı</th>
+              <th width="15%"><i class="fa fa-clock-o" aria-hidden="true"></i> Saat</th>
+              <th width="20%"><i class="fa fa-money" aria-hidden="true"></i> Tutar</th>
             </tr>
           </thead>
           <tbody>
@@ -42,9 +40,7 @@
               <td>{{cash.description}}</td>
               <td>{{cash.user}}</td>
               <td>{{cash.time | date:'HH:mm'}}</td>
-              <td>{{cash.cash}} TL</td>
-              <td>{{cash.card}} TL</td>
-              <td>{{cash.coupon}} TL</td>
+              <td>{{cash.cash + cash.card + cash.coupon}} TL</td>
             </tr>
           </tbody>
         </table>
