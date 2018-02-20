@@ -108,7 +108,7 @@ export class SetupComponent implements OnInit {
       this.mainService.addData('reports', new Report('Store', 'Kart', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Kart Satış Raporu', Date.now()));
       this.mainService.addData('reports', new Report('Store', 'Kupon', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Kupon Satış Raporu', Date.now()));
       this.mainService.addData('reports', new Report('Store', 'İkram', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'İkram Satış Raporu', Date.now()));
-      this.mainService.addData('reports', new Activity('Activity', 'Selling', [], [], []));
+      this.mainService.addData('reports', new Activity('Activity', 'Selling', [0], ['GB'], [0]));
       this.message.sendMessage('Program Yeniden Başlatıyor..');
       setTimeout(() => {
         this.electron.reloadProgram();

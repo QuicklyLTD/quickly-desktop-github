@@ -60,7 +60,8 @@ export class EndofthedayComponent implements OnInit {
         res.docs.forEach(element => {
           this.mainService.changeData('reports', element._id, (doc) => {
             doc.activity = [0];
-            doc.activity_time = ['Gün Başlangıcı'];
+            doc.activity_count = [0];
+            doc.activity_time = ['GB'];
             return doc;
           });
         });

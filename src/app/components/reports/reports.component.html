@@ -136,8 +136,8 @@
                 <div class="card-header">
                   <h5 class="mt-2">Zaman Bazlı Satış Aktivitesi</h5>
                 </div>
-                <div class="card-block tab-height p-0 pt-3">
-                  <canvas *ngIf="ChartLoaded" baseChart style="height: 455px; width:67vw; margin:auto;" [data]="activityData" [labels]="activityLabels"
+                <div class="card-block tab-height p-0">
+                  <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:67vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels"
                     [options]="ChartOptions" [legend]="activityLegend" chartType="line"></canvas>
                 </div>
                 <div class="card-footer">

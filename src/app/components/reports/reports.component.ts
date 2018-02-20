@@ -27,9 +27,9 @@ export class ReportsComponent implements OnInit {
   ChartLoaded: boolean;
   ChartLabels: Array<string>;
 
-  activityData: Array<number>;
+  activityData: Array<object>;
   activityLabels: Array<string>;
-  activityLegend: boolean = false;
+  activityLegend: boolean = true;
 
   pieData: Array<any>;
   pieLabels: Array<any>;
@@ -76,7 +76,7 @@ export class ReportsComponent implements OnInit {
     this.ChartLoaded = false;
     this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
       this.sellingActivity = res.docs[0];
-      this.activityData = this.sellingActivity.activity;
+      this.activityData = [{data:this.sellingActivity.activity, label:'Gelir Endeksi'},{data:this.sellingActivity.activity_count, label:'Doluluk Oranı ( % )'}];
       this.activityLabels = this.sellingActivity.activity_time;
     });
     this.mainService.getAllBy('checks', {}).then(res => {

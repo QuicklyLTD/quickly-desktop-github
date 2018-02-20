@@ -18,6 +18,7 @@ export class PaymentScreenComponent implements OnInit {
   id: string;
   check: Check;
   table: string;
+  tables_count: number;
   userId: string;
   userName: string;
   payedShow: boolean;
@@ -102,9 +103,9 @@ export class PaymentScreenComponent implements OnInit {
           this.mainService.updateData('tables', this.check.table_id, { status: 1 });
         }
         this.mainService.removeData('checks', this.check._id).then(res => {
-          if(this.check.type == 1){
+          if (this.check.type == 1) {
             this.router.navigate(['/store']);
-          }else{
+          } else {
             this.router.navigate(['/home']);
           }
           this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
@@ -255,11 +256,12 @@ export class PaymentScreenComponent implements OnInit {
       let checks_total_amount = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
       let checks_total_count = res.docs.length;
       let activity_value = checks_total_amount / checks_total_count;
+      let activity_count = (checks_total_count * 100) / this.tables_count;
       this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
         let sellingAct = res.docs[0];
         let date = new Date();
         sellingAct.activity.push(Math.round(activity_value));
-        sellingAct.activity_count.push(checks_total_count);
+        sellingAct.activity_count.push(Math.round(activity_count));
         sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
         this.mainService.updateData('reports', sellingAct._id, sellingAct);
       });
@@ -295,5 +297,6 @@ export class PaymentScreenComponent implements OnInit {
       }
       this.check.products = this.check.products.filter(obj => obj.status == 2);
     });
+    this.mainService.getAllBy('tables', {}).then(res => { this.tables_count = res.docs.length; })
   }
 }
