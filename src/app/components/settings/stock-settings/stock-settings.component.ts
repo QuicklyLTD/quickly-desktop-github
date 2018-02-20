@@ -58,13 +58,20 @@ export class StockSettingsComponent implements OnInit {
     }
   }
 
-  getStockDetail(Stock) {
+  getStockDetail(stock) {
     this.onUpdate = true;
-    this.mainService.getData('stocks', Stock._id).then(result => {
+    this.mainService.getData('stocks', stock._id).then(result => {
       this.stockForm.setValue(result)
-      this.selectedStock = Stock;
+      this.selectedStock = stock;
       $('#stock').modal('show');
     });
+  }
+
+  addQuantity(value) {
+    let new_quantity = parseInt(this.selectedStock.quantity) + parseInt(value);
+    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * value) };
+    this.stockForm.setValue(Object.assign(this.selectedStock, after));
+    $('#quantityModal').modal('hide')
   }
 
   addStock(stockForm) {

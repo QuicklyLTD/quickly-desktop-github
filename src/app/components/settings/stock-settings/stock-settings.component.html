@@ -105,7 +105,7 @@
           <div class="col-lg-4 pr-2 pl-0">
             <button [disabled]="categories == undefined || categories.length == 0" class="btn btn-danger btn-md btn-block" (click)="setDefault()"
               data-toggle="modal" data-target="#stock">
-              <i class="fa fa-plus"></i> Stoklar
+              <i class="fa fa-plus"></i> Stok Ekle
             </button>
           </div>
         </div>
@@ -257,35 +257,64 @@
             </select>
           </div>
           <div class="input-group">
-            <div class="input-group-addon">Paket Adet</div>
-            <input type="number" name="quantity" class="form-control form-control-lg" ngModel>
-          </div>
-          <div class="input-group">
-            <div class="input-group-addon">Paket Miktar</div>
+            <div class="input-group-addon">Miktar</div>
             <input type="number" name="total" class="form-control form-control-lg" ngModel>
           </div>
           <div class="input-group">
             <div class="input-group-addon">Birim</div>
-            <select name="unit" class="form-control form-control-lg" ngModel>
+            <select #unitName name="unit" class="form-control form-control-lg" ngModel>
               <option *ngFor="let unit of units" value="{{unit}}">{{unit}}</option>
             </select>
-          </div>
-          <div *ngIf="onUpdate" class="input-group">
-            <div class="input-group-addon">Kalan</div>
-            <input type="number" readonly name="left_total" class="form-control form-control-lg" ngModel>
-            <input type="hidden" name="timestamp" ngModel>
           </div>
           <div class="input-group">
             <div class="input-group-addon">Açıklama</div>
             <input type="text" name="description" class="form-control form-control-lg" ngModel>
           </div>
+          <div class="input-group">
+            <div class="input-group-addon">Adet</div>
+            <input [readonly]='onUpdate' type="number" name="quantity" class="form-control form-control-lg" ngModel>
+          </div>
+          <div *ngIf="onUpdate" class="input-group">
+            <div class="input-group-addon">Kalan</div>
+            <input type="number" readonly name="left_total" class="form-control form-control-lg" ngModel>
+            <input type="hidden" name="timestamp" ngModel>
+            <div class="input-group-addon">{{unitName.value}}</div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-          <button *ngIf="onUpdate" type="button" (click)="removeStock(selectedStock._id)" class="btn btn-danger btn-lg">Stok Sil</button>
-          <button type="submit" class="btn btn-primary btn-lg">Kaydet</button>
+          <button *ngIf="onUpdate" type="button" (click)="removeStock(selectedStock._id)" class="btn btn-danger btn-lg">
+            <i class="fa fa-times"></i> Stok Sil</button>
+          <button *ngIf="onUpdate" type="button" data-toggle="modal" data-target="#quantityModal" class="btn btn-success btn-lg">
+            <i class="fa fa-plus"></i> Adet Ekle</button>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fa fa-check"></i> Kaydet</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedStock" class="modal fade" id="quantityModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modelTitleId">{{selectedStock.name}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <input #quantityInput type="number" class="form-control form-control-lg" placeholder="Lütfen Stok Adedi Giriniz">
+          <div class="input-group-addon">Adet</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button type="button" (click)="addQuantity(quantityInput.value)" class="btn btn-primary btn-lg">
+          <i class="fa fa-plus"></i> Ekle</button>
+      </div>
     </div>
   </div>
 </div>
