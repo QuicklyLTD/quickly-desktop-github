@@ -103,6 +103,10 @@ export class SettingsService {
   }
 
   getAppSettings() {
-    return this.AppSettings.asObservable();
+    return new Promise((resolve) => {
+      this.mainService.getAllBy('settings', {}).then((res) => {
+        resolve(res.docs.filter((setting) => setting.key == 'AppSettings')[0].value);
+      });
+    });
   }
 }

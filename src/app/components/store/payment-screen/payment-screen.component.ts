@@ -68,7 +68,18 @@ export class PaymentScreenComponent implements OnInit {
       this.check.payment_flow.push(newPayment);
       this.check.discount += this.priceWillPay;
       this.mainService.updateData('checks', this.id, this.check).then(res => {
-        this.printerService.printPayment(this.printers[0], this.table, newPayment);
+        this.settings.getAppSettings().then((res: any) => {
+          if (res.ask_print_check == 'Sor') {
+            let isOK = confirm('Fiş Yazdırılsın mı ?');
+            if (isOK) {
+              this.printerService.printPayment(this.printers[0], this.table, newPayment);
+            } else {
+              return false;
+            }
+          } else {
+            this.printerService.printPayment(this.printers[0], this.table, newPayment);
+          }
+        });
         this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
         this.fillData();
         this.setDefault();
@@ -97,7 +108,18 @@ export class PaymentScreenComponent implements OnInit {
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
         this.updateSellingReport(method);
-        this.printerService.printCheck(this.printers[0], this.table, this.check);
+        this.settings.getAppSettings().then((res: any) => {
+          if (res.ask_print_check == 'Sor') {
+            let isOK = confirm('Fiş Yazdırılsın mı ?');
+            if (isOK) {
+              this.printerService.printCheck(this.printers[0], this.table, this.check);
+            } else {
+              return false;
+            }
+          } else {
+            this.printerService.printCheck(this.printers[0], this.table, this.check);
+          }
+        });
         if (this.check.type == 1) {
           this.updateTableReport(this.check);
           this.mainService.updateData('tables', this.check.table_id, { status: 1 });

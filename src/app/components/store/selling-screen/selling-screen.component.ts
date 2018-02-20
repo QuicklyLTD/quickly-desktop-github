@@ -130,7 +130,18 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     }
-    this.printOrder();
+    this.settings.getAppSettings().then((res: any) => {
+      if (res.ask_print_order == 'Sor') {
+        let isOK = confirm('Fiş Yazdırılsın mı ?');
+        if (isOK) {
+          this.printOrder();
+        } else {
+          return false;
+        }
+      } else {
+        this.printOrder();
+      }
+    });
     this.updateUserReport();
     this.check.products.forEach(element => {
       if (element.status === 1) {
@@ -284,13 +295,6 @@ export class SellingScreenComponent implements OnInit {
     data.forEach(obj => {
       this.mainService.getAllBy('reports', { connection_id: obj.product }).then(res => {
         let report = res.docs[0];
-        // report.count += obj.count;
-        // report.amount += obj.total;
-        // report.update_time = Date.now();
-        // report.weekly[this.settings.getDay().day] += obj.total;
-        // report.weekly_count[this.settings.getDay().day] += obj.count;
-        // this.mainService.putDoc('reports',report);
-
         this.mainService.changeData('reports', report._id, (doc) => {
           doc.count += obj.count;
           doc.amount += obj.total;
@@ -299,8 +303,6 @@ export class SellingScreenComponent implements OnInit {
           doc.weekly_count[this.settings.getDay().day] += obj.count;
           return doc;
         });
-
-        // this.mainService.updateData('reports', report._id, report);
       });
       this.mainService.getAllBy('recipes', { product_id: obj.product }).then(result => {
         if (result.docs.length > 0) {
