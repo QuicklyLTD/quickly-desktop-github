@@ -174,45 +174,31 @@ export class MainService {
     });
   }
 
-  syncData(db: string) {
-    return PouchDB.sync(this.LocalDB[db], this.RemoteDB, {
-      live: true,
-      retry: true
-    }).on('change', (sync) => {
-      // if(sync.direction == 'pull'){
-      //
-      // }
-
-      // switch (sync.direction) {
-      //   case 'push':
-      //     break;
-      //   case 'pull':
-      //     const check = sync.change.docs[0];
-      //     delete check._rev;
-      //     this.updateData('checks', check._id, check)
-      //       .then((success) => {
-      //         this.pullRequestSource.next(check);
-      //         this.messageService.sendMessage('Mobil uygulamadan yeni siparişler girildi.');
-      //       })
-      //       .catch((error) => {
-
-      //       })
-      //     return;
-      //   default:
-      //     break;
-      // }
-    })
-      .on('paused', function (err) {
-        console.log('Sync Paused..');
-      }).on('active', function () {
-        console.log('Syncing...');
-      }).on('denied', function (err) {
-        console.warn(err);
-        console.log('Sync Denied..');
-      }).on('complete', function (info) {
-        console.log('Sync Complate', info);
-      }).on('error', function (err) {
-        console.error(err);
+  handleChanges(sync) {
+    const changes = sync.change.docs;
+    if (sync.direction === 'pull') {
+      changes.forEach((element, index) => {
+        if (!element._deleted) {
+          let db = element.db_name;
+          delete element._rev;
+          delete element._revisions;
+          delete element.db_seq;
+          delete element.db_name;
+          this.LocalDB[db].upsert(element._id, (doc) => {
+            return Object.assign(doc, element);
+          });
+        }
       });
+    }
+  }
+
+  syncData(db: string) {
+    return PouchDB.sync(this.LocalDB[db], this.RemoteDB, { live: true, retry: true })
+      .on('change', (sync) => { this.handleChanges(sync) })
+      .on('paused', (err) => { console.log('Sync Paused..') })
+      .on('denied', (err) => { console.log('Sync Denied..') })
+      .on('active', () => { console.log('Syncing...') })
+      .on('complete', (info) => { console.log('Sync Complete', info) })
+      .on('error', (err) => { console.error(err) });
   }
 }
