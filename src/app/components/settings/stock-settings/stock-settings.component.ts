@@ -52,7 +52,7 @@ export class StockSettingsComponent implements OnInit {
     if (isOk) {
       this.mainService.removeData('stocks', id).then(res => {
         this.fillData();
-        $('#stock').modal('show');
+        $('#stock').modal('hide');
         this.messageService.sendMessage('Kategori İsmi Belirtmelisiniz!');
       });
     }

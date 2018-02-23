@@ -189,6 +189,7 @@ export class UserSettingsComponent implements OnInit {
         });
         this.messageService.sendMessage('Kullanıcı Silindi!');
         this.fillData();
+        $('#userModal').modal('hide');
       });
     }
   }
