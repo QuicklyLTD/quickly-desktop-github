@@ -46,10 +46,10 @@
           </div>
           <div class="col-lg-8 pl-0">
             <form #groupDetailForm="ngForm" (ngSubmit)="updateGroup(groupDetailForm)">
-            <div class="card tab-inside-height">
-              <div class="card-header">
-                Ayrıntılar
-              </div>
+              <div class="card tab-inside-height">
+                <div class="card-header">
+                  Ayrıntılar
+                </div>
                 <div class="card-block p-2 flow">
                   <h1 *ngIf="selectedGroup == undefined" class="text-center mt-5">Listeden Grup Seçiniz</h1>
                   <div [hidden]="selectedGroup == undefined">
@@ -70,11 +70,11 @@
                       </div>
                     </div>
                     <div class="form-group mb-2">
-                        <div class="input-group">
-                          <div class="input-group-addon">Grup İzinleri</div>
-                          <input type="text" disabled class="form-control form-control-lg"/>
-                        </div>
+                      <div class="input-group">
+                        <div class="input-group-addon">Grup İzinleri</div>
+                        <input type="text" disabled class="form-control form-control-lg" />
                       </div>
+                    </div>
                     <h5 class="mt-4">Erişim Hakları</h5>
                     <table class="table table-bordered text-center mb-0">
                       <thead>
@@ -265,12 +265,12 @@
           <table class="table table-bordered text-center">
             <thead>
               <tr>
-                <th class="text-center">Satış</th>
-                <th class="text-center">Kasa</th>
-                <th class="text-center">Gün Sonu</th>
-                <th class="text-center">Raporlar</th>
-                <th class="text-center">Ayarlar</th>
-                <th class="text-center">İptal</th>
+                <th width="20%" class="text-center">Satış</th>
+                <th width="20%" class="text-center">Kasa</th>
+                <th width="20%" class="text-center">Gün Sonu</th>
+                <th width="20%" class="text-center">Raporlar</th>
+                <th width="20%" class="text-center">Ayarlar</th>
+                <!-- <th class="text-center">İptal</th> -->
               </tr>
             </thead>
             <tbody>
@@ -290,9 +290,10 @@
                 <td>
                   <input type="checkbox" name="settings" class="form-control" ngModel/>
                 </td>
-                <td>
+                <input type="hidden" name="cancel" ngModel/>
+                <!-- <td>
                   <input type="checkbox" name="cancel" class="form-control" ngModel/>
-                </td>
+                </td> -->
               </tr>
             </tbody>
           </table>
