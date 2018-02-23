@@ -15,7 +15,11 @@ export class GeneralPipe implements PipeTransform {
     return this.mainService.getData(args, value).then((result) => {
       return result.name;
     }).catch((err) => {
-      return value;
+      if (value !== 'Hızlı Satış') {
+        return 'Bilinmiyor';
+      } else {
+        return value;
+      }
     });
   }
 
