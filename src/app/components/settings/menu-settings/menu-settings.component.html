@@ -373,13 +373,14 @@
                 </div>
                 <div class="input-group">
                   <div class="input-group-addon">Ürün Tipi</div>
-                  <select name="type" class="form-control form-control-lg" ngModel>
+                  <select #productTypeSelect (change)="setProductType($event.target.value)" name="type" class="form-control form-control-lg" ngModel>
                     <option value="1">Otamatik Stok</option>
                     <option value="2">Manuel Stok</option>
                   </select>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">Fiyat</div>
+                  <div class="input-group-addon">
+                    {{ (productType == 2) ? 'Birim' : ''}} Fiyat</div>
                   <input type="number" name="price" class="form-control form-control-lg" ngModel/>
                   <div class="input-group-addon normal">TL</div>
                 </div>
@@ -388,24 +389,24 @@
                   <input type="text" name="description" class="form-control form-control-lg" ngModel/>
                 </div>
               </div>
-              <div *ngIf="stocks?.length > 0">
-                <h5 class="mt-2">Ürün İçeriği Oluştur</h5>
-                <form #recipesForm="ngForm" (ngSubmit)="addRecipe(recipesForm)">
-                  <div class="input-group">
-                    <div class="input-group-addon">Stok</div>
-                    <select name="stock_id" (change)="onStockChange($event.target.value)" class="form-control form-control-lg" ngModel>
-                      <option *ngFor="let stock of stocks" value="{{stock._id}}">{{stock.name}}</option>
-                    </select>
-                  </div>
-                  <div class="input-group">
-                    <div class="input-group-addon">Miktar</div>
-                    <input type="number" placeholder="0 {{stockUnit}}" name="amount" class="form-control form-control-lg" ngModel/>
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" type="submit">İçerik Ekle</button>
-                    </span>
-                  </div>
-                </form>
-              </div>
+              <h5 class="mt-2">Ürün İçeriği Oluştur</h5>
+              <form #recipesForm="ngForm" (ngSubmit)="addRecipe(recipesForm)">
+                <div class="input-group">
+                  <div class="input-group-addon">Stok</div>
+                  <select [disabled]="stocks?.length == 0 || productType == 2 && productRecipe.length > 0 || productType == 2 && oldRecipes.length > 0" name="stock_id" (change)="onStockChange($event.target.value)"
+                    class="form-control form-control-lg" ngModel>
+                    <option *ngFor="let stock of stocks" value="{{stock._id}}">{{stock.name}}</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">Miktar</div>
+                  <input [disabled]="stocks?.length == 0 || productType == 2 && productRecipe.length > 0 || productType == 2 && oldRecipes.length > 0" type="number" placeholder="0 {{stockUnit}}"
+                    name="amount" class="form-control form-control-lg" ngModel/>
+                  <span class="input-group-btn">
+                    <button [disabled]="stocks?.length == 0 || productType == 2 && productRecipe.length > 0 || productType == 2 && oldRecipes.length > 0" class="btn btn-success" type="submit">İçerik Ekle</button>
+                  </span>
+                </div>
+              </form>
             </div>
             <div class="col-lg-5 pl-0">
               <div class="card" style="height:100%">
@@ -431,7 +432,9 @@
                           </td>
                         </tr>
                         <tr *ngFor="let item of recipesTable" class="table-success">
-                          <td><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></td>
+                          <td>
+                            <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                          </td>
                           <td>{{item.amount}} {{item.unit}} {{item.name}}</td>
                           <td>
                             <i class="fa fa-undo" (click)="removeRecipe('new',item.id)" aria-hidden="true"></i>

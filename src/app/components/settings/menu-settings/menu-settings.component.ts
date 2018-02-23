@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { Report } from '../../../mocks/report.mock';
@@ -24,6 +24,7 @@ export class MenuSettingsComponent implements OnInit {
   recipeId: string;
   stockUnit: string;
   stockName: string;
+  productType: number;
   productRecipe: Array<Ingredient>;
   recipesTable: Array<any>;
   oldRecipes: Array<any>;
@@ -37,6 +38,7 @@ export class MenuSettingsComponent implements OnInit {
   @ViewChild('productForm') productForm: NgForm;
   @ViewChild('categoryForm') categoryForm: NgForm;
   @ViewChild('recipesForm') recipesForm: NgForm;
+  @ViewChild('productTypeSelect') productTypeSelect: ElementRef
 
   constructor(private mainService: MainService, private messageService: MessageService) {
     this.fillData();
@@ -244,6 +246,7 @@ export class MenuSettingsComponent implements OnInit {
       if (result.subcat_id == undefined) {
         result.subcat_id = "";
       }
+      this.productType = result.type;
       this.productForm.setValue(result);
       $('#productModal').modal('show');
     });
@@ -279,6 +282,26 @@ export class MenuSettingsComponent implements OnInit {
         this.messageService.sendMessage('Ürün Silindi!');
         this.fillData();
       });
+    }
+  }
+
+  setProductType(value) {
+    this.productType = value;
+    if (value == 2) {
+      if (this.oldRecipes.length > 1) {
+        let isOK = confirm('Manuel Stok tipi için tek bir Stok kaydı girebilirsiniz. 2. Stok silinecektir.');
+        if (isOK) {
+          let recipeWillLost = this.oldRecipes.pop();
+          this.removeRecipe('old', recipeWillLost.id);
+        } else {
+          this.productType = 1;
+          this.productTypeSelect.nativeElement.value = 1;
+        }
+      }
+      if (this.productRecipe.length > 0) {
+        this.productRecipe.pop();
+        this.recipesTable.pop();
+      }
     }
   }
 
