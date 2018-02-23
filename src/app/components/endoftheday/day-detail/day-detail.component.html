@@ -284,34 +284,48 @@
           <div class="card-header">
             <h5 class="mb-0">{{cashDetail?.description}}</h5>
           </div>
-          <div class="card-block pt-2 pb-2">
+          <div class="card-block p-0">
             <strong>
-              <p class="text-success">
-                <i class="fa fa-money" aria-hidden="true"></i>
-                Nakit:
-                <span class="pull-right">{{cashDetail?.cash}} TL</span>
-              </p>
-              <p class="text-warning">
-                <i class="fa fa-credit-card" aria-hidden="true"></i>
-                Kart:
-                <span class="pull-right">
-                  {{cashDetail?.card}} TL
-                </span>
-              </p>
-              <p class="text-info">
-                <i class="fa fa-bookmark ml-1" aria-hidden="true"></i>
-                Kupon:
-                <span class="pull-right">
-                  {{cashDetail?.coupon}} TL
-                </span>
-              </p>
-              <p class="mb-0">
-                <i class="fa fa-check" aria-hidden="true"></i>
-                Toplam:
-                <span class="pull-right">
-                  {{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card}} TL
-                </span>
-              </p>
+              <table class="table table-striped mb-0">
+                <tbody>
+                  <tr class="table-success">
+                    <td width="10%">
+                      <i class="fa fa-money" aria-hidden="true"></i>
+                    </td>
+                    <td>Nakit:</td>
+                    <td width="20%">
+                      <span class="pull-right">{{cashDetail?.cash}} TL</span>
+                    </td>
+                  </tr>
+                  <tr class="table-warning">
+                    <td width="10%">
+                      <i class="fa fa-credit-card" aria-hidden="true"></i>
+                    </td>
+                    <td>Kart:</td>
+                    <td width="20%">
+                      <span class="pull-right">{{cashDetail?.card}} TL</span>
+                    </td>
+                  </tr>
+                  <tr class="table-info">
+                    <td width="10%">
+                      <i class="fa fa-bookmark ml-1" aria-hidden="true"></i>
+                    </td>
+                    <td>Kupon:</td>
+                    <td width="20%">
+                      <span class="pull-right">{{cashDetail?.coupon}} TL</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td width="10%">
+                      <i class="fa fa-check" aria-hidden="true"></i>
+                    </td>
+                    <td>Toplam:</td>
+                    <td width="20%">
+                      <span class="pull-right">{{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card}} TL</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </strong>
           </div>
           <div class="card-footer">
