@@ -4,9 +4,10 @@ export class Category {
         public description: string,
         public status: number,
         public printer: string,
-        public order:number,
-        public _id?:string,
-        public _rev?:string
+        public order: number,
+        public tags: string,
+        public _id?: string,
+        public _rev?: string
     ) { }
 }
 export class SubCategory {
@@ -15,8 +16,8 @@ export class SubCategory {
         public name: string,
         public description: string,
         public status: number,
-        public _id?:string,
-        public _rev?:string
+        public _id?: string,
+        public _rev?: string
     ) { }
 }
 export class Occations {
@@ -27,21 +28,22 @@ export class Occations {
 }
 export class OccationUnit {
     constructor(
-        public product_id:string,
-        public price:number,
+        public product_id: string,
+        public price: number,
     ) { }
 }
 export class Product {
     constructor(
         public cat_id: string,
+        public type: number,
         public description: string,
         public name: string,
         public price: number,
         public status: number,
         public subcat_id?: string,
         public specifies?: Array<ProductSpecs>,
-        public _id?:string,
-        public _rev?:string
+        public _id?: string,
+        public _rev?: string
     ) { }
 }
 export class ProductGroup {
@@ -54,8 +56,8 @@ export class ProductGroup {
         public status: number,
         public subcat_id?: string,
         public specifies?: Array<ProductSpecs>,
-        public _id?:string,
-        public _rev?:string
+        public _id?: string,
+        public _rev?: string
     ) { }
 }
 export class ProductSpecs {
@@ -68,8 +70,8 @@ export class Recipe {
     constructor(
         public product_id: string,
         public recipe: Array<Ingredient>,
-        public _id?:string,
-        public _rev?:string
+        public _id?: string,
+        public _rev?: string
     ) { }
 }
 export class Ingredient {

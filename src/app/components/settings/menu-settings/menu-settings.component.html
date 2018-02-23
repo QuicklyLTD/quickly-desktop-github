@@ -55,13 +55,22 @@
                   <div [hidden]="selectedCat == undefined">
                     <input type="hidden" name="_id" ngModel>
                     <input type="hidden" name="_rev" ngModel>
-                    <input type="hidden" name="status" ngModel/>
+                    <input type="hidden" name="order" ngModel>
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-addon">
                           Kategori Adı
                         </div>
                         <input type="text" name="name" class="form-control form-control-lg" ngModel>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">Durum</div>
+                        <select name="status" class="form-control form-control-lg" ngModel>
+                          <option value="1">Herkeze Açık</option>
+                          <option value="2">Özel Kategori</option>
+                        </select>
                       </div>
                     </div>
                     <div class="form-group mb-2">
@@ -85,12 +94,12 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-addon">
-                          Sıra
+                          Etiketler
                         </div>
-                        <input type="number" name="order" readonly class="form-control form-control-lg" ngModel>
+                        <input type="text" name="tags" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-0">
                       <div class="input-group">
                         <div class="input-group-addon">
                           Alt Kategoriler
@@ -105,7 +114,7 @@
                 </div>
                 <div class="card-footer" [hidden]="selectedCat == undefined">
                   <div class="row">
-                    <div class="col pr-1">
+                    <div class="col pr-1 pl-2">
                       <button type="button" (click)="removeCategory(selectedCat._id)" class="btn btn-md btn-block btn-danger">
                         <i class="fa fa-remove" aria-hidden="true"></i> Kategoriyi Sil
                       </button>
@@ -253,6 +262,13 @@
               <input type="text" name="name" class="form-control form-control-lg" ngModel/>
             </div>
             <div class="input-group">
+              <div class="input-group-addon">Durum</div>
+              <select name="status" class="form-control form-control-lg" ngModel>
+                <option value="1">Herkeze Açık</option>
+                <option value="2">Özel Kategori</option>
+              </select>
+            </div>
+            <div class="input-group">
               <div class="input-group-addon">Açıklama</div>
               <input type="text" name="description" class="form-control form-control-lg" ngModel/>
             </div>
@@ -261,6 +277,10 @@
               <select [disabled]="printers?.length == 0" name="printer" class="form-control form-control-lg" ngModel>
                 <option *ngFor="let item of printers">{{item.name}}</option>
               </select>
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon">Etiketler</div>
+              <input type="text" name="tags" class="form-control form-control-lg" ngModel/>
             </div>
           </div>
         </div>
@@ -332,50 +352,96 @@
           <input name="specifies" type="hidden" ngModel/>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <div class="input-group">
-              <div class="input-group-addon">Ürün Adı</div>
-              <input type="text" name="name" class="form-control form-control-lg" ngModel/>
-            </div>
-            <div class="input-group">
-              <div class="input-group-addon">Kategori</div>
-              <select (change)="getSubCategories($event.target.value)" name="cat_id" class="form-control form-control-lg" ngModel>
-                <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <div class="input-group-addon">Alt Kategori</div>
-              <select [disabled]="subCats.length == 0 || subCats == undefined" name="subcat_id" class="form-control form-control-lg" ngModel>
-                <option *ngFor="let cat of subCats" value="{{cat._id}}">{{cat.name}}</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <div class="input-group-addon">Fiyat</div>
-              <input type="number" name="price" class="form-control form-control-lg" ngModel/>
-              <div class="input-group-addon">TL</div>
-            </div>
-            <div class="input-group">
-              <div class="input-group-addon">Ürün Hakkında</div>
-              <input type="text" name="description" class="form-control form-control-lg" ngModel/>
-            </div>
-          </div>
-          <div *ngIf="onUpdate && stocks.length > 0">
-            <h5>Ürün İçeriği</h5>
-            <form #recipesForm="ngForm" (ngSubmit)="addRecipe(recipesForm)">
-              <div class="input-group">
-                <select name="stock_id" (change)="onStockChange($event.target.value)" class="form-control form-control-lg" ngModel>
-                  <option *ngFor="let stock of stocks" value="{{stock._id}}">{{stock.name}}</option>
-                </select>
-                <input type="number" placeholder="0 {{stockUnit}}" name="amount" class="form-control form-control-lg" ngModel/>
-                <span class="input-group-btn">
-                  <button class="btn btn-success" type="submit">İçerik Ekle</button>
-                </span>
+          <div class="row">
+            <div class="col-lg-7 pr-2">
+              <div class="form-group mb-0">
+                <div class="input-group">
+                  <div class="input-group-addon">Ürün Adı</div>
+                  <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">Kategori</div>
+                  <select (change)="getSubCategories($event.target.value)" name="cat_id" class="form-control form-control-lg" ngModel>
+                    <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">Alt Kategori</div>
+                  <select [disabled]="subCats.length == 0 || subCats == undefined" name="subcat_id" class="form-control form-control-lg" ngModel>
+                    <option *ngFor="let cat of subCats" value="{{cat._id}}">{{cat.name}}</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">Ürün Tipi</div>
+                  <select name="type" class="form-control form-control-lg" ngModel>
+                    <option value="1">Otamatik Stok</option>
+                    <option value="2">Manuel Stok</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">Fiyat</div>
+                  <input type="number" name="price" class="form-control form-control-lg" ngModel/>
+                  <div class="input-group-addon normal">TL</div>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon">Ürün Hakkında</div>
+                  <input type="text" name="description" class="form-control form-control-lg" ngModel/>
+                </div>
               </div>
-            </form>
-            <div *ngIf="hasRecipe" class="mt-3">
-              <h5>İçerikler</h5>
-              <span *ngFor="let item of oldRecipes" (click)="removeRecipe('old',item.id)" class="badge badge-warning mr-2">{{item.amount}} {{item.unit}} {{item.name}}</span>
-              <span *ngFor="let item of recipesTable" (click)="removeRecipe('new',item.id)" class="badge badge-info mr-2">{{item.amount}} {{item.unit}} {{item.name}}</span>
+              <div *ngIf="stocks?.length > 0">
+                <h5 class="mt-2">Ürün İçeriği Oluştur</h5>
+                <form #recipesForm="ngForm" (ngSubmit)="addRecipe(recipesForm)">
+                  <div class="input-group">
+                    <div class="input-group-addon">Stok</div>
+                    <select name="stock_id" (change)="onStockChange($event.target.value)" class="form-control form-control-lg" ngModel>
+                      <option *ngFor="let stock of stocks" value="{{stock._id}}">{{stock.name}}</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <div class="input-group-addon">Miktar</div>
+                    <input type="number" placeholder="0 {{stockUnit}}" name="amount" class="form-control form-control-lg" ngModel/>
+                    <span class="input-group-btn">
+                      <button class="btn btn-success" type="submit">İçerik Ekle</button>
+                    </span>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-5 pl-0">
+              <div class="card" style="height:100%">
+                <div class="card-header">
+                  Ürün İçeriği
+                </div>
+                <div class="card-block p-0">
+                  <div *ngIf="hasRecipe">
+                    <table class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th width="%5">#</th>
+                          <th>Stok Adı</th>
+                          <th width="%5">Sil</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of oldRecipes; let i = index;">
+                          <td>{{i+1}}</td>
+                          <td>{{item.amount}} {{item.unit}} {{item.name}}</td>
+                          <td>
+                            <i class="fa fa-trash-o" (click)="removeRecipe('old',item.id)" aria-hidden="true"></i>
+                          </td>
+                        </tr>
+                        <tr *ngFor="let item of recipesTable" class="table-success">
+                          <td><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></td>
+                          <td>{{item.amount}} {{item.unit}} {{item.name}}</td>
+                          <td>
+                            <i class="fa fa-undo" (click)="removeRecipe('new',item.id)" aria-hidden="true"></i>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

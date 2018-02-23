@@ -100,7 +100,7 @@ export class MenuSettingsComponent implements OnInit {
     if (!form.printer) {
       form.printer = '';
     }
-    let schema = new Category(form.name, form.description, 1, form.printer, 0);
+    let schema = new Category(form.name, form.description, 1, form.printer, 0, form.tags);
     this.mainService.addData('categories', schema).then(() => {
       this.fillData();
       this.messageService.sendMessage('Kategori Oluşturuldu');
@@ -193,13 +193,17 @@ export class MenuSettingsComponent implements OnInit {
       this.messageService.sendMessage('Gerekli Alanları Doldurmalısınız');
       return false;
     }
-    let schema = new Product(form.cat_id, form.description, form.name, form.price, 1, form.subcat_id, form.specifies, form._id, form._rev);
+    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.subcat_id, form.specifies, form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('products', schema).then((response) => {
         this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now()));
+        if (this.productRecipe.length > 0) {
+          let schema = new Recipe(response.id, this.productRecipe);
+          this.mainService.addData('recipes', schema);
+        }
         this.fillData();
         this.messageService.sendMessage('Ürün Oluşturuldu');
-      })
+      });
     } else {
       this.mainService.updateData('products', form._id, schema).then((res) => {
         if (res.ok) {
@@ -217,6 +221,7 @@ export class MenuSettingsComponent implements OnInit {
         }
       });
     }
+    this.recipesForm.reset();
     this.productForm.reset();
     $('#productModal').modal('hide');
   }
