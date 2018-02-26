@@ -286,3 +286,47 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="productSpecs" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{productWithSpecs?.name}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="card">
+          <div class="card-header">Miktar</div>
+          <div class="card-block p-0">
+            <div class="input-group">
+              <input #specsInput type="text" readonly class="form-control form-control-lg" [ngModel]="numpad" />
+              <div #specsUnit class="input-group-addon normal">{{productStock?.stock_id | general:'stocks':'unit' | async}}</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div *ngFor="let keys of numboard;" class="row mb-1">
+              <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1">
+                <button type="button" [disabled]="key == '◂' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == '' || key == '.' && isFirstTime || key == '.' && specsUnit.innerHTML == 'Adet'"
+                  (click)="pushKey(key)" class="btn btn-secondary btn-lg btn-block numpad">{{key}}</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <b>
+              <h2 class="mb-0">Tutar:
+                <span class="pull-right">{{(numpad*productWithSpecs?.price) / productStock?.amount }} TL</span>
+              </h2>
+            </b>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button type="button" (click)="numpadToCheck()" [disabled]="((numpad*productWithSpecs?.price) / productStock?.amount) == 0" class="btn btn-primary btn-lg">
+          <i class="fa fa-check" aria-hidden="true"></i> Onayla</button>
+      </div>
+    </div>
+  </div>
+</div>

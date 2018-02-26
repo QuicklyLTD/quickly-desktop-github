@@ -50,12 +50,20 @@ export class SellingScreenComponent implements OnInit {
   printers: Array<Printer>;
   cancelReasons: Array<string>;
   onProductChange: boolean = false;
+  productWithSpecs: Product;
+  productStock: any;
+  numpad: any;
+  numboard: Array<any>;
+  isFirstTime: boolean;
+  askForPrint: boolean;
   @ViewChild('productName') productFilterInput: ElementRef
+  @ViewChild('specsUnit') productUnit: ElementRef
 
   constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService, private logService: LogService) {
     this.owner = this.settings.getUser('name');
     this.ownerRole = this.settings.getUser('type');
     this.ownerId = this.settings.getUser('id');
+    this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "◂"]];
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.type = params['type'];
@@ -87,6 +95,8 @@ export class SellingScreenComponent implements OnInit {
   goPayment() {
     if (this.check.type == 2) {
       if (this.check.status == 0) {
+        this.updateUserReport();
+        this.updateProductReport(this.countData);
         this.check.products.map(obj => obj.status = 2);
         this.check.status = 1;
         this.mainService.addData('checks', this.check).then(res => {
@@ -109,13 +119,55 @@ export class SellingScreenComponent implements OnInit {
     });
   }
 
-  addToCheck(product) {
-    this.productFilterInput.nativeElement.value = '';
-    this.countProductsData(product._id, product.price);
-    let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now());
-    this.check.total_price = this.check.total_price + product.price;
-    this.check.products.push(newProduct);
-    this.newOrders.push(newProduct);
+  addToCheck(product: Product) {
+    if (product.type == 2) {
+      this.isFirstTime = true;
+      this.productWithSpecs = product;
+      this.mainService.getAllBy('recipes', { product_id: product._id }).then(res => {
+        this.productStock = res.docs[0].recipe[0];
+        this.numpad = this.productStock.amount;
+      });
+      $('#productSpecs').modal('show');
+    } else {
+      this.productFilterInput.nativeElement.value = '';
+      this.countProductsData(product._id, product.price);
+      let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now());
+      this.check.total_price = this.check.total_price + product.price;
+      this.check.products.push(newProduct);
+      this.newOrders.push(newProduct);
+    }
+  }
+
+  numpadToCheck() {
+    let newAmount = (this.numpad * this.productWithSpecs.price) / this.productStock.amount;
+    let newNote = `${this.numpad} ${this.productUnit.nativeElement.innerHTML}`;
+    const newProduct = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, newAmount, newNote, 1, this.owner, Date.now());
+    this.check.total_price = this.check.total_price + newProduct.price;
+    let countFor = newAmount / this.productWithSpecs.price;
+    if (this.productUnit.nativeElement.innerHTML == 'Adet') {
+      for (let index = 0; index < countFor; index++) {
+        let repeatingProducts = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, this.productWithSpecs.price, '', 1, this.owner, Date.now());
+        this.check.products.push(repeatingProducts);
+        this.newOrders.push(repeatingProducts);
+      }
+    } else {
+      this.check.products.push(newProduct);
+      this.newOrders.push(newProduct);
+    }
+    this.countProductsData(this.productWithSpecs._id, newAmount, countFor);
+    $('#productSpecs').modal('hide');
+  }
+
+  pushKey(key: any) {
+    if (key === "◂") {
+      this.numpad = '';
+    } else {
+      if (this.isFirstTime) {
+        this.numpad = '';
+        this.isFirstTime = false;
+      }
+      this.numpad += key;
+    }
   }
 
   sendCheck() {
@@ -130,19 +182,15 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     }
-    this.settings.getAppSettings().then((res: any) => {
-      if (res.ask_print_order == 'Sor') {
-        let isOK = confirm('Fiş Yazdırılsın mı ?');
-        if (isOK) {
-          this.printOrder();
-        } else {
-          return false;
-        }
-      } else {
+    this.updateUserReport();
+    if (this.askForPrint) {
+      let isOK = confirm('Fiş Yazdırılsın mı ?');
+      if (isOK) {
         this.printOrder();
       }
-    });
-    this.updateUserReport();
+    } else {
+      this.printOrder();
+    }
     this.check.products.forEach(element => {
       if (element.status === 1) {
         element.status = 2;
@@ -210,6 +258,8 @@ export class SellingScreenComponent implements OnInit {
       this.check.products[this.selectedIndex].owner = this.owner;
       this.check.products[this.selectedIndex].timestamp = Date.now();
       this.check.total_price -= this.selectedProduct.price;
+      const productAfterCancel = this.check.products.filter(obj => obj.status == 1);
+      this.check.products = this.check.products.filter(obj => obj.status !== 1);
       this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
         if (res.ok) {
           this.check._rev = res.rev;
@@ -217,6 +267,9 @@ export class SellingScreenComponent implements OnInit {
           this.selectedProduct = undefined;
           this.selectedIndex = undefined;
           $('#cancelProduct').modal('hide');
+          productAfterCancel.forEach(element => {
+            this.check.products.push(element);
+          })
         }
       });
     }
@@ -266,12 +319,21 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
-  countProductsData(id, price) {
-    let countObj = { product: id, count: 1, total: price };
+  countProductsData(id, price, manuelCount?) {
+    let countObj;
+    if (manuelCount) {
+      countObj = { product: id, count: manuelCount, total: price };
+    } else {
+      countObj = { product: id, count: 1, total: price };
+    }
     let contains = this.countData.some(obj => obj.product === id);
     if (contains) {
       let index = this.countData.findIndex(p_id => p_id.product == id);
-      this.countData[index].count++;
+      if (manuelCount) {
+        this.countData[index].count += manuelCount;
+      } else {
+        this.countData[index].count++;
+      }
       this.countData[index].total += price;
     } else {
       this.countData.push(countObj);
@@ -516,6 +578,13 @@ export class SellingScreenComponent implements OnInit {
     });
     this.mainService.getAllBy('floors', {}).then(res => {
       this.floors = res.docs;
+    });
+    this.settings.getAppSettings().subscribe((res: any) => {
+      if (res.value.ask_print_order == 'Sor') {
+        this.askForPrint = true;
+      } else {
+        this.askForPrint = false;
+      }
     });
   }
 }
