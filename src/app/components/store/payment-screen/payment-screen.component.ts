@@ -38,6 +38,7 @@ export class PaymentScreenComponent implements OnInit {
   currentAmount: number;
   check_id: string;
   check_type: string;
+  askForPrint: boolean;
 
   constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
     this.route.params.subscribe(params => {
@@ -68,23 +69,19 @@ export class PaymentScreenComponent implements OnInit {
       this.check.payment_flow.push(newPayment);
       this.check.discount += this.priceWillPay;
       this.mainService.updateData('checks', this.id, this.check).then(res => {
-        this.settings.getAppSettings().then((res: any) => {
-          if (res.ask_print_check == 'Sor') {
-            let isOK = confirm('Fiş Yazdırılsın mı ?');
-            if (isOK) {
-              this.printerService.printPayment(this.printers[0], this.table, newPayment);
-            } else {
-              return false;
-            }
-          } else {
-            this.printerService.printPayment(this.printers[0], this.table, newPayment);
-          }
-        });
         this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
         this.fillData();
         this.setDefault();
         this.togglePayed();
       });
+      if (this.askForPrint) {
+        let isOK = confirm('Fiş Yazdırılsın mı ?');
+        if (isOK) {
+          this.printerService.printPayment(this.printers[0], this.table, newPayment);
+        }
+      } else {
+        this.printerService.printPayment(this.printers[0], this.table, newPayment);
+      }
     }
     this.updateActivityReport();
   }
@@ -108,18 +105,6 @@ export class PaymentScreenComponent implements OnInit {
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
         this.updateSellingReport(method);
-        this.settings.getAppSettings().then((res: any) => {
-          if (res.ask_print_check == 'Sor') {
-            let isOK = confirm('Fiş Yazdırılsın mı ?');
-            if (isOK) {
-              this.printerService.printCheck(this.printers[0], this.table, this.check);
-            } else {
-              return false;
-            }
-          } else {
-            this.printerService.printCheck(this.printers[0], this.table, this.check);
-          }
-        });
         if (this.check.type == 1) {
           this.updateTableReport(this.check);
           this.mainService.updateData('tables', this.check.table_id, { status: 1 });
@@ -134,6 +119,14 @@ export class PaymentScreenComponent implements OnInit {
         });
       }
     });
+    if (this.askForPrint) {
+      let isOK = confirm('Fiş Yazdırılsın mı ?');
+      if (isOK) {
+        this.printerService.printCheck(this.printers[0], this.table, this.check);
+      }
+    } else {
+      this.printerService.printCheck(this.printers[0], this.table, this.check);
+    }
   }
 
   setDiscount(discount: number) {
@@ -319,6 +312,13 @@ export class PaymentScreenComponent implements OnInit {
       }
       this.check.products = this.check.products.filter(obj => obj.status == 2);
     });
-    this.mainService.getAllBy('tables', {}).then(res => { this.tables_count = res.docs.length; })
+    this.mainService.getAllBy('tables', {}).then(res => { this.tables_count = res.docs.length; });
+    this.settings.getAppSettings().subscribe((res: any) => {
+      if (res.value.ask_print_check == 'Sor') {
+        this.askForPrint = true;
+      } else {
+        this.askForPrint = false;
+      }
+    });
   }
 }
