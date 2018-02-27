@@ -77,13 +77,14 @@
                     </small>
                   </p>
                   <p *ngIf="payment.discount > 0" class="text-danger m-0">
-                      <small>
-                        <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
-                        <span class="pull-right">{{payment.discount}} TL</span>
-                      </small>
-                    </p>
+                    <small>
+                      <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
+                      <span class="pull-right">{{payment.discount}} TL</span>
+                    </small>
+                  </p>
                   <p class="m-0 text-bold">
-                    <small><i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
+                    <small>
+                      <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
                       <span class="pull-right">{{payment.amount}} TL</span>
                     </small>
                   </p>
@@ -114,7 +115,8 @@
           <div class="col-lg-4 pl-1 pr-0">
             <div class="card inside-height">
               <div class="card-header p-2">
-                <h3 class="mb-1 mt-1"><b>Ödenecek Miktar:</b>
+                <h3 class="mb-1 mt-1">
+                  <b>Ödenecek Miktar:</b>
                   <span class="text-primary pull-right">
                     <strong>{{currentAmount}} TL</strong>
                   </span>
@@ -184,19 +186,23 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('Nakit')" class="btn btn-block text-success sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Nakit')"
+              class="btn btn-block text-success sellButton btn-secondary">
               <i class="fa fa-money ml-1"></i>
               <br> Nakit
             </button>
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('Kart')" class="btn btn-block text-warning sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')"
+              class="btn btn-block text-warning sellButton btn-secondary">
               <i class="fa fa-credit-card ml-1"></i>
               <br> Kart
             </button>
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('Kupon')" class="btn btn-block text-info sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')"
+              class="btn btn-block text-info sellButton btn-secondary">
               <i class="fa fa-bookmark ml-1"></i>
               <br> Kupon
             </button>
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
+            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')"
+              class="btn btn-block text-danger sellButton btn-secondary">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
               <br> İkram
             </button>
