@@ -25,10 +25,12 @@ export class SetupComponent implements OnInit {
   setupStep: number = 1;
   headers: Headers;
   options: RequestOptions;
+  baseUrl: string;
 
   constructor(private mainService: MainService, private settings: SettingsService, private http: Http, private electron: ElectronService, private message: MessageService, private router: Router) {
     this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     this.options = new RequestOptions({ headers: this.headers });
+    this.baseUrl = 'https://api.quickly.com.tr';
   }
 
   ngOnInit() {
@@ -46,9 +48,9 @@ export class SetupComponent implements OnInit {
 
   makeLogin(loginForm: NgForm) {
     let Form = loginForm.value;
-    this.http.post('https://api.quickly.com.tr/token/', { username: Form.username, password: Form.password }, this.options).subscribe((res: Response) => {
+    this.http.post(this.baseUrl + '/token/', { username: Form.username, password: Form.password }, this.options).subscribe((res: Response) => {
       this.headers.append('Authorization', 'JWT ' + res.json().token);
-      this.http.get('https://api.quickly.com.tr/restaurants/', new RequestOptions({ headers: this.headers })).subscribe((body: Response) => {
+      this.http.get(this.baseUrl + '/v1/management/restaurants/', new RequestOptions({ headers: this.headers })).subscribe((body: Response) => {
         this.message.sendMessage('Giriş Başarılı!');
         if (body.json().results.length > 1) {
           this.stores = body.json().results;
@@ -77,7 +79,7 @@ export class SetupComponent implements OnInit {
     let authValue = new AuthInfo(Data.remote.host, Data.remote.port, Data.auth.database_name, Data.auth.app_id, Data.auth.app_token);
     let auth = new Settings('AuthInfo', authValue, 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
-    let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order:'Sor', ask_print_check:'Sor' }, 'Uygulama Ayarları', Date.now());
+    let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor' }, 'Uygulama Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', auth);
