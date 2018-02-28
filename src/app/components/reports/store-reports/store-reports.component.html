@@ -318,7 +318,7 @@
           <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
         <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
           <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
-        <button type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1" data-toggle="modal"
+        <button *ngIf="checkDetail?.type !== 3" type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1" data-toggle="modal"
           data-dismiss="modal" data-target="#editCheck">
           <i class="fa fa-edit" aria-hidden="true"></i> Hesap Düzelt</button>
       </div>
@@ -345,7 +345,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button (click)="cancelCheck(checkDetail._id,cancelNote.value)" class="btn btn-danger btn-lg">İptal Et</button>
+        <button [disabled]="cancelNote.value == '' || cancelNote.value == ' '" (click)="cancelCheck(checkDetail._id,cancelNote.value)" class="btn btn-danger btn-lg">İptal Et</button>
       </div>
     </div>
   </div>
