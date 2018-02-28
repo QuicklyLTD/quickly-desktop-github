@@ -8,8 +8,8 @@
       <i class="fa fa-list" aria-hidden="true"></i> Liste</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#other" role="tab">
-      <i class="fa fa-cog" aria-hidden="true"></i> Ayarlar</a>
+    <a class="nav-link disabled" data-toggle="tab" href="#other" role="tab">
+      <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
   </li>
 </ul>
 
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="card-block tab-height p-0">
-        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:67vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
+        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
           [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="card-footer">
@@ -67,10 +67,10 @@
               <th width="5%">
                 <i class="fa fa-glass" aria-hidden="true"></i>
               </th>
-              <th width="30%">Ürün Adı</th>
+              <th width="34%">Ürün Adı</th>
               <th width="20%">Satılan Adet</th>
-              <th width="20%">Toplam Gelir</th>
-              <th width="25%">Son Satış Tarihi</th>
+              <th width="17%">Getiri</th>
+              <th width="24%">Son Satış Tarihi</th>
             </tr>
           </thead>
           <tbody>
@@ -114,7 +114,7 @@
         </button>
       </div>
       <div class="modal-body p-0">
-        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:56vw; margin:auto;" [datasets]="DetailData" [labels]="ChartLabels"
+        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:790px; margin:auto;" [datasets]="DetailData" [labels]="ChartLabels"
           [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="modal-footer">

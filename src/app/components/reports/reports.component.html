@@ -1,5 +1,5 @@
 <div class="row">
-  <div id="settings-holder" class="col-lg-3">
+  <div id="settings-holder" class="col-lg-2">
     <div class="card">
       <div class="card-block text-center" [ngClass]="{'card-danger card-inverse':selected == 1}" (click)="selected = 1">
         <h3 class="card-title">
@@ -41,7 +41,7 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-9">
+  <div class="col-lg-10 pl-0">
     <div class="card full-height">
       <div class="card-block">
         <div *ngIf="selected == undefined">
@@ -69,7 +69,7 @@
                 <div class="card-block tab-height">
                   <div class="row">
                     <div class="col-lg-6">
-                      <canvas *ngIf="ChartLoaded" baseChart style="height: 430px; width:33vw; margin:auto;" [data]="pieData" [colors]="pieColors"
+                      <canvas *ngIf="ChartLoaded" baseChart style="height: 430px; width:37vw; margin:auto;" [data]="pieData" [colors]="pieColors"
                         [labels]="pieLabels" [legend]="true" chartType="pie" [options]="ChartOptions"></canvas>
                     </div>
                     <div class="col-lg-6">
@@ -123,7 +123,7 @@
                   <h5 class="mt-2">Haftalık Satış Raporu</h5>
                 </div>
                 <div class="card-block tab-height p-0">
-                  <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:67vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
+                  <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
                     [options]="ChartOptions" [legend]="ChartLegend" [colors]="ChartColors" [chartType]="ChartType"></canvas>
                 </div>
                 <div class="card-footer">
@@ -137,7 +137,7 @@
                   <h5 class="mt-2">Zaman Bazlı Satış Aktivitesi</h5>
                 </div>
                 <div class="card-block tab-height p-0">
-                  <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:67vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels"
+                  <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels"
                     [options]="ChartOptions" [legend]="activityLegend" chartType="line"></canvas>
                 </div>
                 <div class="card-footer">

@@ -19,7 +19,7 @@
       </div>
       <div class="card-block pt-0 flow">
         <div class="row">
-          <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-3 mt-2 col-card">
+          <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
             <div [ngClass]="{'bg-success': table.status == 2}" class="card card-warning tableCard">
               <div class="card-block p-3">
                 <h1 [ngClass]="{'long-name': table.name.length > 8}" class="card-title">{{table.name}}</h1>
@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="row">
-          <div *ngFor="let check of checks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-3 mt-2 col-card">
+          <div *ngFor="let check of checks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
             <div class="card card-info tableCard">
               <div class="card-block p-3">
                 <h1 class="card-title long-name mb-2">Hızlı Hesap</h1>

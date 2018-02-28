@@ -50,11 +50,10 @@
               <div class="card-block p-1">
                 <div class="row">
                   <div class="col-lg-3 pr-2">
-                    <img class="card-img-top" width="100" height="100" src="{{store.logo}}" alt="">
+                    <img class="card-img-top" width="100" height="100" src="{{baseUrl + store.logo}}" alt="">
                   </div>
                   <div class="col-lg-9 pl-2">
-                    <img src="https://maps.googleapis.com/maps/api/staticmap?center={{store.geolocation}}&zoom=16&size=310x100&markers=size:small%7Ccolor:red|{{store.geolocation}}&key=AIzaSyCwXGFAGU4OsQ248V_uq7kbHPoPEOqW00Y"
-                      alt="">
+                    <img style="width:100%;" src="https://maps.googleapis.com/maps/api/staticmap?center={{store.geolocation}}&zoom=16&size=310x100&markers=size:small%7Ccolor:red|{{store.geolocation}}&key=AIzaSyCwXGFAGU4OsQ248V_uq7kbHPoPEOqW00Y">
                   </div>
                 </div>
               </div>

@@ -8,7 +8,7 @@
       <i class="fa fa-glass" aria-hidden="true"></i> Ürün Ayarları</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#occations" role="tab">
+    <a class="nav-link disabled" data-toggle="tab" href="#occations" role="tab">
       <i class="fa fa-clock-o" aria-hidden="true"></i> Tarife Ayarları</a>
   </li>
 </ul>
@@ -104,7 +104,7 @@
                         <div class="input-group-addon">
                           Alt Kategoriler
                         </div>
-                        <div class="img-thumbnail pl-2" style="width:75%; height:51px">
+                        <div class="img-thumbnail pl-2 subCatInput">
                           <span *ngFor="let sub of subCats" (click)="updateSubCategory(sub);" class="badge badge-warning mr-1 subCat">{{sub.name}}</span>
                         </div>
                       </div>
@@ -127,7 +127,7 @@
                     </div>
                     <div class="col pl-1">
                       <button type="submit" class="btn btn-md btn-block btn-success">
-                        <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+                        <i class="fa fa-check" aria-hidden="true"></i> Kaydet</button>
                     </div>
                   </div>
                 </div>

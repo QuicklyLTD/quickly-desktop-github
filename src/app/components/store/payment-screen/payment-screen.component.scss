@@ -1,17 +1,15 @@
 .sellButton{
     height: 145.8px;
-    width: 102.58px;
     margin-bottom: 3.8px;
     padding-top:20px;
     padding-bottom: 20px;
     padding-right: 0px;
     padding-left: 0px;
-    font-size: 3.5vh;
+    font-size: 3vh;
     font-weight: bold;
 }
 .cashButton{
     height: 94.3px;
-    width: 102.58px;
     margin-bottom: 3.8px;
     padding-top:20px;
     padding-bottom: 20px;
@@ -127,4 +125,7 @@
 }
 .payed-things{
     min-height: 200px;
+}
+.will-pay{
+    font-size:2vw;
 }

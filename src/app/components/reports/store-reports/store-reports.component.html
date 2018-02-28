@@ -11,6 +11,10 @@
     <a class="nav-link" data-toggle="tab" href="#gift" role="tab">
       <i class="fa fa-trash-o" aria-hidden="true"></i> İptal</a>
   </li>
+  <li class="nav-item">
+      <a class="nav-link disabled" data-toggle="tab" href="#gift" role="tab">
+        <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -21,7 +25,7 @@
       </div>
       <div class="card-block tab-height p-0">
         <div class="row">
-          <div class="col-lg-4 pr-0">
+          <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">Filtreleme</div>
               <div class="card-block p-0">
@@ -34,15 +38,9 @@
                   <button type="button" (click)="getNormalChecksBy('İkram')" class="list-group-item list-group-item-action list-group-item-danger list-eq">İkram</button>
                 </div>
               </div>
-              <div class="card-footer">
-                <strong>
-                  Normal Hesap Toplamı:
-                  <span class="pull-right">{{NormalTotal}} TL</span>
-                </strong>
-              </div>
             </div>
           </div>
-          <div class="col-lg-8 pl-0">
+          <div class="col-lg-9 pl-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 <div class="row">
@@ -89,6 +87,12 @@
                 </table>
                 <h3 *ngIf="NormalChecks == undefined || NormalChecks.length == 0" class="text-center mt-5">Eşleşen Hesap Bulunamadı</h3>
               </div>
+              <div class="card-footer">
+                <strong>
+                  Normal Hesap Toplamı:
+                  <span class="pull-right">{{NormalTotal}} TL</span>
+                </strong>
+              </div>
             </div>
           </div>
         </div>
@@ -105,7 +109,7 @@
       </div>
       <div class="card-block tab-height p-0">
         <div class="row">
-          <div class="col-lg-4 pr-0">
+          <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">Filtreleme</div>
               <div class="card-block p-0">
@@ -118,15 +122,9 @@
                   <button type="button" (click)="getFastChecksBy('İkram')" class="list-group-item list-group-item-action list-group-item-danger list-eq">İkram</button>
                 </div>
               </div>
-              <div class="card-footer">
-                <strong>
-                  Hızlı Hesap Toplamı:
-                  <span class="pull-right">{{FastTotal}} TL</span>
-                </strong>
-              </div>
             </div>
           </div>
-          <div class="col-lg-8 pl-0">
+          <div class="col-lg-9 pl-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 <div class="row">
@@ -173,6 +171,12 @@
                 </table>
                 <h3 *ngIf="FastChecks == undefined || FastChecks.length == 0" class="text-center mt-5">Eşleşen Hesap Bulunamadı</h3>
               </div>
+              <div class="card-footer">
+                <strong>
+                  Hızlı Hesap Toplamı:
+                  <span class="pull-right">{{FastTotal}} TL</span>
+                </strong>
+              </div>
             </div>
           </div>
         </div>
@@ -187,7 +191,7 @@
       <div class="card-header">
         <h5 class="mt-2">İptal Edilen Hesaplar</h5>
       </div>
-      <div class="card-block p-0 tab-height full-flow">
+      <div class="card-block p-0 tab-height flow">
         <div class="row">
           <div class="col-lg-12">
             <table class="table table-bordered table-striped table-hover">

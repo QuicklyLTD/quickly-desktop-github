@@ -22,7 +22,6 @@ html, body {
    font-family: Quickly !important;
 }
 
-/* Preloader */
 app-root {
    display: block;
    position: relative;
@@ -43,84 +42,6 @@ app-root {
     margin-right:auto;
    }
 }
-
-@-webkit-keyframes uil-ring-anim {
-   0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-   }
-   100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-   }
-}
-
-@-moz-keyframes uil-ring-anim {
-   0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-   }
-   100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-   }
-}
-
-@-webkit-keyframes uil-ring-anim {
-   0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-   }
-   100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-   }
-}
-
-@-o-keyframes uil-ring-anim {
-   0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-   }
-   100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-   }
-}
-
-@keyframes uil-ring-anim {
-   0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-   }
-   100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-   }
-}
-
-.uil-ring-css {
-   background: none;
-   position: relative;
-   width: 200px;
-   height: 200px;
-}
-
-.uil-ring-css > div {
-   position: absolute;
-   display: block;
-   width: 160px;
-   height: 160px;
-   top: -80px;
-   left: -80px;
-   border-radius: 80px;
-   box-shadow: 0 3px 0 0 #f02c2c;
-   -webkit-transform-origin: 80px 81.5px;
-   transform-origin: 80px 81.5px;
-   -webkit-animation: uil-ring-anim 1s linear infinite;
-   animation: uil-ring-anim 1s linear infinite;
-}
-
 
 .full-height {
    height: 88.4vh;
@@ -165,9 +86,6 @@ app-root {
     }
 }
 .nav-tabs{
-    .nav-link{
-        font-size: 3vh;
-    }
     .nav-link.active{
         background-color: #f7f7f9;
         border-bottom-color: #f7f7f9;
@@ -176,7 +94,6 @@ app-root {
 .ntb{
     border-top: 0px !important;
 }
-
 .tab-height{
     height: 61vh;
 }
@@ -186,4 +103,42 @@ app-root {
 .flow{
     overflow-y: scroll;
     overflow-x: hidden;
+}
+
+#settings-holder{
+    .card{
+        i{
+            font-size:3vw;
+        }
+        height: 16vh;
+        font-size: 1.2vw;
+        .card-block{
+            padding-left: auto;
+            padding-right: auto;
+        }
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .nav-tabs{
+        .nav-link{
+            font-size: 2vw;
+        }
+    }
+    .subCatInput{
+        width:70%;
+        height:51px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .nav-tabs{
+        .nav-link{
+            font-size: 3vh;
+        }
+    }
+    .subCatInput{
+        width:79%;
+        height:51px;
+    }
 }

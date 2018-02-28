@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-lg-10 pr-0">
+  <div class="col-lg-10 pr-0" [ngClass]="{'col-lg-12 pr-3': selectedEndDay !== undefined}">
     <div class="card full-height">
       <div class="card-header">
         <div class="row">
@@ -46,7 +46,7 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-2">
+  <div class="col-lg-2" [hidden]="selectedEndDay !== undefined">
     <button [disabled]="isStarted" (click)="startDay()" class="btn btn-lg btn-success btn-block pt-5 pb-5">Gün Başı</button>
     <button [disabled]="!isStarted" (click)="endDay()" class="btn btn-lg btn-danger btn-block pt-5 pb-5">Gün Sonu</button>
   </div>

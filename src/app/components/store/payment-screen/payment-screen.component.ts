@@ -141,7 +141,7 @@ export class PaymentScreenComponent implements OnInit {
   togglePayed() {
     if (this.payedShow) {
       this.payedShow = false;
-      this.payedTitle = 'Alınan Ödemeleri Görüntüle';
+      this.payedTitle = 'Alınan Ödemeleri Göster';
     } else {
       this.payedShow = true;
       this.payedTitle = 'Alınan Ödemeleri Gizle';
