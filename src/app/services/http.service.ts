@@ -1,50 +1,54 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
-const AUTH_PREFIX = "JWT";
+const AUTH_PREFIX = "JWT ";
 
 @Injectable()
 export class HttpClient {
+  headers: Headers;
+  options: RequestOptions;
+  baseUrl: string;
+  apiVersion: string;
 
-  constructor(private http: Http) { }
-
-  private _createAuthorizationHeader(headers: Headers) {
-    headers.append('Authorization', AUTH_PREFIX +
-      btoa('username:password'));
+  constructor(private http: Http) {
+    this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
+    this.options = new RequestOptions({ headers: this.headers });
+    this.baseUrl = 'https://api.quickly.com.tr/';
+    this.apiVersion = 'v1';
   }
 
-  get(url) {
-    let headers = new Headers();
-    this._createAuthorizationHeader(headers);
-    return this.http.get(url, {
-      headers: headers
+  private _createAuthorizationHeader(headers: Headers, token?: string) {
+    headers.set('Authorization', AUTH_PREFIX + token);
+  }
+
+  get(url, token?) {
+    this._createAuthorizationHeader(this.headers, token);
+    return this.http.get(this.baseUrl + url, {
+      headers: this.headers
     });
   }
 
-  post(url, data) {
-    let headers = new Headers();
-    this._createAuthorizationHeader(headers);
-    return this.http.post(url, data, {
-      headers: headers
+  post(url, data, token?) {
+    this._createAuthorizationHeader(this.headers, token);
+    return this.http.post(this.baseUrl + url, data, {
+      headers: this.headers
     });
   }
 
-  put(url, data) {
-    let headers = new Headers();
-    this._createAuthorizationHeader(headers);
-    return this.http.post(url, data, {
-      headers: headers
+  put(url, data, token?) {
+    this._createAuthorizationHeader(this.headers, token);
+    return this.http.post(this.baseUrl + url, data, {
+      headers: this.headers
     });
   }
 
-  delete(url) {
-    let headers = new Headers();
-    this._createAuthorizationHeader(headers);
-    return this.http.get(url, {
-      headers: headers
+  delete(url, token?) {
+    this._createAuthorizationHeader(this.headers, token);
+    return this.http.get(this.baseUrl + url, {
+      headers: this.headers
     });
   }
 }

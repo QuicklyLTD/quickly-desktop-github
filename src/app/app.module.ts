@@ -39,6 +39,7 @@ import { ApplicationService } from './services/application.service';
 import { SettingsService } from './services/settings.service';
 import { AuthService } from './services/auth.service';
 import { LogService } from './services/log.service';
+import { HttpClient } from './services/http.service';
 //////  Providers
 import { KeyboardService } from './providers/keyboard.service';
 import { MessageService } from "./providers/message.service";
@@ -114,7 +115,8 @@ import { DayDetailComponent } from './components/endoftheday/day-detail/day-deta
     LogService,
     MessageService,
     KeyboardService,
-    PrinterService
+    PrinterService,
+    HttpClient
   ],
   bootstrap: [AppComponent]
 })
