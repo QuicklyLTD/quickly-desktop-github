@@ -21,7 +21,7 @@
             <div class="card inside-height">
               <div class="card-header">Adisyon</div>
               <div class="card-block p-2 check-flow">
-                <div *ngFor="let item of check?.products; let i = index" class="mb-2">
+                <div *ngFor="let item of check?.products; let i = index" class="mb-2 animated slideInRight">
                   <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="text-bold text-danger mb-0">
                     {{item.name}}
                     <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
@@ -46,7 +46,7 @@
             <div class="card inside-height">
               <div class="card-header">Ödenecek Ürünler</div>
               <div class="card-block p-2 check-flow">
-                <div *ngFor="let item of productsWillPay" class="mb-2">
+                <div *ngFor="let item of productsWillPay" class="mb-2 animated slideInLeft">
                   <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="text-bold text-danger mb-0">
                     {{item.name}}
                     <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
@@ -135,7 +135,7 @@
                 </h4>
                 <h4 *ngIf="discount !== undefined" class="mb-1">İndirim Tutarı:
                   <span class="text-danger pull-right">
-                    <small>{{discount}} %</small> -
+                    <small>{{discount | number:'2.0-0' }} %</small> -
                     <b>{{discountAmount}} TL</b>
                   </span>
                 </h4>
@@ -162,7 +162,7 @@
               <div class="card-footer">
                 <div *ngFor="let keys of numboard;" class="row mb-1">
                   <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1">
-                    <button type="button" [disabled]="key == '✔' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == ''"
+                    <button type="button" [ngClass]="{'btn-success': key == '✔' && numpad > 0}" [disabled]="key == '✔' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == ''"
                       (click)="pushKey(key)" class="btn btn-secondary btn-lg btn-block numpad">{{key}}</button>
                   </div>
                 </div>
@@ -181,22 +181,22 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Nakit')"
+            <button [disabled]="currentAmount == 0 || payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Nakit')"
               class="btn btn-block text-success sellButton btn-secondary">
               <i class="fa fa-money ml-1"></i>
               <br> Nakit
             </button>
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')"
+            <button [disabled]="currentAmount == 0 || payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')"
               class="btn btn-block text-warning sellButton btn-secondary">
               <i class="fa fa-credit-card ml-1"></i>
               <br> Kart
             </button>
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')"
+            <button [disabled]="currentAmount == 0 || payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')"
               class="btn btn-block text-info sellButton btn-secondary">
               <i class="fa fa-bookmark ml-1"></i>
               <br> Kupon
             </button>
-            <button [disabled]="payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')"
+            <button [disabled]="productsWillPay.length == 0" (click)="payProducts('İkram')"
               class="btn btn-block text-danger sellButton btn-secondary">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
               <br> İkram
@@ -219,6 +219,21 @@
       </div>
       <div class="modal-body">
         <div class="row">
+          <div class="col">
+            <div class="input-group">
+              <input #discountInput type="number" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg">
+              <div class="input-group-addon normal">
+                TL
+              </div>
+              <span class="input-group-btn">
+                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= currentAmount" (click)="setDiscount((discountInput.value*100)/priceWillPay)" type="button">
+                  <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Yap
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
           <div *ngFor="let item of discounts;" class="col">
             <button type="button" (click)="setDiscount(item)" class="btn btn-primary btn-block btn-lg btn-discount">{{item}} %</button>
           </div>

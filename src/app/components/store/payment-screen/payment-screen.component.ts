@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
@@ -39,6 +39,7 @@ export class PaymentScreenComponent implements OnInit {
   check_id: string;
   check_type: string;
   askForPrint: boolean;
+  @ViewChild('discountInput') discountInput: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
     this.route.params.subscribe(params => {
@@ -74,14 +75,14 @@ export class PaymentScreenComponent implements OnInit {
         this.setDefault();
         this.togglePayed();
       });
-      if (this.askForPrint) {
-        let isOK = confirm('Fiş Yazdırılsın mı ?');
-        if (isOK) {
-          this.printerService.printPayment(this.printers[0], this.table, newPayment);
-        }
-      } else {
-        this.printerService.printPayment(this.printers[0], this.table, newPayment);
-      }
+      // if (this.askForPrint) {
+      //   let isOK = confirm('Fiş Yazdırılsın mı ?');
+      //   if (isOK) {
+      //     this.printerService.printPayment(this.printers[0], this.table, newPayment);
+      //   }
+      // } else {
+      //   this.printerService.printPayment(this.printers[0], this.table, newPayment);
+      // }
     }
     this.updateActivityReport();
   }
@@ -122,10 +123,10 @@ export class PaymentScreenComponent implements OnInit {
     if (this.askForPrint) {
       let isOK = confirm('Fiş Yazdırılsın mı ?');
       if (isOK) {
-        this.printerService.printCheck(this.printers[0], this.table, this.check);
+        this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
       }
     } else {
-      this.printerService.printCheck(this.printers[0], this.table, this.check);
+      this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
     }
   }
 
@@ -135,6 +136,7 @@ export class PaymentScreenComponent implements OnInit {
       this.payedPrice = this.priceWillPay;
     }
     this.setChange();
+    this.discountInput.nativeElement.value = 0;
     $('#discount').modal('hide');
   }
 
