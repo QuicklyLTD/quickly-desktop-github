@@ -24,6 +24,12 @@ app-root {
    height: 100%;
    width: 100%;
 }
+.animated {
+    -webkit-animation-duration: 0.4s;
+    animation-duration: 0.4s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+ }
 .full-height {
    height: 88.4vh;
 }
@@ -93,10 +99,6 @@ app-root {
         }
         height: 16vh;
         font-size: 1.2vw;
-        .card-block{
-            padding-left: auto;
-            padding-right: auto;
-        }
     }
 }
 
