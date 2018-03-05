@@ -68,7 +68,7 @@
                       <div class="input-group">
                         <div class="input-group-addon">Durum</div>
                         <select name="status" class="form-control form-control-lg" ngModel>
-                          <option value="1">Herkeze Açık</option>
+                          <option value="1">Herkese Açık</option>
                           <option value="2">Özel Kategori</option>
                         </select>
                       </div>
@@ -109,7 +109,6 @@
                         </div>
                       </div>
                     </div>
-
                   </div>
                 </div>
                 <div class="card-footer" [hidden]="selectedCat == undefined">
@@ -264,7 +263,7 @@
             <div class="input-group">
               <div class="input-group-addon">Durum</div>
               <select name="status" class="form-control form-control-lg" ngModel>
-                <option value="1">Herkeze Açık</option>
+                <option value="1">Herkese Açık</option>
                 <option value="2">Özel Kategori</option>
               </select>
             </div>
@@ -374,7 +373,7 @@
                 <div class="input-group">
                   <div class="input-group-addon">Ürün Tipi</div>
                   <select #productTypeSelect (change)="setProductType($event.target.value)" name="type" class="form-control form-control-lg" ngModel>
-                    <option value="1">Otamatik Stok</option>
+                    <option value="1">Otomatik Stok</option>
                     <option value="2">Manuel Stok</option>
                   </select>
                 </div>
