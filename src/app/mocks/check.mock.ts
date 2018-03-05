@@ -27,8 +27,9 @@ export class ClosedCheck {
         public type: number,
         public payment_method: string,
         public payment_flow?: Array<PaymentStatus>,
+        public description?:string,
         public _id?:string,
-        public _rev?:string
+        public _rev?:string,
     ) { }
 }
 export class PaymentStatus {
