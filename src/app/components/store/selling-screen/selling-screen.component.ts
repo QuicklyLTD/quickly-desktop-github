@@ -202,7 +202,7 @@ export class SellingScreenComponent implements OnInit {
       this.router.navigate(['/store']);
     } else {
       if (this.check.type == 1) {
-        this.mainService.updateData('tables', this.id, { status: 2 });
+        this.mainService.updateData('tables', this.id, { status: 2, timestamp: Date.now() });
       }
       this.check.status = 1;
       this.mainService.addData('checks', this.check);
@@ -233,10 +233,14 @@ export class SellingScreenComponent implements OnInit {
   addNote(form: NgForm) {
     if (this.selectedProduct != undefined) {
       let note = form.value.description;
-      let shit = this.check.products[this.selectedIndex];
-      this.check.products[this.selectedIndex].note = note;
-      form.reset();
-      $('#noteModal').modal('hide');
+      if (note == '' || note == null || note == ' ') {
+        this.message.sendMessage('Not Alanı Boş Bırakılamaz');
+      } else {
+        let shit = this.check.products[this.selectedIndex];
+        this.check.products[this.selectedIndex].note = note;
+        form.reset();
+        $('#noteModal').modal('hide');
+      }
     }
   }
 
@@ -260,18 +264,51 @@ export class SellingScreenComponent implements OnInit {
       this.check.total_price -= this.selectedProduct.price;
       const productAfterCancel = this.check.products.filter(obj => obj.status == 1);
       this.check.products = this.check.products.filter(obj => obj.status !== 1);
-      this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
-        if (res.ok) {
-          this.check._rev = res.rev;
-          this.message.sendMessage('Ürün İptal Edildi');
-          this.selectedProduct = undefined;
-          this.selectedIndex = undefined;
-          $('#cancelProduct').modal('hide');
-          productAfterCancel.forEach(element => {
-            this.check.products.push(element);
-          })
+      let analizeCheck = this.check.products.some(obj => obj.status !== 3);
+      if (analizeCheck) {
+        this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
+          if (res.ok) {
+            this.check._rev = res.rev;
+            this.message.sendMessage('Ürün İptal Edildi');
+            this.selectedProduct = undefined;
+            this.selectedIndex = undefined;
+            $('#cancelProduct').modal('hide');
+            productAfterCancel.forEach(element => {
+              this.check.products.push(element);
+            })
+          }
+        });
+      } else {
+        $('#cancelProduct').modal('hide');
+        let checkToCancel = new ClosedCheck(this.check.table_id, this.check.total_price, 0, this.owner, this.check.note, 3, this.check.products, Date.now(), 3, 'İkram', this.check.payment_flow);
+        checkToCancel.description = 'Bütün Ürünler İptal Edildi';
+        this.mainService.addData('closed_checks', checkToCancel).then(res => {
+          this.message.sendMessage('Hesap İptal Edildi');
+        });
+        if (this.check.payment_flow.length > 0) {
+          let payedDiscounts = 0;
+          this.check.payment_flow.forEach((obj, index) => {
+            payedDiscounts += obj.discount;
+            this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
+              this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+                doc.count++;
+                doc.weekly_count[this.settings.getDay().day]++;
+                doc.amount += obj.amount;
+                doc.weekly[this.settings.getDay().day] += obj.amount;
+                doc.update_time = Date.now();
+                return doc;
+              });
+            });
+          });
+          let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
+          this.mainService.addData('closed_checks', checksForPayed);
         }
-      });
+        this.mainService.removeData('checks', this.check._id);
+        if (this.check.type == 1) {
+          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        }
+        this.router.navigate(['/store']);
+      }
     }
   }
 

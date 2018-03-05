@@ -44,12 +44,12 @@
     padding-right: 5px;
 }
 .proCard{
-    height: 112.4px;
+    height: 13vh;
     .card-block{
         padding: 1rem;
     }
     h2{
-        font-size: 3vh;
+        font-size: 1.7vw;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -59,12 +59,13 @@
         background-color: #ebcccc;
     }
     .long-name{
-        font-size: 2.4vh;
+        height: 50px;
+        font-size:1.2vw;
     }
     p{
         position: absolute;
         bottom: 15px;
-        font-size: 20px;
+        font-size: 1.2vw;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
