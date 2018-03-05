@@ -22,9 +22,12 @@
           <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
             <div [ngClass]="{'bg-success': table.status == 2}" class="card card-warning tableCard">
               <div class="card-block p-3">
-                <h1 [ngClass]="{'long-name': table.name.length > 8}" class="card-title">{{table.name}}</h1>
-                <p class="card-text">
+                <h1 [ngClass]="{'long-name': table.name.length > 8}" class="card-title mb-4">{{table.name}}</h1>
+                <p>
                   <i class="fa fa-user"></i> {{table.capacity}}
+                  <span *ngIf="table.status == 2" class="pull-right">
+                    <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | date:'HH:mm'}}
+                  </span>
                 </p>
               </div>
             </div>
