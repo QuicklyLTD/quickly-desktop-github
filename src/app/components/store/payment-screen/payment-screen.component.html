@@ -3,13 +3,13 @@
     <div class="card full-height">
       <div class="card-header">
         <div class="row">
-          <div class="col-lg-10">
+          <div class="col-xl-10 col-lg-9">
             Masa:
             <b>
               {{check?.table_id | general:'tables' | async}}
             </b>
           </div>
-          <div class="col-lg-2 pr-1">
+          <div class="col-xl-2 col-lg-3 pr-1">
             <button type="button" [routerLink]="['/selling-screen',check_type, check_id]" class="btn btn-danger btn-sm btn-block">
               <i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</button>
           </div>
@@ -21,7 +21,7 @@
             <div class="card inside-height">
               <div class="card-header">Adisyon</div>
               <div class="card-block p-2 check-flow">
-                <div *ngFor="let item of check?.products; let i = index" class="mb-2 animated slideInRight">
+                <div *ngFor="let item of check?.products; let i = index" class="mb-2">
                   <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="text-bold text-danger mb-0">
                     {{item.name}}
                     <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
@@ -181,23 +181,22 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button [disabled]="currentAmount == 0 || payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Nakit')"
-              class="btn btn-block text-success sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 ||  payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
+              (click)="payProducts('Nakit')" class="btn btn-block text-success sellButton btn-secondary">
               <i class="fa fa-money ml-1"></i>
               <br> Nakit
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')"
-              class="btn btn-block text-warning sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
+              (click)="payProducts('Kart')" class="btn btn-block text-warning sellButton btn-secondary">
               <i class="fa fa-credit-card ml-1"></i>
               <br> Kart
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice < currentAmount || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')"
-              class="btn btn-block text-info sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
+              (click)="payProducts('Kupon')" class="btn btn-block text-info sellButton btn-secondary">
               <i class="fa fa-bookmark ml-1"></i>
               <br> Kupon
             </button>
-            <button [disabled]="productsWillPay.length == 0" (click)="payProducts('İkram')"
-              class="btn btn-block text-danger sellButton btn-secondary">
+            <button [disabled]="productsWillPay.length == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
               <br> İkram
             </button>
@@ -226,7 +225,8 @@
                 TL
               </div>
               <span class="input-group-btn">
-                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= currentAmount" (click)="setDiscount((discountInput.value*100)/priceWillPay)" type="button">
+                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= currentAmount" (click)="setDiscount((discountInput.value*100)/priceWillPay)"
+                  type="button">
                   <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Yap
                 </button>
               </span>

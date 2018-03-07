@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
@@ -59,22 +59,55 @@ export class PaymentScreenComponent implements OnInit {
     this.userName = this.settings.getUser('name');
   }
 
+  ngOnDestroy(){
+    this.check.products = Object.assign(this.check.products,this.productsWillPay);
+    this.mainService.updateData('checks',this.check._id,this.check);
+  }
+
   payProducts(method: string) {
-    if (this.check.total_price == 0) {
+    if (this.check.total_price == 0 && this.changePrice >= 0) {
       this.closeCheck(method);
     } else {
-      let newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
+      var newPayment: PaymentStatus;
+      let isAnyEqual = this.productsWillPay.some(obj => obj.price == this.payedPrice);
+      let isAnyGreat = this.productsWillPay.some(obj => obj.price > this.payedPrice);
+      if (this.changePrice < 0) {
+        if (isAnyEqual) {
+          let equalProduct = this.productsWillPay.filter(obj => obj.price == this.payedPrice)[0];
+          let indexOfEqual = this.productsWillPay.findIndex(obj => obj == equalProduct);
+          newPayment = new PaymentStatus(this.userName, method, this.payedPrice, 0, Date.now(), [equalProduct]);
+          this.productsWillPay.splice(indexOfEqual, 1);
+        } else if (isAnyGreat) {
+          let greatOne = this.productsWillPay.sort((a, b) => b.price - a.price)[0];
+          let greatOneCopy = Object.assign({}, greatOne);
+          greatOneCopy.price = this.payedPrice;
+          newPayment = new PaymentStatus(this.userName, method, this.payedPrice, 0, Date.now(), [greatOneCopy]);
+          greatOne.price -= this.payedPrice;
+        }
+        this.priceWillPay -= this.payedPrice;
+        this.currentAmount -= this.payedPrice;
+        this.numpad = this.priceWillPay.toString();
+      } else {
+        newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
+      }
       if (this.check.payment_flow == undefined) {
         this.check.payment_flow = [];
       }
       this.check.payment_flow.push(newPayment);
-      this.check.discount += this.priceWillPay;
+      this.check.discount += this.payedPrice;
+      this.payedPrice = 0;
       this.mainService.updateData('checks', this.id, this.check).then(res => {
-        this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
-        this.fillData();
-        this.setDefault();
+        if (this.changePrice >= 0) {
+          this.fillData();
+          this.setDefault();
+          this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
+        } else {
+          delete this.check._rev;
+          this.messageService.sendMessage(`'${newPayment.payed_products[0].name}' ürününün ${newPayment.amount} TL'si ${method} olarak ödendi;`);
+        }
         this.togglePayed();
       });
+      this.isFirstTime = true;
       // if (this.askForPrint) {
       //   let isOK = confirm('Fiş Yazdırılsın mı ?');
       //   if (isOK) {
@@ -84,7 +117,9 @@ export class PaymentScreenComponent implements OnInit {
       //   this.printerService.printPayment(this.printers[0], this.table, newPayment);
       // }
     }
-    this.updateActivityReport();
+    if (this.check.type == 1) {
+      this.updateActivityReport();
+    }
   }
 
   closeCheck(method: string) {
