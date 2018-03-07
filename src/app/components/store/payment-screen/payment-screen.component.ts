@@ -39,6 +39,7 @@ export class PaymentScreenComponent implements OnInit {
   check_id: string;
   check_type: string;
   askForPrint: boolean;
+  onClosing:boolean;
   @ViewChild('discountInput') discountInput: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
@@ -57,11 +58,14 @@ export class PaymentScreenComponent implements OnInit {
     this.payedTitle = 'Alınan Ödemeleri Göster';
     this.userId = this.settings.getUser('id');
     this.userName = this.settings.getUser('name');
+    this.onClosing = false;
   }
 
   ngOnDestroy(){
-    this.check.products = Object.assign(this.check.products,this.productsWillPay);
-    this.mainService.updateData('checks',this.check._id,this.check);
+    if(!this.onClosing){
+      this.check.products = Object.assign(this.check.products,this.productsWillPay);
+      this.mainService.updateData('checks',this.check._id,this.check);
+    }
   }
 
   payProducts(method: string) {
@@ -108,14 +112,6 @@ export class PaymentScreenComponent implements OnInit {
         this.togglePayed();
       });
       this.isFirstTime = true;
-      // if (this.askForPrint) {
-      //   let isOK = confirm('Fiş Yazdırılsın mı ?');
-      //   if (isOK) {
-      //     this.printerService.printPayment(this.printers[0], this.table, newPayment);
-      //   }
-      // } else {
-      //   this.printerService.printPayment(this.printers[0], this.table, newPayment);
-      // }
     }
     if (this.check.type == 1) {
       this.updateActivityReport();
@@ -123,6 +119,7 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   closeCheck(method: string) {
+    this.onClosing = true;
     let total_discounts = 0;
     let checkWillClose;
     if (this.check.payment_flow !== undefined && this.check.payment_flow.length > 0) {
