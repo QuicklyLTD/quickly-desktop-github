@@ -410,6 +410,7 @@ export class SellingScreenComponent implements OnInit {
             let downStock = stock.amount * obj.count;
             this.mainService.changeData('stocks', stock.stock_id, (doc) => {
               doc.left_total -= downStock;
+              doc.quantity = doc.left_total / doc.total;
               return doc;
             });
           });
