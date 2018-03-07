@@ -285,7 +285,7 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.addData('closed_checks', checkToCancel).then(res => {
           this.message.sendMessage('Hesap İptal Edildi');
         });
-        if (this.check.payment_flow.length > 0) {
+        if (this.check.payment_flow) {
           let payedDiscounts = 0;
           this.check.payment_flow.forEach((obj, index) => {
             payedDiscounts += obj.discount;
@@ -488,7 +488,7 @@ export class SellingScreenComponent implements OnInit {
           if (res.ok) {
             this.check.products.splice(this.selectedIndex, 1);
             this.check.total_price -= this.selectedProduct.price;
-            this.mainService.updateData('tables', this.selectedTable._id, { status: 2 }).then(res => {
+            this.mainService.updateData('tables', this.selectedTable._id, { status: 2, timestamp: Date.now() }).then(res => {
               if (res.ok) {
                 this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
                 this.setDefault();
@@ -525,9 +525,9 @@ export class SellingScreenComponent implements OnInit {
     if (this.selectedTable.status == 1) {
       if (this.check.status > 0) {
         if (this.check.type == 1) {
-          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+          this.mainService.updateData('tables', this.check.table_id, { status: 1, timestamp: Date.now() });
         }
-        this.mainService.updateData('tables', this.selectedTable._id, { status: 2 });
+        this.mainService.updateData('tables', this.selectedTable._id, { status: 2, timestamp: Date.now() });
         this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id, type: 1 }).then(res => {
           if (res.ok) {
             this.message.sendMessage(`Hesap ${this.selectedTable.name} Masasına Aktarıldı.`)
