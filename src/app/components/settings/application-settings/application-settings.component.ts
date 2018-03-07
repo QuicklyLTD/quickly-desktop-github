@@ -42,7 +42,7 @@ export class ApplicationSettingsComponent implements OnInit {
       delete res.value.remote;
       this.restInfo = res.value
       this.appLogo = this.restInfo.logo;
-      this.restaurantForm.setValue(this.restInfo);
+      //this.restaurantForm.setValue(this.restInfo);
     });
   }
 
