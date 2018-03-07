@@ -7,6 +7,7 @@ export class Stock {
         public unit: string,
         public total: number,
         public left_total: number,
+        public first_quantity: number,
         public timestamp: number,
         public _id?:string,
         public _rev?:string

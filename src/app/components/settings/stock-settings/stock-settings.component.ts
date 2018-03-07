@@ -11,10 +11,10 @@ import { MessageService } from '../../../providers/message.service';
   styleUrls: ['./stock-settings.component.scss']
 })
 export class StockSettingsComponent implements OnInit {
-  categories: Array<any>;
-  stocks: Array<any>;
-  selectedStock: any;
-  selectedCat: any;
+  categories: Array<StockCategory>;
+  stocks: Array<Stock>;
+  selectedStock: Stock;
+  selectedCat: StockCategory;
   onUpdate: boolean;
   units: Array<string>;
   @ViewChild('stockCatForm') stockCatForm: NgForm;
@@ -68,8 +68,9 @@ export class StockSettingsComponent implements OnInit {
   }
 
   addQuantity(value) {
-    let new_quantity = parseInt(this.selectedStock.quantity) + parseInt(value);
-    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * value) };
+    const old_quantity = this.selectedStock.left_total / this.selectedStock.total;
+    const new_quantity = (old_quantity + parseInt(value));
+    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * parseInt(value)), first_quantity: new_quantity };
     this.stockForm.setValue(Object.assign(this.selectedStock, after));
     $('#quantityModal').modal('hide')
   }
@@ -85,7 +86,7 @@ export class StockSettingsComponent implements OnInit {
     }
     if (form._id == undefined) {
       let left_total = form.total * form.quantity;
-      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, Date.now());
+      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, Date.now());
       this.mainService.addData('stocks', schema).then((response) => {
         this.fillData();
         stockForm.reset();

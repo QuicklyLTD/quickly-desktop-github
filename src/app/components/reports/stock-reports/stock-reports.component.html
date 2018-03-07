@@ -23,9 +23,9 @@
         <div class="row">
           <div class="col-lg-12">
             <blockquote *ngFor="let stock of allStocks" class="blockquote">
-              <p class="mb-2"><strong>{{stock.name}}</strong> <small>({{stock.cat_id | general:'stocks_cat' | async}})</small> <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.quantity))*100 | number: '1.0-0'}}%</span></p>
+              <p class="mb-2"><strong>{{stock.name}}</strong> <small>({{stock.cat_id | general:'stocks_cat' | async}})</small> <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-0'}}%</span></p>
               <div class="progress">
-                <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.quantity) | percent:'1.0-1'}" [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
+                <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.first_quantity) | percent:'1.0-1'}" [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
               </div>
               <small class="mt-2">
                 Kalan : {{stock.left_total | number:'2.0-0'}} {{stock.unit}}
@@ -61,8 +61,8 @@
               <td>{{i+1}}</td>
               <td>{{stock.name}}</td>
               <td>{{stock.cat_id | general:'stocks_cat' | async}}</td>
-              <td>{{stock.total*stock.quantity | number:'2.0-0'}} {{stock.unit}}</td>
-              <td>{{stock.total*stock.quantity - stock.left_total | number:'2.0-0'}} {{stock.unit}}</td>
+              <td>{{stock.total*stock.first_quantity | number:'2.0-0'}} {{stock.unit}}</td>
+              <td>{{stock.total*stock.first_quantity - stock.left_total | number:'2.0-0'}} {{stock.unit}}</td>
               <td>{{stock.left_total | number:'2.0-0'}} {{stock.unit}}</td>
             </tr>
           </tbody>

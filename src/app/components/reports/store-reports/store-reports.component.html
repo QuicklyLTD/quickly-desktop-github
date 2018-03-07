@@ -75,7 +75,7 @@
                       <td>{{check.table_id | general:'tables' | async}}
                         <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
                       </td>
-                      <td>{{check.total_price}} TL
+                      <td>{{check.total_price + check.discount}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
                         </small>
@@ -159,7 +159,7 @@
                       <td>{{check.table_id}}
                         <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
                       </td>
-                      <td>{{check.total_price}} TL
+                      <td>{{check.total_price + check.discount}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
                         </small>
@@ -308,7 +308,7 @@
           <div class="card-footer">
             <b>
               <i class="fa fa-check" aria-hidden="true"></i> Ödenen Miktar:
-              <span class="pull-right">{{checkDetail?.total_price - checkDetail?.discount}} TL</span>
+              <span class="pull-right">{{checkDetail?.total_price}} TL</span>
             </b>
           </div>
         </div>
