@@ -29,6 +29,7 @@ export class EndofthedayComponent implements OnInit {
   reports: Array<Report>;
   cashbox: Array<Cashbox>;
   selectedEndDay: EndDay;
+  lastDay: any;
   progress: string;
 
   constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settings: SettingsService) {
@@ -36,6 +37,9 @@ export class EndofthedayComponent implements OnInit {
     this.day = this.settings.getDay().day;
     this.owner = this.settings.getUser('id');
     this.endDayReport = new EndDay(Date.now(), this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+    this.settings.AppSettings.subscribe(res => {
+      this.lastDay = res.value.last_day;
+    });
   }
 
   ngOnInit() {
@@ -176,7 +180,7 @@ export class EndofthedayComponent implements OnInit {
         });
       });
       //////////////////////////////////////////////////////////////////
-      if (this.settings.getDay().day == 0) {
+      if (this.settings.getDay().day == this.lastDay) {
         this.reports.forEach((element, index) => {
           this.mainService.changeData('reports', element._id, (doc) => {
             doc.weekly = [0, 0, 0, 0, 0, 0, 0];
