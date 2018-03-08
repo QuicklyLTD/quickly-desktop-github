@@ -70,7 +70,7 @@ export class StockSettingsComponent implements OnInit {
   addQuantity(value) {
     const old_quantity = this.selectedStock.left_total / this.selectedStock.total;
     const new_quantity = (old_quantity + parseInt(value));
-    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * parseInt(value)), first_quantity: new_quantity };
+    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * parseInt(value)), first_quantity: new_quantity, warning_limit: (this.selectedStock.total * new_quantity) * 25 / 100 };
     this.stockForm.setValue(Object.assign(this.selectedStock, after));
     $('#quantityModal').modal('hide')
   }
@@ -86,7 +86,7 @@ export class StockSettingsComponent implements OnInit {
     }
     if (form._id == undefined) {
       let left_total = form.total * form.quantity;
-      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, Date.now());
+      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * 25 / 100, Date.now());
       this.mainService.addData('stocks', schema).then((response) => {
         this.fillData();
         stockForm.reset();

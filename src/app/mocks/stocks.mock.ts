@@ -8,6 +8,7 @@ export class Stock {
         public total: number,
         public left_total: number,
         public first_quantity: number,
+        public warning_limit:number,
         public timestamp: number,
         public _id?:string,
         public _rev?:string

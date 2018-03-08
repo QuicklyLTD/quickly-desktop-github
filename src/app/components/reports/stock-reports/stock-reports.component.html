@@ -25,7 +25,7 @@
             <blockquote *ngFor="let stock of allStocks" class="blockquote">
               <p class="mb-2"><strong>{{stock.name}}</strong> <small>({{stock.cat_id | general:'stocks_cat' | async}})</small> <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-0'}}%</span></p>
               <div class="progress">
-                <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.first_quantity) | percent:'1.0-1'}" [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
+                <div [ngClass]="{'bg-danger':stock.warning_limit >= stock.left_total}" class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.first_quantity) | percent:'1.0-1'}" [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
               </div>
               <small class="mt-2">
                 Kalan : {{stock.left_total | number:'2.0-0'}} {{stock.unit}}
@@ -50,20 +50,23 @@
             <tr>
               <th width="5%"><i class="fa fa-truck" aria-hidden="true"></i></th>
               <th width="20%">Stok Adı</th>
-              <th width="20%">Kategori</th>
-              <th width="20%">Son Toplam</th>
-              <th width="17%">Harcanan</th>
-              <th width="17%">Kalan</th>
+              <th colspan="3" width="25%">Son Toplam</th>
+              <th colspan="2" width="15%">Harcanan</th>
+              <th colspan="3" width="30%">Kalan Miktar</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let stock of allStocks; let i = index;">
               <td>{{i+1}}</td>
               <td>{{stock.name}}</td>
-              <td>{{stock.cat_id | general:'stocks_cat' | async}}</td>
-              <td>{{stock.total*stock.first_quantity | number:'2.0-0'}} {{stock.unit}}</td>
-              <td>{{stock.total*stock.first_quantity - stock.left_total | number:'2.0-0'}} {{stock.unit}}</td>
-              <td>{{stock.left_total | number:'2.0-0'}} {{stock.unit}}</td>
+              <td>{{stock.first_quantity}}x</td>
+              <td>{{stock.total*stock.first_quantity | number:'2.0-0'}} </td>
+              <td>{{stock.unit}}</td>
+              <td class="table-info">{{stock.total*stock.first_quantity - stock.left_total | number:'2.0-0'}}</td>
+              <td class="table-info">{{stock.unit}}</td>
+              <td >{{stock.quantity}}x</td>
+              <td>{{stock.left_total | number:'2.0-0'}}</td>
+              <td>{{stock.unit}}</td>
             </tr>
           </tbody>
         </table>

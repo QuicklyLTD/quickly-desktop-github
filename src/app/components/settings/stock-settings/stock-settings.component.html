@@ -112,7 +112,7 @@
       </div>
       <div class="card-block tab-height p-0">
         <div class="row">
-          <div class="col-lg-4 pr-0">
+          <div class="col-xl-4 col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Kategoriler
@@ -125,7 +125,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-8 pl-0">
+          <div class="col-xl-8 col-lg-9 pl-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 <div class="row">
@@ -150,19 +150,18 @@
                       <tr>
                         <th width="5%">#</th>
                         <th width="30%">Stok</th>
-                        <th width="15%">Paket</th>
-                        <th width="15%">Miktar</th>
-                        <th width="18%">Kalan</th>
-                        <th width="17%">Birim</th>
+                        <th colspan="2" width="30%">Son Giriş</th>
+                        <th colspan="3" width="35%">Kalan Miktar</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let item of stocks; let i=index;" (click)="getStockDetail(item);">
                         <td>{{i+1}}</td>
                         <td>{{item.name}}</td>
-                        <td>{{item.quantity}}</td>
-                        <td>{{item.total}}</td>
-                        <td>{{item.left_total}}</td>
+                        <td>{{item.first_quantity}}x</td>
+                        <td>{{item.total}} {{item.unit}}</td>
+                        <td>{{item.quantity}}x</td>
+                        <td>{{item.left_total | number:'2.0-0'}}</td>
                         <td>{{item.unit}}</td>
                       </tr>
                     </tbody>
@@ -246,6 +245,7 @@
             <input name="_id" type="hidden" ngModel/>
             <input name="_rev" type="hidden" ngModel/>
             <input name="first_quantity" type="hidden" ngModel/>
+            <input name="warning_limit" type="hidden" ngModel/>
           </div>
           <div class="input-group">
             <div class="input-group-addon">Stok Adı</div>

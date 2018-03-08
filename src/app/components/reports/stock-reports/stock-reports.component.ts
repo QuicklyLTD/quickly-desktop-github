@@ -21,7 +21,7 @@ export class StockReportsComponent implements OnInit {
   fillData() {
     this.mainService.getAllBy('stocks', {}).then(result => {
       this.allStocks = result.docs;
-      this.allStocks = this.allStocks.sort((a,b) => (b.quantity*b.total/b.left_total) - (a.quantity*a.total/a.left_total) );
+      this.allStocks = this.allStocks.sort((a,b) => (b.first_quantity*b.total/b.left_total) - (a.first_quantity*a.total/a.left_total) );
     });
     this.mainService.getAllBy('stocks_cat', {}).then(result => {
       this.allCats = result.docs;
