@@ -49,6 +49,7 @@ export class SetupComponent implements OnInit {
   makeLogin(loginForm: NgForm) {
     let Form = loginForm.value;
     this.http.post(this.baseUrl + '/token/', { username: Form.username, password: Form.password }, this.options).subscribe((res: Response) => {
+      localStorage.setItem('AccessToken', res.json().token);
       this.headers.append('Authorization', 'JWT ' + res.json().token);
       this.http.get(this.baseUrl + '/v1/management/restaurants/', new RequestOptions({ headers: this.headers })).subscribe((body: Response) => {
         this.message.sendMessage('Giriş Başarılı!');
@@ -79,7 +80,7 @@ export class SetupComponent implements OnInit {
     let authValue = new AuthInfo(Data.remote.host, Data.remote.port, Data.auth.database_name, Data.auth.app_id, Data.auth.app_token);
     let auth = new Settings('AuthInfo', authValue, 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
-    let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor' }, 'Uygulama Ayarları', Date.now());
+    let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor', last_day: 0 }, 'Uygulama Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', auth);
