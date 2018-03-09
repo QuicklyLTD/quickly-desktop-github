@@ -32,11 +32,11 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    if(this.setupFinished){
-      if(new Date().getDay() !== this.settingsService.getDay().day){
-        if(this.settingsService.getDay().started){
+    if (this.setupFinished) {
+      if (new Date().getDay() !== this.settingsService.getDay().day) {
+        if (this.settingsService.getDay().started) {
           alert('Gün Sonu Yapılmamış.');
-        }else{
+        } else {
           alert('Gün Başlangıcı Yapmalısınız.');
         }
       }
@@ -49,8 +49,8 @@ export class AppComponent implements OnInit {
   startApp() {
     let activationStatus = localStorage['ActivationStatus'];
     if (activationStatus !== undefined) {
-      this.setupFinished = true;
-      this.mainService.syncData('allData');
+        this.setupFinished = true;
+        this.mainService.syncData('allData');
     } else {
       this.router.navigate(['/setup']);
     }
@@ -68,7 +68,7 @@ export class AppComponent implements OnInit {
       this.electronService.exitProgram();
     }
   }
-  
+
   changeWindow() {
     this.electronService.fullScreen(this.windowStatus);
     this.windowStatus = !this.windowStatus;
