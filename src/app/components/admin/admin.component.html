@@ -2,7 +2,7 @@
   <div class="card-header">Uygulama Konsolu</div>
   <div class="card-body p-2">
     <div class="row">
-      <div class="col-lg-2 pr-1">
+      <div class="col-xl-2 col-lg-3 pr-1">
         <div class="card inside-height">
           <div class="card-header">Veritabanı</div>
           <div class="card-body flow">
@@ -13,7 +13,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-8 pl-0 pr-1">
+      <div class="col-xl-8 col-lg-6 pl-0 pr-1">
         <div class="card inside-height">
           <div class="card-header">Dökümanlar</div>
           <div class="card-block p-0 flow">
@@ -36,12 +36,12 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-2 pl-0">
-        <div class="card">
+      <div class="col-xl-2 col-lg-3 pl-0">
+        <div class="card inside-height">
           <div class="card-header">
             Satış Raporları
           </div>
-          <div class="card-body">
+          <div class="card-block p-0">
             <div class="list-group">
               <button *ngFor="let item of storeReports" type="button" (click)="selectedDB = 'reports';showDocument(item);" class="list-group-item list-group-item-action list-eq">{{item.connection_id}}</button>
             </div>
@@ -51,6 +51,15 @@
           </div>
           <div class="card-footer p-1">
             <button (click)="syncData()" [disabled]="selectedDB == undefined || selectedDB == 'allData'" class="btn btn-warning btn-md btn-block">Senkorinize Et</button>
+          </div>
+          <div class="card-footer p-1">
+            <button type="button" (click)="refreshToken()" class="btn btn-success btn-block btn-md">Erişimi Güncelle</button>
+          </div>
+          <div class="card-footer p-1">
+            <button type="button" (click)="testEndDay()" class="btn btn-info btn-block btn-md">Gün Sonu Güncelle</button>
+          </div>
+          <div class="card-footer p-1">
+            <button type="button" (click)="updateProgram()" class="btn btn-primary btn-block btn-md">Programı Güncelle</button>
           </div>
         </div>
       </div>

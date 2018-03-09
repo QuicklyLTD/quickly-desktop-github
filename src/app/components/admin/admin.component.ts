@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { MainService } from 'app/services/main.service';
+import { MainService } from '../../services/main.service';
+import { HttpClient } from '../../services/http.service';
 
 @Component({
   selector: 'app-admin',
@@ -14,7 +15,7 @@ export class AdminComponent implements OnInit {
   storeReports: Array<any>;
   @ViewChild('editArea') editArea: ElementRef;
 
-  constructor(private mainService: MainService) {
+  constructor(private mainService: MainService, private httpService: HttpClient) {
     this.databases = [
       'users',
       'users_group',
@@ -45,7 +46,7 @@ export class AdminComponent implements OnInit {
     })
   }
 
-  syncData(){
+  syncData() {
     this.mainService.syncToLocal(this.selectedDB).then(message => {
       alert(message);
     });
@@ -106,6 +107,28 @@ export class AdminComponent implements OnInit {
         });
       });
       this.mainService.compactBeforeSync('reports');
+    });
+  }
+
+  refreshToken() {
+    let oldToken = localStorage['AccessToken'];
+    this.httpService.post('token/refresh/', { token: oldToken })
+      .subscribe(res => {
+        if (res.ok) {
+          const token = res.json().token; 
+          localStorage.setItem('AccessToken', token);
+          alert('İşlem Başarılı');
+        } else {
+          alert('Başarısız');
+        }
+      });
+  }
+
+  testEndDay() {
+    let token = localStorage.getItem("AccessToken");
+    let restaurantID = JSON.parse(localStorage['RestaurantInfo']).id;
+    this.httpService.post(`v1/management/restaurants/${restaurantID}/report_generator/`, { timestamp: Date.now(), data: { hello: 'test' } }, token).subscribe(res => {
+      console.log(res);
     });
   }
 }
