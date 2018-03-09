@@ -40,9 +40,10 @@ export class ApplicationSettingsComponent implements OnInit {
     this.settings.RestaurantInfo.subscribe(res => {
       delete res.value.auth;
       delete res.value.remote;
+      delete res.value.settings;
       this.restInfo = res.value
       this.appLogo = this.restInfo.logo;
-      //this.restaurantForm.setValue(this.restInfo);
+      this.restaurantForm.setValue(this.restInfo);
     });
   }
 
