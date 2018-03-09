@@ -3,8 +3,8 @@ import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { ClosedCheck, Check } from '../../../mocks/check.mock';
-import { SettingsService } from 'app/services/settings.service';
-import { MessageService } from 'app/providers/message.service';
+import { SettingsService } from '../../../services/settings.service';
+import { MessageService } from '../../../providers/message.service';
 
 @Component({
   selector: 'app-store-reports',

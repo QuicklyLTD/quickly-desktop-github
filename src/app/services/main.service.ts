@@ -4,7 +4,7 @@ import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
 import { AuthInfo } from '../mocks/settings.mock';
-import { MessageService } from 'app/providers/message.service';
+import { MessageService } from '../providers/message.service';
 
 @Injectable()
 export class MainService {
