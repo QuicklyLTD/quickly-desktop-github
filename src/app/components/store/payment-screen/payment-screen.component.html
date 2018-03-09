@@ -196,7 +196,7 @@
               <i class="fa fa-bookmark ml-1"></i>
               <br> Kupon
             </button>
-            <button [disabled]="productsWillPay.length == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
               <br> İkram
             </button>
