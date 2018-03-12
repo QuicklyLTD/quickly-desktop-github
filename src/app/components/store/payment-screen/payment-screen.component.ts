@@ -96,36 +96,30 @@ export class PaymentScreenComponent implements OnInit {
           greatOne.price -= this.payedPrice;
         } else if (isAnyLittle) {
           newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), []);
-          let priceCount = this.payedPrice + this.discountAmount;
-          const counter = this.productsWillPay.filter(obj => obj).sort((a, b) => b.price - a.price);
-          counter.forEach((product, index) => {
+          let priceCount = this.payedPrice;
+          let willRemove = 0;
+          this.productsWillPay = this.productsWillPay.filter(obj => obj).sort((a, b) => b.price - a.price);
+          this.productsWillPay.forEach((product, index) => {
             if (priceCount > 0) {
-              if (priceCount > product.price) {
-                newPayment.payed_products.push(product);
-                this.productsWillPay.splice(index, 1);
+              if (priceCount >= product.price) {
+                newPayment.payed_products.push(Object.assign({}, product));
+                willRemove++;
                 priceCount -= product.price;
-              } else if (priceCount < product.price) {
-                product.price = priceCount;
-                newPayment.payed_products.push(product);
-                this.productsWillPay[0].price = priceCount;
+              } else {
+                const productWillPush = Object.assign({}, product);
+                productWillPush.price = priceCount;
+                newPayment.payed_products.push(productWillPush);
+                if (product.price - priceCount == 0) {
+                  willRemove++;
+                } else {
+                  let pro = this.productsWillPay[index];
+                  pro.price -= priceCount;
+                }
                 priceCount = 0;
-                return;
               }
-            } else {
-              return;
             }
           });
-          // let greatOne = this.productsWillPay.sort((a, b) => b.price - a.price).shift();
-          // let secondOne = this.productsWillPay.sort((a, b) => b.price - a.price)[0];
-          // let thirdOne = this.productsWillPay.sort((a, b) => b.price - a.price)[1];
-          // if(secondOne.price < (this.payedPrice - greatOne.price)){
-          //   newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), [greatOne,secondOne]);
-          //   this.productsWillPay.sort((a, b) => b.price - a.price).shift();
-          //   thirdOne.price -= (this.payedPrice - secondOne.price);
-          // }else{
-          //   newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), [greatOne]);
-          //   secondOne.price -= (this.payedPrice - greatOne.price);
-          // }
+          this.productsWillPay.splice(0, willRemove);
         }
         this.priceWillPay -= this.payedPrice;
         this.currentAmount -= (this.payedPrice - this.discountAmount);
@@ -139,6 +133,11 @@ export class PaymentScreenComponent implements OnInit {
       this.check.payment_flow.push(newPayment);
       this.check.discount += this.payedPrice;
       this.payedPrice = 0;
+      
+      //// Discount Will Added ///////
+      return false;
+      //// Discount Will Added ///////
+
       this.mainService.updateData('checks', this.id, this.check).then(res => {
         if (this.changePrice >= 0) {
           this.fillData();
