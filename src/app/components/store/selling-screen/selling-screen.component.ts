@@ -5,7 +5,7 @@ import { MessageService } from '../../../providers/message.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Table, Floor } from '../../../mocks/table.mock';
 import { Check, ClosedCheck, PaymentStatus, CheckProduct } from '../../../mocks/check.mock';
-import { Product, Recipe, SubCategory, Category } from '../../../mocks/product.mock';
+import { Product, Recipe, SubCategory, Category, Ingredient } from '../../../mocks/product.mock';
 import { Report, Activity } from '../../../mocks/report.mock';
 import { Printer } from '../../../mocks/settings.mock';
 import { ElectronService } from '../../../providers/electron.service';
@@ -405,12 +405,16 @@ export class SellingScreenComponent implements OnInit {
       });
       this.mainService.getAllBy('recipes', { product_id: obj.product }).then(result => {
         if (result.docs.length > 0) {
-          let pRecipe: Recipe = result.docs[0];
-          pRecipe.recipe.forEach(stock => {
+          const pRecipe: Array<Ingredient> = result.docs[0].recipe;
+          pRecipe.forEach(stock => {
             let downStock = stock.amount * obj.count;
             this.mainService.changeData('stocks', stock.stock_id, (doc) => {
               doc.left_total -= downStock;
               doc.quantity = doc.left_total / doc.total;
+              if (doc.left_total < doc.warning_limit) {
+                console.log(doc.left_total);
+                console.log('Stok Azaldı....');
+              }
               return doc;
             });
           });
