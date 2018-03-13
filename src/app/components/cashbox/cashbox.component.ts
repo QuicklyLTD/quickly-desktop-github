@@ -4,7 +4,7 @@ import { Cashbox } from '../../mocks/cashbox.mock';
 import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
 import { MessageService } from '../../providers/message.service';
-import { LogService } from '../../services/log.service';
+import { LogService, logType } from '../../services/log.service';
 
 
 @Component({
@@ -25,7 +25,7 @@ export class CashboxComponent implements OnInit {
   day: any;
   @ViewChild('cashboxForm') cashboxForm: NgForm;
 
-  constructor(private mainService: MainService, private settingsService: SettingsService, private messageService: MessageService, private logService:LogService) {
+  constructor(private mainService: MainService, private settingsService: SettingsService, private messageService: MessageService, private logService: LogService) {
     this.day = this.settingsService.getDay().day;
     this.user = this.settingsService.getUser('name');
     this.sellingIncomes = 0;
@@ -52,6 +52,7 @@ export class CashboxComponent implements OnInit {
     if (!form._id) {
       let schema = new Cashbox(this.type, form.description, Date.now(), form.cash, form.card, form.coupon, this.user);
       this.mainService.addData('cashbox', schema).then(res => {
+        this.logService.createLog(logType.CASHBOX_CREATED,res.id,`Kasaya ${(form.cash+form.card+form.coupon)} tutarında ${this.type} eklendi.`);
         this.fillData();
         this.messageService.sendMessage(this.type + ' Eklendi');
       });
@@ -71,6 +72,7 @@ export class CashboxComponent implements OnInit {
     this.selectedData = data;
     this.type = this.selectedData.type;
     this.mainService.getData('cashbox', data._id).then(res => {
+      this.logService.createLog(logType.CASHBOX_UPDATED,res.id,`Kasa '${this.selectedData.description}' adlı ${this.type}'i güncellendi.`);
       this.cashboxForm.setValue(res);
       this.fillData();
       $('#cashboxModal').modal('show');
@@ -79,6 +81,7 @@ export class CashboxComponent implements OnInit {
 
   removeData(id) {
     this.mainService.removeData('cashbox', id).then(res => {
+      this.logService.createLog(logType.CASHBOX_DELETED,res.id,`Kasadan '${this.selectedData.description}' adlı ${this.type}'i silindi.`);
       this.messageService.sendMessage('Kayıt Silindi');
       this.fillData();
     });

@@ -7,6 +7,7 @@ import { MessageService } from '../../../providers/message.service';
 import { Check, CheckProduct, PaymentStatus, ClosedCheck } from '../../../mocks/check.mock';
 import { PrinterService } from '../../../providers/printer.service';
 import { Printer } from '../../../mocks/settings.mock';
+import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-payment-screen',
@@ -42,7 +43,7 @@ export class PaymentScreenComponent implements OnInit {
   onClosing: boolean;
   @ViewChild('discountInput') discountInput: ElementRef;
 
-  constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService) {
+  constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.fillData();
@@ -71,6 +72,9 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   payProducts(method: string) {
+    if(this.discountAmount > 0){
+      this.logService.createLog(logType.DISCOUNT,this.userId,`${this.table} Hesabına ${this.discountAmount} tutarında indirim yapıldı.`);
+    }
     if (this.check.total_price == 0 && this.changePrice >= 0) {
       this.closeCheck(method);
     } else {
@@ -144,6 +148,7 @@ export class PaymentScreenComponent implements OnInit {
           this.discount = undefined;
           this.discountAmount = 0;
         }
+        this.logService.createLog(logType.CHECK_CREATED,this.check._id,`${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
         this.togglePayed();
       });
       this.isFirstTime = true;
@@ -171,6 +176,7 @@ export class PaymentScreenComponent implements OnInit {
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
+        this.logService.createLog(logType.CHECK_CLOSED,res.id,`${this.table} Hesabı ${this.currentAmount} tutarında ödeme alınarak kapatıldı.`);
         this.updateSellingReport(method);
         if (this.check.type == 1) {
           this.updateTableReport(this.check);

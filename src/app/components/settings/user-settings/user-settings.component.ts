@@ -3,7 +3,8 @@ import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { User, UserGroup, UserAuth, ComponentsAuth } from '../../../mocks/user.mock';
 import { Report } from '../../../mocks/report.mock';
-import { MessageService } from "../../../providers/message.service";
+import { MessageService } from '../../../providers/message.service';
+import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-user-settings',
@@ -22,7 +23,7 @@ export class UserSettingsComponent implements OnInit {
   @ViewChild('groupDetailForm') groupDetailForm: NgForm;
 
   constructor(
-    private mainService: MainService, private messageService: MessageService) {
+    private mainService: MainService, private messageService: MessageService, private logService: LogService) {
   }
 
   ngOnInit() {
@@ -41,7 +42,7 @@ export class UserSettingsComponent implements OnInit {
   getGroup(id) {
     this.selectedGroup = id;
     this.mainService.getData('users_group', id).then(res => {
-      res = Object.assign(res,res.auth.components);
+      res = Object.assign(res, res.auth.components);
       res.cancel = (res.auth.cancelProduct && res.auth.cancelCheck && res.auth.discount) ? true : false;
       delete res.auth;
       this.groupDetailForm.setValue(res);
@@ -49,11 +50,11 @@ export class UserSettingsComponent implements OnInit {
   }
 
   getUsersByGroup(id) {
-    if(id){
+    if (id) {
       this.mainService.getAllBy('users', { role_id: id }).then(res => {
         this.users = res.docs;
       });
-    }else{
+    } else {
       this.mainService.getAllBy('users', {}).then(res => {
         this.users = res.docs;
       });
@@ -145,7 +146,9 @@ export class UserSettingsComponent implements OnInit {
             let role = result.name;
             let schema = new User(form.name, role, form.role_id, form.pincode, 1, Date.now());
             this.mainService.addData('users', schema).then((response) => {
-              this.mainService.addData('reports', new Report('User', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now()));
+              this.mainService.addData('reports', new Report('User', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
+                this.logService.createLog(logType.USER_CREATED,res.id,`${form.name} Adlı Kullanıcı Oluşturuldu`);
+              });
               this.messageService.sendMessage('Kullanıcı Oluşturuldu!');
               this.fillData();
               userForm.reset();
@@ -159,7 +162,8 @@ export class UserSettingsComponent implements OnInit {
         if (result.docs.length > 0 && result.docs[0].name != form.name) {
           this.messageService.sendMessage('Bu giriş kodu ile başka bir kullanıcı kayıtlı. Lütfen başka bir giriş kodu deneyin.');
         } else {
-          this.mainService.updateData('users', form._id, form).then(() => {
+          this.mainService.updateData('users', form._id, form).then((res) => {
+            this.logService.createLog(logType.USER_UPDATED,res.id,`${form.name} Adlı Kullanıcı Güncellendi`);
             this.messageService.sendMessage('Bilgiler Güncellendi!');
             this.fillData();
             userForm.reset();
@@ -184,6 +188,7 @@ export class UserSettingsComponent implements OnInit {
     let isOk = confirm('Kulanıcıyı Silmek Üzerisiniz. Bu işlem Geri Alınamaz.');
     if (isOk) {
       this.mainService.removeData('users', id).then((result) => {
+        this.logService.createLog(logType.USER_DELETED,result.id,`${this.userForm.value.name} Adlı Kullanıcı Silindi`);
         this.mainService.getAllBy('reports', { connection_id: result.id }).then(res => {
           this.mainService.removeData('reports', res.docs[0]._id);
         });

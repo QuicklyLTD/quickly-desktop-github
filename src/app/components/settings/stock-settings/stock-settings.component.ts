@@ -4,6 +4,7 @@ import { Stock, StockCategory } from '../../../mocks/stocks.mock';
 import { Report } from '../../../mocks/report.mock';
 import { MainService } from '../../../services/main.service';
 import { MessageService } from '../../../providers/message.service';
+import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-stock-settings',
@@ -21,7 +22,7 @@ export class StockSettingsComponent implements OnInit {
   @ViewChild('stockCatDetailForm') stockCatDetailForm: NgForm;
   @ViewChild('stockForm') stockForm: NgForm;
   @ViewChild('stockDetailForm') stockDetailForm: NgForm;
-  constructor(private mainService: MainService, private messageService: MessageService) {
+  constructor(private mainService: MainService, private messageService: MessageService, private logService: LogService) {
     this.units = ['Gram', 'Mililitre', 'Adet'];
     this.fillData();
   }
@@ -51,6 +52,7 @@ export class StockSettingsComponent implements OnInit {
     let isOk = confirm('Kaydı Silmek Üzeresiniz. Bu İşlem Geri Alınamaz');
     if (isOk) {
       this.mainService.removeData('stocks', id).then(res => {
+        this.logService.createLog(logType.STOCK_DELETED,res.id,`${this.stockDetailForm.name} adlı Stok silindi.`);
         this.fillData();
         $('#stock').modal('hide');
         this.messageService.sendMessage('Kategori İsmi Belirtmelisiniz!');
@@ -87,7 +89,8 @@ export class StockSettingsComponent implements OnInit {
     if (form._id == undefined) {
       let left_total = form.total * form.quantity;
       let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * 25 / 100, Date.now());
-      this.mainService.addData('stocks', schema).then((response) => {
+      this.mainService.addData('stocks', schema).then((res) => {
+        this.logService.createLog(logType.STOCK_CREATED, res.id, `${form.name} adlı Stok oluşturuldu.`);
         this.fillData();
         stockForm.reset();
         this.messageService.sendMessage('Stok oluşturuldu');
@@ -96,6 +99,7 @@ export class StockSettingsComponent implements OnInit {
       this.mainService.updateData('stocks', form._id, form).then(() => {
         this.fillData();
         stockForm.reset();
+        this.logService.createLog(logType.STOCK_UPDATED, form._id, `${form.name} adlı Stok Güncellendi.`);
         this.messageService.sendMessage('Stok Düzenlendi');
       });
     }

@@ -5,6 +5,7 @@ import { PrinterService } from '../../../providers/printer.service';
 import { ClosedCheck, Check } from '../../../mocks/check.mock';
 import { SettingsService } from '../../../services/settings.service';
 import { MessageService } from '../../../providers/message.service';
+import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-store-reports',
@@ -25,7 +26,7 @@ export class StoreReportsComponent implements OnInit {
   printers: Array<any>;
   @ViewChild('checkEdit') editForm: NgForm;
 
-  constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService, private messageService: MessageService) {
+  constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService, private messageService: MessageService, private logService: LogService) {
     this.fillData();
     this.settingsService.getPrinters().subscribe(res => {
       this.printers = res.value;
@@ -130,12 +131,14 @@ export class StoreReportsComponent implements OnInit {
         return false;
       }
     }
+    this.logService.createLog(logType.CHECK_UPDATED, Form._id, `${this.checkDetail.total_price} tutarındaki kapatılan hesap ${Form.total_price} TL ${Form.payment_method} olarak güncellendi.`);
   }
 
   cancelCheck(id, note) {
     let isOK = confirm('Kapanmış Hesap İptal Edilecek. Bu İşlem Geri Alınamaz!');
     if (isOK) {
-      this.mainService.updateData('closed_checks', id, { description: note, type: 3 }).then(() => {
+      this.mainService.updateData('closed_checks', id, { description: note, type: 3 }).then(res => {
+        this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price + this.checkDetail.discount} tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`)
         this.fillData();
         $('#cancelDetail').modal('hide');
       });

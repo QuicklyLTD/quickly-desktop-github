@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { Report } from '../../../mocks/report.mock';
 import { MessageService } from '../../../providers/message.service';
+import { LogService, logType } from '../../../services/log.service';
 import { Product, Category, SubCategory, ProductGroup, ProductSpecs, Recipe, Ingredient } from '../../../mocks/product.mock';
 import { Printer } from 'app/mocks/settings.mock';
 
@@ -40,7 +41,7 @@ export class MenuSettingsComponent implements OnInit {
   @ViewChild('recipesForm') recipesForm: NgForm;
   @ViewChild('productTypeSelect') productTypeSelect: ElementRef
 
-  constructor(private mainService: MainService, private messageService: MessageService) {
+  constructor(private mainService: MainService, private messageService: MessageService, private logService: LogService) {
     this.fillData();
   }
 
@@ -198,7 +199,9 @@ export class MenuSettingsComponent implements OnInit {
     let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.subcat_id, form.specifies, form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('products', schema).then((response) => {
-        this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now()));
+        this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
+          this.logService.createLog(logType.PRODUCT_CREATED,res.id,`${form.name} adlı Ürün Oluşturuldu`)
+        });
         if (this.productRecipe.length > 0) {
           let schema = new Recipe(response.id, this.productRecipe);
           this.mainService.addData('recipes', schema);
@@ -209,6 +212,7 @@ export class MenuSettingsComponent implements OnInit {
     } else {
       this.mainService.updateData('products', form._id, schema).then((res) => {
         if (res.ok) {
+          this.logService.createLog(logType.PRODUCT_UPDATED,res.id,`${this.productForm.value.name} adlı Ürün Güncellendi`);
           if (this.productRecipe.length > 0) {
             if (this.recipe.length == 0) {
               let schema = new Recipe(form._id, this.productRecipe);
@@ -271,6 +275,7 @@ export class MenuSettingsComponent implements OnInit {
     let isOk = confirm('Ürünü Silmek Üzerisiniz..');
     if (isOk) {
       this.mainService.removeData('products', this.selectedId).then((result) => {
+        this.logService.createLog(logType.PRODUCT_DELETED,result.id,`${this.productForm.value.name} adlı Ürün Silindi`);
         this.mainService.getAllBy('reports', { connection_id: result.id }).then(res => {
           if (res.docs.length > 0)
             this.mainService.removeData('reports', res.docs[0]._id);

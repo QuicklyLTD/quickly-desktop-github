@@ -11,7 +11,7 @@ import { Printer } from '../../../mocks/settings.mock';
 import { ElectronService } from '../../../providers/electron.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { SettingsService } from '../../../services/settings.service';
-import { LogService } from '../../../services/log.service';
+import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-selling-screen',
@@ -198,14 +198,19 @@ export class SellingScreenComponent implements OnInit {
     });
     this.updateProductReport(this.countData);
     if (this.check.status == 1) {
-      this.mainService.updateData('checks', this.check_id, this.check);
+      this.mainService.updateData('checks', this.check_id, this.check).then(res => {
+        let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
+        this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+      });
       this.router.navigate(['/store']);
     } else {
       if (this.check.type == 1) {
         this.mainService.updateData('tables', this.id, { status: 2, timestamp: Date.now() });
       }
       this.check.status = 1;
-      this.mainService.addData('checks', this.check);
+      this.mainService.addData('checks', this.check).then(res => {
+        this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
+      });
       this.router.navigate(['/store']);
     }
   }
@@ -268,6 +273,7 @@ export class SellingScreenComponent implements OnInit {
       if (analizeCheck) {
         this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
           if (res.ok) {
+            this.logService.createLog(logType.ORDER_CANCELED, this.check._id, `${this.table.name} Masasından ${this.selectedProduct.name} adlı ürün iptal edildi Açıklama:'${reason}'`);
             this.check._rev = res.rev;
             this.message.sendMessage('Ürün İptal Edildi');
             this.selectedProduct = undefined;
@@ -284,6 +290,7 @@ export class SellingScreenComponent implements OnInit {
         checkToCancel.description = 'Bütün Ürünler İptal Edildi';
         this.mainService.addData('closed_checks', checkToCancel).then(res => {
           this.message.sendMessage('Hesap İptal Edildi');
+          this.logService.createLog(logType.CHECK_CANCELED, this.check._id, `${this.table.name}'de kalan bütün ürünler iptal edildi. Hesap Kapatıldı.`)
         });
         if (this.check.payment_flow) {
           let payedDiscounts = 0;
@@ -379,12 +386,16 @@ export class SellingScreenComponent implements OnInit {
 
   updateUserReport() {
     let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
+    this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} hesabına ${pricesTotal} tutarında sipariş girdi.`);
     this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
       let doc = res.docs[0]
       doc.amount += pricesTotal;
       doc.count++;
       doc.weekly[this.settings.getDay().day] += pricesTotal;
       doc.weekly_count[this.settings.getDay().day]++;
+      if (doc.weekly_count[this.settings.getDay().day] == 100) {
+        this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
+      }
       doc.update_time = Date.now();
       this.mainService.updateData('reports', doc._id, doc).then();
     });
@@ -524,6 +535,7 @@ export class SellingScreenComponent implements OnInit {
         });
       });
     }
+    this.logService.createLog(logType.ORDER_MOVED, this.selectedProduct.id, `${this.selectedProduct.name} siparişi ${this.table.name} masasından ${this.selectedTable.name} masasına aktarıldı`)
   }
 
   splitTable() {
@@ -536,6 +548,7 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id, type: 1 }).then(res => {
           if (res.ok) {
             this.message.sendMessage(`Hesap ${this.selectedTable.name} Masasına Aktarıldı.`)
+            this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.table.name} Hesabı ${this.selectedTable.name} masasına taşındı.`);
             $('#splitTable').modal('hide');
             this.router.navigate(['/store']);
           }
@@ -550,8 +563,10 @@ export class SellingScreenComponent implements OnInit {
           otherCheck.total_price += this.check.total_price;
           if (this.check.type == 1) {
             otherCheck.note = `${this.table.name} Masası İle Birleştirildi`;
+            this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.table.name} Masası ${this.selectedTable.name} ile Birleştirildi.`);
           } else {
             otherCheck.note = `${this.check.note} Hesabı İle Birleştirildi`;
+            this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.check.note} Hesabı ${this.selectedTable.name} Masasına Aktarıldı.`);
           }
           if (this.check.payment_flow) {
             if (otherCheck.payment_flow) {

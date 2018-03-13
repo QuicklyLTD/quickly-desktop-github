@@ -4,6 +4,7 @@ import { MainService } from '../../../services/main.service';
 import { MessageService } from '../../../providers/message.service';
 import { Table, Floor, FloorSpecs } from '../../../mocks/table.mock';
 import { Report } from '../../../mocks/report.mock';
+import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-restaurant-settings',
@@ -21,7 +22,7 @@ export class RestaurantSettingsComponent implements OnInit {
   @ViewChild('areaDetailForm') areaDetailForm: NgForm;
   @ViewChild('tableForm') tableForm: NgForm;
 
-  constructor(private mainService: MainService, private messageService: MessageService) {
+  constructor(private mainService: MainService, private messageService: MessageService, private logService: LogService) {
     this.onUpdate = false;
     this.fillData();
   }
@@ -94,8 +95,8 @@ export class RestaurantSettingsComponent implements OnInit {
           for (let prop in data) {
             this.mainService.removeData('tables', data[prop]._id).then(result => {
               this.mainService.getAllBy('reports', { connection_id: result.id }).then((res) => {
-                if(res.docs.length > 0)
-                this.mainService.removeData('reports', res.docs[0]._id);
+                if (res.docs.length > 0)
+                  this.mainService.removeData('reports', res.docs[0]._id);
               });
             });
           }
@@ -119,13 +120,16 @@ export class RestaurantSettingsComponent implements OnInit {
     let schema = new Table(form.name, form.floor_id, form.capacity, form.description, 1, Date.now(), [], form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('tables', schema).then((response) => {
-        this.mainService.addData('reports', new Report('Table', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now()));
+        this.mainService.addData('reports', new Report('Table', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
+          this.logService.createLog(logType.TABLE_CREATED, res.id, `${form.name} adlı Masa oluşturuldu.`);
+        });
         this.fillData();
         this.messageService.sendMessage('Masa Oluşturuldu.');
         tableForm.reset();
       })
     } else {
       this.mainService.updateData('tables', form._id, schema).then(() => {
+        this.logService.createLog(logType.TABLE_UPDATED, form._id, `${this.tableForm.value.name} adlı Masa Güncellendi.`);
         this.fillData();
         this.messageService.sendMessage('Masa Güncellendi.');
         tableForm.reset();
@@ -148,9 +152,10 @@ export class RestaurantSettingsComponent implements OnInit {
     let isOk = confirm('Masayı Silmek Üzeresiniz!');
     if (isOk) {
       this.mainService.removeData('tables', this.selectedTable).then((result) => {
+        this.logService.createLog(logType.TABLE_DELETED, result._id, `${this.tableForm.value.name} adlı Masa Silindi.`);
         this.mainService.getAllBy('reports', { connection_id: result.id }).then((res) => {
-          if(res.docs.length > 0)
-          this.mainService.removeData('reports', res.docs[0]._id);
+          if (res.docs.length > 0)
+            this.mainService.removeData('reports', res.docs[0]._id);
         });
         this.fillData();
         this.messageService.sendMessage('Masa Silindi.');
