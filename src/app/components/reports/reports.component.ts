@@ -81,7 +81,9 @@ export class ReportsComponent implements OnInit {
     });
     this.mainService.getAllBy('checks', {}).then(res => {
       const activeChecks = res.docs;
-      this.activeTotal = activeChecks.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
+      if(res.docs.length > 0){
+        this.activeTotal = activeChecks.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
+      }
     });
     this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
       let report: Array<Report> = res.docs;

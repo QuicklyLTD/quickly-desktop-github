@@ -133,11 +133,6 @@ export class PaymentScreenComponent implements OnInit {
       this.check.payment_flow.push(newPayment);
       this.check.discount += this.payedPrice;
       this.payedPrice = 0;
-      
-      //// Discount Will Added ///////
-      return false;
-      //// Discount Will Added ///////
-
       this.mainService.updateData('checks', this.id, this.check).then(res => {
         if (this.changePrice >= 0) {
           this.fillData();
@@ -145,7 +140,7 @@ export class PaymentScreenComponent implements OnInit {
           this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
         } else {
           delete this.check._rev;
-          this.messageService.sendMessage(`'${newPayment.payed_products[0].name}' ürününün ${newPayment.amount} TL'si ${method} olarak ödendi;`);
+          this.messageService.sendMessage(`Ürünlerin ${newPayment.amount} TL'si ${method} olarak ödendi`);
           this.discount = undefined;
           this.discountAmount = 0;
         }
