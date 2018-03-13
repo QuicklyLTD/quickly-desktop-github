@@ -76,14 +76,12 @@ export class ReportsComponent implements OnInit {
     this.ChartLoaded = false;
     this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
       this.sellingActivity = res.docs[0];
-      this.activityData = [{data:this.sellingActivity.activity, label:'Gelir Endeksi'},{data:this.sellingActivity.activity_count, label:'Doluluk Oranı ( % )'}];
+      this.activityData = [{ data: this.sellingActivity.activity, label: 'Gelir Endeksi' }, { data: this.sellingActivity.activity_count, label: 'Doluluk Oranı ( % )' }];
       this.activityLabels = this.sellingActivity.activity_time;
     });
     this.mainService.getAllBy('checks', {}).then(res => {
-      let activeChecks = res.docs;
-      activeChecks.forEach(element => {
-        this.activeTotal = element.discount + element.total_price;
-      });
+      const activeChecks = res.docs;
+      this.activeTotal = activeChecks.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
     });
     this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
       let report: Array<Report> = res.docs;
