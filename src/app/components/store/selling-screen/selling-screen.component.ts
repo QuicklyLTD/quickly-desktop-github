@@ -386,7 +386,7 @@ export class SellingScreenComponent implements OnInit {
 
   updateUserReport() {
     let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
-    this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} hesabına ${pricesTotal} tutarında sipariş girdi.`);
+    this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
     this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
       let doc = res.docs[0]
       doc.amount += pricesTotal;
