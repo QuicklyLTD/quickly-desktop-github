@@ -200,7 +200,11 @@ export class SellingScreenComponent implements OnInit {
     if (this.check.status == 1) {
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
         let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
-        this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+        if (this.check.type == 1) {
+          this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+        }else{
+          this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+        }
       });
       this.router.navigate(['/store']);
     } else {
@@ -209,7 +213,11 @@ export class SellingScreenComponent implements OnInit {
       }
       this.check.status = 1;
       this.mainService.addData('checks', this.check).then(res => {
-        this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
+        if(this.check.type == 1){
+          this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
+        }else{
+          this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
+        }
       });
       this.router.navigate(['/store']);
     }
@@ -273,7 +281,11 @@ export class SellingScreenComponent implements OnInit {
       if (analizeCheck) {
         this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
           if (res.ok) {
-            this.logService.createLog(logType.ORDER_CANCELED, this.check._id, `${this.table.name} Masasından ${this.selectedProduct.name} adlı ürün iptal edildi Açıklama:'${reason}'`);
+            if(this.check.type == 1){
+              this.logService.createLog(logType.ORDER_CANCELED, this.check._id, `${this.table.name} Masasından ${this.selectedProduct.name} adlı ürün iptal edildi Açıklama:'${reason}'`);
+            }else{
+              this.logService.createLog(logType.ORDER_CANCELED, this.check._id, `${this.check.note} Hesabından ${this.selectedProduct.name} adlı ürün iptal edildi Açıklama:'${reason}'`);
+            }
             this.check._rev = res.rev;
             this.message.sendMessage('Ürün İptal Edildi');
             this.selectedProduct = undefined;
@@ -386,7 +398,11 @@ export class SellingScreenComponent implements OnInit {
 
   updateUserReport() {
     let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
-    this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
+    if (this.check.type == 1) {
+      this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} masasına ${pricesTotal} TL tutarında sipariş girdi.`);
+    }else{
+      this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
+    }
     this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
       let doc = res.docs[0]
       doc.amount += pricesTotal;
@@ -548,7 +564,11 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id, type: 1 }).then(res => {
           if (res.ok) {
             this.message.sendMessage(`Hesap ${this.selectedTable.name} Masasına Aktarıldı.`)
-            this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.table.name} Hesabı ${this.selectedTable.name} masasına taşındı.`);
+            if(this.check.type == 1){
+              this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.table.name} Hesabı ${this.selectedTable.name} masasına taşındı.`);
+            }else{
+              this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.check.note} Hesabı ${this.selectedTable.name} masasına taşındı.`);
+            }
             $('#splitTable').modal('hide');
             this.router.navigate(['/store']);
           }
