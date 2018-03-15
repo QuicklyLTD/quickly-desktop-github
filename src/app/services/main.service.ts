@@ -5,6 +5,7 @@ import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
 import { AuthInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
+import { TerminalService } from '../providers/terminal.service';
 
 @Injectable()
 export class MainService {
@@ -15,7 +16,11 @@ export class MainService {
   LocalDB: any;
   RemoteDB: any;
 
-  constructor(private messageService: MessageService) {
+  printers: any;
+  categories: any;
+  tables: any;
+
+  constructor(private messageService: MessageService, private terminal: TerminalService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
 
@@ -48,6 +53,16 @@ export class MainService {
       this.db_prefix = this.authInfo.app_db;
       this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajaxOpts);
     }
+
+    this.getAllBy('settings', { key: 'Printers' }).then(res => {
+      this.printers = res.docs[0].value;
+    });
+    this.getAllBy('categories', {}).then(res => {
+      this.categories = res.docs;
+    });
+    this.getAllBy('tables', {}).then(res => {
+      this.tables = res.docs;
+    });
   }
 
   getAllData(db: string, $limit) {
@@ -183,6 +198,16 @@ export class MainService {
           delete element._rev;
           delete element._revisions;
           delete element.db_seq;
+          if (db == 'checks') {
+            this.terminal.printOrders(this.printers, this.categories, element, this.tables);
+            element.products.forEach(element => {
+              element.status = 2;
+            });
+            setTimeout(() => {
+              this.updateData('checks', element._id, element);
+              console.log('güncel');
+            }, 2000)
+          }
           delete element.db_name;
           this.LocalDB[db].upsert(element._id, (doc) => {
             return Object.assign(doc, element);

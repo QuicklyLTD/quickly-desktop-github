@@ -45,6 +45,7 @@ import { KeyboardService } from './providers/keyboard.service';
 import { MessageService } from "./providers/message.service";
 import { PrinterService } from "./providers/printer.service"
 import { ElectronService } from './providers/electron.service';
+import { TerminalService } from './providers/terminal.service';
 //////  Guards
 import { CanActivateViaAuthGuard } from './guards/auth.guard.service';
 //////  Pipes
@@ -116,6 +117,7 @@ import { DayDetailComponent } from './components/endoftheday/day-detail/day-deta
     MessageService,
     KeyboardService,
     PrinterService,
+    TerminalService,
     HttpClient
   ],
   bootstrap: [AppComponent]
