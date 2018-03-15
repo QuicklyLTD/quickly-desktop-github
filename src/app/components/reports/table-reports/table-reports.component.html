@@ -8,9 +8,9 @@
       <i class="fa fa-list" aria-hidden="true"></i> Liste</a>
   </li>
   <li class="nav-item">
-      <a class="nav-link disabled" data-toggle="tab" href="#notifications" role="tab">
-        <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
-    </li>
+    <a class="nav-link" data-toggle="tab" href="#notifications" role="tab">
+      <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -87,13 +87,31 @@
       </div>
     </div>
   </div>
-  <div class="tab-pane" id="other" role="tabpanel">
+  <div class="tab-pane" id="notifications" role="tabpanel">
     <div class="card ntb">
       <div class="card-header">
-        <h5 class="mt-2">Ayarlar</h5>
+        <h5 class="mt-2">Bildirimler</h5>
       </div>
-      <div class="card-block tab-height flow">
-
+      <div class="card-block tab-height p-0 flow">
+        <table class="table table-striped table-bordered">
+          <thead class="thead-inverse">
+            <tr>
+              <th width="5%">Tip</th>
+              <th>Açıklama</th>
+              <th width="10%">Kullanıcı</th>
+              <th width="12%" colspan="2">Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of tableLogs">
+              <td>{{log.type}}</td>
+              <td>{{log.description}}</td>
+              <td>{{log.user}}</td>
+              <td>{{log.timestamp | date:'HH:mm'}}</td>
+              <td>{{log.timestamp | date:'dd/M/y'}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Report } from '../../../mocks/report.mock'
 import { MainService } from '../../../services/main.service';
+import { Log, logType } from '../../../mocks/log.mock';
 @Component({
   selector: 'app-user-reports',
   templateUrl: './user-reports.component.html',
@@ -8,6 +9,7 @@ import { MainService } from '../../../services/main.service';
 })
 export class UserReportsComponent implements OnInit {
   usersList: Array<Report>;
+  userLogs: Array<Log>;
   generalList: Array<Report>;
 
 
@@ -22,7 +24,7 @@ export class UserReportsComponent implements OnInit {
   DetailData: Array<any>;
   DetailLoaded: boolean;
 
-  constructor(private mainService: MainService) { 
+  constructor(private mainService: MainService) {
     this.DetailLoaded = false;
     this.DetailData = [];
     this.fillData(false);
@@ -62,7 +64,7 @@ export class UserReportsComponent implements OnInit {
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
-      this.DetailData = [{ data: res.weekly, label: 'Sipariş Tutarı' },{ data: res.weekly_count, label: 'Sipariş Adedi' }];
+      this.DetailData = [{ data: res.weekly, label: 'Sipariş Tutarı' }, { data: res.weekly_count, label: 'Sipariş Adedi' }];
       this.DetailLoaded = true;
       $('#reportDetail').modal('show');
     });
@@ -121,6 +123,9 @@ export class UserReportsComponent implements OnInit {
           };
         });
       });
+    });
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.userLogs = res.docs.filter(obj => obj.type >= logType.USER_CREATED && obj.type <= logType.USER_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }

@@ -12,9 +12,9 @@
       <i class="fa fa-trash-o" aria-hidden="true"></i> İptal</a>
   </li>
   <li class="nav-item">
-      <a class="nav-link disabled" data-toggle="tab" href="#gift" role="tab">
-        <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
-    </li>
+    <a class="nav-link" data-toggle="tab" href="#notifications" role="tab">
+      <i class="fa fa-bell" aria-hidden="true"></i> Bildirimler</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -228,6 +228,37 @@
       </div>
     </div>
   </div>
+  <div class="tab-pane" id="notifications" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Bildirimler</h5>
+      </div>
+      <div class="card-block tab-height p-0 flow">
+        <table class="table table-striped table-bordered">
+          <thead class="thead-inverse">
+            <tr>
+              <th width="5%">Tip</th>
+              <th>Açıklama</th>
+              <th width="10%">Kullanıcı</th>
+              <th width="12%" colspan="2">Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of sellingLogs">
+              <td>{{log.type}}</td>
+              <td>{{log.description}}</td>
+              <td>{{log.user}}</td>
+              <td>{{log.timestamp | date:'HH:mm'}}</td>
+              <td>{{log.timestamp | date:'dd/M/y'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="reportDetail" tabindex="-1" role="dialog" aria-hidden="true">
@@ -318,8 +349,8 @@
           <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
         <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
           <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
-        <button *ngIf="checkDetail?.type !== 3" type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1" data-toggle="modal"
-          data-dismiss="modal" data-target="#editCheck">
+        <button *ngIf="checkDetail?.type !== 3" type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1"
+          data-toggle="modal" data-dismiss="modal" data-target="#editCheck">
           <i class="fa fa-edit" aria-hidden="true"></i> Hesap Düzelt</button>
       </div>
     </div>
@@ -345,7 +376,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button [disabled]="cancelNote.value == '' || cancelNote.value == ' '" (click)="cancelCheck(checkDetail._id,cancelNote.value)" class="btn btn-danger btn-lg">İptal Et</button>
+        <button [disabled]="cancelNote.value == '' || cancelNote.value == ' '" (click)="cancelCheck(checkDetail._id,cancelNote.value)"
+          class="btn btn-danger btn-lg">İptal Et</button>
       </div>
     </div>
   </div>

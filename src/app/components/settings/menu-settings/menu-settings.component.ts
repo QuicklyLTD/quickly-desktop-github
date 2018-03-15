@@ -212,7 +212,7 @@ export class MenuSettingsComponent implements OnInit {
     } else {
       this.mainService.updateData('products', form._id, schema).then((res) => {
         if (res.ok) {
-          this.logService.createLog(logType.PRODUCT_UPDATED,res.id,`${this.productForm.value.name} adlı Ürün Güncellendi`);
+          this.logService.createLog(logType.PRODUCT_UPDATED,res.id,`${form.name} adlı Ürün Güncellendi`);
           if (this.productRecipe.length > 0) {
             if (this.recipe.length == 0) {
               let schema = new Recipe(form._id, this.productRecipe);

@@ -6,6 +6,7 @@ import { ClosedCheck, Check } from '../../../mocks/check.mock';
 import { SettingsService } from '../../../services/settings.service';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
+import { Log } from '../../../mocks/log.mock';
 
 @Component({
   selector: 'app-store-reports',
@@ -24,6 +25,7 @@ export class StoreReportsComponent implements OnInit {
   NormalTotal: number = 0;
   FastTotal: number = 0;
   printers: Array<any>;
+  sellingLogs: Array<Log>;
   @ViewChild('checkEdit') editForm: NgForm;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService, private messageService: MessageService, private logService: LogService) {
@@ -131,14 +133,14 @@ export class StoreReportsComponent implements OnInit {
         return false;
       }
     }
-    this.logService.createLog(logType.CHECK_UPDATED, Form._id, `${this.checkDetail.total_price} tutarındaki kapatılan hesap ${Form.total_price} TL ${Form.payment_method} olarak güncellendi.`);
+    this.logService.createLog(logType.CHECK_UPDATED, Form._id, `${this.checkDetail.total_price} TL tutarındaki kapatılan ${this.checkDetail.payment_method} hesap ${Form.total_price} TL ${Form.payment_method} olarak güncellendi.`);
   }
 
   cancelCheck(id, note) {
     let isOK = confirm('Kapanmış Hesap İptal Edilecek. Bu İşlem Geri Alınamaz!');
     if (isOK) {
       this.mainService.updateData('closed_checks', id, { description: note, type: 3 }).then(res => {
-        this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price + this.checkDetail.discount} tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`)
+        this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price} TL tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`)
         this.fillData();
         $('#cancelDetail').modal('hide');
       });
@@ -158,6 +160,9 @@ export class StoreReportsComponent implements OnInit {
           this.FastTotal = this.FastChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
         } catch (error) { }
       }
+    });
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.sellingLogs = res.docs.filter(obj => obj.type >= logType.CHECK_CREATED && obj.type <= logType.ORDER_MOVED || obj.type == logType.DISCOUNT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }

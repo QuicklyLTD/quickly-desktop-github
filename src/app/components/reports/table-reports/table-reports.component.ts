@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MainService } from '../../../services/main.service';
 import { Report } from '../../../mocks/report.mock';
+import { Log, logType } from '../../../mocks/log.mock';
 
 @Component({
   selector: 'app-table-reports',
@@ -10,6 +11,7 @@ import { Report } from '../../../mocks/report.mock';
 export class TableReportsComponent implements OnInit {
   tablesList: Array<Report>;
   generalList: Array<Report>;
+  tableLogs: Array<Log>;
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
   ChartOptions: any = { responsive: false };
@@ -69,7 +71,7 @@ export class TableReportsComponent implements OnInit {
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
-      this.DetailData = [{ data: res.weekly, label: 'Hesap Tutarı' },{ data: res.weekly_count, label: 'Hesap Adedi' }];
+      this.DetailData = [{ data: res.weekly, label: 'Hesap Tutarı' }, { data: res.weekly_count, label: 'Hesap Adedi' }];
       this.DetailLoaded = true;
       $('#reportDetail').modal('show');
     });
@@ -125,6 +127,9 @@ export class TableReportsComponent implements OnInit {
           };
         });
       });
+    });
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.tableLogs = res.docs.filter(obj => obj.type >= logType.TABLE_CREATED && obj.type <= logType.TABLE_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 

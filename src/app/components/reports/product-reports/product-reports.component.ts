@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MainService } from '../../../services/main.service';
 import { Report } from '../../../mocks/report.mock';
+import { Log, logType } from '../../../mocks/log.mock';
 
 @Component({
   selector: 'app-product-reports',
@@ -10,6 +11,7 @@ import { Report } from '../../../mocks/report.mock';
 export class ProductReportsComponent implements OnInit {
   generalList: Array<Report>;
   productList: Array<Report>;
+  productLogs: Array<Log>;
   chartList: Array<Report>;
   toDay: number;
 
@@ -127,6 +129,9 @@ export class ProductReportsComponent implements OnInit {
           };
         });
       });
+    });
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.productLogs = res.docs.filter(obj => obj.type >= logType.PRODUCT_CREATED && obj.type <= logType.PRODUCT_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }
