@@ -151,6 +151,15 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepReports() {
+    this.mainService.getAllBy('logs', {}).then(res => {
+      const logs = res.docs;
+      const logsBackup = new BackupData('logs', logs);
+      this.backupData.push(logsBackup);
+      this.mainService.compactBeforeSync('logs');
+      logs.forEach(element => {
+        this.mainService.removeDoc('logs', element);
+      });
+    });
     this.mainService.getAllBy('reports', {}).then(res => {
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);
