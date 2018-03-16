@@ -15,6 +15,7 @@ import { Printer, Settings } from '../../../mocks/settings.mock';
 })
 export class ApplicationSettingsComponent implements OnInit {
   restInfo: any;
+  restMap: string;
   appSettings: any;
   appLogo: string;
   printers: Array<any>;
@@ -42,6 +43,7 @@ export class ApplicationSettingsComponent implements OnInit {
       delete res.value.remote;
       delete res.value.settings;
       this.restInfo = res.value
+      this.restMap = res.value.geolocation;
       this.appLogo = this.restInfo.logo;
       this.restaurantForm.setValue(this.restInfo);
     });
