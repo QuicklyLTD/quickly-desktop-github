@@ -50,8 +50,11 @@ app-root {
 }
 .proCard{
     height: 7.5vw;
+    .card-block{
+        padding: 1rem;
+    }
     h2{
-        font-size: 3vh;
+        font-size: 1.7vw;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -61,12 +64,14 @@ app-root {
         background-color: #ebcccc;
     }
     .long-name{
-        font-size: 2.4vh;
+        height: 50px;
+        font-size:1.2vw;
     }
     p{
-        font-weight: bold;
         position: absolute;
         bottom: 15px;
+        font-size: 1.2vw;
+        font-weight: bolder;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

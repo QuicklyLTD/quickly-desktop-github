@@ -19,7 +19,6 @@ export class StockReportsComponent implements OnInit {
     this.fillData();
   }
 
-
   fillData() {
     this.mainService.getAllBy('stocks', {}).then(result => {
       this.allStocks = result.docs;
