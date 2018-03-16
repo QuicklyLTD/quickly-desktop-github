@@ -72,6 +72,7 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   payProducts(method: string) {
+    this.updateActivityReport();
     if(this.discountAmount > 0){
       this.logService.createLog(logType.DISCOUNT,this.userId,`${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
     }
@@ -152,9 +153,6 @@ export class PaymentScreenComponent implements OnInit {
         this.togglePayed();
       });
       this.isFirstTime = true;
-    }
-    if (this.check.type == 1) {
-      this.updateActivityReport();
     }
   }
 

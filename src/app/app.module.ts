@@ -1,12 +1,12 @@
 import 'zone.js';
 import 'reflect-metadata';
-//////  Moduller
+//////  Modules
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ErrorHandler } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
-//////  Komponentler
+//////  Main Pages Components
 import { AppComponent } from './app.component';
 import { SetupComponent } from './components/setup/setup.component';
 import { LoginComponent } from './components/login/login.component';
@@ -16,6 +16,9 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
 import { StoreComponent } from './components/store/store.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { AdminComponent } from './components/admin/admin.component';
+//EndDay Child Components
+import { DayDetailComponent } from './components/endoftheday/day-detail/day-detail.component';
 //Store Child Components
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
@@ -55,8 +58,7 @@ import { KeyboardComponent } from './components/helpers/keyboard/keyboard.compon
 import { MessageComponent } from './components/helpers/message/message.component';
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
-import { AdminComponent } from './components/admin/admin.component';
-import { DayDetailComponent } from './components/endoftheday/day-detail/day-detail.component';
+
 
 
 //// Error Handler Sentry

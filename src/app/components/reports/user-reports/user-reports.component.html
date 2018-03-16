@@ -33,11 +33,11 @@
         </div>
       </div>
       <div class="card-block tab-height p-0">
-        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels" [options]="ChartOptions"
-        [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
+          [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="card-footer">
-        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
       </div>
     </div>
   </div>
@@ -64,7 +64,9 @@
         <table class="table table-bordered table-striped table-hover">
           <thead class="thead-inverse">
             <tr>
-              <th width="5%"><i class="fa fa-user" aria-hidden="true"></i></th>
+              <th width="5%">
+                <i class="fa fa-user" aria-hidden="true"></i>
+              </th>
               <th width="30%">Kullanıcı</th>
               <th width="20%">Sipariş Adedi</th>
               <th width="20%">Satış Tutarı</th>
@@ -83,41 +85,39 @@
         </table>
       </div>
       <div class="card-footer">
-        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım 
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
       </div>
     </div>
   </div>
   <div class="tab-pane" id="notifications" role="tabpanel">
-      <div class="card ntb">
-        <div class="card-header">
-          <h5 class="mt-2">Bildirimler</h5>
-        </div>
-        <div class="card-block tab-height p-0 flow">
-          <table class="table table-striped table-bordered">
-            <thead class="thead-inverse">
-              <tr>
-                <th width="5%">Tip</th>
-                <th>Açıklama</th>
-                <th width="10%">Kullanıcı</th>
-                <th width="12%" colspan="2">Tarih</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let log of userLogs">
-                <td>{{log.type}}</td>
-                <td>{{log.description}}</td>
-                <td>{{log.user}}</td>
-                <td>{{log.timestamp | date:'HH:mm'}}</td>
-                <td>{{log.timestamp | date:'dd/M/y'}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer">
-          <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
-        </div>
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Bildirimler</h5>
+      </div>
+      <div class="card-block tab-height p-0 flow">
+        <table class="table table-striped table-bordered">
+          <thead class="thead-inverse">
+            <tr>
+              <th width="10%">Kullanıcı</th>
+              <th>Açıklama</th>
+              <th width="12%" colspan="2">Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of userLogs">
+              <td>{{log.user}}</td>
+              <td>{{log.description}}</td>
+              <td>{{log.timestamp | date:'HH:mm'}}</td>
+              <td>{{log.timestamp | date:'dd/M/y'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
       </div>
     </div>
+  </div>
 </div>
 
 <div class="modal fade" id="reportDetail" tabindex="-1" role="dialog" aria-hidden="true">

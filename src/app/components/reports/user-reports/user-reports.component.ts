@@ -125,7 +125,7 @@ export class UserReportsComponent implements OnInit {
       });
     });
     this.mainService.getAllBy('logs', {}).then(res => {
-      this.userLogs = res.docs.filter(obj => obj.type >= logType.USER_CREATED && obj.type <= logType.USER_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
+      this.userLogs = res.docs.filter(obj => obj.type >= logType.USER_CREATED && obj.type <= logType.USER_CHECKPOINT || obj.type == logType.ORDER_CREATED).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }
