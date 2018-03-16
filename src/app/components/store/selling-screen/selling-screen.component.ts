@@ -401,7 +401,7 @@ export class SellingScreenComponent implements OnInit {
     if (this.check.type == 1) {
       this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} masasına ${pricesTotal} TL tutarında sipariş girdi.`);
     }else{
-      this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
+      this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' Hızlı Satış - ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
     }
     this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
       let doc = res.docs[0]
@@ -439,8 +439,13 @@ export class SellingScreenComponent implements OnInit {
               doc.left_total -= downStock;
               doc.quantity = doc.left_total / doc.total;
               if (doc.left_total < doc.warning_limit) {
-                console.log(doc.left_total);
-                console.log('Stok Azaldı....');
+                if(doc.db_name){
+                  if(doc.left_total <= 0){
+                    this.logService.createLog(logType.STOCK_CHECKPOINT,doc._id,`${doc.name} adlı stok tükendi!`);
+                  }else{
+                    this.logService.createLog(logType.STOCK_CHECKPOINT,doc._id,`${doc.name} adlı stok bitmek üzere! - Kalan: '${doc.left_total +' '+ doc.unit}'`);
+                  }
+                }
               }
               return doc;
             });
