@@ -115,13 +115,38 @@ export class AdminComponent implements OnInit {
     this.httpService.post('token/refresh/', { token: oldToken })
       .subscribe(res => {
         if (res.ok) {
-          const token = res.json().token; 
+          const token = res.json().token;
           localStorage.setItem('AccessToken', token);
           alert('İşlem Başarılı');
         } else {
           alert('Başarısız');
         }
       });
+  }
+
+  updateProgram() {
+    this.mainService.getAllBy('products', {}).then(res => {
+      const products = res.docs;
+      products.forEach(element => {
+        this.mainService.updateData('products', element._id, { type: 1 }).then(res => {
+          console.log('Products',res.ok);
+        });
+      });
+    });
+    this.mainService.getAllBy('categories', {}).then(res => {
+      const categories = res.docs;
+      categories.forEach(element => {
+        this.mainService.updateData('categories', element._id, { tags: '' }).then(res => {
+          console.log('Categories',res.ok);
+        });
+      });
+    });
+    this.mainService.getAllBy('settings', { key: "AppSettings" }).then(res => {
+      const appSettings = res.docs[0];
+      this.mainService.updateData('settings', appSettings._id, { last_day: 0 }).then(res => {
+        console.log('Settings',res.ok);
+      });
+    });
   }
 
   testEndDay() {
