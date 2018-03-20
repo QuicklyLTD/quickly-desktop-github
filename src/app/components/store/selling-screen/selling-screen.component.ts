@@ -249,8 +249,10 @@ export class SellingScreenComponent implements OnInit {
   }
 
   changeSpecs(spec){
+    const oldPrice = this.selectedProduct.price;
     this.selectedProduct.note = spec.spec_name;
     this.selectedProduct.price = spec.spec_price;
+    this.check.total_price = (this.check.total_price - oldPrice) + spec.spec_price;
     $('#noteModal').modal('hide');
   }
 
