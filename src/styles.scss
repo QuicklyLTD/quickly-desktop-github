@@ -107,6 +107,10 @@ app-root {
     }
 }
 
+.modal-xl{
+    max-width: 1000px;
+}
+
 @media screen and (min-width: 900px) {
     .nav-tabs{
         .nav-link{

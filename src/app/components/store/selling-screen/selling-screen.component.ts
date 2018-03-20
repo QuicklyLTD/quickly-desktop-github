@@ -5,7 +5,7 @@ import { MessageService } from '../../../providers/message.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Table, Floor } from '../../../mocks/table.mock';
 import { Check, ClosedCheck, PaymentStatus, CheckProduct } from '../../../mocks/check.mock';
-import { Product, Recipe, SubCategory, Category, Ingredient } from '../../../mocks/product.mock';
+import { Product, Recipe, SubCategory, Category, Ingredient, ProductSpecs } from '../../../mocks/product.mock';
 import { Report, Activity } from '../../../mocks/report.mock';
 import { Printer } from '../../../mocks/settings.mock';
 import { ElectronService } from '../../../providers/electron.service';
@@ -56,6 +56,7 @@ export class SellingScreenComponent implements OnInit {
   numboard: Array<any>;
   isFirstTime: boolean;
   askForPrint: boolean;
+  productSpecs: Array<ProductSpecs>;
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
@@ -202,7 +203,7 @@ export class SellingScreenComponent implements OnInit {
         let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
         if (this.check.type == 1) {
           this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
-        }else{
+        } else {
           this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
         }
       });
@@ -213,9 +214,9 @@ export class SellingScreenComponent implements OnInit {
       }
       this.check.status = 1;
       this.mainService.addData('checks', this.check).then(res => {
-        if(this.check.type == 1){
+        if (this.check.type == 1) {
           this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
-        }else{
+        } else {
           this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
         }
       });
@@ -241,6 +242,16 @@ export class SellingScreenComponent implements OnInit {
       this.selectedProduct = this.check.products[index];
       this.selectedIndex = index;
     }
+  }
+
+  getSpecies(product) {
+    this.productSpecs = this.products.find(obj => obj._id == product.id).specifies;
+  }
+
+  changeSpecs(spec){
+    this.selectedProduct.note = spec.spec_name;
+    this.selectedProduct.price = spec.spec_price;
+    $('#noteModal').modal('hide');
   }
 
   addNote(form: NgForm) {
@@ -281,9 +292,9 @@ export class SellingScreenComponent implements OnInit {
       if (analizeCheck) {
         this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
           if (res.ok) {
-            if(this.check.type == 1){
+            if (this.check.type == 1) {
               this.logService.createLog(logType.ORDER_CANCELED, this.check._id, `${this.table.name} Masasından ${this.selectedProduct.name} adlı ürün iptal edildi Açıklama:'${reason}'`);
-            }else{
+            } else {
               this.logService.createLog(logType.ORDER_CANCELED, this.check._id, `${this.check.note} Hesabından ${this.selectedProduct.name} adlı ürün iptal edildi Açıklama:'${reason}'`);
             }
             this.check._rev = res.rev;
@@ -400,7 +411,7 @@ export class SellingScreenComponent implements OnInit {
     let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
     if (this.check.type == 1) {
       this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} masasına ${pricesTotal} TL tutarında sipariş girdi.`);
-    }else{
+    } else {
       this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' Hızlı Satış - ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
     }
     this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
@@ -439,11 +450,11 @@ export class SellingScreenComponent implements OnInit {
               doc.left_total -= downStock;
               doc.quantity = doc.left_total / doc.total;
               if (doc.left_total < doc.warning_limit) {
-                if(doc.db_name){
-                  if(doc.left_total <= 0){
-                    this.logService.createLog(logType.STOCK_CHECKPOINT,doc._id,`${doc.name} adlı stok tükendi!`);
-                  }else{
-                    this.logService.createLog(logType.STOCK_CHECKPOINT,doc._id,`${doc.name} adlı stok bitmek üzere! - Kalan: '${doc.left_total +' '+ doc.unit}'`);
+                if (doc.db_name) {
+                  if (doc.left_total <= 0) {
+                    this.logService.createLog(logType.STOCK_CHECKPOINT, doc._id, `${doc.name} adlı stok tükendi!`);
+                  } else {
+                    this.logService.createLog(logType.STOCK_CHECKPOINT, doc._id, `${doc.name} adlı stok bitmek üzere! - Kalan: '${doc.left_total + ' ' + doc.unit}'`);
                   }
                 }
               }
@@ -569,9 +580,9 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.updateData('checks', this.check_id, { table_id: this.selectedTable._id, type: 1 }).then(res => {
           if (res.ok) {
             this.message.sendMessage(`Hesap ${this.selectedTable.name} Masasına Aktarıldı.`)
-            if(this.check.type == 1){
+            if (this.check.type == 1) {
               this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.table.name} Hesabı ${this.selectedTable.name} masasına taşındı.`);
-            }else{
+            } else {
               this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.check.note} Hesabı ${this.selectedTable.name} masasına taşındı.`);
             }
             $('#splitTable').modal('hide');

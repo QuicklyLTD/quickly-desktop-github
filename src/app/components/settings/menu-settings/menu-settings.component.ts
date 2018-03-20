@@ -29,10 +29,12 @@ export class MenuSettingsComponent implements OnInit {
   productRecipe: Array<Ingredient>;
   recipesTable: Array<any>;
   oldRecipes: Array<any>;
+  selectedProduct: Product;
   selectedCat: Category;
   selectedSubCat: SubCategory;
   subCats: Array<SubCategory> = [];
   printers: Array<Printer>;
+  productSpecs: Array<ProductSpecs>;
 
   @ViewChild('catDetails') catDetails: NgForm;
   @ViewChild('subCatForm') subCatForm: NgForm;
@@ -48,6 +50,7 @@ export class MenuSettingsComponent implements OnInit {
   ngOnInit() {
     this.stockUnit = 'Birim';
     this.productRecipe = [];
+    this.productSpecs = [];
     this.recipesTable = [];
     this.oldRecipes = [];
     this.recipe = [];
@@ -196,11 +199,13 @@ export class MenuSettingsComponent implements OnInit {
       this.messageService.sendMessage('Gerekli Alanları Doldurmalısınız');
       return false;
     }
-    if (form.type == 2 && this.productRecipe.length == 0) {
-      this.messageService.sendMessage('Stok Girişi Yapmalısınız!');
-      return false;
+    if (form.type == 2 && this.oldRecipes.length == 0) {
+      if (form.type == 2 && this.productRecipe.length == 0) {
+        this.messageService.sendMessage('Stok Girişi Yapmalısınız!');
+        return false;
+      }
     }
-    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.subcat_id, form.specifies, form._id, form._rev);
+    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.subcat_id, this.productSpecs, form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('products', schema).then((response) => {
         this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
@@ -242,15 +247,18 @@ export class MenuSettingsComponent implements OnInit {
     this.recipesTable = [];
     this.oldRecipes = [];
     this.recipe = [];
+    this.productSpecs = [];
     this.onUpdate = true;
     this.mainService.getData('products', id).then(result => {
+      this.selectedProduct = result;
       this.mainService.getAllBy('sub_categories', { cat_id: result.cat_id }).then(res => {
         this.subCats = res.docs;
       });
       result.note = "";
-      if (result.specifies == undefined) {
-        result.specifies = "";
+      if (result.specifies == undefined || result.specifies == '') {
+        result.specifies = [];
       }
+      this.productSpecs = result.specifies;
       if (result.subcat_id == undefined) {
         result.subcat_id = "";
       }
@@ -297,8 +305,9 @@ export class MenuSettingsComponent implements OnInit {
   setProductType(value) {
     this.productType = value;
     if (value == 2) {
+      if(this.productSpecs.length > 0){}
       if (this.oldRecipes.length > 1) {
-        let isOK = confirm('Manuel Stok tipi için tek bir Stok kaydı girebilirsiniz. 2. Stok silinecektir.');
+        let isOK = confirm('Manuel Stok tipi için tek bir Stok kaydı girebilirsiniz. 2. Stok ve Ürün Durumları silinecektir.');
         if (isOK) {
           let recipeWillLost = this.oldRecipes.pop();
           this.removeRecipe('old', recipeWillLost.id);
@@ -311,7 +320,19 @@ export class MenuSettingsComponent implements OnInit {
         this.productRecipe.pop();
         this.recipesTable.pop();
       }
+      this.productSpecs = [];
     }
+  }
+
+  addSpecies(speciesForm) {
+    let form = speciesForm.value;
+    let spec = new ProductSpecs(form.spec_name, form.spec_price);
+    this.productSpecs.push(spec);
+    speciesForm.reset();
+  }
+
+  removeSpecies(index) {
+    this.productSpecs.splice(index, 1);
   }
 
   addRecipe(recipesForm) {
@@ -389,11 +410,13 @@ export class MenuSettingsComponent implements OnInit {
 
   setDefault() {
     this.productRecipe = [];
+    this.productSpecs = []
     this.recipesTable = [];
     this.oldRecipes = [];
     this.recipe = [];
     this.subCats = [];
     this.sub_categories = [];
+    this.selectedProduct = undefined;
     this.selectedCat = undefined;
     this.selectedSubCat = undefined;
     this.selectedId = undefined;
