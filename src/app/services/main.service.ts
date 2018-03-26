@@ -6,6 +6,7 @@ import * as PouchDBUpsert from 'pouchdb-upsert';
 import { AuthInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
+import { ElectronService } from '../providers/electron.service';
 
 @Injectable()
 export class MainService {
@@ -20,7 +21,7 @@ export class MainService {
   categories: any;
   tables: any;
 
-  constructor(private messageService: MessageService, private terminal: TerminalService) {
+  constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
 
@@ -53,7 +54,6 @@ export class MainService {
       this.db_prefix = this.authInfo.app_db;
       this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajaxOpts);
     }
-
     this.getAllBy('settings', { key: 'Printers' }).then(res => {
       this.printers = res.docs[0].value;
     });
@@ -63,6 +63,8 @@ export class MainService {
     this.getAllBy('tables', {}).then(res => {
       this.tables = res.docs;
     });
+
+    this.syncToAppServer();
   }
 
   getAllData(db: string, $limit) {
@@ -77,18 +79,6 @@ export class MainService {
     return this.LocalDB[db].find({
       selector: $schema
     });
-  }
-
-  getByFilter(db: string, $schema: object, $index: object) {
-    return this.LocalDB[db].createIndex({ index: $index }).then(function () {
-      return this.LocalDB[db].find($schema);
-    });
-  }
-
-  getInfo(db: string) {
-    this.LocalDB[db].info().then((info) => {
-      console.log(info);
-    })
   }
 
   addData(db, schema) {
@@ -128,17 +118,6 @@ export class MainService {
     return this.LocalDB[db].put(doc);
   }
 
-  removeDB(db: string) {
-    return this.LocalDB[db].destroy(
-      (err, response) => {
-        if (err) {
-          return console.log(err);
-        } else {
-          console.log(db + ' Silindi!');
-        }
-      });
-  }
-
   createIndex(db: string) {
     this.LocalDB[db].createIndex({
       index: {
@@ -165,6 +144,29 @@ export class MainService {
       }
     }).on('error', (err) => {
       console.error('Change Error', err);
+    });
+  }
+
+  syncToAppServer() {
+    this.LocalDB['allData'].changes({ since: 'now', live: true }).on('change', (change) => {
+      this.getAllBy('allData', {}).then(res => {
+        this.electron.ipcRenderer.send('appServer', res.docs);
+      });
+    });
+    this.electron.ipcRenderer.on('serverListener', (event, method, db, doc) => {
+      switch (method) {
+        case 'add':
+          this.addData(db, doc);
+          break;
+        case 'update':
+          this.updateData(db, doc._id, doc);
+          break;
+        case 'remove':
+          this.removeData(db, doc);
+          break;
+        default:
+          break;
+      }
     });
   }
 
