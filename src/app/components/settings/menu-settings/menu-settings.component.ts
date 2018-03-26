@@ -305,7 +305,6 @@ export class MenuSettingsComponent implements OnInit {
   setProductType(value) {
     this.productType = value;
     if (value == 2) {
-      if(this.productSpecs.length > 0){}
       if (this.oldRecipes.length > 1) {
         let isOK = confirm('Manuel Stok tipi için tek bir Stok kaydı girebilirsiniz. 2. Stok ve Ürün Durumları silinecektir.');
         if (isOK) {
@@ -326,6 +325,10 @@ export class MenuSettingsComponent implements OnInit {
 
   addSpecies(speciesForm) {
     let form = speciesForm.value;
+    if (form.spec_name == '' || form.spec_name == null || form.spec_price <= 0 || form.spec_price == undefined) {
+      this.messageService.sendMessage('Durum Notu ve Fiyatı Boş Bırakılamaz');
+      return false;
+    }
     let spec = new ProductSpecs(form.spec_name, form.spec_price);
     this.productSpecs.push(spec);
     speciesForm.reset();
