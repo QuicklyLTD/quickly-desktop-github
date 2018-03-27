@@ -38,7 +38,7 @@
               <div class="card-block p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let cat of categories" class="btn-group btn-group-justify">
-                    <button (click)="getCategory(cat)" type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
+                    <button (click)="getCategory(cat)" [ngClass]="{'list-group-item-warning' : selectedCat == cat}" type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
                   </div>
                 </div>
               </div>

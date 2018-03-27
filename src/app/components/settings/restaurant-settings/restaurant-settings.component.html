@@ -38,7 +38,7 @@
               <div class="card-block p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let item of floors" class="btn-group btn-group-justify">
-                    <button (click)="getFloor(item)" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                    <button (click)="getFloor(item)" [ngClass]="{'list-group-item-warning' : selectedFloor == item._id}" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
                   </div>
                 </div>
               </div>

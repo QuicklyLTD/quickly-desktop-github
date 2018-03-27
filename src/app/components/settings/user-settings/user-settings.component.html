@@ -38,7 +38,7 @@
               <div class="card-block p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let item of groups" class="btn-group btn-group-justify">
-                    <button (click)="getGroup(item._id)" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                    <button (click)="getGroup(item._id)" [ngClass]="{'list-group-item-warning' : selectedGroup == item._id}" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
                   </div>
                 </div>
               </div>
@@ -158,7 +158,7 @@
               <div class="card-block p-0 flow">
                 <div class="list-group">
                   <button (click)="getUsersByGroup(null)" type="button" class="list-group-item list-group-item-action">Bütün Kullanıcılar</button>
-                  <button *ngFor="let item of groups" (click)="getUsersByGroup(item._id)" type="button" class="list-group-item list-group-item-action">
+                  <button *ngFor="let item of groups"  (click)="getUsersByGroup(item._id)" type="button" class="list-group-item list-group-item-action">
                     {{item.name}}
                   </button>
                 </div>

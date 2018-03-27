@@ -23,6 +23,7 @@ export class ApplicationSettingsComponent implements OnInit {
   printersFound: Array<any>;
   selectedPrinter: any;
   choosenPrinter: any;
+  currentSection: string;
   @ViewChild('settingsForm') settingsForm: NgForm;
   @ViewChild('restaurantForm') restaurantForm: NgForm;
   @ViewChild('printerForm') printerForm: NgForm;
@@ -34,6 +35,7 @@ export class ApplicationSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.currentSection = 'AppSettings';
     this.settings.AppSettings.subscribe(res => {
       this.appSettings = res.value
       this.settingsForm.setValue(this.appSettings);
@@ -47,6 +49,10 @@ export class ApplicationSettingsComponent implements OnInit {
       this.appLogo = this.restInfo.logo;
       this.restaurantForm.setValue(this.restInfo);
     });
+  }
+
+  getSettingsDetail(section: string) {
+    this.currentSection = section;
   }
 
   saveSettings(Form: NgForm) {
