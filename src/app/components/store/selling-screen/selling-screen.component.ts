@@ -101,7 +101,9 @@ export class SellingScreenComponent implements OnInit {
         this.check.products.map(obj => obj.status = 2);
         this.check.status = 1;
         this.mainService.addData('checks', this.check).then(res => {
-          this.router.navigate(['/payment', res.id]);
+          if (res.ok) {
+            this.router.navigate(['/payment', res.id]);
+          }
         });
       } else {
         this.router.navigate(['/payment', this.check_id]);
@@ -200,27 +202,31 @@ export class SellingScreenComponent implements OnInit {
     this.updateProductReport(this.countData);
     if (this.check.status == 1) {
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
-        let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
-        if (this.check.type == 1) {
-          this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
-        } else {
-          this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+        if (res.ok) {
+          let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
+          if (this.check.type == 1) {
+            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+          } else {
+            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+          }
+          this.router.navigate(['/store']);
         }
       });
-      this.router.navigate(['/store']);
     } else {
       if (this.check.type == 1) {
         this.mainService.updateData('tables', this.id, { status: 2, timestamp: Date.now() });
       }
       this.check.status = 1;
       this.mainService.addData('checks', this.check).then(res => {
-        if (this.check.type == 1) {
-          this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
-        } else {
-          this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
+        if (res.ok) {
+          if (this.check.type == 1) {
+            this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
+          } else {
+            this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
+          }
+          this.router.navigate(['/store']);
         }
       });
-      this.router.navigate(['/store']);
     }
   }
 
@@ -248,7 +254,7 @@ export class SellingScreenComponent implements OnInit {
     this.productSpecs = this.products.find(obj => obj._id == product.id).specifies;
   }
 
-  changeSpecs(spec){
+  changeSpecs(spec) {
     const oldPrice = this.selectedProduct.price;
     this.selectedProduct.note = spec.spec_name;
     this.selectedProduct.price = spec.spec_price;

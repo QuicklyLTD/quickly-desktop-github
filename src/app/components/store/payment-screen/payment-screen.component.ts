@@ -73,8 +73,8 @@ export class PaymentScreenComponent implements OnInit {
 
   payProducts(method: string) {
     this.updateActivityReport();
-    if(this.discountAmount > 0){
-      this.logService.createLog(logType.DISCOUNT,this.userId,`${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
+    if (this.discountAmount > 0) {
+      this.logService.createLog(logType.DISCOUNT, this.userId, `${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
     }
     if (this.check.total_price == 0 && this.changePrice >= 0) {
       this.closeCheck(method);
@@ -139,18 +139,20 @@ export class PaymentScreenComponent implements OnInit {
       this.check.discount += this.payedPrice;
       this.payedPrice = 0;
       this.mainService.updateData('checks', this.id, this.check).then(res => {
-        if (this.changePrice >= 0) {
-          this.fillData();
-          this.setDefault();
-          this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
-        } else {
-          delete this.check._rev;
-          this.messageService.sendMessage(`Ürünlerin ${newPayment.amount} TL'si ${method} olarak ödendi`);
-          this.discount = undefined;
-          this.discountAmount = 0;
+        if (res.ok) {
+          if (this.changePrice >= 0) {
+            this.fillData();
+            this.setDefault();
+            this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
+          } else {
+            delete this.check._rev;
+            this.messageService.sendMessage(`Ürünlerin ${newPayment.amount} TL'si ${method} olarak ödendi`);
+            this.discount = undefined;
+            this.discountAmount = 0;
+          }
+          this.logService.createLog(logType.CHECK_CREATED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
+          this.togglePayed();
         }
-        this.logService.createLog(logType.CHECK_CREATED,this.check._id,`${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
-        this.togglePayed();
       });
       this.isFirstTime = true;
     }
@@ -174,12 +176,6 @@ export class PaymentScreenComponent implements OnInit {
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
-        this.logService.createLog(logType.CHECK_CLOSED,res.id,`${this.table} Hesabı ${this.currentAmount} TL tutarında ödeme alınarak kapatıldı.`);
-        this.updateSellingReport(method);
-        if (this.check.type == 1) {
-          this.updateTableReport(this.check);
-          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
-        }
         this.mainService.removeData('checks', this.check._id).then(res => {
           this.onClosing = false;
           if (this.check.type == 1) {
@@ -187,8 +183,14 @@ export class PaymentScreenComponent implements OnInit {
           } else {
             this.router.navigate(['/home']);
           }
+          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+          this.logService.createLog(logType.CHECK_CLOSED, res.id, `${this.table} Hesabı ${this.currentAmount} TL tutarında ödeme alınarak kapatıldı.`);
           this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
         });
+        this.updateSellingReport(method);
+        if (this.check.type == 1) {
+          this.updateTableReport(this.check);
+        }
       }
     });
     if (this.check.payment_flow == undefined) {
