@@ -54,6 +54,11 @@ export class MainService {
       this.db_prefix = this.authInfo.app_db;
       this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajaxOpts);
     }
+
+    /////////////////////////////////////////////////////////////
+    this.getAllBy('allData', {}).then(res => {
+      this.electron.ipcRenderer.send('appServer', res.docs);
+    });
     this.getAllBy('settings', { key: 'Printers' }).then(res => {
       this.printers = res.docs[0].value;
     });
@@ -63,6 +68,7 @@ export class MainService {
     this.getAllBy('tables', {}).then(res => {
       this.tables = res.docs;
     });
+    /////////////////////////////////////////////////////////////
 
     this.syncToAppServer();
   }
@@ -153,13 +159,13 @@ export class MainService {
         this.electron.ipcRenderer.send('appServer', res.docs);
       });
     });
-    this.electron.ipcRenderer.on('serverListener', (event, method, db, doc) => {
+    this.electron.ipcRenderer.on('serverListener', (event, method, db, doc, schema?) => {
       switch (method) {
         case 'add':
           this.addData(db, doc);
           break;
         case 'update':
-          this.updateData(db, doc._id, doc);
+          this.updateData(db, doc, schema);
           break;
         case 'remove':
           this.removeData(db, doc);
@@ -205,10 +211,7 @@ export class MainService {
             element.products.forEach(element => {
               element.status = 2;
             });
-            setTimeout(() => {
-              this.updateData('checks', element._id, element);
-              console.log('güncel');
-            }, 2000)
+            setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
           }
           delete element.db_name;
           this.LocalDB[db].upsert(element._id, (doc) => {

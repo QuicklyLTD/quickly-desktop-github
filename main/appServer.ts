@@ -9,6 +9,9 @@ ipcMain.on('appServer', (event, data) => {
     observableData = data;
 });
 
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: true }));
+
 server.get('/db/:name', (req, res) => {
     const requestedDB = req.params.name;
     let responseFromApp
@@ -22,27 +25,24 @@ server.get('/db/:name', (req, res) => {
 
 server.post('/add/:dbname', (req, res) => {
     const requestedDB = req.params.dbname;
-    const docWillAdd = req.params.doc;
-    // webContents.getAllWebContents()[1].send('serverListener', 'add', requestedDB, docWillAdd);
-    console.log(req.body);
+    const docWillAdd = req.body;
+    webContents.getAllWebContents()[1].send('serverListener', 'add', requestedDB, docWillAdd);
     res.send(req.body);
 });
 
 server.put('/update/:dbname/:doc', (req, res) => {
     const requestedDB = req.params.dbname;
-    const docWillUpdate = req.params.doc;
-    //webContents.getAllWebContents()[1].send('serverListener', 'update', requestedDB, docWillUpdate);
+    const docId = req.params.doc;
+    const schema = req.body;
+    webContents.getAllWebContents()[1].send('serverListener', 'update', requestedDB, docId, schema);
     res.send(req.body.username);
 });
 
 server.delete('/remove/:dbname/:doc', (req, res) => {
     const requestedDB = req.params.dbname;
-    const docWillRemove = req.params.doc;
-    //webContents.getAllWebContents()[1].send('serverListener', 'remove', requestedDB, docWillRemove);
+    const docId = req.params.doc;
+    webContents.getAllWebContents()[1].send('serverListener', 'remove', requestedDB, docId);
     res.send(JSON.stringify(req.body));
 });
-
-server.use(bodyParser.json());
-server.use(bodyParser.urlencoded({ extended: true }));
 
 server.listen(3000, () => { });
