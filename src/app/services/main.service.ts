@@ -7,9 +7,11 @@ import { AuthInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
 import { ElectronService } from '../providers/electron.service';
+import * as os from 'os';
 
 @Injectable()
 export class MainService {
+  ip_adresses: Array<string>;
   hostname: string;
   db_prefix: string;
   authInfo: AuthInfo;
@@ -17,9 +19,11 @@ export class MainService {
   LocalDB: any;
   RemoteDB: any;
 
+  /////////////////////////////////
   printers: any;
   categories: any;
   tables: any;
+  /////////////////////////////////
 
   constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
@@ -70,6 +74,7 @@ export class MainService {
     });
     /////////////////////////////////////////////////////////////
 
+    this.getLocalServerIP();
     this.syncToAppServer();
   }
 
@@ -174,6 +179,20 @@ export class MainService {
           break;
       }
     });
+  }
+
+  getLocalServerIP() {
+    const interfaces = os.networkInterfaces();
+    this.ip_adresses = [];
+    for (var k in interfaces) {
+      for (var k2 in interfaces[k]) {
+        var address = interfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+          this.ip_adresses.push(address.address);
+        }
+      }
+    }
+    return this.ip_adresses[0];
   }
 
   syncToLocal(db: string) {

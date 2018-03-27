@@ -12,13 +12,23 @@ ipcMain.on('appServer', (event, data) => {
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 
+server.get('/db', (req, res) => {
+    let responseFromApp
+    if (observableData) {
+        responseFromApp = observableData;
+    } else {
+        responseFromApp = [];
+    }
+    res.send(responseFromApp);
+});
+
 server.get('/db/:name', (req, res) => {
     const requestedDB = req.params.name;
     let responseFromApp
     if (observableData) {
         responseFromApp = observableData.filter(obj => obj.db_name == requestedDB);
     } else {
-        responseFromApp = "Bulunamadı!";
+        responseFromApp = [];
     }
     res.send(responseFromApp);
 });
