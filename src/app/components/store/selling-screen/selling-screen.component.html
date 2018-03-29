@@ -8,7 +8,7 @@
               <div class="col-lg-8">
                 <span *ngIf="check?.type == 1">Masa:</span>
                 <b>{{check?.table_id | general:'tables' | async}}</b>
-                <span *ngIf="check.note !== '' && check.note !== null" class="text-muted">( {{check.note}} )</span>
+                <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-muted">( {{check.note}} )</span>
               </div>
               <div class="col-lg-4 pr-1">
                 <div class="input-group input-group-sm">
@@ -91,7 +91,7 @@
                     (click)="selectProduct(i)" class="text-bold mb-0">
                     <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
                     {{item.name}}
-                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                     <span class="pull-right"> {{item.price}} TL</span>
                   </p>
                   <div *ngIf="selectedIndex == i && item.status !== 1">

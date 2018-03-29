@@ -73,7 +73,7 @@
                     <tr *ngFor="let check of NormalChecks let i = index;" (click)="getDetail(check)">
                       <td>{{i+1}}</td>
                       <td>{{check.table_id | general:'tables' | async}}
-                        <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
+                        <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
                       <td>{{check.total_price + check.discount}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
@@ -157,7 +157,7 @@
                     <tr *ngFor="let check of FastChecks let i = index;" (click)="getDetail(check)">
                       <td>{{i+1}}</td>
                       <td>{{check.table_id}}
-                        <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
+                        <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
                       <td>{{check.total_price + check.discount}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
@@ -210,7 +210,7 @@
                 <tr *ngFor="let check of NotPayedChecks let i = index;" (click)="getDetail(check)">
                   <td>{{i+1}}</td>
                   <td>{{check.table_id | general:'tables' | async}}
-                    <small *ngIf="check.note !== ''" class="text-muted">({{check.note}})</small>
+                    <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                   </td>
                   <td>{{check.description}}</td>
                   <td>{{check.payment_method}}</td>
@@ -283,7 +283,7 @@
                 <tr *ngFor="let item of checkDetail?.products; let i = index;" [ngClass]="{'table-danger': item.status == 3}">
                   <td width="4%">{{i+1}}</td>
                   <td width="50%">{{item.name}}
-                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                   </td>
                   <td width="14%">{{item.owner}}</td>
                   <td width="14%">{{item.timestamp |date:'HH:mm'}}</td>
@@ -312,7 +312,7 @@
                   <tr *ngFor="let product of item.payed_products; let i = index;" [ngClass]="{'table-danger': product.status == 3}">
                     <td width="4%">{{i+1}}</td>
                     <td width="48%">{{product.name}}
-                      <small *ngIf="product.note !== ''" class="text-muted">({{product.note}})</small>
+                      <small *ngIf="product.note !== '' && product.note !== undefined" class="text-muted">({{product.note}})</small>
                     </td>
                     <td width="15%">{{product.owner}}</td>
                     <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>

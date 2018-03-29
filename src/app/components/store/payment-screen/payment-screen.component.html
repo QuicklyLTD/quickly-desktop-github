@@ -24,7 +24,7 @@
                 <div *ngFor="let item of check?.products; let i = index" class="mb-2">
                   <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="text-bold text-danger mb-0">
                     {{item.name}}
-                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                     <span class="pull-right"> {{item.price}} TL</span>
                   </p>
                 </div>
@@ -49,7 +49,7 @@
                 <div *ngFor="let item of productsWillPay" class="mb-2 animated slideInLeft">
                   <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="text-bold text-danger mb-0">
                     {{item.name}}
-                    <small *ngIf="item.note !== ''" class="text-muted">({{item.note}})</small>
+                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                     <span class="pull-right"> {{item.price}} TL</span>
                   </p>
                 </div>
