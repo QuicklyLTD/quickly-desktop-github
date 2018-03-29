@@ -117,7 +117,7 @@ export class EndofthedayComponent implements OnInit {
       } catch (error) {
         console.log('İptal Hesap Bulunamadı..')
       }
-      this.mainService.compactBeforeSync('closed_checks');
+      this.mainService.localSyncBeforeRemote('closed_checks');
       this.checks.forEach((element, index) => {
         this.mainService.removeDoc('closed_checks', element);
       });
@@ -132,7 +132,7 @@ export class EndofthedayComponent implements OnInit {
       this.cashbox = res.docs;
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
-      this.mainService.compactBeforeSync('cashbox');
+      this.mainService.localSyncBeforeRemote('cashbox');
       this.cashbox.forEach((element, index) => {
         this.mainService.removeDoc('cashbox', element);
       });
@@ -155,7 +155,7 @@ export class EndofthedayComponent implements OnInit {
       const logs = res.docs;
       const logsBackup = new BackupData('logs', logs);
       this.backupData.push(logsBackup);
-      this.mainService.compactBeforeSync('logs');
+      this.mainService.localSyncBeforeRemote('logs');
       logs.forEach(element => {
         this.mainService.removeDoc('logs', element);
       });
@@ -197,7 +197,7 @@ export class EndofthedayComponent implements OnInit {
             return doc;
           });
         });
-        this.mainService.compactBeforeSync('reports');
+        this.mainService.localSyncBeforeRemote('reports');
         localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
       }
       //////////////////////////////////////////////////////////////////
