@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { SettingsService } from '../../../services/settings.service';
@@ -25,6 +25,7 @@ export class ApplicationSettingsComponent implements OnInit {
   choosenPrinter: any;
   currentSection: string;
   @ViewChild('settingsForm') settingsForm: NgForm;
+  @ViewChild('appServerForm') appServerForm: NgForm;
   @ViewChild('restaurantForm') restaurantForm: NgForm;
   @ViewChild('printerForm') printerForm: NgForm;
   @ViewChild('printerDetailForm') printerDetailForm: NgForm;
@@ -69,6 +70,17 @@ export class ApplicationSettingsComponent implements OnInit {
     setTimeout(() => {
       this.electronService.reloadProgram();
     }, 1500)
+  }
+
+  saveServerSettings(Form: NgForm) {
+    
+  }
+
+  generateKey(Form: NgForm) {
+    let newKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    Form.value.secret_key = newKey;
+    Form.value.address = this.electronService.getLocalIP();
+    this.appServerForm.setValue(Form.value);
   }
 
   getPrinterDetail(printer: Printer) {

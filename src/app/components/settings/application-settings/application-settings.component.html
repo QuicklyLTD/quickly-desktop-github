@@ -27,200 +27,262 @@
         </div>
       </div>
       <div class="card-block tab-height p-0">
-          <div class="row">
-              <div class="col-lg-4 pr-0">
-                <div class="card tab-inside-height">
-                  <div class="card-header">
-                    Ayarlar
-                  </div>
-                  <div class="card-block p-0 flow">
-                    <div class="list-group">
-                      <button (click)="getSettingsDetail('AppSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AppSettings'}"
-                        type="button" class="list-group-item list-group-item-action">
-                        Uygulama Ayarları
-                      </button>
-                      <button (click)="getSettingsDetail('ServerSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'ServerSettings'}"
-                        type="button" class="list-group-item list-group-item-action">
-                        Sunucu Ayarları
-                      </button>
-                      <button (click)="getSettingsDetail('AccountSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AccountSettings'}"
-                        type="button" class="list-group-item list-group-item-action">
-                        Hesap Ayarları
-                      </button>
-                    </div>
-                  </div>
+        <div class="row">
+          <div class="col-lg-4 pr-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Ayarlar
+              </div>
+              <div class="card-block p-0 flow">
+                <div class="list-group">
+                  <button (click)="getSettingsDetail('AppSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AppSettings'}"
+                    type="button" class="list-group-item list-group-item-action">
+                    Uygulama Ayarları
+                  </button>
+                  <button (click)="getSettingsDetail('ServerSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'ServerSettings'}"
+                    type="button" class="list-group-item list-group-item-action">
+                    Sunucu Ayarları
+                  </button>
+                  <button (click)="getSettingsDetail('AccountSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AccountSettings'}"
+                    type="button" class="list-group-item list-group-item-action">
+                    Hesap Ayarları
+                  </button>
                 </div>
               </div>
-              <div class="col-lg-8 pl-0">
-                <section [hidden]="currentSection !== 'AppSettings'">
-                  <form #settingsForm="ngForm" (ngSubmit)="saveSettings(settingsForm)">
-                    <div class="card tab-inside-height">
-                      <div class="card-header">Uygulama Ayarları</div>
-                      <div class="card-block flow p-2">
-                        <div class="form-group mb-2">
-                          <div class="input-group text-center">
-                            <div class="input-group-addon">
-                              Zaman Aşımı
-                            </div>
-                            <input name="timeout" type="number" class="form-control form-control-lg" ngModel/>
-                            <div class="input-group-addon normal">
-                              Saniye
-                            </div>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Ekran Klavyesi
-                            </div>
-                            <select name="keyboard" class="form-control form-control-lg" id="" ngModel>
-                              <option>Açık</option>
-                              <option>Kapalı</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Hızlı Satış
-                            </div>
-                            <select name="takeaway" class="form-control form-control-lg" id="" ngModel>
-                              <option>Açık</option>
-                              <option>Kapalı</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Sipariş Fişi İçin
-                            </div>
-                            <select name="ask_print_order" class="form-control form-control-lg" ngModel>
-                              <option>Sor</option>
-                              <option>Sorma</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Hesap Fişi İçin
-                            </div>
-                            <select name="ask_print_check" class="form-control form-control-lg" ngModel>
-                              <option>Sor</option>
-                              <option>Sorma</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group mb-0">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Son Gün
-                            </div>
-                            <select name="last_day" class="form-control form-control-lg" ngModel>
-                              <option value="1">Pazartesi</option>
-                              <option value="2">Salı</option>
-                              <option value="3">Çarşamba</option>
-                              <option value="4">Perşembe</option>
-                              <option value="5">Cuma</option>
-                              <option value="6">Cumartesi</option>
-                              <option value="0">Pazar</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="card-footer">
-                        <button type="submit" class="btn btn-success btn-md btn-block">
-                          <i class="fa fa-check" aria-hidden="true"></i> Ayarları Kaydet</button>
-                      </div>
-                    </div>
-                  </form>
-                </section>
-                <section [hidden]="currentSection !== 'ServerSettings'">
-                </section>
-                <section [hidden]="currentSection !== 'AccountSettings'">
-                  <form #restaurantForm="ngForm" (ngSubmit)="saveRestSettings(restaurantForm)">
-                    <input type="hidden" name="state" ngModel/>
-                    <input type="hidden" name="city" ngModel/>
-                    <input type="hidden" name="geolocation" ngModel/>
-                    <input type="hidden" name="_order" ngModel/>
-                    <input type="hidden" name="created_at" ngModel/>
-                    <input type="hidden" name="logo" ngModel/>
-                    <input type="hidden" name="is_premium" ngModel/>
-                    <input type="hidden" name="owner" ngModel/>
-                    <div class="card tab-inside-height">
-                      <div class="card-header">
-                        Hesap Ayarları
-                      </div>
-                      <div class="card-block flow p-2">
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              İşletme Logo
-                            </div>
-                            <div style="width: 78%;" class="img-thumbnail">
-                              <img src="{{appLogo}}" style="height:133px;" class="img-responsive mx-auto d-block" alt="">
-                            </div>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              İşletme Adı
-                            </div>
-                            <input name="name" type="text" class="form-control form-control-lg" ngModel/>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              İşletme No
-                            </div>
-                            <input name="id" type="string" class="form-control form-control-lg" readonly ngModel/>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Telefon
-                            </div>
-                            <input name="phone_number" type="text" class="form-control form-control-lg" ngModel/>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Şehir
-                            </div>
-                            <input name="city" type="text" class="form-control form-control-lg" ngModel/>
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Bölge
-                            </div>
-                            <input name="state" type="text" class="form-control form-control-lg" ngModel/>
-                          </div>
-                        </div>
-                        <div class="form-group mb-0">
-                          <div class="input-group">
-                            <div class="input-group-addon">
-                              Adres
-                            </div>
-                            <textarea name="address" rows="2" class="form-control form-control-lg" ngModel></textarea>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="card-footer">
-                        <button type="submit" class="btn btn-success btn-block btn-md">
-                          <i class="fa fa-check" aria-hidden="true"></i> Ayarları Kaydet</button>
-                      </div>
-                    </div>
-                  </form>
-                </section>
-              </div>
             </div>
+          </div>
+          <div class="col-lg-8 pl-0">
+            <section [hidden]="currentSection !== 'AppSettings'">
+              <form #settingsForm="ngForm" (ngSubmit)="saveSettings(settingsForm)">
+                <div class="card tab-inside-height">
+                  <div class="card-header">Uygulama Ayarları</div>
+                  <div class="card-block flow p-2">
+                    <div class="form-group mb-2">
+                      <div class="input-group text-center">
+                        <div class="input-group-addon">
+                          Zaman Aşımı
+                        </div>
+                        <input name="timeout" type="number" class="form-control form-control-lg" ngModel/>
+                        <div class="input-group-addon normal">
+                          Saniye
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Ekran Klavyesi
+                        </div>
+                        <select name="keyboard" class="form-control form-control-lg" id="" ngModel>
+                          <option>Açık</option>
+                          <option>Kapalı</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Hızlı Satış
+                        </div>
+                        <select name="takeaway" class="form-control form-control-lg" id="" ngModel>
+                          <option>Açık</option>
+                          <option>Kapalı</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Sipariş Fişi İçin
+                        </div>
+                        <select name="ask_print_order" class="form-control form-control-lg" ngModel>
+                          <option>Sor</option>
+                          <option>Sorma</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Hesap Fişi İçin
+                        </div>
+                        <select name="ask_print_check" class="form-control form-control-lg" ngModel>
+                          <option>Sor</option>
+                          <option>Sorma</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-0">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Son Gün
+                        </div>
+                        <select name="last_day" class="form-control form-control-lg" ngModel>
+                          <option value="1">Pazartesi</option>
+                          <option value="2">Salı</option>
+                          <option value="3">Çarşamba</option>
+                          <option value="4">Perşembe</option>
+                          <option value="5">Cuma</option>
+                          <option value="6">Cumartesi</option>
+                          <option value="0">Pazar</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-md btn-block">
+                      <i class="fa fa-check" aria-hidden="true"></i> Ayarları Kaydet</button>
+                  </div>
+                </div>
+              </form>
+            </section>
+            <section [hidden]="currentSection !== 'ServerSettings'">
+              <form #appServerForm="ngForm" (ngSubmit)="saveServerSettings(appServerForm)">
+                <div class="card tab-inside-height">
+                  <div class="card-header">Sunucu Ayarları</div>
+                  <div class="card-block p-2 flow">
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Sunucu Modu
+                        </div>
+                        <select name="type" class="form-control form-control-lg" ngModel>
+                          <option value="0">Birincil</option>
+                          <option value="1">İkincil</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Sunucu Durumu
+                        </div>
+                        <select name="status" class="form-control form-control-lg" ngModel>
+                          <option value="0">Kapalı</option>
+                          <option value="1">Açık</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Sunucu Adresi
+                        </div>
+                        <input type="text" name="address" readonly class="form-control form-control-lg" ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Sunucu Portu
+                        </div>
+                        <input type="text" name="port" class="form-control form-control-lg" ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-0">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Sunucu Anahtarı
+                        </div>
+                        <textarea rows="3" name="secret_key" class="form-control form-control-lg" ngModel></textarea>
+                        <div class="input-group-btn">
+                          <button type="button" (click)="generateKey(appServerForm)" class="btn btn-primary">
+                            <i class="fa fa-key"></i>
+                            <br> Anahtar Üret</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-md btn-block">
+                      <i class="fa fa-check" aria-hidden="true"></i> Ayarları Kaydet</button>
+                  </div>
+                </div>
+              </form>
+            </section>
+            <section [hidden]="currentSection !== 'AccountSettings'">
+              <form #restaurantForm="ngForm" (ngSubmit)="saveRestSettings(restaurantForm)">
+                <input type="hidden" name="state" ngModel/>
+                <input type="hidden" name="city" ngModel/>
+                <input type="hidden" name="geolocation" ngModel/>
+                <input type="hidden" name="_order" ngModel/>
+                <input type="hidden" name="created_at" ngModel/>
+                <input type="hidden" name="logo" ngModel/>
+                <input type="hidden" name="is_premium" ngModel/>
+                <input type="hidden" name="owner" ngModel/>
+                <div class="card tab-inside-height">
+                  <div class="card-header">
+                    Hesap Ayarları
+                  </div>
+                  <div class="card-block flow p-2">
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          İşletme Logo
+                        </div>
+                        <div style="width: 78%;" class="img-thumbnail">
+                          <img src="{{appLogo}}" style="height:133px;" class="img-responsive mx-auto d-block" alt="">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          İşletme Adı
+                        </div>
+                        <input name="name" type="text" class="form-control form-control-lg" ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          İşletme No
+                        </div>
+                        <input name="id" type="string" class="form-control form-control-lg" readonly ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Telefon
+                        </div>
+                        <input name="phone_number" type="text" class="form-control form-control-lg" ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Şehir
+                        </div>
+                        <input name="city" type="text" class="form-control form-control-lg" ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Bölge
+                        </div>
+                        <input name="state" type="text" class="form-control form-control-lg" ngModel/>
+                      </div>
+                    </div>
+                    <div class="form-group mb-0">
+                      <div class="input-group">
+                        <div class="input-group-addon">
+                          Adres
+                        </div>
+                        <textarea name="address" rows="2" class="form-control form-control-lg" ngModel></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-block btn-md">
+                      <i class="fa fa-check" aria-hidden="true"></i> Ayarları Kaydet</button>
+                  </div>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
