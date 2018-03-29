@@ -4,6 +4,9 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
 import * as childProcess from 'child_process';
+import * as os from 'os';
+import * as crypto from 'crypto';
+
 
 @Injectable()
 export class ElectronService {
@@ -14,6 +17,7 @@ export class ElectronService {
   appPath: string;
   appRealPath: string;
   ipcRenderer: typeof ipcRenderer;
+  ipAddress: Array<string>;
 
   constructor() {
     this.app = remote.app
@@ -26,6 +30,27 @@ export class ElectronService {
 
   isElectron() {
     return window && window.process && window.process.type;
+  }
+
+  encryptData(secret: string, data: Buffer) {
+    return crypto.privateEncrypt(secret, data);
+  }
+  decryptData(secret: string, data: Buffer) {
+    return crypto.privateDecrypt(secret, data);
+  }
+
+  getLocalIP() {
+    const interfaces = os.networkInterfaces();
+    this.ipAddress = [];
+    for (var k in interfaces) {
+      for (var k2 in interfaces[k]) {
+        var address = interfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+          this.ipAddress.push(address.address);
+        }
+      }
+    }
+    return this.ipAddress[0];
   }
 
   saveLogo(url) {
@@ -47,10 +72,6 @@ export class ElectronService {
         });
       }
     });
-  }
-
-  shellCommand(command: string) {
-    childProcess.exec(command);
   }
 
   backupData(data, date) {
@@ -96,6 +117,9 @@ export class ElectronService {
     });
   }
 
+  shellCommand(command: string) {
+    childProcess.exec(command);
+  }
   reloadProgram() {
     this.appWindow.reload();
   }

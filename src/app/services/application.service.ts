@@ -12,6 +12,7 @@ export class ApplicationService {
   appActivationStatus: boolean;
   countDown: any;
   timer: number;
+  
   constructor(private settings: SettingsService, private messageService: MessageService, private router: Router) {
     this.settings.AppSettings.subscribe((data) => {
       if(data){
@@ -24,10 +25,8 @@ export class ApplicationService {
   isActive() {
     this.settings.ActivationStatus.subscribe(res => {
       if (res.value) {
-        ///// İşletme Aktif İse
         console.log('İşletme Hesabı Aktif.');
       } else {
-        ///// İşletme Aktif Değil İse
         console.warn('İşletme Hesabı Aktif Değil.');
         this.router.navigate(['/setup']);
       }
