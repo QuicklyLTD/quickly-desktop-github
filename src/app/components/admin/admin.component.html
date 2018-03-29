@@ -47,6 +47,9 @@
             </div>
           </div>
           <div class="card-footer p-1">
+            <button [disabled]="selectedDB == undefined" (click)="compactDB()" class="btn btn-default btn-md btn-block">Veritabanı Temizle</button>
+          </div>
+          <div class="card-footer p-1">
             <button (click)="resetReports()" class="btn btn-danger btn-md btn-block">Raporları Sıfırla</button>
           </div>
           <div class="card-footer p-1">

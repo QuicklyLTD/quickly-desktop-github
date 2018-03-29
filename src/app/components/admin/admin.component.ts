@@ -106,7 +106,15 @@ export class AdminComponent implements OnInit {
           return doc;
         });
       });
-      this.mainService.compactBeforeSync('reports');
+      this.mainService.localSyncBeforeRemote('reports');
+    });
+  }
+
+  compactDB() {
+    this.mainService.compactDB(this.selectedDB).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
     });
   }
 
@@ -129,7 +137,7 @@ export class AdminComponent implements OnInit {
       const products = res.docs;
       products.forEach(element => {
         this.mainService.updateData('products', element._id, { type: 1 }).then(res => {
-          console.log('Products',res.ok);
+          console.log('Products', res.ok);
         });
       });
     });
@@ -137,14 +145,14 @@ export class AdminComponent implements OnInit {
       const categories = res.docs;
       categories.forEach(element => {
         this.mainService.updateData('categories', element._id, { tags: '' }).then(res => {
-          console.log('Categories',res.ok);
+          console.log('Categories', res.ok);
         });
       });
     });
     this.mainService.getAllBy('settings', { key: "AppSettings" }).then(res => {
       const appSettings = res.docs[0];
       this.mainService.updateData('settings', appSettings._id, { last_day: 0 }).then(res => {
-        console.log('Settings',res.ok);
+        console.log('Settings', res.ok);
       });
     });
   }
