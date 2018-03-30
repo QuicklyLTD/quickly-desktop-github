@@ -183,7 +183,9 @@ export class PaymentScreenComponent implements OnInit {
       if (res.ok) {
         this.mainService.removeData('checks', this.check._id).then(res => {
           this.onClosing = false;
-          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+          if(this.check.type == 1){
+            this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+          }
           this.logService.createLog(logType.CHECK_CLOSED, res.id, `${this.table} Hesabı ${this.currentAmount} TL tutarında ödeme alınarak kapatıldı.`);
           this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
         });
