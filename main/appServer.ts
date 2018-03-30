@@ -36,7 +36,7 @@ server.get('/db/:name', (req, res) => {
 server.post('/add/:dbname', (req, res) => {
     const requestedDB = req.params.dbname;
     const docWillAdd = req.body;
-    webContents.getAllWebContents()[1].send('serverListener', 'add', requestedDB, docWillAdd);
+    webContents.getAllWebContents()[0].send('serverListener', 'add', requestedDB, docWillAdd);
     res.send(req.body);
 });
 
@@ -44,14 +44,14 @@ server.put('/update/:dbname/:doc', (req, res) => {
     const requestedDB = req.params.dbname;
     const docId = req.params.doc;
     const schema = req.body;
-    webContents.getAllWebContents()[1].send('serverListener', 'update', requestedDB, docId, schema);
+    webContents.getAllWebContents()[0].send('serverListener', 'update', requestedDB, docId, schema);
     res.send(req.body.username);
 });
 
 server.delete('/remove/:dbname/:doc', (req, res) => {
     const requestedDB = req.params.dbname;
     const docId = req.params.doc;
-    webContents.getAllWebContents()[1].send('serverListener', 'remove', requestedDB, docId);
+    webContents.getAllWebContents()[0].send('serverListener', 'remove', requestedDB, docId);
     res.send(JSON.stringify(req.body));
 });
 
