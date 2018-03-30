@@ -66,7 +66,8 @@ export class PaymentScreenComponent implements OnInit {
     if (this.onClosing) {
       this.productsWillPay.forEach(element => {
         this.check.products.push(element);
-      })
+        this.check.total_price += element.price;
+      });
       this.mainService.updateData('checks', this.check._id, this.check);
     }
   }
@@ -183,7 +184,7 @@ export class PaymentScreenComponent implements OnInit {
       if (res.ok) {
         this.mainService.removeData('checks', this.check._id).then(res => {
           this.onClosing = false;
-          if(this.check.type == 1){
+          if (this.check.type == 1) {
             this.mainService.updateData('tables', this.check.table_id, { status: 1 });
           }
           this.logService.createLog(logType.CHECK_CLOSED, res.id, `${this.table} Hesabı ${this.currentAmount} TL tutarında ödeme alınarak kapatıldı.`);
