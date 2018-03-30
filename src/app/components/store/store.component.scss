@@ -1,23 +1,28 @@
 #floorHolder{
     h2{
-        font-size: 3vh;
+        font-size: 1.5vw;
+        font-weight: bolder;
     }
 }
 .tableCard{
     height: 15vh;
     h1{
-        font-size: 4vh;
+        font-size: 2.45vw;
     }
     .long-name{
-        font-size: 3vh;
+        font-size: 1.7vw;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
-    .card-text{
+    p{
         position: absolute;
-        bottom: 1rem;
+        width: 78%;
+        bottom: 0px;
+    }
+    .card-text{
+        position: relative !important;
     }
 }
 .col-card{
