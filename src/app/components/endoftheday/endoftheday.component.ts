@@ -8,6 +8,7 @@ import { SettingsService } from '../../services/settings.service';
 import { ClosedCheck } from '../../mocks/check.mock';
 import { Report } from '../../mocks/report.mock';
 import { Cashbox } from '../../mocks/cashbox.mock';
+import { Log } from '../../mocks/log.mock';
 
 @Component({
   selector: 'app-endoftheday',
@@ -28,6 +29,7 @@ export class EndofthedayComponent implements OnInit {
   checks: Array<ClosedCheck>;
   reports: Array<Report>;
   cashbox: Array<Cashbox>;
+  logs: Array<Log>;
   selectedEndDay: EndDay;
   lastDay: any;
   progress: string;
@@ -152,11 +154,11 @@ export class EndofthedayComponent implements OnInit {
 
   stepReports() {
     this.mainService.getAllBy('logs', {}).then(res => {
-      const logs = res.docs;
-      const logsBackup = new BackupData('logs', logs);
+      this.logs = res.docs;
+      const logsBackup = new BackupData('logs', this.logs);
       this.backupData.push(logsBackup);
       this.mainService.localSyncBeforeRemote('logs');
-      logs.forEach(element => {
+      this.logs.forEach(element => {
         this.mainService.removeDoc('logs', element);
       });
     });
