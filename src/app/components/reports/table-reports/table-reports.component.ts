@@ -104,6 +104,12 @@ export class TableReportsComponent implements OnInit {
     this.tablesList = newArray;
   }
 
+  getLogs() {
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.tableLogs = res.docs.filter(obj => obj.type >= logType.TABLE_CREATED && obj.type <= logType.TABLE_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
+    });
+  }
+
   fillData(daily: boolean) {
     this.ChartData = [];
     this.ChartLoaded = false;
@@ -127,9 +133,6 @@ export class TableReportsComponent implements OnInit {
           };
         });
       });
-    });
-    this.mainService.getAllBy('logs', {}).then(res => {
-      this.tableLogs = res.docs.filter(obj => obj.type >= logType.TABLE_CREATED && obj.type <= logType.TABLE_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 

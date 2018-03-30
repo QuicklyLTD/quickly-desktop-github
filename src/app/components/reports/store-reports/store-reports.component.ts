@@ -147,6 +147,12 @@ export class StoreReportsComponent implements OnInit {
     }
   }
 
+  getLogs() {
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.sellingLogs = res.docs.filter(obj => obj.type >= logType.CHECK_CREATED && obj.type <= logType.ORDER_MOVED || obj.type == logType.DISCOUNT).sort((a, b) => b.timestamp - a.timestamp);
+    });
+  }
+
   fillData() {
     this.mainService.getAllBy('closed_checks', {}).then(res => {
       if (res.docs.length > 0) {
@@ -158,11 +164,10 @@ export class StoreReportsComponent implements OnInit {
         try {
           this.NormalTotal = this.NormalChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
           this.FastTotal = this.FastChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
-        } catch (error) { }
+        } catch (error) {
+          console.log(error);
+        }
       }
-    });
-    this.mainService.getAllBy('logs', {}).then(res => {
-      this.sellingLogs = res.docs.filter(obj => obj.type >= logType.CHECK_CREATED && obj.type <= logType.ORDER_MOVED || obj.type == logType.DISCOUNT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }
