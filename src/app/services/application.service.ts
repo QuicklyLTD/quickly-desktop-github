@@ -12,10 +12,10 @@ export class ApplicationService {
   appActivationStatus: boolean;
   countDown: any;
   timer: number;
-  
+
   constructor(private settings: SettingsService, private messageService: MessageService, private router: Router) {
     this.settings.AppSettings.subscribe((data) => {
-      if(data){
+      if (data) {
         this.appLockTime = data.value.timeout;
         this.screenLock('start');
       }
@@ -51,9 +51,9 @@ export class ApplicationService {
               this.timer = this.appLockTime;
             } else {
               this.timer = this.appLockTime;
-                if($('body').hasClass('modal-open')){
-                  $('*').modal('hide');
-                }
+              if ($('body').hasClass('modal-open')) {
+                $('*').modal('hide');
+              }
               this.router.navigate(['']);
               this.messageService.sendMessage('Zaman aşımına uğrandı.');
             }

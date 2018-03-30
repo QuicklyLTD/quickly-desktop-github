@@ -38,11 +38,12 @@ import { UserReportsComponent } from './components/reports/user-reports/user-rep
 import { ChartsModule } from 'ng2-charts';
 //////  Servisler
 import { MainService } from './services/main.service';
+import { ReactiveDataService } from './services/reactive-data.service';
 import { ApplicationService } from './services/application.service';
 import { SettingsService } from './services/settings.service';
 import { AuthService } from './services/auth.service';
 import { LogService } from './services/log.service';
-import { HttpClient } from './services/http.service';
+import { HttpService } from './services/http.service';
 //////  Providers
 import { KeyboardService } from './providers/keyboard.service';
 import { MessageService } from "./providers/message.service";
@@ -112,6 +113,7 @@ import { KeyboardDirective } from './directives/keyboard.directive';
     //{ provide: ErrorHandler, useClass: RavenErrorHandler },
     ElectronService,
     MainService,
+    ReactiveDataService,
     ApplicationService,
     SettingsService,
     AuthService,
@@ -120,7 +122,7 @@ import { KeyboardDirective } from './directives/keyboard.directive';
     KeyboardService,
     PrinterService,
     TerminalService,
-    HttpClient
+    HttpService
   ],
   bootstrap: [AppComponent]
 })

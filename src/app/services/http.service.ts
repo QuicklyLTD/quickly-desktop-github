@@ -7,7 +7,7 @@ import 'rxjs/add/operator/catch';
 const AUTH_PREFIX = "JWT ";
 
 @Injectable()
-export class HttpClient {
+export class HttpService {
   headers: Headers;
   options: RequestOptions;
   baseUrl: string;

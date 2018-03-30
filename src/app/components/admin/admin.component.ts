@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MainService } from '../../services/main.service';
-import { HttpClient } from '../../services/http.service';
+import { HttpService } from '../../services/http.service';
 
 @Component({
   selector: 'app-admin',
@@ -15,7 +15,7 @@ export class AdminComponent implements OnInit {
   storeReports: Array<any>;
   @ViewChild('editArea') editArea: ElementRef;
 
-  constructor(private mainService: MainService, private httpService: HttpClient) {
+  constructor(private mainService: MainService, private httpService: HttpService) {
     this.databases = [
       'users',
       'users_group',
