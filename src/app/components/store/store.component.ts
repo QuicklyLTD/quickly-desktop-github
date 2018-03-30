@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MainService } from '../../services/main.service';
 import { Table, Floor } from '../../mocks/table.mock';
 
@@ -14,11 +14,24 @@ export class StoreComponent implements OnInit {
   tableViews: Array<any>;
   checks: Array<any>;
   selected: string;
+  changes: any;
 
-  constructor(private mainService: MainService) { }
+  constructor(private mainService: MainService) {
+    this.fillData();
+   }
 
   ngOnInit() {
-    this.fillData();
+    this.changes = this.mainService.LocalDB['tables'].changes({ since: 'now', live: true }).on('change', (change) => {
+      this.mainService.getAllBy('tables', {}).then((result) => {
+        this.tables = result.docs;
+        this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
+        this.tableViews = this.tables;
+      });
+    });
+  }
+
+  ngOnDestroy() {
+    this.changes.cancel();
   }
 
   getTablesBy(id: string) {
@@ -28,7 +41,7 @@ export class StoreComponent implements OnInit {
 
   filterTables(value: string) {
     let regexp = new RegExp(value, 'i');
-    this.tableViews = this.tables.filter(({name}) => name.match(regexp));
+    this.tableViews = this.tables.filter(({ name }) => name.match(regexp));
   }
 
   fillData() {

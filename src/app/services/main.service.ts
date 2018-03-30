@@ -7,7 +7,6 @@ import { AuthInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
 import { ElectronService } from '../providers/electron.service';
-import { ReactiveDataService } from '../services/reactive-data.service';
 
 @Injectable()
 export class MainService {
@@ -24,7 +23,7 @@ export class MainService {
   tables: any;
   /////////////////////////////////
 
-  constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService, private reactiveData: ReactiveDataService) {
+  constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
 
@@ -70,10 +69,8 @@ export class MainService {
     });
     this.getAllBy('tables', {}).then(res => {
       this.tables = res.docs;
-      this.reactiveData.tables.next(this.tables);
     });
     /////////////////////////////////////////////////////////////
-
     this.syncToAppServer();
   }
 
@@ -219,7 +216,6 @@ export class MainService {
             element.products.forEach(element => {
               element.status = 2;
             });
-            console.log(element);
             setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
           }
           delete element.db_name;

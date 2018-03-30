@@ -185,7 +185,6 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     }
-    this.updateUserReport();
     if (this.askForPrint) {
       let isOK = confirm('Fiş Yazdırılsın mı ?');
       if (isOK) {
@@ -199,17 +198,16 @@ export class SellingScreenComponent implements OnInit {
         element.status = 2;
       }
     });
-    this.updateProductReport(this.countData);
     if (this.check.status == 1) {
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
         if (res.ok) {
+          this.router.navigate(['/store']);
           let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
           if (this.check.type == 1) {
             this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
           } else {
             this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
           }
-          this.router.navigate(['/store']);
         }
       });
     } else {
@@ -219,15 +217,17 @@ export class SellingScreenComponent implements OnInit {
       this.check.status = 1;
       this.mainService.addData('checks', this.check).then(res => {
         if (res.ok) {
+          this.router.navigate(['/store']);
           if (this.check.type == 1) {
             this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
           } else {
             this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
           }
-          this.router.navigate(['/store']);
         }
       });
     }
+    this.updateUserReport();
+    this.updateProductReport(this.countData);
   }
 
   togglePayed() {
