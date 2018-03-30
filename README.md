@@ -1,4 +1,4 @@
-# QDesktop App Cross Platform
+# QDesktop App Cross Platform Version 1.1.2
 
 Uygulama Altyapısı
 
@@ -28,12 +28,6 @@ Eğer AngularCLI yüklü değil ise .angular-cli.json dosyası bulunmuyor ise al
 ``` bash
 npm install -g @angular/cli
 ```
-**Önemli Bazı Node paketlerinin prebuild edilmesi gerekiyor aşşağıdaki komutu "npm start" komutundan önce 1 kere çalıştırmalısın :**
-
-``` bash
-npm run rebuild
-``` 
-
 ## Uygulamayı Başlatmak için
 
 - **1.Terminalde (Webpack'i başlatıp HotReload'ı aktif eder)** -> npm start
@@ -97,4 +91,3 @@ npm test
 ```
 
 Tarayıcıda açtığı arayüzde Uygulamada bulduğu hataları gösterir.
-

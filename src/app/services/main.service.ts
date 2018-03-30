@@ -212,7 +212,6 @@ export class MainService {
           delete element._revisions;
           delete element.db_seq;
           if (db == 'checks') {
-            console.log(element);
             this.terminal.printOrders(this.printers, this.categories, element, this.tables);
             element.products.forEach(element => {
               element.status = 2;
