@@ -1,6 +1,6 @@
 import { app, BrowserWindow, screen, webContents, ipcMain } from 'electron';
 import './main/ipcPrinter';
-import './main/appServer';
+// import './main/appServer';
 
 let win: BrowserWindow;
 let serve: any;
@@ -29,10 +29,9 @@ function createWindow() {
     win.webContents.openDevTools();
     require('devtron').install();
   }
-
   win.on('closed', () => {
-    win = null;
-  });
+      win = null;
+    });
 }
 
 try {

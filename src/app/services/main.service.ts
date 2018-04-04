@@ -71,7 +71,7 @@ export class MainService {
       this.tables = res.docs;
     });
     /////////////////////////////////////////////////////////////
-    this.syncToAppServer();
+    //  this.syncToAppServer();
   }
 
   getAllData(db: string, $limit) {
@@ -138,7 +138,7 @@ export class MainService {
   }
 
   localSyncBeforeRemote(local_db) {
-    this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
+    return this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
       if (change.deleted) {
         this.LocalDB['allData'].get(change.id).then((doc) => {
           this.LocalDB['allData'].remove(doc);
@@ -211,16 +211,20 @@ export class MainService {
           delete element._rev;
           delete element._revisions;
           delete element.db_seq;
-          if (db == 'checks') {
-            this.terminal.printOrders(this.printers, this.categories, element, this.tables);
-            element.products.forEach(element => {
-              element.status = 2;
-            });
-            setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
-          }
+          // if (db == 'checks') {
+          //   this.terminal.printOrders(this.printers, this.categories, element, this.tables);
+          //   element.products.forEach(element => {
+          //     element.status = 2;
+          //   });
+          //   setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
+          // }
           delete element.db_name;
           this.LocalDB[db].upsert(element._id, (doc) => {
             return Object.assign(doc, element);
+          });
+        } else {
+          this.LocalDB['checks'].get(element._id).then((doc) => {
+            this.LocalDB['checks'].remove(doc);
           });
         }
       });
