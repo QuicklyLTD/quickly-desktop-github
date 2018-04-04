@@ -198,10 +198,10 @@ export class SellingScreenComponent implements OnInit {
         element.status = 2;
       }
     });
+    this.router.navigate(['/store']);
     if (this.check.status == 1) {
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
         if (res.ok) {
-          this.router.navigate(['/store']);
           let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
           if (this.check.type == 1) {
             this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
@@ -217,7 +217,6 @@ export class SellingScreenComponent implements OnInit {
       this.check.status = 1;
       this.mainService.addData('checks', this.check).then(res => {
         if (res.ok) {
-          this.router.navigate(['/store']);
           if (this.check.type == 1) {
             this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
           } else {
@@ -288,7 +287,6 @@ export class SellingScreenComponent implements OnInit {
 
   cancelProduct(reason: string) {
     if (this.selectedProduct !== undefined) {
-      this.decountProductsData(this.selectedProduct);
       this.check.products[this.selectedIndex].status = 3
       this.check.products[this.selectedIndex].note = reason;
       this.check.products[this.selectedIndex].owner = this.owner;
@@ -511,6 +509,10 @@ export class SellingScreenComponent implements OnInit {
       this.printerService.printCheck(this.printers[0], this.table.name, this.check);
       if (this.check.status > 0) {
         this.mainService.updateData('checks', this.check_id, { status: 2 });
+        if (this.check.type == 1) {
+          this.mainService.updateData('tables', this.check.table_id, { status: 3 });
+          this.message.sendMessage('Hesap Yazdırıldı..');
+        }
         this.check.status = 2;
       }
     } else {
