@@ -9,6 +9,12 @@ $fa-font-path: "../node_modules/font-awesome/fonts/";
 .quickly-color{
     background-color: #312783 !important;
 }
+*, *::after, *::before {
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-app-region: no-drag;
+	cursor: default;
+}
 html, body {
    margin: 0;
    padding: 0;

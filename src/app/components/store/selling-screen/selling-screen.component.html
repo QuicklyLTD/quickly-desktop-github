@@ -86,16 +86,18 @@
           <div class="col-xl-3 col-lg-4 pr-0 pl-1">
             <div class="card inside-height">
               <div class="card-block check-flow p-2">
-                <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}" class="mb-2">
-                  <p [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning':selectedIndex == i}" style="cursor:pointer"
-                    (click)="selectProduct(i)" class="text-bold mb-0">
-                    <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
-                    {{item.name}}
-                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
-                    <span class="pull-right"> {{item.price}} TL</span>
-                  </p>
+                <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
+                  <div [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning':selectedIndex == i}" style="cursor:pointer"
+                    (click)="selectProduct(i)" class="check-product">
+                    <div class="product-name">
+                      <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
+                      {{item.name}}
+                      <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
+                    </div>
+                    <div class="product-price">{{item.price}} TL</div>
+                  </div>
                   <div *ngIf="selectedIndex == i && item.status !== 1">
-                    <small class="text-muted">
+                    <small>
                       <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
                       <span class="pull-right">
                         <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>

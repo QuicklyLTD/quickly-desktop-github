@@ -5,7 +5,7 @@
     }
 }
 .tableCard{
-    height: 15vh;
+    height: 13.5vh;
     h1{
         font-size: 2.45vw;
     }
@@ -16,13 +16,11 @@
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
-    p{
-        position: absolute;
-        width: 78%;
-        bottom: 0px;
-    }
     .card-text{
-        position: relative !important;
+        bottom: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 .col-card{

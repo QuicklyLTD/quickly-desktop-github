@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { app, remote, screen, shell, Remote, App, BrowserWindow, WebContents, ipcRenderer } from 'electron';
+import { app, remote, screen, shell, Remote, App, BrowserWindow, WebContents, ipcRenderer, webFrame } from 'electron';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
@@ -18,6 +18,7 @@ export class ElectronService {
   appRealPath: string;
   ipcRenderer: typeof ipcRenderer;
   ipAddress: Array<string>;
+  webFrame: typeof webFrame;
 
   constructor() {
     this.app = remote.app
@@ -26,9 +27,12 @@ export class ElectronService {
     this.appPath = this.app.getAppPath();
     this.appRealPath = window.process.cwd();
     this.ipcRenderer = ipcRenderer;
+    this.webFrame = webFrame;
   }
 
   isElectron() {
+    webFrame.setVisualZoomLevelLimits(1, 1);
+    webFrame.setLayoutZoomLevelLimits(0, 0);
     return window && window.process && window.process.type;
   }
 

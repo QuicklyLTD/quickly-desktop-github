@@ -20,13 +20,16 @@
       <div class="card-block pt-0 flow">
         <div class="row">
           <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
-            <div [ngClass]="{'bg-success': table.status == 2}" class="card card-warning tableCard">
+            <div [ngClass]="{'bg-success': table.status == 2, 'bg-danger text-white': table.status == 3 }" class="card card-warning tableCard">
               <div class="card-block p-3">
-                <h1 [ngClass]="{'long-name': table.name.length > 8}" class="card-title mb-4">{{table.name}}</h1>
+                <h1 [ngClass]="{'long-name mb-4': table.name.length >= 7}" class="card-title mb-3">{{table.name}}</h1>
                 <p>
                   <i class="fa fa-user"></i> {{table.capacity}}
                   <span *ngIf="table.status == 2" class="pull-right">
                     <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | date:'HH:mm'}}
+                  </span>
+                  <span *ngIf="table.status == 3" class="pull-right">
+                    <i class="fa fa-print" aria-hidden="true"></i> 
                   </span>
                 </p>
               </div>
@@ -37,11 +40,10 @@
           <div *ngFor="let check of checks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
             <div class="card card-info tableCard">
               <div class="card-block p-3">
-                <h1 class="card-title long-name mb-2">Hızlı Hesap</h1>
-                <p>
-                  <i class="fa fa-user" aria-hidden="true"></i> {{check.owner}}
-                </p>
+                <h1 class="card-title long-name mb-1">Hızlı Hesap</h1>
                 <p class="card-text">
+                  <i class="fa fa-user" aria-hidden="true"></i> {{check.owner}}
+                  <br>
                   <i class="fa fa-sticky-note"></i> {{check.note}}
                 </p>
               </div>

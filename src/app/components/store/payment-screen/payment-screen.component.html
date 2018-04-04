@@ -21,12 +21,16 @@
             <div class="card inside-height">
               <div class="card-header">Adisyon</div>
               <div class="card-block p-2 check-flow">
-                <div *ngFor="let item of check?.products; let i = index" class="mb-2">
-                  <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="text-bold text-danger mb-0">
-                    {{item.name}}
-                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
-                    <span class="pull-right"> {{item.price}} TL</span>
-                  </p>
+                <div *ngFor="let item of check?.products; let i = index">
+                  <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="check-product text-danger mb-0">
+                    <div class="product-name">
+                      {{item.name}}
+                      <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
+                    </div>
+                    <div class="product-price">
+                      {{item.price}} TL
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="card-footer p-1">
@@ -46,12 +50,16 @@
             <div class="card inside-height">
               <div class="card-header">Ödenecek Ürünler</div>
               <div class="card-block p-2 check-flow">
-                <div *ngFor="let item of productsWillPay" class="mb-2 animated slideInLeft">
-                  <p *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="text-bold text-danger mb-0">
-                    {{item.name}}
-                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
-                    <span class="pull-right"> {{item.price}} TL</span>
-                  </p>
+                <div *ngFor="let item of productsWillPay" class="animated slideInLeft">
+                  <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="check-product text-danger mb-0">
+                    <div class="product-name">
+                      {{item.name}}
+                      <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
+                    </div>
+                    <div class="product-price">
+                      {{item.price}} TL
+                    </div>
+                  </div>
                 </div>
               </div>
               <div *ngIf="check?.discount > 0" class="card-footer p-1">
@@ -181,22 +189,23 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0">
-            <button [disabled]="currentAmount == 0 ||  payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('Nakit')" class="btn btn-block text-success sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 ||  payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Nakit')"
+              class="btn btn-block text-success sellButton btn-secondary">
               <i class="fa fa-money ml-1"></i>
               <br> Nakit
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('Kart')" class="btn btn-block text-warning sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')"
+              class="btn btn-block text-warning sellButton btn-secondary">
               <i class="fa fa-credit-card ml-1"></i>
               <br> Kart
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('Kupon')" class="btn btn-block text-info sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')"
+              class="btn btn-block text-info sellButton btn-secondary">
               <i class="fa fa-bookmark ml-1"></i>
               <br> Kupon
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')" class="btn btn-block text-danger sellButton btn-secondary">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')"
+              class="btn btn-block text-danger sellButton btn-secondary">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
               <br> İkram
             </button>

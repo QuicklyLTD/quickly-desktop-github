@@ -1,35 +1,31 @@
 <div class="row animated fadeIn">
   <div class="col-lg-4">
-    <div *ngIf="takeaway" data-toggle="modal" data-target="#menuModal" class="card card-inverse card-danger mb-3 text-center mainCard">
+    <div *ngIf="takeaway" data-toggle="modal" data-target="#menuModal" class="card card-inverse card-danger mb-3 mainCard store">
       <div class="card-block">
         <p>Satış</p>
-        <i class="fa fa-glass fa-2x"></i>
       </div>
     </div>
     <a *ngIf="!takeaway" routerLink="/store">
-      <div class="card card-inverse card-danger mb-3 text-center mainCard">
+      <div class="card card-inverse card-danger mb-3 mainCard store">
         <div class="card-block">
           <p>Satış</p>
-          <i class="fa fa-glass fa-2x"></i>
         </div>
       </div>
     </a>
   </div>
   <div class="col-lg-4" *ngFor="let menu of menus">
     <a routerLink="/{{menu.link}}">
-      <div class="card card-inverse card-{{menu.color}} mb-3 text-center mainCard">
+      <div class="card card-inverse card-{{menu.color}} mb-3 mainCard {{menu.link}}">
         <div class="card-block">
           <p>{{menu.name}}</p>
-          <i class="fa {{menu.icon}} fa-2x"></i>
         </div>
       </div>
     </a>
   </div>
   <div class="col-lg-4">
-    <div class="card card-inverse mb-3 text-center mainCard" (click)="closeProgram()" style="background-color: #333; border-color: #333;">
+    <div class="card card-inverse mb-3 mainCard exit" (click)="closeProgram()" style="background-color: #333; border-color: #333;">
       <div class="card-block">
         <p>Çıkış</p>
-        <i class="fa fa-sign-out fa-2x"></i>
       </div>
     </div>
   </div>
