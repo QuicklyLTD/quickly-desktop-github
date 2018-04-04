@@ -52,7 +52,7 @@ export class CashboxComponent implements OnInit {
     if (!form._id) {
       let schema = new Cashbox(this.type, form.description, Date.now(), form.cash, form.card, form.coupon, this.user);
       this.mainService.addData('cashbox', schema).then(res => {
-        this.logService.createLog(logType.CASHBOX_CREATED,res.id,`Kasaya ${(form.cash+form.card+form.coupon)} tutarında ${this.type} eklendi.`);
+        this.logService.createLog(logType.CASHBOX_CREATED, res.id, `Kasaya ${(form.cash + form.card + form.coupon)} tutarında ${this.type} eklendi.`);
         this.fillData();
         this.messageService.sendMessage(this.type + ' Eklendi');
       });
@@ -72,7 +72,7 @@ export class CashboxComponent implements OnInit {
     this.selectedData = data;
     this.type = this.selectedData.type;
     this.mainService.getData('cashbox', data._id).then(res => {
-      this.logService.createLog(logType.CASHBOX_UPDATED,res.id,`Kasa '${this.selectedData.description}' adlı ${this.type}'i güncellendi.`);
+      this.logService.createLog(logType.CASHBOX_UPDATED, res.id, `Kasa '${this.selectedData.description}' adlı ${this.type}'i güncellendi.`);
       this.cashboxForm.setValue(res);
       this.fillData();
       $('#cashboxModal').modal('show');
@@ -81,7 +81,7 @@ export class CashboxComponent implements OnInit {
 
   removeData(id) {
     this.mainService.removeData('cashbox', id).then(res => {
-      this.logService.createLog(logType.CASHBOX_DELETED,res.id,`Kasadan '${this.selectedData.description}' adlı ${this.type}'i silindi.`);
+      this.logService.createLog(logType.CASHBOX_DELETED, res.id, `Kasadan '${this.selectedData.description}' adlı ${this.type}'i silindi.`);
       this.messageService.sendMessage('Kayıt Silindi');
       this.fillData();
     });
@@ -118,6 +118,7 @@ export class CashboxComponent implements OnInit {
           }
           if (report.length - 1 == index) {
             this.leftTotal = this.sellingIncomes + left;
+            this.leftTotal = Math.round(this.leftTotal);
           };
         });
       });
