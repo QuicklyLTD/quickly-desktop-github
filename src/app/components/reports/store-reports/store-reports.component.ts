@@ -164,8 +164,7 @@ export class StoreReportsComponent implements OnInit {
         try {
           this.NormalTotal = this.NormalChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
           this.FastTotal = this.FastChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
-        } catch (error) {
-          console.log(error);
+        } catch (err) {
         }
       }
     });
