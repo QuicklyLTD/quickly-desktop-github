@@ -119,13 +119,15 @@ export class EndofthedayComponent implements OnInit {
       } catch (error) {
         console.log('İptal Hesap Bulunamadı..')
       }
-      this.mainService.localSyncBeforeRemote('closed_checks');
+      this.mainService.localSyncBeforeRemote('closed_checks').on('complete', (info) => {
+        console.log('Hesaplar Temizlendi...');
+        this.stepCashbox();
+      });
       this.checks.forEach((element, index) => {
         this.mainService.removeDoc('closed_checks', element);
       });
       this.endDayReport.canceled_total = canceledTotal;
       this.endDayReport.check_count = this.checks.length;
-      this.stepCashbox();
     });
   }
 
@@ -134,7 +136,10 @@ export class EndofthedayComponent implements OnInit {
       this.cashbox = res.docs;
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
-      this.mainService.localSyncBeforeRemote('cashbox');
+      this.mainService.localSyncBeforeRemote('cashbox').on('complete', (info) => {
+        console.log('Kasa Temizlendi..')
+        this.stepReports()
+      });
       this.cashbox.forEach((element, index) => {
         this.mainService.removeDoc('cashbox', element);
       });
@@ -148,20 +153,10 @@ export class EndofthedayComponent implements OnInit {
       }
       this.endDayReport.incomes = incomes;
       this.endDayReport.outcomes = outcomes;
-      this.stepReports()
     });
   }
 
   stepReports() {
-    this.mainService.getAllBy('logs', {}).then(res => {
-      this.logs = res.docs;
-      const logsBackup = new BackupData('logs', this.logs);
-      this.backupData.push(logsBackup);
-      this.mainService.localSyncBeforeRemote('logs');
-      this.logs.forEach(element => {
-        this.mainService.removeDoc('logs', element);
-      });
-    });
     this.mainService.getAllBy('reports', {}).then(res => {
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);
@@ -181,7 +176,10 @@ export class EndofthedayComponent implements OnInit {
       this.endDayReport.coupon_total = couponTotal;
       this.endDayReport.free_total = freeTotal;
       this.endDayReport.total_income = this.total;
-      /////////////////////////////////////////////////////////////////
+      this.mainService.localSyncBeforeRemote('reports').on('complete', (info) => {
+        console.log('Raporlar Temizlendi...');
+        this.stepLogs();
+      });
       activities.forEach(element => {
         this.mainService.changeData('reports', element._id, (doc) => {
           doc.activity = [];
@@ -190,7 +188,6 @@ export class EndofthedayComponent implements OnInit {
           return doc;
         });
       });
-      //////////////////////////////////////////////////////////////////
       if (this.settings.getDay().day == this.lastDay) {
         this.reports.forEach((element, index) => {
           this.mainService.changeData('reports', element._id, (doc) => {
@@ -199,11 +196,23 @@ export class EndofthedayComponent implements OnInit {
             return doc;
           });
         });
-        this.mainService.localSyncBeforeRemote('reports');
         localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
       }
-      //////////////////////////////////////////////////////////////////
-      this.stepFinal()
+    });
+  }
+
+  stepLogs() {
+    this.mainService.getAllBy('logs', {}).then(res => {
+      this.logs = res.docs;
+      const logsBackup = new BackupData('logs', this.logs);
+      this.backupData.push(logsBackup);
+      this.mainService.localSyncBeforeRemote('logs').on('complete', (info) => {
+        console.log('Loglar Temizlendi..');
+        this.stepFinal();
+      });
+      this.logs.forEach(element => {
+        this.mainService.removeDoc('logs', element);
+      });
     });
   }
 
@@ -220,7 +229,7 @@ export class EndofthedayComponent implements OnInit {
         $('#endDayModal').modal('hide');
         this.messageService.sendMessage('Gün Sonu Tamamlandı.');
         this.electronService.reloadProgram();
-      }, 15000);
+      }, 10000);
     });
   }
 
