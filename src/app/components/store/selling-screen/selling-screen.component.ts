@@ -123,6 +123,8 @@ export class SellingScreenComponent implements OnInit {
   }
 
   addToCheck(product: Product) {
+    this.selectedIndex = undefined;
+    this.selectedProduct = undefined;
     if (product.type == 2) {
       this.isFirstTime = true;
       this.productWithSpecs = product;
@@ -138,6 +140,12 @@ export class SellingScreenComponent implements OnInit {
       this.check.total_price = this.check.total_price + product.price;
       this.check.products.push(newProduct);
       this.newOrders.push(newProduct);
+      if (product.specifies.length > 0) {
+        this.selectedIndex = this.check.products.length - 1;
+        this.selectedProduct = this.check.products[this.selectedIndex];
+        this.getSpecies(newProduct);
+        $('#noteModal').modal('show');
+      }
     }
   }
 
@@ -664,6 +672,7 @@ export class SellingScreenComponent implements OnInit {
     this.selectedCat = undefined;
     this.mainService.getAllBy('categories', {}).then(result => {
       this.categories = result.docs;
+      this.categories = this.categories.sort((a, b) => a.order - b.order);
     });
     this.mainService.getAllBy('sub_categories', {}).then(result => {
       this.sub_categories = result.docs;
