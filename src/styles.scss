@@ -56,6 +56,7 @@ app-root {
 }
 .proCard{
     height: 7.5vw;
+    box-shadow: 1px 1px 3px rgba(60, 58, 58, 0.48);
     .card-block{
         padding: 1rem;
     }
@@ -70,7 +71,6 @@ app-root {
         background-color: #ebcccc;
     }
     .long-name{
-        height: 50px;
         font-size:1.2vw;
     }
     p{
