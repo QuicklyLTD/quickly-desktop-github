@@ -14,7 +14,7 @@ import { ApplicationService } from './services/application.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.1.3';
+  version = '1.1.5';
   date: number;
   windowStatus: boolean;
   connectionStatus: boolean;
