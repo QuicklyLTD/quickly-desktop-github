@@ -41,6 +41,7 @@ export class PaymentScreenComponent implements OnInit {
   check_type: string;
   askForPrint: boolean;
   onClosing: boolean;
+  permissions: Object;
   @ViewChild('discountInput') discountInput: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
@@ -48,6 +49,7 @@ export class PaymentScreenComponent implements OnInit {
       this.id = params['id'];
       this.fillData();
     });
+    this.permissions = JSON.parse(localStorage['userPermissions']);
     this.settings.getPrinters().subscribe(res => this.printers = res.value);
   }
 

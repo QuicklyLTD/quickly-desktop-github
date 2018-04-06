@@ -33,6 +33,7 @@ export class AuthService {
     localStorage.removeItem('userName');
     localStorage.removeItem('userAuth');
     localStorage.removeItem('userID');
+    localStorage.removeItem('userPermissions');
   }
 
   getToken() {
@@ -53,60 +54,68 @@ export class AuthService {
     return this.subject.asObservable();
   }
 
+  setPermissions() {
+    let auth = localStorage.getItem('userAuth');
+    this.mainService.getData('users_group', auth).then(result => {
+      delete result.auth.components;
+      localStorage.setItem('userPermissions', JSON.stringify(result.auth));
+    });
+  }
+
   isAuthed(url) {
     let auth = localStorage.getItem('userAuth');
-    if(auth){
-    url = url.replace('/', '').split('/');
-    return this.mainService.getData('users_group', auth).then(result => {
-      let guard = result.auth.components;
-      switch (url[0]) {
-        case 'settings':
-          if (guard.settings) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        case 'selling-screen':
-          if (guard.store) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        case 'fast-selling':
-          if (guard.store) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        case 'store':
-          if (guard.store) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        case 'reports':
-          if (guard.reports) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        case 'endoftheday':
-          if (guard.endoftheday) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        case 'cashbox':
-          if (guard.cashbox) {
-            return true;
-          }
-          this.messageService.sendMessage("Giriş Yetkiniz Yok!");
-          break;
-        default:
-          break;
-      }
-    });
-    }else{
+    if (auth) {
+      url = url.replace('/', '').split('/');
+      return this.mainService.getData('users_group', auth).then(result => {
+        let guard = result.auth.components;
+        switch (url[0]) {
+          case 'settings':
+            if (guard.settings) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          case 'selling-screen':
+            if (guard.store) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          case 'fast-selling':
+            if (guard.store) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          case 'store':
+            if (guard.store) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          case 'reports':
+            if (guard.reports) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          case 'endoftheday':
+            if (guard.endoftheday) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          case 'cashbox':
+            if (guard.cashbox) {
+              return true;
+            }
+            this.messageService.sendMessage("Giriş Yetkiniz Yok!");
+            break;
+          default:
+            break;
+        }
+      });
+    } else {
       this.messageService.sendMessage("Şifre girilmedi.");
     }
   }
