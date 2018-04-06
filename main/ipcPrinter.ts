@@ -31,6 +31,7 @@ ipcMain.on('printTest', (event, device) => {
           .control('LF')
           .control('LF')
           .cut()
+          .beep(3, 2)
           .close();
       }
     });
@@ -51,6 +52,7 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
         printer
           .align('lt')
           .size(2, 2)
+          .text(' ')
           .text('Masa No: ' + table, '857')
           .size(1, 1)
           .text(line)
@@ -67,6 +69,7 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
           .control('LF')
           .cut()
+          .beep(3, 2)
           .close();
       }
     });
@@ -118,6 +121,7 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .text('Mali degeri yoktur.', '857')
             .control('LF')
             .cut()
+            .beep(2, 3)
             .close();
         }
       });
@@ -164,9 +168,47 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .text('Mali degeri yoktur.', '857')
             .control('LF')
             .cut()
+            .beep(2, 3)
             .close();
         }
       });
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    let date = new Date();
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer
+          .align('lt')
+          .size(3, 3)
+          .text('----IPTAL!----', '857')
+          .size(2, 2)
+          .text('Masa No: ' + table, '857')
+          .size(1, 1)
+          .text(line)
+          .align('lt')
+          .size(2, 2)
+          .text(product.name, '857')
+          .size(1, 1)
+          .text(reason, '857')
+          .size(1, 1)
+          .text(line)
+          .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+          .control('LF')
+          .cut()
+          .beep(1, 6)
+          .beep(1, 3)
+          .close();
+      }
     });
   } else {
     event.sender.send('error', 'Yazıcı Bulunamadı');

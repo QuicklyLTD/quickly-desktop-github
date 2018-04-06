@@ -50,7 +50,7 @@ export class PrinterService {
         ordersArray[index].total_price += element.price;
         ordersArray[index].count++;
       } else {
-        let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status};
+        let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
         ordersArray.push(schema);
       }
     });
@@ -59,7 +59,7 @@ export class PrinterService {
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, this.storeInfo);
   }
 
-  printPayment(device, table, payment){
+  printPayment(device, table, payment) {
     let ordersArray = [];
     payment.payed_products.forEach(element => {
       let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
@@ -68,7 +68,7 @@ export class PrinterService {
         ordersArray[index].total_price += element.price;
         ordersArray[index].count++;
       } else {
-        let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status};
+        let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
         ordersArray.push(schema);
       }
     });
@@ -78,6 +78,10 @@ export class PrinterService {
 
   printReport(device, EndDayData) {
     this.electron.ipcRenderer.send('printReport', device, EndDayData, this.quicklyLogo);
+  }
+
+  printCancel(device, product, reason, table, owner) {
+    this.electron.ipcRenderer.send('printCancel', device, product, reason, table, owner);
   }
 
   getUSBPrinters() {
