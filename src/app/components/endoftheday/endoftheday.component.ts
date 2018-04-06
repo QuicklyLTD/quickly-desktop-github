@@ -147,12 +147,18 @@ export class EndofthedayComponent implements OnInit {
       let outcomes = 0;
       try {
         incomes = this.cashbox.filter(obj => obj.type == 'Gelir').map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
-        outcomes = this.cashbox.filter(obj => obj.type == 'Gider').map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
+        this.endDayReport.incomes = incomes;
       } catch (error) {
+        this.endDayReport.incomes = 0;
         console.log('Kasa Geliri Yok..');
       }
-      this.endDayReport.incomes = incomes;
-      this.endDayReport.outcomes = outcomes;
+      try {
+        outcomes = this.cashbox.filter(obj => obj.type == 'Gider').map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
+        this.endDayReport.outcomes = outcomes;
+      } catch (error) {
+        this.endDayReport.outcomes = 0;
+        console.log('Kasa Gideri Yok..');
+      }
     });
   }
 
