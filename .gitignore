@@ -6,6 +6,10 @@
 /out-tsc
 /app-builds
 /data
+/_replicator/*
+/_users/*
+/pouch__all_dbs__/*
+/appServer
 
 # dependencies
 /node_modules

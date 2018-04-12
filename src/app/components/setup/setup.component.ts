@@ -22,7 +22,7 @@ export class SetupComponent implements OnInit {
   status: number = 0;
   statusMessage: string;
   showMessage: boolean = false;
-  setupStep: number = 1;
+  setupStep: number = 0;
   headers: Headers;
   options: RequestOptions;
   baseUrl: string;
@@ -44,6 +44,24 @@ export class SetupComponent implements OnInit {
         this.electron.reloadProgram();
       }, 5000)
     }
+  }
+
+  getConfigrations(connectionForm: NgForm) {
+    let Form = connectionForm.value;
+    localStorage.setItem('AppType', 'Slave');
+    localStorage.setItem('ConnectionInfo', JSON.stringify({ host: Form.address, key: Form.key, port: parseInt(Form.port) }));
+    let serverSettings = new Settings('ServerSettings', { type: 1, status: 1, ip_address: Form.address, ip_port: parseInt(Form.port), key: Form.key }, 'Sunucu Ayarları', Date.now());
+    this.mainService.addData('settings', serverSettings).then(res => {
+      if (res.ok) {
+        localStorage.setItem('ActivationStatus', 'true');
+        localStorage.setItem('WeekStatus', '{"started": true, "time": ' + Date.now() + '}');
+        localStorage.setItem('DayStatus', '{"started": true, "day":' + new Date().getDay() + ', "time": ' + Date.now() + '}');
+        this.progressBar(5);
+        setTimeout(() => {
+          this.electron.reloadProgram();
+        }, 21000)
+      }
+    });
   }
 
   makeLogin(loginForm: NgForm) {
@@ -81,12 +99,16 @@ export class SetupComponent implements OnInit {
     let auth = new Settings('AuthInfo', authValue, 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
     let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor', last_day: 0 }, 'Uygulama Ayarları', Date.now());
+    let serverSettings = new Settings('ServerSettings', { type: 0, status: 1, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.app_id }, 'Sunucu Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', auth);
     this.mainService.addData('settings', appSettings);
     this.mainService.addData('settings', printerSettings);
+    this.mainService.addData('settings', serverSettings);
     this.mainService.addData('settings', activation).then((result) => {
+      localStorage.setItem('ConnectionInfo', JSON.stringify({ host: this.electron.getLocalIP(), key: Data.auth.app_id, port: 3000 }));
+      localStorage.setItem('AppType', 'Master');
       localStorage.setItem('AuthInfo', JSON.stringify(authValue));
       localStorage.setItem('ActivationStatus', 'true');
       localStorage.setItem('WeekStatus', '{"started": true, "time": ' + Date.now() + '}');
@@ -121,7 +143,7 @@ export class SetupComponent implements OnInit {
 
   progressBar(step) {
     this.statusMessage = 'Program Ayarlanıyor...';
-    this.setupStep = 0;
+    this.setupStep = 5;
     let stat = setInterval(() => {
       this.progress = this.status + '%';
       this.status++;

@@ -29,6 +29,7 @@ export class ApplicationSettingsComponent implements OnInit {
   @ViewChild('restaurantForm') restaurantForm: NgForm;
   @ViewChild('printerForm') printerForm: NgForm;
   @ViewChild('printerDetailForm') printerDetailForm: NgForm;
+  @ViewChild('serverSettingsForm') serverSettingsForm: NgForm;
 
   constructor(private settings: SettingsService, private router: Router, private printerService: PrinterService, private electronService: ElectronService, private message: MessageService, ) {
     this.appLogo = "";
@@ -50,6 +51,9 @@ export class ApplicationSettingsComponent implements OnInit {
       this.appLogo = this.restInfo.logo;
       this.restaurantForm.setValue(this.restInfo);
     });
+    this.settings.ServerSettings.subscribe(res => {
+      this.serverSettingsForm.setValue(res.value);
+    })
   }
 
   getSettingsDetail(section: string) {
@@ -73,14 +77,19 @@ export class ApplicationSettingsComponent implements OnInit {
   }
 
   saveServerSettings(Form: NgForm) {
-    
+    this.settings.setAppSettings('ServerSettings', Form.value);
+    this.message.sendMessage('Sunucu Ayarları Kaydediliyor.. Makina Yeniden Başlatılıyor.');
+    setTimeout(() => {
+      this.electronService.ipcRenderer.send('closeServer');
+      this.electronService.relaunchProgram();
+    }, 1500)
   }
 
   generateKey(Form: NgForm) {
     let newKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    Form.value.secret_key = newKey;
-    Form.value.address = this.electronService.getLocalIP();
-    this.appServerForm.setValue(Form.value);
+    Form.value.key = newKey;
+    Form.value.ip_address = this.electronService.getLocalIP();
+    this.serverSettingsForm.setValue(Form.value);
   }
 
   getPrinterDetail(printer: Printer) {

@@ -18,7 +18,7 @@ export class PrinterService {
     this.electron.ipcRenderer.on('error', (event, message) => {
       this.messageService.sendMessage(message);
     });
-    this.storeInfo = JSON.parse(localStorage['RestaurantInfo']);
+    // this.storeInfo = JSON.parse(localStorage['RestaurantInfo']);
   }
 
   printTest(device) {
@@ -56,7 +56,7 @@ export class PrinterService {
     });
     let newCheck = Object.assign({}, check);
     newCheck.products = ordersArray;
-    this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, this.storeInfo);
+    this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, '');
   }
 
   printPayment(device, table, payment) {

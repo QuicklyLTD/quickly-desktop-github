@@ -12,6 +12,7 @@ export class SettingsService {
   ActivationStatus: Subject<Settings>;
   RestaurantInfo: Subject<Settings>;
   Printers: Subject<Settings>;
+  ServerSettings: Subject<Settings>;
 
   constructor(private mainService: MainService) {
     this.AppInformation = new Subject<Settings>();
@@ -20,15 +21,17 @@ export class SettingsService {
     this.ActivationStatus = new Subject<Settings>();
     this.RestaurantInfo = new Subject<Settings>();
     this.Printers = new Subject<Settings>();
+    this.ServerSettings = new Subject<Settings>();
 
     this.mainService.getAllBy('settings', {}).then((res) => {
       this.Settings = res.docs;
-      this.AppSettings.next(this.Settings.filter((setting) => setting.key == 'AppSettings')[0]);
-      this.AuthInfo.next(this.Settings.filter((setting) => setting.key == 'AuthInfo')[0]);
-      this.ActivationStatus.next(this.Settings.filter((setting) => setting.key == 'ActivationStatus')[0]);
-      this.AppInformation.next(this.Settings.filter((setting) => setting.key == 'AppInformation')[0]);
-      this.RestaurantInfo.next(this.Settings.filter((setting) => setting.key == 'RestaurantInfo')[0]);
-      this.Printers.next(this.Settings.filter((setting) => setting.key == 'Printers')[0]);
+      this.AppSettings.next(this.Settings.find((setting) => setting.key == 'AppSettings'));
+      this.AuthInfo.next(this.Settings.find((setting) => setting.key == 'AuthInfo'));
+      this.ActivationStatus.next(this.Settings.find((setting) => setting.key == 'ActivationStatus'));
+      this.AppInformation.next(this.Settings.find((setting) => setting.key == 'AppInformation'));
+      this.RestaurantInfo.next(this.Settings.find((setting) => setting.key == 'RestaurantInfo'));
+      this.Printers.next(this.Settings.find((setting) => setting.key == 'Printers'));
+      this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings'));
     });
   }
 

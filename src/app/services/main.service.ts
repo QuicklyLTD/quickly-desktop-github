@@ -3,19 +3,22 @@ import { Subject } from 'rxjs/Subject';
 import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
-import { AuthInfo } from '../mocks/settings.mock';
+import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
 import { ElectronService } from '../providers/electron.service';
 
 @Injectable()
 export class MainService {
+  PouchDB: typeof PouchDB;
   hostname: string;
   db_prefix: string;
+  ajax_opts: object;
   authInfo: AuthInfo;
-  ajaxOpts: object;
+  serverInfo: ServerInfo;
   LocalDB: any;
   RemoteDB: any;
+  ServerDB: any;
 
   /////////////////////////////////
   printers: any;
@@ -48,30 +51,43 @@ export class MainService {
       logs: new PouchDB('local_logs'),
       allData: new PouchDB('local_alldata')
     };
-
     this.authInfo = JSON.parse(localStorage.getItem('AuthInfo'));
     if (this.authInfo) {
       this.hostname = 'http://' + this.authInfo.app_remote + ':' + this.authInfo.app_port;
-      this.ajaxOpts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
+      this.ajax_opts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
       this.db_prefix = this.authInfo.app_db;
-      this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajaxOpts);
+      this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajax_opts);
     }
+    this.getAllBy('settings', { key: 'ServerSettings' }).then(res => {
+      if (res.docs.length > 0) {
+        this.serverInfo = res.docs[0].value;
+        if (this.serverInfo.type == 0) {
+          if (this.serverInfo.status == 1) {
+            this.electron.ipcRenderer.send('appServer', this.serverInfo.key, this.serverInfo.ip_port);
+            this.ServerDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
+            setTimeout(() => {
+              this.syncToAppServer();
+            }, 5000)
+          }
+        } else if (this.serverInfo.type == 1) {
+          this.RemoteDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
+        }
+        this.syncData('allData');
+      }
+    });
+    // this.getAllBy('allData', {}).then(res => {
+    //   this.electron.ipcRenderer.send('appServer', res.docs);
+    // });
 
-    /////////////////////////////////////////////////////////////
-    this.getAllBy('allData', {}).then(res => {
-      this.electron.ipcRenderer.send('appServer', res.docs);
-    });
-    this.getAllBy('settings', { key: 'Printers' }).then(res => {
-      this.printers = res.docs[0].value;
-    });
-    this.getAllBy('categories', {}).then(res => {
-      this.categories = res.docs;
-    });
-    this.getAllBy('tables', {}).then(res => {
-      this.tables = res.docs;
-    });
-    /////////////////////////////////////////////////////////////
-    //  this.syncToAppServer();
+    // this.getAllBy('settings', { key: 'Printers' }).then(res => {
+    //   this.printers = res.docs[0].value;
+    // });
+    // this.getAllBy('categories', {}).then(res => {
+    //   this.categories = res.docs;
+    // });
+    // this.getAllBy('tables', {}).then(res => {
+    //   this.tables = res.docs;
+    // });
   }
 
   getAllData(db: string, $limit) {
@@ -159,26 +175,13 @@ export class MainService {
   }
 
   syncToAppServer() {
-    this.LocalDB['allData'].changes({ since: 'now', live: true }).on('change', (change) => {
-      this.getAllBy('allData', {}).then(res => {
-        this.electron.ipcRenderer.send('appServer', res.docs);
-      });
-    });
-    this.electron.ipcRenderer.on('serverListener', (event, method, db, doc, schema?) => {
-      switch (method) {
-        case 'add':
-          this.addData(db, doc);
-          break;
-        case 'update':
-          this.updateData(db, doc, schema);
-          break;
-        case 'remove':
-          this.removeData(db, doc);
-          break;
-        default:
-          break;
-      }
-    });
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true })
+      .on('change', (sync) => { this.handleChanges(sync) })
+      .on('paused', (err) => { console.log('Local Sync Paused..') })
+      .on('denied', (err) => { console.log('Local Sync Denied..') })
+      .on('active', () => { console.log('Local Syncing...') })
+      .on('complete', (info) => { console.log('Sync Complete', info) })
+      .on('error', (err) => { console.error(err) });
   }
 
   syncToLocal(db: string) {
@@ -204,24 +207,29 @@ export class MainService {
 
   handleChanges(sync) {
     const changes = sync.change.docs;
+    console.log(sync);
     if (sync.direction === 'pull') {
       changes.forEach((element, index) => {
         if (!element._deleted) {
           let db = element.db_name;
-          delete element._rev;
-          delete element._revisions;
-          delete element.db_seq;
-          // if (db == 'checks') {
-          //   this.terminal.printOrders(this.printers, this.categories, element, this.tables);
-          //   element.products.forEach(element => {
-          //     element.status = 2;
-          //   });
-          //   setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
-          // }
-          delete element.db_name;
-          this.LocalDB[db].upsert(element._id, (doc) => {
-            return Object.assign(doc, element);
-          });
+          if (db == 'settings' && element.key == 'ServerSettings') {
+            // Do nothing... 
+          } else {
+            delete element._rev;
+            delete element._revisions;
+            delete element.db_seq;
+            // if (db == 'checks') {
+            //   this.terminal.printOrders(this.printers, this.categories, element, this.tables);
+            //   element.products.forEach(element => {
+            //     element.status = 2;
+            //   });
+            //   setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
+            // }
+            delete element.db_name;
+            this.LocalDB[db].upsert(element._id, (doc) => {
+              return Object.assign(doc, element);
+            });
+          }
         } else {
           this.LocalDB['checks'].get(element._id).then((doc) => {
             this.LocalDB['checks'].remove(doc);

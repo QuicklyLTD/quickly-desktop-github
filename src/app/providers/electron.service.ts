@@ -120,15 +120,19 @@ export class ElectronService {
       });
     });
   }
-
+  
+  fullScreen(status: boolean) {
+    this.appWindow.setFullScreen(status);
+  }
   shellCommand(command: string) {
     childProcess.exec(command);
   }
   reloadProgram() {
     this.appWindow.reload();
   }
-  fullScreen(status: boolean) {
-    this.appWindow.setFullScreen(status);
+  relaunchProgram(){
+    this.app.relaunch();
+    this.app.quit();
   }
   exitProgram() {
     this.app.quit();
