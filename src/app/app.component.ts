@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ElectronService } from './providers/electron.service';
+import { MainService } from './services/main.service';
 import { SettingsService } from './services/settings.service';
 import { ApplicationService } from './services/application.service';
 
@@ -19,7 +20,7 @@ export class AppComponent implements OnInit {
   connectionStatus: boolean;
   setupFinished: boolean;
 
-  constructor(private electronService: ElectronService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService) {
+  constructor(private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService) {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
@@ -47,6 +48,18 @@ export class AppComponent implements OnInit {
     let activationStatus = localStorage['ActivationStatus'];
     if (activationStatus !== undefined) {
       this.setupFinished = true;
+      this.settingsService.ServerSettings.subscribe(res => {
+        let configrations = res.value;
+        if (configrations.status == 1) {
+          if (configrations.type == 0) {
+            this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
+            this.mainService.syncToServer();
+            this.mainService.syncToRemote();
+          } else if (configrations.type == 1) {
+            this.mainService.syncToRemote();
+          }
+        }
+      })
     } else {
       this.router.navigate(['/setup']);
     }

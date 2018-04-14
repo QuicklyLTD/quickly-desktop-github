@@ -3,6 +3,7 @@ import { Subject } from 'rxjs/Subject';
 import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
+// import * as InMemory from 'pouchdb-adapter-memory';
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
@@ -29,6 +30,7 @@ export class MainService {
   constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
+    // PouchDB.plugin(InMemory);
 
     this.LocalDB = {
       users: new PouchDB('local_users'),
@@ -63,22 +65,13 @@ export class MainService {
         this.serverInfo = res.docs[0].value;
         if (this.serverInfo.type == 0) {
           if (this.serverInfo.status == 1) {
-            this.electron.ipcRenderer.send('appServer', this.serverInfo.key, this.serverInfo.ip_port);
             this.ServerDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
-            setTimeout(() => {
-              this.syncToAppServer();
-            }, 5000)
           }
         } else if (this.serverInfo.type == 1) {
           this.RemoteDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
         }
-        this.syncData('allData');
       }
     });
-    // this.getAllBy('allData', {}).then(res => {
-    //   this.electron.ipcRenderer.send('appServer', res.docs);
-    // });
-
     // this.getAllBy('settings', { key: 'Printers' }).then(res => {
     //   this.printers = res.docs[0].value;
     // });
@@ -174,40 +167,8 @@ export class MainService {
     });
   }
 
-  syncToAppServer() {
-    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true })
-      .on('change', (sync) => { this.handleChanges(sync) })
-      .on('paused', (err) => { console.log('Local Sync Paused..') })
-      .on('denied', (err) => { console.log('Local Sync Denied..') })
-      .on('active', () => { console.log('Local Syncing...') })
-      .on('complete', (info) => { console.log('Sync Complete', info) })
-      .on('error', (err) => { console.error(err) });
-  }
-
-  syncToLocal(db: string) {
-    return new Promise((resolve, reject) => {
-      this.getAllBy('allData', { db_name: db }).then(res => {
-        const docs = res.docs;
-        if (docs.length > 0) {
-          docs.forEach((element, index) => {
-            delete element.db_name;
-            delete element.db_seq;
-            delete element._rev;
-            this.LocalDB[db].put(element);
-            if (docs.length == index + 1) {
-              resolve(`Dökümanlar '${db}' Veritabınına eklendi`);
-            }
-          });
-        } else {
-          reject('Sunucuda Döküman Bulunamadı');
-        }
-      });
-    });
-  }
-
   handleChanges(sync) {
     const changes = sync.change.docs;
-    console.log(sync);
     if (sync.direction === 'pull') {
       changes.forEach((element, index) => {
         if (!element._deleted) {
@@ -231,21 +192,46 @@ export class MainService {
             });
           }
         } else {
-          this.LocalDB['checks'].get(element._id).then((doc) => {
-            this.LocalDB['checks'].remove(doc);
+          Object.keys(this.LocalDB).forEach(db => {
+            this.LocalDB[db].get(element._id).then((doc) => {
+              if (doc) {
+                this.LocalDB[db].remove(doc);
+              }
+            }).catch(err => { });
           });
         }
       });
     }
   }
-
-  syncData(db: string) {
-    return PouchDB.sync(this.LocalDB[db], this.RemoteDB, { live: true, retry: true })
-      .on('change', (sync) => { this.handleChanges(sync) })
-      .on('paused', (err) => { console.log('Sync Paused..') })
-      .on('denied', (err) => { console.log('Sync Denied..') })
-      .on('active', () => { console.log('Syncing...') })
-      .on('complete', (info) => { console.log('Sync Complete', info) })
-      .on('error', (err) => { console.error(err) });
+  syncToLocal(db: string) {
+    return new Promise((resolve, reject) => {
+      this.getAllBy('allData', { db_name: db }).then(res => {
+        const docs = res.docs;
+        if (docs.length > 0) {
+          docs.forEach((element, index) => {
+            delete element.db_name;
+            delete element.db_seq;
+            delete element._rev;
+            this.LocalDB[db].put(element);
+            if (docs.length == index + 1) {
+              resolve(`Dökümanlar '${db}' Veritabınına eklendi`);
+            }
+          });
+        } else {
+          reject('Sunucuda Döküman Bulunamadı');
+        }
+      });
+    });
+  }
+  syncToServer() {
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) })
+    // .on('paused', (err) => { console.log('Local Sync Paused..') })
+    // .on('denied', (err) => { console.log('Local Sync Denied..') })
+    // .on('active', () => { console.log('Local Syncing...') })
+    // .on('complete', (info) => { console.log('Sync Complete', info) })
+    // .on('error', (err) => { console.error(err) });
+  }
+  syncToRemote() {
+    return PouchDB.sync(this.LocalDB['allData'], this.RemoteDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });
   }
 }

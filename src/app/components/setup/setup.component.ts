@@ -99,7 +99,7 @@ export class SetupComponent implements OnInit {
     let auth = new Settings('AuthInfo', authValue, 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
     let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor', last_day: 0 }, 'Uygulama Ayarları', Date.now());
-    let serverSettings = new Settings('ServerSettings', { type: 0, status: 1, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.app_id }, 'Sunucu Ayarları', Date.now());
+    let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.app_id }, 'Sunucu Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', auth);
