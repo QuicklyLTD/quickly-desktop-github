@@ -55,11 +55,9 @@ export class AppComponent implements OnInit {
           if (configrations.type == 0) {
             this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
             this.mainService.syncToServer();
-            this.mainService.syncToRemote();
-          } else if (configrations.type == 1) {
-            this.mainService.syncToRemote();
           }
         }
+        this.mainService.syncToRemote();
       })
     } else {
       this.router.navigate(['/setup']);
