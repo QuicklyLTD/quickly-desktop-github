@@ -112,7 +112,7 @@ export class UserReportsComponent implements OnInit {
     this.mainService.getAllBy('reports', { type: 'User' }).then(res => {
       this.generalList = res.docs.sort((a, b) => b.count - a.count);
       this.usersList = JSON.parse(JSON.stringify(this.generalList));
-      let chartTable = this.usersList.slice(0, 10);
+      let chartTable = this.usersList.slice(0, 5);
       chartTable.forEach((obj, index) => {
         this.mainService.getData('users', obj.connection_id).then(res => {
           obj.weekly = this.normalWeekOrder(obj.weekly);
