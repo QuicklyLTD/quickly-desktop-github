@@ -224,12 +224,7 @@ export class MainService {
     });
   }
   syncToServer() {
-    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) })
-    // .on('paused', (err) => { console.log('Local Sync Paused..') })
-    // .on('denied', (err) => { console.log('Local Sync Denied..') })
-    // .on('active', () => { console.log('Local Syncing...') })
-    // .on('complete', (info) => { console.log('Sync Complete', info) })
-    // .on('error', (err) => { console.error(err) });
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });
   }
   syncToRemote() {
     return PouchDB.sync(this.LocalDB['allData'], this.RemoteDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });

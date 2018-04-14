@@ -39,8 +39,9 @@ export class AppComponent implements OnInit {
         }
       }
       setInterval(() => {
+        this.date = Date.now();
         this.connectionStatus = this.aplicationService.connectionStatus();
-      }, 3000)
+      }, 5000)
     }
   }
 

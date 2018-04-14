@@ -278,7 +278,7 @@
             <span class="pull-right text-muted"> Hesap Türü : {{checkDetail?.payment_method}}</span>
           </div>
           <div class="card-block flow p-0">
-            <table *ngIf="checkDetail?.payment_method != 'Parçalı'" class="table table-striped table-sm mb-0">
+            <table *ngIf="checkDetail?.payment_method != 'Parçalı'" class="table table-striped table-bordered table-sm mb-0">
               <thead class="thead-inverse">
                 <th>#</th>
                 <th>Ürün</th>
@@ -299,7 +299,7 @@
               </tbody>
             </table>
             <section *ngIf="checkDetail?.payment_method == 'Parçalı'">
-              <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm table-striped mb-0">
+              <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm table-bordered table-striped mb-0">
                 <thead class="thead-inverse">
                   <th>#</th>
                   <th>{{item.owner}}</th>
