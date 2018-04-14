@@ -276,6 +276,7 @@ module.exports = {
     "serialport": "require('serialport')",
     "pouchdb": "require('pouchdb')",
     "pouchdb-browser": "require('pouchdb-browser')",
+    "pouchdb-adapter-memory": "require('pouchdb-adapter-memory')",
     "pouchdb-find": "require('pouchdb-find')",
     "pouchdb-upsert": "require('pouchdb-upsert')"
   },
