@@ -3,7 +3,6 @@ import { Subject } from 'rxjs/Subject';
 import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
-// import * as InMemory from 'pouchdb-adapter-memory';
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
@@ -11,16 +10,16 @@ import { ElectronService } from '../providers/electron.service';
 
 @Injectable()
 export class MainService {
-  PouchDB: typeof PouchDB;
+  LocalDB: object;
+  RemoteDB: PouchDB.Database;
+  ServerDB: PouchDB.Database;
+  /////////////////////////////////
   hostname: string;
   db_prefix: string;
   ajax_opts: object;
+  /////////////////////////////////
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
-  LocalDB: any;
-  RemoteDB: any;
-  ServerDB: any;
-
   /////////////////////////////////
   printers: any;
   categories: any;
@@ -30,7 +29,6 @@ export class MainService {
   constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
-    // PouchDB.plugin(InMemory);
 
     this.LocalDB = {
       users: new PouchDB('local_users'),
