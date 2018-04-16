@@ -209,22 +209,25 @@ export class SellingScreenComponent implements OnInit {
       }
     });
     this.router.navigate(['/store']);
-    if (this.check.status == 1) {
+    if (this.check.status !== 0) {
+      if (this.check.type == 1) {
+        this.mainService.updateData('tables', this.id, { status: 2 });
+      }
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
         if (res.ok) {
           let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
           if (this.check.type == 1) {
-            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
           } else {
-            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} tutarında sipariş eklendi.`);
+            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
           }
         }
       });
     } else {
+      this.check.status = 1;
       if (this.check.type == 1) {
         this.mainService.updateData('tables', this.id, { status: 2, timestamp: Date.now() });
       }
-      this.check.status = 1;
       this.mainService.addData('checks', this.check).then(res => {
         if (res.ok) {
           if (this.check.type == 1) {
@@ -521,14 +524,14 @@ export class SellingScreenComponent implements OnInit {
     if (this.check.status !== 2) {
       this.printerService.printCheck(this.printers[0], this.table.name, this.check);
       if (this.check.status > 0) {
-        this.mainService.updateData('checks', this.check_id, { status: 2 }).then(res => {
-          this.check._rev = res.rev
-        });
+        this.check.status == 2
+        this.mainService.updateData('checks', this.check_id, this.check);
         if (this.check.type == 1) {
-          this.mainService.updateData('tables', this.check.table_id, { status: 3 });
+          this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
+            this.router.navigate(['store']);
+          });;
           this.message.sendMessage('Hesap Yazdırıldı..');
         }
-        this.check.status = 2;
       }
     } else {
       let isOk = confirm('Adisyon Tekrar Yazdırılsın mı?');
