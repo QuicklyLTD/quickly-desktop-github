@@ -13,6 +13,7 @@ export class SettingsService {
   RestaurantInfo: Subject<Settings>;
   Printers: Subject<Settings>;
   ServerSettings: Subject<Settings>;
+  DateSettings: Subject<Settings>;
 
   constructor(private mainService: MainService) {
     this.AppInformation = new Subject<Settings>();
@@ -22,6 +23,7 @@ export class SettingsService {
     this.RestaurantInfo = new Subject<Settings>();
     this.Printers = new Subject<Settings>();
     this.ServerSettings = new Subject<Settings>();
+    this.DateSettings = new Subject<Settings>();
 
     this.mainService.getAllBy('settings', {}).then((res) => {
       this.Settings = res.docs;
@@ -32,14 +34,10 @@ export class SettingsService {
       this.RestaurantInfo.next(this.Settings.find((setting) => setting.key == 'RestaurantInfo'));
       this.Printers.next(this.Settings.find((setting) => setting.key == 'Printers'));
       this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings'));
+      this.DateSettings.next(this.Settings.find((setting) => setting.key == 'DateSettings'));
     });
-  }
 
-  getDay() {
-    return JSON.parse(localStorage.getItem('DayStatus'));
-  }
-  getWeekStatus() {
-    return JSON.parse(localStorage.getItem('WeekStatus')).started;
+    this.setLocalStorage();
   }
 
   getUser(value) {
@@ -63,11 +61,21 @@ export class SettingsService {
     return result;
   }
 
+  setLocalStorage() {
+    this.DateSettings.subscribe(res => {
+      localStorage.setItem('DayStatus', JSON.stringify(res.value));
+    });
+  }
+
   setAppSettings(Key: string, SettingsData) {
     let AppSettings = new Settings(Key, SettingsData, 'Uygulama Ayarları', Date.now());
     this.mainService.getAllBy('settings', { key: Key }).then(res => {
       this.mainService.updateData('settings', res.docs[0]._id, AppSettings);
     });
+  }
+
+  getPrinters() {
+    return this.Printers.asObservable();
   }
 
   addPrinter(printerData) {
@@ -101,8 +109,12 @@ export class SettingsService {
     });
   }
 
-  getPrinters() {
-    return this.Printers.asObservable();
+  getDate() {
+    this.DateSettings.asObservable();
+  }
+
+  getActivationStatus() {
+    return this.ActivationStatus.asObservable();
   }
 
   getAppSettings() {
