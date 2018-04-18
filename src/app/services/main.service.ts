@@ -21,11 +21,6 @@ export class MainService {
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
   /////////////////////////////////
-  printers: any;
-  categories: any;
-  tables: any;
-  /////////////////////////////////
-
   constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
@@ -51,13 +46,17 @@ export class MainService {
       logs: new PouchDB('local_logs'),
       allData: new PouchDB('local_alldata')
     };
-    this.authInfo = JSON.parse(localStorage.getItem('AuthInfo'));
-    if (this.authInfo) {
-      this.hostname = 'http://' + this.authInfo.app_remote + ':' + this.authInfo.app_port;
-      this.ajax_opts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
-      this.db_prefix = this.authInfo.app_db;
-      this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajax_opts);
-    }
+
+    this.getAllBy('settings', { key: 'AuthInfo' }).then(res => {
+      if (res.docs.length > 0) {
+        this.authInfo = res.docs[0].value;
+        this.hostname = 'http://' + this.authInfo.app_remote + ':' + this.authInfo.app_port;
+        this.ajax_opts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
+        this.db_prefix = this.authInfo.app_db;
+        this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajax_opts);
+      }
+    });
+
     this.getAllBy('settings', { key: 'ServerSettings' }).then(res => {
       if (res.docs.length > 0) {
         this.serverInfo = res.docs[0].value;
@@ -70,15 +69,7 @@ export class MainService {
         }
       }
     });
-    // this.getAllBy('settings', { key: 'Printers' }).then(res => {
-    //   this.printers = res.docs[0].value;
-    // });
-    // this.getAllBy('categories', {}).then(res => {
-    //   this.categories = res.docs;
-    // });
-    // this.getAllBy('tables', {}).then(res => {
-    //   this.tables = res.docs;
-    // });
+
   }
 
   getAllData(db: string, $limit) {
@@ -201,29 +192,48 @@ export class MainService {
       });
     }
   }
-  syncToLocal(db: string) {
+
+  replicateDB(db_configrations) {
+    let db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
+    return db.replicate.to(this.LocalDB['allData']);
+  }
+
+  syncToLocal(database?: string) {
+    let selector;
+    if (database) {
+      selector = { db_name: database };
+    } else {
+      selector = {}
+    }
     return new Promise((resolve, reject) => {
-      this.getAllBy('allData', { db_name: db }).then(res => {
+      this.getAllBy('allData', selector).then(res => {
         const docs = res.docs;
         if (docs.length > 0) {
           docs.forEach((element, index) => {
-            delete element.db_name;
-            delete element.db_seq;
-            delete element._rev;
-            this.LocalDB[db].put(element);
+            let db = element.db_name;
+            if (db == 'settings' && element.key == 'ServerSettings') {
+              // Do nothing... 
+            } else {
+              delete element.db_name;
+              delete element.db_seq;
+              delete element._rev;
+              this.LocalDB[db].put(element);
+            }
             if (docs.length == index + 1) {
-              resolve(`Dökümanlar '${db}' Veritabınına eklendi`);
+              resolve(true);
             }
           });
         } else {
-          reject('Sunucuda Döküman Bulunamadı');
+          reject({ ok: false });
         }
       });
     });
   }
+
   syncToServer() {
     return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });
   }
+
   syncToRemote() {
     return PouchDB.sync(this.LocalDB['allData'], this.RemoteDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });
   }

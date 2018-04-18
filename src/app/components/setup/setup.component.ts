@@ -13,7 +13,8 @@ import { UserGroup, User, UserAuth, ComponentsAuth } from '../../mocks/user.mock
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
-  styleUrls: ['./setup.component.scss']
+  styleUrls: ['./setup.component.scss'],
+  providers: [SettingsService]
 })
 
 export class SetupComponent implements OnInit {
@@ -27,39 +28,51 @@ export class SetupComponent implements OnInit {
   options: RequestOptions;
   baseUrl: string;
 
-  constructor(private mainService: MainService, private settings: SettingsService, private http: Http, private electron: ElectronService, private message: MessageService, private router: Router) {
+  constructor(private mainService: MainService, private settingsService: SettingsService, private http: Http, private electron: ElectronService, private message: MessageService, private router: Router) {
     this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     this.options = new RequestOptions({ headers: this.headers });
     this.baseUrl = 'https://api.quickly.com.tr';
   }
 
   ngOnInit() {
-    if (navigator.onLine) {
-      if (localStorage['ActivationStatus'] !== undefined) {
-        this.router.navigate(['']);
-      }
-    } else {
+    if (!navigator.onLine) {
       alert('İnternet Bağlantınızı Kontol Edin...');
       setTimeout(() => {
         this.electron.reloadProgram();
       }, 5000)
     }
+    this.settingsService.ActivationStatus.subscribe(res => {
+      if (res) {
+        this.router.navigate(['']);
+      }
+    })
   }
 
   getConfigrations(connectionForm: NgForm) {
     let Form = connectionForm.value;
-    localStorage.setItem('AppType', 'Slave');
-    localStorage.setItem('ConnectionInfo', JSON.stringify({ host: Form.address, key: Form.key, port: parseInt(Form.port) }));
     let serverSettings = new Settings('ServerSettings', { type: 1, status: 1, ip_address: Form.address, ip_port: parseInt(Form.port), key: Form.key }, 'Sunucu Ayarları', Date.now());
     this.mainService.addData('settings', serverSettings).then(res => {
       if (res.ok) {
-        localStorage.setItem('ActivationStatus', 'true');
-        localStorage.setItem('WeekStatus', '{"started": true, "time": ' + Date.now() + '}');
-        localStorage.setItem('DayStatus', '{"started": true, "day":' + new Date().getDay() + ', "time": ' + Date.now() + '}');
-        this.progressBar(5);
-        setTimeout(() => {
-          this.electron.reloadProgram();
-        }, 21000)
+        this.mainService.replicateDB(serverSettings.value)
+          .on('active', () => {
+            this.progressBar(5);
+          })
+          .on('change', (sync) => {
+            console.log(sync);
+          })
+          .on('complete', info => {
+            this.mainService.syncToLocal().then(res => {
+              this.statusMessage = 'Kurulum Tamamlandı !'
+              if (res) {
+                setTimeout(() => {
+                  this.electron.relaunchProgram();
+                }, 5000)
+              }
+            });
+          }).catch(err => {
+            connectionForm.reset();
+            this.message.sendMessage('Sunucuya Bağlanılamıyor.');
+          });
       }
     });
   }
@@ -94,33 +107,27 @@ export class SetupComponent implements OnInit {
 
   makeAuth(Data) {
     this.electron.saveLogo(Data.logo);
-    let activation = new Settings('ActivationStatus', true, Data.auth.database_name, Date.now());
-    let authValue = new AuthInfo(Data.remote.host, Data.remote.port, Data.auth.database_name, Data.auth.app_id, Data.auth.app_token);
-    let auth = new Settings('AuthInfo', authValue, 'Giriş Bilgileri Oluşturuldu', Date.now());
+    let activationStatus = new Settings('ActivationStatus', true, Data.auth.database_name, Date.now());
+    let dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() }, 'Tarih-Zaman Ayarları', Date.now());
+    let authInfo = new Settings('AuthInfo', new AuthInfo(Data.remote.host, Data.remote.port, Data.auth.database_name, Data.auth.app_id, Data.auth.app_token), 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
     let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor', last_day: 0 }, 'Uygulama Ayarları', Date.now());
     let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.app_id }, 'Sunucu Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
     this.mainService.addData('settings', restaurantInfo);
-    this.mainService.addData('settings', auth);
+    this.mainService.addData('settings', authInfo);
     this.mainService.addData('settings', appSettings);
     this.mainService.addData('settings', printerSettings);
     this.mainService.addData('settings', serverSettings);
-    this.mainService.addData('settings', activation).then((result) => {
-      localStorage.setItem('ConnectionInfo', JSON.stringify({ host: this.electron.getLocalIP(), key: Data.auth.app_id, port: 3000 }));
-      localStorage.setItem('AppType', 'Master');
-      localStorage.setItem('AuthInfo', JSON.stringify(authValue));
-      localStorage.setItem('ActivationStatus', 'true');
-      localStorage.setItem('WeekStatus', '{"started": true, "time": ' + Date.now() + '}');
-      localStorage.setItem('DayStatus', '{"started": true, "day":' + new Date().getDay() + ', "time": ' + Date.now() + '}');
-      localStorage.setItem('RestaurantInfo', JSON.stringify(Data));
+    this.mainService.addData('settings', dateSettings);
+    this.mainService.addData('settings', activationStatus).then((result) => {
       this.progressBar(3);
     });
   }
 
   makeAdmin(adminForm: NgForm) {
     let Form = adminForm.value;
-    let userAuth = new UserAuth(new ComponentsAuth(true, true, true, true, true), true, true, true);
+    let userAuth = new UserAuth(new ComponentsAuth(true, true, true, true, true), true, true, true, true);
     this.mainService.addData('users_group', new UserGroup('Yönetici', 'Yönetici Grubu', userAuth, 1, Date.now())).then(res => {
       this.mainService.addData('users', new User(Form.admin_name, 'Yönetici', res.id, parseInt(Form.admin_pass), 1, Date.now())).then((user) => {
         this.mainService.addData('reports', new Report('User', user.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], user.name, Date.now()));
@@ -162,10 +169,10 @@ export class SetupComponent implements OnInit {
       }
       if (this.status == 101) {
         clearInterval(stat);
-        this.statusMessage = 'Kurulum Tamamlandı...';
+        this.statusMessage = 'Kurulum Tamamlanıyor...';
         this.showMessage = true;
         this.setupStep = step;
-        this.progress = '0%';
+        this.progress = '100%';
       }
     }, 200);
   }

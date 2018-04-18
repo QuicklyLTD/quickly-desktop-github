@@ -34,12 +34,14 @@ export class EndofthedayComponent implements OnInit {
   lastDay: any;
   progress: string;
 
-  constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settings: SettingsService) {
-    this.isStarted = this.settings.getDay().started;
-    this.day = this.settings.getDay().day;
-    this.owner = this.settings.getUser('id');
+  constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settingsService: SettingsService) {
+    this.settingsService.DateSettings.subscribe(res => {
+      this.isStarted = res.value.started;
+      this.day = res.value.day;
+    })
+    this.owner = this.settingsService.getUser('id');
     this.endDayReport = new EndDay(Date.now(), this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
-    this.settings.AppSettings.subscribe(res => {
+    this.settingsService.AppSettings.subscribe(res => {
       this.lastDay = res.value.last_day;
     });
   }
@@ -57,7 +59,7 @@ export class EndofthedayComponent implements OnInit {
   }
 
   startDay() {
-    if (this.settings.getDay().started) {
+    if (this.isStarted) {
       this.messageService.sendMessage('Gün Sonu Yapmalısınız!');
       return false;
     } else {
@@ -73,7 +75,7 @@ export class EndofthedayComponent implements OnInit {
         });
       });
       this.messageService.sendMessage('Gün Başlatıldı.');
-      if (this.settings.getDay().day == 1) {
+      if (this.day == 1) {
         this.mainService.getAllBy('reports', {}).then(res => {
           let reports = res.docs.filter(obj => obj.type !== 'Activity');
           reports.forEach(element => {
@@ -92,7 +94,7 @@ export class EndofthedayComponent implements OnInit {
   }
 
   endDay() {
-    if (this.settings.getDay().started) {
+    if (this.isStarted) {
       this.mainService.getAllBy('checks', {}).then((res) => {
         let date = Date.now();
         if (res.docs.length == 0) {
@@ -171,7 +173,7 @@ export class EndofthedayComponent implements OnInit {
       const activities = res.docs.filter(obj => obj.type == 'Activity');
       const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
       storeData.forEach(element => {
-        this.total += element.weekly[this.settings.getDay().day];
+        this.total += element.weekly[this.day];
       });
       let cashTotal = this.reports.filter(obj => obj.connection_id == 'Nakit')[0].weekly[this.day];
       let cardTotal = this.reports.filter(obj => obj.connection_id == 'Kart')[0].weekly[this.day];
@@ -194,7 +196,7 @@ export class EndofthedayComponent implements OnInit {
           return doc;
         });
       });
-      if (this.settings.getDay().day == this.lastDay) {
+      if (this.day == this.lastDay) {
         this.reports.forEach((element, index) => {
           this.mainService.changeData('reports', element._id, (doc) => {
             doc.weekly = [0, 0, 0, 0, 0, 0, 0];
@@ -228,7 +230,7 @@ export class EndofthedayComponent implements OnInit {
     this.mainService.addData('endday', this.endDayReport).then(res => {
       this.electronService.backupData(this.backupData, this.endDayReport.time);
       this.printerService.printReport(this.printers[0], this.endDayReport);
-      localStorage.setItem('DayStatus', '{"started":false, "day":' + this.settings.getDay().day + ', "time": ' + Date.now() + '}');
+      localStorage.setItem('DayStatus', '{"started":false, "day":' + this.day + ', "time": ' + Date.now() + '}');
       this.fillData();
       this.isStarted = false;
       setTimeout(() => {
@@ -244,6 +246,6 @@ export class EndofthedayComponent implements OnInit {
       this.endDayData = result.docs;
       this.endDayData = this.endDayData.sort((a, b) => b.time - a.time);
     });
-    this.settings.getPrinters().subscribe(res => this.printers = res.value);
+    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
   }
 }

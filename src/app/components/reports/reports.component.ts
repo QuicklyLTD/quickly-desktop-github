@@ -7,7 +7,8 @@ import { Report, Activity } from '../../mocks/report.mock';
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
-  styleUrls: ['./reports.component.scss']
+  styleUrls: ['./reports.component.scss'],
+  providers: [SettingsService]
 })
 export class ReportsComponent implements OnInit {
   selected: number;
@@ -38,7 +39,9 @@ export class ReportsComponent implements OnInit {
 
 
   constructor(private mainService: MainService, private settingsService: SettingsService) {
-    this.day = this.settingsService.getDay().day;
+    this.settingsService.DateSettings.subscribe(res => {
+      this.day = res.value.day;
+    })
     this.closedTotal = 0;
     this.activeTotal = 0;
     this.generalTotal = 0;
@@ -81,7 +84,7 @@ export class ReportsComponent implements OnInit {
     });
     this.mainService.getAllBy('checks', {}).then(res => {
       const activeChecks = res.docs;
-      if(res.docs.length > 0){
+      if (res.docs.length > 0) {
         this.activeTotal = activeChecks.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
       }
     });

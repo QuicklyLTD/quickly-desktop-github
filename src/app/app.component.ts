@@ -8,7 +8,8 @@ import { ApplicationService } from './services/application.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  providers: [SettingsService]
 })
 
 export class AppComponent implements OnInit {
@@ -24,44 +25,51 @@ export class AppComponent implements OnInit {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
-    if (electronService.isElectron()) {
-      this.startApp();
-    }
   }
 
   ngOnInit() {
-    if (this.setupFinished) {
-      if (new Date().getDay() !== this.settingsService.getDay().day) {
-        if (this.settingsService.getDay().started) {
-          alert('Gün Sonu Yapılmamış.');
-        } else {
-          alert('Gün Başlangıcı Yapmalısınız.');
-        }
-      }
-      setInterval(() => {
-        this.date = Date.now();
-        this.connectionStatus = this.aplicationService.connectionStatus();
-      }, 5000)
+    if (this.electronService.isElectron()) {
+      this.startApp();
     }
+    setInterval(() => {
+      this.date = Date.now();
+      this.connectionStatus = this.aplicationService.connectionStatus();
+    }, 5000)
   }
 
   startApp() {
-    let activationStatus = localStorage['ActivationStatus'];
-    if (activationStatus !== undefined) {
-      this.setupFinished = true;
-      this.settingsService.ServerSettings.subscribe(res => {
-        let configrations = res.value;
-        if (configrations.status == 1) {
-          if (configrations.type == 0) {
-            this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
-            this.mainService.syncToServer();
+    this.settingsService.ActivationStatus.subscribe(res => {
+      if (res) {
+        this.setupFinished = true;
+        if (this.setupFinished) {
+          if (res.value) {
+            this.settingsService.DateSettings.subscribe(res => {
+              if (new Date().getDay() !== res.value.day) {
+                if (res.value.started) {
+                  alert('Gün Sonu Yapılmamış.');
+                } else {
+                  alert('Gün Başlangıcı Yapmalısınız.');
+                }
+              }
+            });
+            this.settingsService.ServerSettings.subscribe(res => {
+              let configrations = res.value;
+              if (configrations.status == 1) {
+                if (configrations.type == 0) {
+                  this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
+                  this.mainService.syncToServer();
+                }
+              }
+              this.mainService.syncToRemote();
+            });
+          } else {
+            this.router.navigate(['/activation']);
           }
         }
-        this.mainService.syncToRemote();
-      })
-    } else {
-      this.router.navigate(['/setup']);
-    }
+      } else {
+        this.router.navigate(['/setup']);
+      }
+    });
   }
 
   resetTimer() {

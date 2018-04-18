@@ -58,13 +58,14 @@ export class SellingScreenComponent implements OnInit {
   askForPrint: boolean;
   productSpecs: Array<ProductSpecs>;
   permissions: Object;
+  day: number;
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
-  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settings: SettingsService, private logService: LogService) {
-    this.owner = this.settings.getUser('name');
-    this.ownerRole = this.settings.getUser('type');
-    this.ownerId = this.settings.getUser('id');
+  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settingsService: SettingsService, private logService: LogService) {
+    this.owner = this.settingsService.getUser('name');
+    this.ownerRole = this.settingsService.getUser('type');
+    this.ownerId = this.settingsService.getUser('id');
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "◂"]];
     this.route.params.subscribe(params => {
       this.id = params['id'];
@@ -81,8 +82,11 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     });
+    this.settingsService.DateSettings.subscribe(res => {
+      this.day = res.value.day;
+    });
     this.permissions = JSON.parse(localStorage['userPermissions']);
-    this.settings.getPrinters().subscribe(res => this.printers = res.value);
+    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
   }
 
   ngOnInit() {
@@ -344,9 +348,9 @@ export class SellingScreenComponent implements OnInit {
             this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
               this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
                 doc.count++;
-                doc.weekly_count[this.settings.getDay().day]++;
+                doc.weekly_count[this.day]++;
                 doc.amount += obj.amount;
-                doc.weekly[this.settings.getDay().day] += obj.amount;
+                doc.weekly[this.day] += obj.amount;
                 doc.update_time = Date.now();
                 return doc;
               });
@@ -440,9 +444,9 @@ export class SellingScreenComponent implements OnInit {
       let doc = res.docs[0]
       doc.amount += pricesTotal;
       doc.count++;
-      doc.weekly[this.settings.getDay().day] += pricesTotal;
-      doc.weekly_count[this.settings.getDay().day]++;
-      if (doc.weekly_count[this.settings.getDay().day] == 100) {
+      doc.weekly[this.day] += pricesTotal;
+      doc.weekly_count[this.day]++;
+      if (doc.weekly_count[this.day] == 100) {
         this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
       }
       doc.update_time = Date.now();
@@ -458,8 +462,8 @@ export class SellingScreenComponent implements OnInit {
           doc.count += obj.count;
           doc.amount += obj.total;
           doc.update_time = Date.now();
-          doc.weekly[this.settings.getDay().day] += obj.total;
-          doc.weekly_count[this.settings.getDay().day] += obj.count;
+          doc.weekly[this.day] += obj.total;
+          doc.weekly_count[this.day] += obj.count;
           return doc;
         });
       });
@@ -701,7 +705,7 @@ export class SellingScreenComponent implements OnInit {
     this.mainService.getAllBy('floors', {}).then(res => {
       this.floors = res.docs;
     });
-    this.settings.getAppSettings().subscribe((res: any) => {
+    this.settingsService.getAppSettings().subscribe((res: any) => {
       if (res.value.ask_print_order == 'Sor') {
         this.askForPrint = true;
       } else {

@@ -63,7 +63,9 @@ export class SettingsService {
 
   setLocalStorage() {
     this.DateSettings.subscribe(res => {
-      localStorage.setItem('DayStatus', JSON.stringify(res.value));
+      if (res) {
+        localStorage.setItem('DayStatus', JSON.stringify(res.value));
+      }
     });
   }
 

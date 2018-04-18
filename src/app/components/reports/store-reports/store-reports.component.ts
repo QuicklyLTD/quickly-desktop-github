@@ -26,13 +26,17 @@ export class StoreReportsComponent implements OnInit {
   FastTotal: number = 0;
   printers: Array<any>;
   sellingLogs: Array<Log>;
+  day: number;
   @ViewChild('checkEdit') editForm: NgForm;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService, private messageService: MessageService, private logService: LogService) {
-    this.fillData();
+    this.settingsService.DateSettings.subscribe(res => {
+      this.day = res.value.day;
+    });
     this.settingsService.getPrinters().subscribe(res => {
       this.printers = res.value;
     });
+    this.fillData();
   }
 
   ngOnInit() {
@@ -96,16 +100,16 @@ export class StoreReportsComponent implements OnInit {
       this.mainService.getAllBy('reports', { connection_id: this.checkDetail.payment_method }).then(res => {
         let docReport = res.docs[0];
         this.mainService.changeData('reports', docReport._id, (doc) => {
-          doc.weekly[this.settingsService.getDay().day] -= this.checkDetail.total_price;
-          doc.weekly_count[this.settingsService.getDay().day]--
+          doc.weekly[this.day] -= this.checkDetail.total_price;
+          doc.weekly_count[this.day]--
           return doc;
         });
       });
       this.mainService.getAllBy('reports', { connection_id: Form.payment_method }).then(res => {
         let docReport = res.docs[0];
         this.mainService.changeData('reports', docReport._id, (doc) => {
-          doc.weekly[this.settingsService.getDay().day] += Form.total_price;
-          doc.weekly_count[this.settingsService.getDay().day]++
+          doc.weekly[this.day] += Form.total_price;
+          doc.weekly_count[this.day]++
           return doc;
         });
       });
@@ -119,8 +123,8 @@ export class StoreReportsComponent implements OnInit {
         this.mainService.getAllBy('reports', { connection_id: this.checkDetail.payment_method }).then(res => {
           let docReport = res.docs[0];
           this.mainService.changeData('reports', docReport._id, (doc) => {
-            doc.weekly[this.settingsService.getDay().day] -= this.checkDetail.total_price;
-            doc.weekly[this.settingsService.getDay().day] += Form.total_price;
+            doc.weekly[this.day] -= this.checkDetail.total_price;
+            doc.weekly[this.day] += Form.total_price;
             return doc;
           });
         });

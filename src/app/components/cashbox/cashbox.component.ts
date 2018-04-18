@@ -10,7 +10,8 @@ import { LogService, logType } from '../../services/log.service';
 @Component({
   selector: 'app-cashbox',
   templateUrl: './cashbox.component.html',
-  styleUrls: ['./cashbox.component.scss']
+  styleUrls: ['./cashbox.component.scss'],
+  providers: [SettingsService]
 })
 export class CashboxComponent implements OnInit {
   cashboxData: Array<Cashbox>;
@@ -26,13 +27,15 @@ export class CashboxComponent implements OnInit {
   @ViewChild('cashboxForm') cashboxForm: NgForm;
 
   constructor(private mainService: MainService, private settingsService: SettingsService, private messageService: MessageService, private logService: LogService) {
-    this.day = this.settingsService.getDay().day;
     this.user = this.settingsService.getUser('name');
     this.sellingIncomes = 0;
-    this.fillData();
+    this.settingsService.DateSettings.subscribe(res => {
+      this.day = res.value.day;
+    });
   }
 
   ngOnInit() {
+    this.fillData();
     this.onUpdate = false;
   }
 

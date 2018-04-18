@@ -42,15 +42,19 @@ export class PaymentScreenComponent implements OnInit {
   askForPrint: boolean;
   onClosing: boolean;
   permissions: Object;
+  day: number;
   @ViewChild('discountInput') discountInput: ElementRef;
 
-  constructor(private route: ActivatedRoute, private router: Router, private settings: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
+  constructor(private route: ActivatedRoute, private router: Router, private settingsService: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.fillData();
     });
     this.permissions = JSON.parse(localStorage['userPermissions']);
-    this.settings.getPrinters().subscribe(res => this.printers = res.value);
+    this.settingsService.DateSettings.subscribe(res => {
+      this.day = res.value.day;
+    })
+    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
   }
 
   ngOnInit() {
@@ -59,8 +63,8 @@ export class PaymentScreenComponent implements OnInit {
     this.setDefault();
     this.payedShow = false;
     this.payedTitle = 'Alınan Ödemeleri Göster';
-    this.userId = this.settings.getUser('id');
-    this.userName = this.settings.getUser('name');
+    this.userId = this.settingsService.getUser('id');
+    this.userName = this.settingsService.getUser('name');
     this.onClosing = false;
   }
 
@@ -325,9 +329,9 @@ export class PaymentScreenComponent implements OnInit {
         if (res.docs.length > 0) {
           let doc = res.docs[0];
           doc.count++;
-          doc.weekly_count[this.settings.getDay().day]++;
+          doc.weekly_count[this.day]++;
           doc.amount += this.currentAmount;
-          doc.weekly[this.settings.getDay().day] += this.currentAmount;
+          doc.weekly[this.day] += this.currentAmount;
           doc.update_time = Date.now();
           this.mainService.updateData('reports', doc._id, doc);
         }
@@ -337,9 +341,9 @@ export class PaymentScreenComponent implements OnInit {
         this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
           this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
             doc.count++;
-            doc.weekly_count[this.settings.getDay().day]++;
+            doc.weekly_count[this.day]++;
             doc.amount += obj.amount;
-            doc.weekly[this.settings.getDay().day] += obj.amount;
+            doc.weekly[this.day] += obj.amount;
             doc.update_time = Date.now();
             return doc;
           });
@@ -371,8 +375,8 @@ export class PaymentScreenComponent implements OnInit {
       report.count++;
       report.amount += this.currentAmount;
       report.update_time = Date.now();
-      report.weekly[this.settings.getDay().day] += this.currentAmount;
-      report.weekly_count[this.settings.getDay().day]++;
+      report.weekly[this.day] += this.currentAmount;
+      report.weekly_count[this.day]++;
       this.mainService.updateData('reports', report._id, report);
     });
   }
@@ -395,7 +399,7 @@ export class PaymentScreenComponent implements OnInit {
       this.check.products = this.check.products.filter(obj => obj.status == 2);
     });
     this.mainService.getAllBy('tables', {}).then(res => { this.tables_count = res.docs.length; });
-    this.settings.getAppSettings().subscribe((res: any) => {
+    this.settingsService.getAppSettings().subscribe((res: any) => {
       if (res.value.ask_print_check == 'Sor') {
         this.askForPrint = true;
       } else {
