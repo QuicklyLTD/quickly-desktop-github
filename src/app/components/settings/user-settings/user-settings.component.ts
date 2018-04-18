@@ -67,7 +67,7 @@ export class UserSettingsComponent implements OnInit {
       this.messageService.sendMessage('Grup Adı Girmek Zorundasınız.');
       return false;
     }
-    let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false));
+    let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false));
     let schema = new UserGroup(form.name, form.description, userAuth, 1, Date.now());
     this.mainService.getAllBy('users_group', { name: form.name }).then(result => {
       if (result.docs.length > 0 && result.docs[0].name == form.name) {
@@ -89,7 +89,7 @@ export class UserSettingsComponent implements OnInit {
       if (result.docs.length > 0 && result.docs[0].name != form.name) {
         this.messageService.sendMessage('Belirtilen Grup İsmi Kullanılmaktadır..');
       } else {
-        let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false))
+        let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false))
         let schema = new UserGroup(form.name, form.description, userAuth, 1, Date.now(), form._id, form._rev);
         this.mainService.updateData('users_group', form._id, schema).then(() => {
           this.messageService.sendMessage('Grup Bilgileri Güncellendi!');
@@ -147,7 +147,7 @@ export class UserSettingsComponent implements OnInit {
             let schema = new User(form.name, role, form.role_id, form.pincode, 1, Date.now());
             this.mainService.addData('users', schema).then((response) => {
               this.mainService.addData('reports', new Report('User', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
-                this.logService.createLog(logType.USER_CREATED,res.id,`${form.name} Adlı Kullanıcı Oluşturuldu`);
+                this.logService.createLog(logType.USER_CREATED, res.id, `${form.name} Adlı Kullanıcı Oluşturuldu`);
               });
               this.messageService.sendMessage('Kullanıcı Oluşturuldu!');
               this.fillData();
@@ -163,7 +163,7 @@ export class UserSettingsComponent implements OnInit {
           this.messageService.sendMessage('Bu giriş kodu ile başka bir kullanıcı kayıtlı. Lütfen başka bir giriş kodu deneyin.');
         } else {
           this.mainService.updateData('users', form._id, form).then((res) => {
-            this.logService.createLog(logType.USER_UPDATED,res.id,`${form.name} Adlı Kullanıcı Güncellendi`);
+            this.logService.createLog(logType.USER_UPDATED, res.id, `${form.name} Adlı Kullanıcı Güncellendi`);
             this.messageService.sendMessage('Bilgiler Güncellendi!');
             this.fillData();
             userForm.reset();
@@ -188,7 +188,7 @@ export class UserSettingsComponent implements OnInit {
     let isOk = confirm('Kulanıcıyı Silmek Üzerisiniz. Bu işlem Geri Alınamaz.');
     if (isOk) {
       this.mainService.removeData('users', id).then((result) => {
-        this.logService.createLog(logType.USER_DELETED,result.id,`${this.userForm.value.name} Adlı Kullanıcı Silindi`);
+        this.logService.createLog(logType.USER_DELETED, result.id, `${this.userForm.value.name} Adlı Kullanıcı Silindi`);
         this.mainService.getAllBy('reports', { connection_id: result.id }).then(res => {
           this.mainService.removeData('reports', res.docs[0]._id);
         });

@@ -26,15 +26,16 @@ export class UserAuth {
     public components: ComponentsAuth,
     public cancelCheck: boolean,
     public cancelProduct: boolean,
-    public discount: boolean
+    public discount: boolean,
+    public payment: boolean
   ) { }
 }
 export class ComponentsAuth {
   constructor(
-    public store:boolean,
-    public cashbox:boolean,
-    public endoftheday:boolean,
-    public reports:boolean,
-    public settings:boolean
+    public store: boolean,
+    public cashbox: boolean,
+    public endoftheday: boolean,
+    public reports: boolean,
+    public settings: boolean
   ) { }
 }
