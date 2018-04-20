@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MainService } from '../../services/main.service';
+import { Settings } from '../../mocks/settings.mock';
 import { HttpService } from '../../services/http.service';
 
 @Component({
@@ -133,28 +134,32 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
-    this.mainService.getAllBy('products', {}).then(res => {
-      const products = res.docs;
-      products.forEach(element => {
-        this.mainService.updateData('products', element._id, { type: 1 }).then(res => {
-          console.log('Products', res.ok);
-        });
-      });
-    });
-    this.mainService.getAllBy('categories', {}).then(res => {
-      const categories = res.docs;
-      categories.forEach(element => {
-        this.mainService.updateData('categories', element._id, { tags: '' }).then(res => {
-          console.log('Categories', res.ok);
-        });
-      });
-    });
-    this.mainService.getAllBy('settings', { key: "AppSettings" }).then(res => {
-      const appSettings = res.docs[0];
-      this.mainService.updateData('settings', appSettings._id, { last_day: 0 }).then(res => {
-        console.log('Settings', res.ok);
-      });
-    });
+    // this.mainService.getAllBy('products', {}).then(res => {
+    //   const products = res.docs;
+    //   products.forEach(element => {
+    //     this.mainService.updateData('products', element._id, { type: 1 }).then(res => {
+    //       console.log('Products', res.ok);
+    //     });
+    //   });
+    // });
+    // this.mainService.getAllBy('categories', {}).then(res => {
+    //   const categories = res.docs;
+    //   categories.forEach(element => {
+    //     this.mainService.updateData('categories', element._id, { tags: '' }).then(res => {
+    //       console.log('Categories', res.ok);
+    //     });
+    //   });
+    // });
+    // this.mainService.getAllBy('settings', { key: "AppSettings" }).then(res => {
+    //   const appSettings = res.docs[0];
+    //   this.mainService.updateData('settings', appSettings._id, { last_day: 0 }).then(res => {
+    //     console.log('Settings', res.ok);
+    //   });
+    // });
+    let dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() }, 'Tarih-Zaman Ayarları', Date.now());
+    let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: '192.168.0.1', ip_port: 3000, key: 'test' }, 'Sunucu Ayarları', Date.now());
+    this.mainService.addData('settings', serverSettings);
+    this.mainService.addData('settings', dateSettings);
   }
 
   testEndDay() {
