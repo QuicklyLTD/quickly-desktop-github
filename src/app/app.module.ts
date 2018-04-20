@@ -8,6 +8,7 @@ import { HttpModule } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
 //////  Main Pages Components
 import { AppComponent } from './app.component';
+import { ActivationComponent } from './components/activation/activation.component';
 import { SetupComponent } from './components/setup/setup.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
@@ -100,6 +101,7 @@ import { KeyboardDirective } from './directives/keyboard.directive';
     KeyboardDirective,
     AdminComponent,
     DayDetailComponent,
+    ActivationComponent,
   ],
   imports: [
     BrowserModule,

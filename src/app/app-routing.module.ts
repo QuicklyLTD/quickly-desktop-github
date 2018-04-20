@@ -11,6 +11,7 @@ import { EndofthedayComponent } from './components/endoftheday/endoftheday.compo
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { ActivationComponent } from './components/activation/activation.component';
 import { CanActivateViaAuthGuard, AnonymousCanActivate, SetupFinished, DayStarted } from './guards/auth.guard.service';
 import { AuthService } from "./services/auth.service";
 
@@ -23,6 +24,10 @@ const routes: Routes = [
     path: 'home',
     component: HomeComponent,
     canActivate: [AnonymousCanActivate]
+  },
+  {
+    path: 'activation',
+    component: ActivationComponent
   },
   {
     path: 'store',
@@ -51,12 +56,13 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    component: AdminComponent
+    component: AdminComponent,
+    canActivate: [CanActivateViaAuthGuard]
   },
   {
     path: 'selling-screen/:type/:id',
     component: SellingScreenComponent,
-    canActivate: [CanActivateViaAuthGuard , DayStarted]
+    canActivate: [CanActivateViaAuthGuard, DayStarted]
   },
   {
     path: 'payment/:id',
