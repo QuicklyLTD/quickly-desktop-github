@@ -193,13 +193,6 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div *ngIf="productSpecs?.length > 0" class="modal-body">
-        <div class="row">
-          <div *ngFor="let spec of productSpecs" class="col">
-            <button class="btn btn-warning btn-lg btn-block" (click)="changeSpecs(spec)">{{spec.spec_name}} {{spec.spec_price}} TL</button>
-          </div>
-        </div>
-      </div>
       <form #noteForm="ngForm" (ngSubmit)="addNote(noteForm)">
         <div class="modal-body">
           <div class="form-group">
@@ -214,6 +207,27 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="specsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">{{selectedProduct?.name}}
+          </h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div *ngIf="productSpecs?.length > 0" class="modal-body">
+          <div class="row">
+            <div *ngFor="let spec of productSpecs" class="col pr-2 pl-2">
+              <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="changeSpecs(spec)">{{spec.spec_name}} <small>{{spec.spec_price}} TL</small></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <div class="modal fade" id="checkNote" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">

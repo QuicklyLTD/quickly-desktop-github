@@ -150,7 +150,7 @@ export class SellingScreenComponent implements OnInit {
         this.selectedIndex = this.check.products.length - 1;
         this.selectedProduct = this.check.products[this.selectedIndex];
         this.getSpecies(newProduct);
-        $('#noteModal').modal('show');
+        $('#specsModal').modal('show');
       }
     }
   }
@@ -272,10 +272,10 @@ export class SellingScreenComponent implements OnInit {
 
   changeSpecs(spec) {
     const oldPrice = this.selectedProduct.price;
-    this.selectedProduct.note = spec.spec_name;
+    this.selectedProduct.name = this.selectedProduct.name + ' ' + spec.spec_name;
     this.selectedProduct.price = spec.spec_price;
     this.check.total_price = (this.check.total_price - oldPrice) + spec.spec_price;
-    $('#noteModal').modal('hide');
+    $('#specsModal').modal('hide');
   }
 
   addNote(form: NgForm) {
