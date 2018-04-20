@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
     setInterval(() => {
       this.date = Date.now();
       this.connectionStatus = this.aplicationService.connectionStatus();
-    }, 5000)
+    }, 5000);
   }
 
   startApp() {
@@ -58,11 +58,22 @@ export class AppComponent implements OnInit {
                 if (configrations.type == 0) {
                   this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
                   this.mainService.syncToServer();
+                } else if (configrations.type == 1) {
+                  this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', change => {
+                    this.router.navigate(['/endoftheday']).then(res => {
+                      $('#endDayModal').modal('show');
+                      setTimeout(() => {
+                        this.electronService.shellCommand('shutdown now');
+                      }, 10000)
+                    });
+                  });
                 }
               }
               this.mainService.syncToRemote();
             });
           } else {
+            console.log('Aktif Değil');
+            this.setupFinished = false;
             this.router.navigate(['/activation']);
           }
         }

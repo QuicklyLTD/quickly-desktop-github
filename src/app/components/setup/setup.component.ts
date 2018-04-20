@@ -62,8 +62,8 @@ export class SetupComponent implements OnInit {
           })
           .on('complete', info => {
             this.mainService.syncToLocal().then(res => {
-              this.statusMessage = 'Kurulum Tamamlandı !'
               if (res) {
+                this.statusMessage = 'Kurulum Tamamlandı !'
                 setTimeout(() => {
                   this.electron.relaunchProgram();
                 }, 5000)

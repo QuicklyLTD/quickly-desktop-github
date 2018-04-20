@@ -63,7 +63,7 @@ export class EndofthedayComponent implements OnInit {
       this.messageService.sendMessage('Gün Sonu Yapmalısınız!');
       return false;
     } else {
-      localStorage.setItem('DayStatus', '{"started":true, "day":' + new Date().getDay() + ', "time": ' + Date.now() + '}');
+      let dateData = { started: true, day: new Date().getDay(), time: Date.now() };
       this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
         res.docs.forEach(element => {
           this.mainService.changeData('reports', element._id, (doc) => {
@@ -74,7 +74,7 @@ export class EndofthedayComponent implements OnInit {
           });
         });
       });
-      this.messageService.sendMessage('Gün Başlatıldı.');
+      this.messageService.sendMessage('Gün Başlatıldı. Program Yeniden Başlatılıyor..');
       if (this.day == 1) {
         this.mainService.getAllBy('reports', {}).then(res => {
           let reports = res.docs.filter(obj => obj.type !== 'Activity');
@@ -86,10 +86,13 @@ export class EndofthedayComponent implements OnInit {
             });
           });
         });
-        localStorage.setItem('WeekStatus', '{"started": true, "time": ' + Date.now() + '}');
       }
-      this.isStarted = true;
-      this.electronService.reloadProgram();
+      this.settingsService.setAppSettings('DateSettings', dateData).then(res => {
+        this.isStarted = true;
+        setTimeout(() => {
+          this.electronService.reloadProgram();
+        },5000)
+      })
     }
   }
 
@@ -230,7 +233,9 @@ export class EndofthedayComponent implements OnInit {
     this.mainService.addData('endday', this.endDayReport).then(res => {
       this.electronService.backupData(this.backupData, this.endDayReport.time);
       this.printerService.printReport(this.printers[0], this.endDayReport);
-      localStorage.setItem('DayStatus', '{"started":false, "day":' + this.day + ', "time": ' + Date.now() + '}');
+      let dateData = { started: false, day: this.day, time: Date.now() };
+      this.settingsService.setAppSettings('DateSettings', dateData);
+      localStorage.setItem('DayStatus', JSON.stringify(dateData));
       this.fillData();
       this.isStarted = false;
       setTimeout(() => {
