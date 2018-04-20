@@ -104,7 +104,7 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .text(line);
           for (let prop in check.products) {
             if (check.products[prop].status !== 3) {
-              let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name + (check.products[prop].note != '' ? ' (' + check.products[prop].note + ') ' : ''), check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price >= 100 ? check.products[prop].total_price : (check.products[prop].total_price >= 10 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
+              let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
               printer.text(text, '857');
             }
           }
