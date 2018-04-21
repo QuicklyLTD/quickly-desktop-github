@@ -220,7 +220,7 @@
               </tbody>
             </table>
             <section *ngIf="checkDetail?.payment_method == 'Parçalı'">
-              <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm table-striped mb-0">
+              <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm table-bordered table-striped mb-0">
                 <thead class="thead-inverse">
                   <th>#</th>
                   <th>{{item.owner}}</th>
