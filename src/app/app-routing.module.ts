@@ -57,7 +57,6 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminComponent,
-    canActivate: [CanActivateViaAuthGuard]
   },
   {
     path: 'selling-screen/:type/:id',
