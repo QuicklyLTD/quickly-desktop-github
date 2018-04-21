@@ -27,6 +27,7 @@ export class StoreReportsComponent implements OnInit {
   printers: Array<any>;
   sellingLogs: Array<Log>;
   day: number;
+  permissions: Object;
   @ViewChild('checkEdit') editForm: NgForm;
 
   constructor(private mainService: MainService, private printerService: PrinterService, private settingsService: SettingsService, private messageService: MessageService, private logService: LogService) {
@@ -37,9 +38,11 @@ export class StoreReportsComponent implements OnInit {
       this.printers = res.value;
     });
     this.fillData();
+
   }
 
   ngOnInit() {
+    this.permissions = JSON.parse(localStorage['userPermissions']);
   }
 
   getDetail(check) {

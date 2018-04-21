@@ -351,7 +351,7 @@
         </div>
       </div>
       <div class="modal-footer pr-2 text-center">
-        <button *ngIf="checkDetail?.type !== 3" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">
+        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">
           <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
         <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
           <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>

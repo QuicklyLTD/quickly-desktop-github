@@ -127,7 +127,7 @@ export class SetupComponent implements OnInit {
 
   makeAdmin(adminForm: NgForm) {
     let Form = adminForm.value;
-    let userAuth = new UserAuth(new ComponentsAuth(true, true, true, true, true), true, true, true, true);
+    let userAuth = new UserAuth(new ComponentsAuth(true, true, true, true, true), true, true, true, true, true);
     this.mainService.addData('users_group', new UserGroup('Yönetici', 'Yönetici Grubu', userAuth, 1, Date.now())).then(res => {
       this.mainService.addData('users', new User(Form.admin_name, 'Yönetici', res.id, parseInt(Form.admin_pass), 1, Date.now())).then((user) => {
         this.mainService.addData('reports', new Report('User', user.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], user.name, Date.now()));

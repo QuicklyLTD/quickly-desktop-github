@@ -69,12 +69,6 @@
                         <input type="text" name="description" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
-                    <div class="form-group mb-2">
-                      <div class="input-group">
-                        <div class="input-group-addon">Grup İzinleri</div>
-                        <input type="text" disabled class="form-control form-control-lg" />
-                      </div>
-                    </div>
                     <h5 class="mt-4">Erişim Hakları</h5>
                     <table class="table table-bordered text-center mb-0">
                       <thead>
@@ -84,7 +78,6 @@
                           <th class="text-center">Gün Sonu</th>
                           <th class="text-center">Raporlar</th>
                           <th class="text-center">Ayarlar</th>
-                          <th class="text-center">İptal</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -104,8 +97,36 @@
                           <td>
                             <input type="checkbox" name="settings" class="form-control" ngModel/>
                           </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <h5 class="mt-3">Grup İzinleri</h5>
+                    <table class="table table-bordered text-center">
+                      <thead>
+                        <tr>
+                          <th width="20%" class="text-center">Hesap İptal</th>
+                          <th width="20%" class="text-center">Ürün İptal</th>
+                          <th width="20%" class="text-center">Ödeme</th>
+                          <th width="20%" class="text-center">İndirim</th>
+                          <th width="20%" class="text-center">Gün Sonu</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="text-center">
                           <td>
-                            <input type="checkbox" name="cancel" class="form-control" ngModel/>
+                            <input type="checkbox" name="cancelCheck" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="cancelProduct" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="payment" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="discount" class="form-control" ngModel/>
+                          </td>
+                          <td>
+                            <input type="checkbox" name="end" class="form-control" ngModel/>
                           </td>
                         </tr>
                       </tbody>
@@ -158,7 +179,7 @@
               <div class="card-block p-0 flow">
                 <div class="list-group">
                   <button (click)="getUsersByGroup(null)" type="button" class="list-group-item list-group-item-action">Bütün Kullanıcılar</button>
-                  <button *ngFor="let item of groups"  (click)="getUsersByGroup(item._id)" type="button" class="list-group-item list-group-item-action">
+                  <button *ngFor="let item of groups" (click)="getUsersByGroup(item._id)" type="button" class="list-group-item list-group-item-action">
                     {{item.name}}
                   </button>
                 </div>
@@ -261,7 +282,7 @@
               <input type="text" name="description" class="form-control form-control-lg" ngModel/>
             </div>
           </div>
-          <h5 class="mt-3">Erişim Hakları</h5>
+          <h5 class="mt-3">Bölüm Erişim Hakları</h5>
           <table class="table table-bordered text-center">
             <thead>
               <tr>
@@ -270,7 +291,6 @@
                 <th width="20%" class="text-center">Gün Sonu</th>
                 <th width="20%" class="text-center">Raporlar</th>
                 <th width="20%" class="text-center">Ayarlar</th>
-                <!-- <th class="text-center">İptal</th> -->
               </tr>
             </thead>
             <tbody>
@@ -290,10 +310,37 @@
                 <td>
                   <input type="checkbox" name="settings" class="form-control" ngModel/>
                 </td>
-                <input type="hidden" name="cancel" ngModel/>
-                <!-- <td>
-                  <input type="checkbox" name="cancel" class="form-control" ngModel/>
-                </td> -->
+              </tr>
+            </tbody>
+          </table>
+          <h5 class="mt-3">Grup İzinleri</h5>
+          <table class="table table-bordered text-center">
+            <thead>
+              <tr>
+                <th width="20%" class="text-center">Hesap İptal</th>
+                <th width="20%" class="text-center">Ürün İptal</th>
+                <th width="20%" class="text-center">Ödeme</th>
+                <th width="20%" class="text-center">İndirim</th>
+                <th width="20%" class="text-center">Gün Sonu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center">
+                <td>
+                  <input type="checkbox" name="cancelCheck" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="cancelProduct" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="payment" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="discount" class="form-control" ngModel/>
+                </td>
+                <td>
+                  <input type="checkbox" name="end" class="form-control" ngModel/>
+                </td>
               </tr>
             </tbody>
           </table>

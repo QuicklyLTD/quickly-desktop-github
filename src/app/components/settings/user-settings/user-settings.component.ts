@@ -43,7 +43,8 @@ export class UserSettingsComponent implements OnInit {
     this.selectedGroup = id;
     this.mainService.getData('users_group', id).then(res => {
       res = Object.assign(res, res.auth.components);
-      res.cancel = (res.auth.cancelProduct && res.auth.cancelCheck && res.auth.discount) ? true : false;
+      delete res.auth.components;
+      res = Object.assign(res, res.auth);
       delete res.auth;
       this.groupDetailForm.setValue(res);
     });
@@ -67,7 +68,7 @@ export class UserSettingsComponent implements OnInit {
       this.messageService.sendMessage('Grup Adı Girmek Zorundasınız.');
       return false;
     }
-    let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false));
+    let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), form.cancelCheck, form.cancelProduct, form.discount, form.payment, form.end);
     let schema = new UserGroup(form.name, form.description, userAuth, 1, Date.now());
     this.mainService.getAllBy('users_group', { name: form.name }).then(result => {
       if (result.docs.length > 0 && result.docs[0].name == form.name) {
@@ -89,7 +90,7 @@ export class UserSettingsComponent implements OnInit {
       if (result.docs.length > 0 && result.docs[0].name != form.name) {
         this.messageService.sendMessage('Belirtilen Grup İsmi Kullanılmaktadır..');
       } else {
-        let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false), (form.cancel ? true : false))
+        let userAuth = new UserAuth(new ComponentsAuth(form.store, form.cashbox, form.endoftheday, form.reports, form.settings), form.cancelCheck, form.cancelProduct, form.discount, form.payment, form.end);
         let schema = new UserGroup(form.name, form.description, userAuth, 1, Date.now(), form._id, form._rev);
         this.mainService.updateData('users_group', form._id, schema).then(() => {
           this.messageService.sendMessage('Grup Bilgileri Güncellendi!');

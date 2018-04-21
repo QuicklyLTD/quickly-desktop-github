@@ -27,7 +27,8 @@ export class UserAuth {
     public cancelCheck: boolean,
     public cancelProduct: boolean,
     public discount: boolean,
-    public payment: boolean
+    public payment: boolean,
+    public end: boolean,
   ) { }
 }
 export class ComponentsAuth {
