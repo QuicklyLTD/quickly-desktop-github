@@ -45,7 +45,7 @@ export class EndofthedayComponent implements OnInit {
     this.settingsService.AppSettings.subscribe(res => {
       this.lastDay = res.value.last_day;
     });
-    this.permissions = JSON.parse(localStorage['userPermissions']);
+    this.permissions = JSON.parse(localStorage.getItem('userPermissions'));
   }
 
   ngOnInit() {
@@ -57,9 +57,9 @@ export class EndofthedayComponent implements OnInit {
   }
 
   getDetail(data: EndDay) {
-    if(this.permissions.end){
+    if (this.permissions.end) {
       this.selectedEndDay = data;
-    }else{
+    } else {
       this.messageService.sendMessage('Görüntüleme Yetkiniz Yok')
     }
   }
@@ -121,6 +121,7 @@ export class EndofthedayComponent implements OnInit {
 
   stepChecks() {
     this.mainService.getAllBy('closed_checks', {}).then(res => {
+      this.progress = 'Kapatılan Hesaplar Yedekleniyor...';
       this.checks = res.docs;
       const checksBackup = new BackupData('closed_checks', this.checks);
       this.backupData.push(checksBackup);
@@ -132,7 +133,9 @@ export class EndofthedayComponent implements OnInit {
       }
       this.mainService.localSyncBeforeRemote('closed_checks').on('complete', (info) => {
         console.log('Hesaplar Temizlendi...');
-        this.stepCashbox();
+        this.mainService.compactDB('closed_checks').then(res => {
+          this.stepCashbox();
+        })
       });
       this.checks.forEach((element, index) => {
         this.mainService.removeDoc('closed_checks', element);
@@ -144,12 +147,15 @@ export class EndofthedayComponent implements OnInit {
 
   stepCashbox() {
     this.mainService.getAllBy('cashbox', {}).then(res => {
+      this.progress = 'Kasa Verileri Yedekleniyor...';
       this.cashbox = res.docs;
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
       this.mainService.localSyncBeforeRemote('cashbox').on('complete', (info) => {
         console.log('Kasa Temizlendi..')
-        this.stepReports()
+        this.mainService.compactDB('cashbox').then(res => {
+          this.stepReports();
+        });
       });
       this.cashbox.forEach((element, index) => {
         this.mainService.removeDoc('cashbox', element);
@@ -175,6 +181,7 @@ export class EndofthedayComponent implements OnInit {
 
   stepReports() {
     this.mainService.getAllBy('reports', {}).then(res => {
+      this.progress = 'Raporlar Yedikleniyor...';
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);
       this.backupData.push(reportsBackup);
@@ -195,7 +202,9 @@ export class EndofthedayComponent implements OnInit {
       this.endDayReport.total_income = this.total;
       this.mainService.localSyncBeforeRemote('reports').on('complete', (info) => {
         console.log('Raporlar Temizlendi...');
-        this.stepLogs();
+        this.mainService.compactDB('reports').then(res => {
+          this.stepLogs();
+        })
       });
       activities.forEach(element => {
         this.mainService.changeData('reports', element._id, (doc) => {
@@ -220,12 +229,15 @@ export class EndofthedayComponent implements OnInit {
 
   stepLogs() {
     this.mainService.getAllBy('logs', {}).then(res => {
+      this.progress = 'Kayıtlar Yedikleniyor...';
       this.logs = res.docs;
       const logsBackup = new BackupData('logs', this.logs);
       this.backupData.push(logsBackup);
       this.mainService.localSyncBeforeRemote('logs').on('complete', (info) => {
         console.log('Loglar Temizlendi..');
-        this.stepFinal();
+        this.mainService.compactDB('logs').then(res => {
+          this.stepFinal();
+        });
       });
       this.logs.forEach(element => {
         this.mainService.removeDoc('logs', element);
@@ -237,6 +249,7 @@ export class EndofthedayComponent implements OnInit {
     this.endDayReport.time = Date.now();
     this.endDayReport.data_file = this.endDayReport.time + '.qdat';
     this.mainService.addData('endday', this.endDayReport).then(res => {
+      this.progress = 'Gün Sonu Tamamlanıyor...';
       this.electronService.backupData(this.backupData, this.endDayReport.time);
       this.printerService.printReport(this.printers[0], this.endDayReport);
       let dateData = { started: false, day: this.day, time: Date.now() };
@@ -244,11 +257,13 @@ export class EndofthedayComponent implements OnInit {
       localStorage.setItem('DayStatus', JSON.stringify(dateData));
       this.fillData();
       this.isStarted = false;
-      setTimeout(() => {
-        $('#endDayModal').modal('hide');
-        this.messageService.sendMessage('Gün Sonu Tamamlandı.');
-        this.electronService.reloadProgram();
-      }, 10000);
+      this.mainService.compactDB('allData').then(res => {
+        setTimeout(() => {
+          $('#endDayModal').modal('hide');
+          this.messageService.sendMessage('Gün Sonu Tamamlandı.');
+          this.electronService.reloadProgram();
+        }, 10000);
+      });
     });
   }
 

@@ -50,6 +50,10 @@ const routes: Routes = [
     canActivate: [CanActivateViaAuthGuard]
   },
   {
+    path: 'endoftheday_no_guard',
+    component: EndofthedayComponent,
+  },
+  {
     path: 'settings',
     component: SettingsComponent,
     canActivate: [CanActivateViaAuthGuard]

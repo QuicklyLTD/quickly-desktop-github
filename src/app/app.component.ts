@@ -60,11 +60,11 @@ export class AppComponent implements OnInit {
                   this.mainService.syncToServer();
                 } else if (configrations.type == 1) {
                   this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', change => {
-                    this.router.navigate(['/endoftheday']).then(res => {
+                    this.router.navigate(['/endoftheday_no_guard']).then(res => {
                       $('#endDayModal').modal('show');
                       setTimeout(() => {
                         this.electronService.shellCommand('shutdown now');
-                      }, 10000)
+                      }, 15000)
                     });
                   });
                 }
