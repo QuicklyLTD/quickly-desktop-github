@@ -13,7 +13,7 @@ $fa-font-path: "../node_modules/font-awesome/fonts/";
 	-webkit-user-select: none;
 	-webkit-user-drag: none;
 	-webkit-app-region: no-drag;
-	cursor: default;
+    cursor: default;
 }
 html, body {
    margin: 0;
@@ -29,6 +29,9 @@ app-root {
    position: relative;
    height: 100%;
    width: 100%;
+}
+nav{
+    height: 56px !important;
 }
 .animated {
     -webkit-animation-duration: 0.3s;

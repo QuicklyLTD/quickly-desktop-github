@@ -30,8 +30,8 @@ function createWindow() {
     require('devtron').install();
   }
   win.on('closed', () => {
-      win = null;
-    });
+    win = null;
+  });
 }
 
 try {
