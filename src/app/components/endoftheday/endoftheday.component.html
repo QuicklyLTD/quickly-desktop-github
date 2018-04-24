@@ -22,7 +22,7 @@
               <th width="35%">
                 <i class="fa fa-clock-o" aria-hidden="true"></i> Tarih
               </th>
-              <th width="20%">
+              <th width="20%" *ngIf="permissions.end">
                 <i class="fa fa-turkish-lira" aria-hidden="true"></i> Toplam Satış
               </th>
               <th width="20%">
@@ -37,7 +37,7 @@
             <tr *ngFor="let item of endDayData; let i = index;" (click)="getDetail(item)">
               <td>{{i+1}}</td>
               <td>{{item.time | date:'dd/M/y HH:mm'}}</td>
-              <td>{{item.total_income}} TL</td>
+              <td *ngIf="permissions.end">{{item.total_income}} TL</td>
               <td>{{item.check_count}} Adet</td>
               <td>{{item.owner | general:'users' | async}}</td>
             </tr>

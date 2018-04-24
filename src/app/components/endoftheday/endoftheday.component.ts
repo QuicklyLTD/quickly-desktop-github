@@ -33,6 +33,7 @@ export class EndofthedayComponent implements OnInit {
   selectedEndDay: EndDay;
   lastDay: any;
   progress: string;
+  permissions: any;
 
   constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settingsService: SettingsService) {
     this.settingsService.DateSettings.subscribe(res => {
@@ -44,6 +45,7 @@ export class EndofthedayComponent implements OnInit {
     this.settingsService.AppSettings.subscribe(res => {
       this.lastDay = res.value.last_day;
     });
+    this.permissions = JSON.parse(localStorage['userPermissions']);
   }
 
   ngOnInit() {
@@ -55,7 +57,11 @@ export class EndofthedayComponent implements OnInit {
   }
 
   getDetail(data: EndDay) {
-    this.selectedEndDay = data;
+    if(this.permissions.end){
+      this.selectedEndDay = data;
+    }else{
+      this.messageService.sendMessage('Görüntüleme Yetkiniz Yok')
+    }
   }
 
   startDay() {
@@ -91,7 +97,7 @@ export class EndofthedayComponent implements OnInit {
         this.isStarted = true;
         setTimeout(() => {
           this.electronService.reloadProgram();
-        },5000)
+        }, 5000)
       })
     }
   }
