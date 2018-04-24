@@ -53,12 +53,13 @@ export class SetupComponent implements OnInit {
     let serverSettings = new Settings('ServerSettings', { type: 1, status: 1, ip_address: Form.address, ip_port: parseInt(Form.port), key: Form.key }, 'Sunucu Ayarları', Date.now());
     this.mainService.addData('settings', serverSettings).then(res => {
       if (res.ok) {
+        this.electron.openDevTools();
         this.mainService.replicateDB(serverSettings.value)
           .on('active', () => {
             this.progressBar(5);
           })
           .on('change', (sync) => {
-            console.log(sync);
+            this.statusMessage = `Dökümanlar Senkorinize Ediliyor.. - ${sync.docs_written}`;
           })
           .on('complete', info => {
             this.mainService.syncToLocal().then(res => {

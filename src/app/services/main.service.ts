@@ -210,17 +210,20 @@ export class MainService {
         const docs = res.docs;
         if (docs.length > 0) {
           docs.forEach((element, index) => {
+            console.log(index);
             let db = element.db_name;
-            if (db == 'settings' && element.key == 'ServerSettings') {
-              // Do nothing... 
-            } else {
-              delete element.db_name;
-              delete element.db_seq;
-              delete element._rev;
-              this.LocalDB[db].put(element);
-            }
-            if (docs.length == index + 1) {
-              resolve(true);
+            if (db !== undefined) {
+              if (db == 'settings' && element.key == 'ServerSettings') {
+                // Do nothing... 
+              } else {
+                delete element.db_name;
+                delete element.db_seq;
+                delete element._rev;
+                this.LocalDB[db].put(element);
+              }
+              if (docs.length == index + 1) {
+                resolve(true);
+              }
             }
           });
         } else {
