@@ -570,9 +570,25 @@ export class SellingScreenComponent implements OnInit {
             this.check.total_price -= this.selectedProduct.price;
             this.mainService.updateData('tables', this.selectedTable._id, { status: 2, timestamp: Date.now() }).then(res => {
               if (res.ok) {
-                this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
-                this.setDefault();
-                $('#splitTable').modal('hide');
+                if (this.check.products.length == 0) {
+                  this.mainService.removeData('checks', this.check._id).then(res => {
+                    if (res.ok) {
+                      $('#splitTable').modal('hide');
+                      this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
+                        this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                      });
+                      this.router.navigate(['/store']);
+                    }
+                  });
+                } else {
+                  this.mainService.updateData('checks', this.check._id, this.check).then(res => {
+                    if (res.ok) {
+                      this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                      this.setDefault();
+                      $('#splitTable').modal('hide');
+                    }
+                  });
+                }
               }
             })
           }
@@ -587,14 +603,26 @@ export class SellingScreenComponent implements OnInit {
         this.check.products.splice(this.selectedIndex, 1);
         this.mainService.updateData('checks', otherCheck._id, otherCheck).then(res => {
           if (res.ok) {
-            this.mainService.updateData('checks', this.check._id, this.check).then(res => {
-              if (res.ok) {
-                this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
-                delete this.check._rev;
-                this.setDefault();
-                $('#splitTable').modal('hide');
-              }
-            });
+            if (this.check.products.length == 0) {
+              this.mainService.removeData('checks', this.check._id).then(res => {
+                if (res.ok) {
+                  $('#splitTable').modal('hide');
+                  this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(res => {
+                    this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                  });
+                  this.router.navigate(['/store']);
+                }
+              });
+            } else {
+              this.mainService.updateData('checks', this.check._id, this.check).then(res => {
+                if (res.ok) {
+                  this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                  delete this.check._rev;
+                  this.setDefault();
+                  $('#splitTable').modal('hide');
+                }
+              });
+            }
           }
         });
       });
