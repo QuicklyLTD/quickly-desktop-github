@@ -119,6 +119,15 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  clearDB() {
+    this.mainService.getAllBy(this.selectedDB, {}).then(res => {
+      res.docs.forEach((element, index) => {
+        this.mainService.removeData(this.selectedDB, element._id);
+        console.log(index);
+      });
+    });
+  }
+
   refreshToken() {
     let oldToken = localStorage['AccessToken'];
     this.httpService.post('token/refresh/', { token: oldToken })
