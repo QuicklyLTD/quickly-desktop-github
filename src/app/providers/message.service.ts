@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import swal from 'sweetalert';
 
 @Injectable()
 export class MessageService {
@@ -17,5 +17,13 @@ export class MessageService {
 
       getMessage(): Observable<any> {
             return this.subject.asObservable();
+      }
+
+      sendAlert(header: string, message: string, type: string) {
+            swal(header, message, type, { buttons: { confirm: { text: 'Tamam' } } });
+      }
+
+      sendConfirm(message: string) {
+            return swal(message, { buttons: ["İptal", "Tamam"], });
       }
 }

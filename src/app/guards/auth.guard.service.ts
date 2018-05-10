@@ -4,6 +4,7 @@ import { environment } from '../../environments/index';
 import { AuthService } from '../services/auth.service';
 import { SettingsService } from '../services/settings.service';
 import { Subscription } from 'rxjs/Subscription';
+import { MessageService } from '../providers/message.service';
 
 @Injectable()
 export class CanActivateViaAuthGuard implements CanActivate {
@@ -31,12 +32,12 @@ export class SetupFinished implements CanActivate {
 
 @Injectable()
 export class DayStarted implements CanActivate {
-    constructor(private settings: SettingsService) { }
+    constructor(private settings: SettingsService, private messageService: MessageService) { }
     canActivate() {
         let Status = JSON.parse(localStorage.getItem('DayStatus'));
         let isStarted: boolean = Status.started;
-        if(isStarted == false){
-            alert('Gün Başlangıcı Yapınız.');
+        if (isStarted == false) {
+            this.messageService.sendAlert('Dikkat', 'Lütfen Gün Başlangıcı Yapınız', 'warning');
         }
         return isStarted;
     }
