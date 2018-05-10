@@ -59,6 +59,7 @@
     "pouchdb-upsert": "^2.2.0",
     "raven-js": "^3.22.1",
     "rxjs": "5.5.2",
+    "sweetalert": "^2.1.0",
     "tether": "^1.4.3",
     "zone.js": "^0.8.18"
   },
