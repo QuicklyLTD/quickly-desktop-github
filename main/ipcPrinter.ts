@@ -108,10 +108,28 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               printer.text(text, '857');
             }
           }
-          printer.text(line);
           printer
+            .text(line)
             .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
             .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+            .control('LF');
+          if (check.payment_flow) {
+            printer
+              .text(fitText('Önceden Ödenen Ürünler Toplam:', check.discount + ' TL', 1), '857')
+              .control('LF')
+              .align('lt')
+              .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
+              .text(line);
+            for (let prop in check.payed_products) {
+              if (check.payed_products[prop].status !== 3) {
+                let text = fitText((check.payed_products[prop].count >= 10 ? check.payed_products[prop].count : ' ' + check.payed_products[prop].count) + ' x  ' + check.payed_products[prop].name, check.payed_products[prop].price + ' TL' + '   ' + (check.payed_products[prop].total_price.toString().length > 3 ? check.payed_products[prop].total_price : (check.payed_products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.payed_products[prop].total_price) + ' TL', 1);
+                printer.text(text, '857');
+              }
+            }
+            printer
+              .text(line);
+          }
+          printer
             .align('ct')
             .size(2, 2)
             .control('LF')
@@ -190,7 +208,8 @@ ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
         printer
           .align('lt')
           .size(3, 3)
-          .text('----IPTAL!----', '857')
+          .text('-----IPTAL!-----', '857')
+          .control('LF')
           .size(2, 2)
           .text('Masa No: ' + table, '857')
           .size(1, 1)

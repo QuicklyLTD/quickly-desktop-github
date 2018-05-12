@@ -21,6 +21,11 @@ export class MainService {
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
   /////////////////////////////////
+  // printers: Array<any>;
+  // categories: Array<any>;
+  // tables: Array<any>;
+
+
   constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
@@ -69,6 +74,16 @@ export class MainService {
         }
       }
     });
+
+    // this.getAllBy('settings', { key: 'Printers' }).then(res => {
+    //   this.printers = res.docs[0].value;
+    // });
+    // this.getAllBy('categories', {}).then(res => {
+    //   this.categories = res.docs;
+    // });
+    // this.getAllBy('tables', {}).then(res => {
+    //   this.tables = res.docs;
+    // });
 
   }
 

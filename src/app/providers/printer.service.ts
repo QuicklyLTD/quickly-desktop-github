@@ -43,8 +43,9 @@ export class PrinterService {
 
   printCheck(device, table, check) {
     let ordersArray = [];
+    let payedArray = [];
     check.products.forEach(element => {
-      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
+      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
       if (contains) {
         let index = ordersArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
         ordersArray[index].total_price += element.price;
@@ -54,8 +55,28 @@ export class PrinterService {
         ordersArray.push(schema);
       }
     });
+    if (check.payment_flow) {
+      let payed;
+      if (check.payment_flow.length > 1) {
+        payed = check.payment_flow.reduce((a, b) => a.payed_products.concat(b.payed_products));
+      } else {
+        payed = check.payment_flow[0].payed_products;
+      }
+      payed.forEach(element => {
+        let contains = payedArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
+        if (contains) {
+          let index = payedArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+          payedArray[index].total_price += element.price;
+          payedArray[index].count++;
+        } else {
+          let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
+          payedArray.push(schema);
+        }
+      });
+    }
     let newCheck = Object.assign({}, check);
     newCheck.products = ordersArray;
+    newCheck.payed_products = payedArray;
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, '');
   }
 
