@@ -562,8 +562,6 @@ export class SellingScreenComponent implements OnInit {
     if (this.table.status !== 3) {
       this.printerService.printCheck(this.printers[0], this.table.name, this.check);
       if (this.check.status > 0) {
-        // this.check.status == 2
-        // this.mainService.updateData('checks', this.check_id, this.check);
         if (this.check.type == 1) {
           this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
             this.router.navigate(['store']);
@@ -619,6 +617,7 @@ export class SellingScreenComponent implements OnInit {
                     this.mainService.updateData('checks', this.check._id, this.check).then(res => {
                       if (res.ok) {
                         this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
+                        this.check._rev = res.rev;
                         this.setDefault();
                         $('#splitTable').modal('hide');
                       }
@@ -653,7 +652,7 @@ export class SellingScreenComponent implements OnInit {
               this.mainService.updateData('checks', this.check._id, this.check).then(res => {
                 if (res.ok) {
                   this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
-                  delete this.check._rev;
+                  this.check._rev = res.rev;
                   this.setDefault();
                   $('#splitTable').modal('hide');
                 }
