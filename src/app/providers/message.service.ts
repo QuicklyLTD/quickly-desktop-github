@@ -5,25 +5,55 @@ import swal from 'sweetalert';
 
 @Injectable()
 export class MessageService {
-      private subject = new Subject<any>();
+    private subject = new Subject<any>();
 
-      sendMessage(message: string) {
-            this.subject.next({ text: message });
-            setTimeout(
-                  () => {
-                        this.subject.next();
-                  }, 2000)
-      }
+    sendMessage(message: string) {
+        this.subject.next({ text: message });
+        setTimeout(
+            () => {
+                this.subject.next();
+            }, 2000)
+    }
 
-      getMessage(): Observable<any> {
-            return this.subject.asObservable();
-      }
+    getMessage(): Observable<any> {
+        return this.subject.asObservable();
+    }
 
-      sendAlert(header: string, message: string, type: string) {
-            swal(header, message, type, { buttons: { confirm: { text: 'Tamam' } } });
-      }
+    sendAlert(header: string, message: string, type: string) {
+        swal(header, message, type, {
+            buttons: {
+                confirm: {
+                    text: "Tamam",
+                    value: true,
+                    visible: true,
+                    className: "btn btn-lg btn-success",
+                    buttonsStyling: false,
+                    closeModal: true
+                }
+            }
+        });
+    }
 
-      sendConfirm(message: string) {
-            return swal(message, { buttons: ["İptal", "Tamam"], });
-      }
+    sendConfirm(message: string) {
+        return swal(message, {
+            buttons: {
+                cancel: {
+                    text: "İptal",
+                    value: false,
+                    visible: true,
+                    className: "btn btn-lg btn-danger",
+                    buttonsStyling: false,
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Tamam",
+                    value: true,
+                    visible: true,
+                    className: "btn btn-lg btn-success",
+                    buttonsStyling: false,
+                    closeModal: true
+                }
+            },
+        });
+    }
 }

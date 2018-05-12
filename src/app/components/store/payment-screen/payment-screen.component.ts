@@ -202,15 +202,14 @@ export class PaymentScreenComponent implements OnInit {
         }
       }
     });
-    if (this.check.payment_flow == undefined) {
-      if (this.askForPrint) {
-        let isOK = confirm('Fiş Yazdırılsın mı ?');
+    if (this.askForPrint) {
+      this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
         if (isOK) {
           this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
         }
-      } else {
-        this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
-      }
+      })
+    } else {
+      this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
     }
   }
 
