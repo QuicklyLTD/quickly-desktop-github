@@ -132,7 +132,7 @@ export class EndofthedayComponent implements OnInit {
         console.log('İptal Hesap Bulunamadı..')
       }
       this.mainService.localSyncBeforeRemote('closed_checks').on('complete', (info) => {
-        console.log('Hesaplar Temizlendi...');
+        this.progress = 'Kapatılan Hesaplar Temizlendi...';
         this.mainService.compactDB('closed_checks').then(res => {
           this.stepCashbox();
         })
@@ -152,7 +152,7 @@ export class EndofthedayComponent implements OnInit {
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
       this.mainService.localSyncBeforeRemote('cashbox').on('complete', (info) => {
-        console.log('Kasa Temizlendi..')
+        this.progress = 'Kasa Verileri Temizlendi...';
         this.mainService.compactDB('cashbox').then(res => {
           this.stepReports();
         });
@@ -181,7 +181,7 @@ export class EndofthedayComponent implements OnInit {
 
   stepReports() {
     this.mainService.getAllBy('reports', {}).then(res => {
-      this.progress = 'Raporlar Yedikleniyor...';
+      this.progress = 'Raporlar Yedekleniyor...';
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);
       this.backupData.push(reportsBackup);
@@ -201,7 +201,7 @@ export class EndofthedayComponent implements OnInit {
       this.endDayReport.free_total = freeTotal;
       this.endDayReport.total_income = this.total;
       this.mainService.localSyncBeforeRemote('reports').on('complete', (info) => {
-        console.log('Raporlar Temizlendi...');
+        this.progress = 'Raporlar Temizlendi...';
         this.mainService.compactDB('reports').then(res => {
           this.stepLogs();
         })
@@ -229,12 +229,12 @@ export class EndofthedayComponent implements OnInit {
 
   stepLogs() {
     this.mainService.getAllBy('logs', {}).then(res => {
-      this.progress = 'Kayıtlar Yedikleniyor...';
+      this.progress = 'Kayıtlar Yedekleniyor...';
       this.logs = res.docs;
       const logsBackup = new BackupData('logs', this.logs);
       this.backupData.push(logsBackup);
       this.mainService.localSyncBeforeRemote('logs').on('complete', (info) => {
-        console.log('Loglar Temizlendi..');
+        this.progress = 'Kayıtlar Temizlendi...';
         this.mainService.compactDB('logs').then(res => {
           this.stepFinal();
         });
@@ -248,19 +248,20 @@ export class EndofthedayComponent implements OnInit {
   stepFinal() {
     this.endDayReport.time = Date.now();
     this.endDayReport.data_file = this.endDayReport.time + '.qdat';
-    this.mainService.addData('endday', this.endDayReport).then(res => {
-      this.progress = 'Gün Sonu Tamamlanıyor...';
-      this.electronService.backupData(this.backupData, this.endDayReport.time);
-      this.printerService.printReport(this.printers[0], this.endDayReport);
-      let dateData = { started: false, day: this.day, time: Date.now() };
-      this.settingsService.setAppSettings('DateSettings', dateData);
-      localStorage.setItem('DayStatus', JSON.stringify(dateData));
-      this.fillData();
-      this.isStarted = false;
-      this.mainService.compactDB('allData').then(res => {
+    this.progress = 'Gün Sonu Tamamlanıyor...';
+    this.mainService.compactDB('allData').then(res => {
+      this.mainService.addData('endday', this.endDayReport).then(res => {
+        this.electronService.backupData(this.backupData, this.endDayReport.time);
+        this.printerService.printReport(this.printers[0], this.endDayReport);
+        this.progress = 'Gün Sonu Tamamlandı !';
+        let dateData = { started: false, day: this.day, time: Date.now() };
+        this.settingsService.setAppSettings('DateSettings', dateData);
+        localStorage.setItem('DayStatus', JSON.stringify(dateData));
+        this.fillData();
+        this.isStarted = false;
         setTimeout(() => {
           $('#endDayModal').modal('hide');
-          this.messageService.sendMessage('Gün Sonu Tamamlandı.');
+          this.messageService.sendMessage('10 saniye içinde program yeniden başlatılacak.');
           this.electronService.reloadProgram();
         }, 10000);
       });

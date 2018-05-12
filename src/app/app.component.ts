@@ -16,7 +16,7 @@ import { ApplicationService } from './services/application.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.2.2';
+  version = '1.2.5';
   date: number;
   windowStatus: boolean;
   connectionStatus: boolean;
@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
                       $('#endDayModal').modal('show');
                       setTimeout(() => {
                         this.electronService.shellCommand('shutdown now');
-                      }, 15000)
+                      }, 30000);
                     });
                   });
                 }
