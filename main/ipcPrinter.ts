@@ -99,23 +99,29 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .text('Quickly')
             .text('www.quickly.com.tr')
             .align('lt')
-            .control('LF')
-            .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
-            .text(line);
-          for (let prop in check.products) {
-            if (check.products[prop].status !== 3) {
-              let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
-              printer.text(text, '857');
-            }
-          }
-          printer
-            .text(line)
-            .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
-            .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
             .control('LF');
-          if (check.payment_flow) {
+          if (check.products.length > 0) {
             printer
-              .text(fitText('Önceden Ödenen Ürünler Toplam:', check.discount + ' TL', 1), '857')
+              .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
+              .text(line);
+            for (let prop in check.products) {
+              if (check.products[prop].status !== 3) {
+                let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
+                printer.text(text, '857');
+              }
+            }
+            printer
+              .text(line)
+              .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
+              .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+              .control('LF');
+          }
+          if (check.payment_flow) {
+            if (check.type == 1) {
+              printer
+                .text(fitText('Önceden Ödenen Ürünler Toplam:', check.discount + ' TL', 1), '857');
+            }
+            printer
               .control('LF')
               .align('lt')
               .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
@@ -128,6 +134,13 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             }
             printer
               .text(line);
+
+            if (check.products.length == 0) {
+              printer
+                .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
+                .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+                .control('LF');
+            }
           }
           printer
             .align('ct')

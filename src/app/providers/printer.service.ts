@@ -56,9 +56,13 @@ export class PrinterService {
       }
     });
     if (check.payment_flow) {
-      let payed;
+      let payed = [];
       if (check.payment_flow.length > 1) {
-        payed = check.payment_flow.reduce((a, b) => a.payed_products.concat(b.payed_products));
+        let things = check.payment_flow.map(obj => obj.payed_products);
+        things.forEach(element => {
+          payed = payed.concat(element);
+          console.log(payed);
+        });
       } else {
         payed = check.payment_flow[0].payed_products;
       }
