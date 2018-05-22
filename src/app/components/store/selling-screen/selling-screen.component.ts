@@ -7,7 +7,7 @@ import { Table, Floor } from '../../../mocks/table.mock';
 import { Check, ClosedCheck, PaymentStatus, CheckProduct } from '../../../mocks/check.mock';
 import { Product, Recipe, SubCategory, Category, Ingredient, ProductSpecs } from '../../../mocks/product.mock';
 import { Report, Activity } from '../../../mocks/report.mock';
-import { Printer } from '../../../mocks/settings.mock';
+import { Printer, PaymentMethod } from '../../../mocks/settings.mock';
 import { ElectronService } from '../../../providers/electron.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { SettingsService } from '../../../services/settings.service';
@@ -60,6 +60,7 @@ export class SellingScreenComponent implements OnInit {
   productSpecs: Array<ProductSpecs>;
   permissions: Object;
   day: number;
+  paymentMethods: Array<PaymentMethod>;
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
@@ -67,6 +68,12 @@ export class SellingScreenComponent implements OnInit {
     this.owner = this.settingsService.getUser('name');
     this.ownerRole = this.settingsService.getUser('type');
     this.ownerId = this.settingsService.getUser('id');
+    this.paymentMethods = [
+      new PaymentMethod('Nakit', 'Nakit Ödeme', '#5cb85c', 'fa-money', 1, 1),
+      new PaymentMethod('Kart', 'Kredi veya Banka Kartı', '#f0ad4e', 'fa-credit-card', 2, 1),
+      new PaymentMethod('Kupon', 'İndirim Kuponu veya Yemek Çeki', '#5bc0de', 'fa-bookmark', 3, 1),
+      new PaymentMethod('İkram', 'İkram Hesap', '#c9302c', 'fa-handshake-o', 4, 1)
+    ];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "◂"]];
     this.route.params.subscribe(params => {
       this.id = params['id'];
@@ -242,15 +249,12 @@ export class SellingScreenComponent implements OnInit {
       } else {
         if (this.askForPrint) {
           this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
-            console.log(isOk);
             if (isOk) {
               this.printOrder();
               this.confirmCheck();
             } else {
               this.confirmCheck();
             }
-          }).catch(err => {
-            console.log(err);
           });
         } else {
           this.printOrder();
@@ -272,6 +276,82 @@ export class SellingScreenComponent implements OnInit {
         this.confirmCheck();
       }
     }
+  }
+
+  closeCheck(method: string) {
+    if (this.check.payment_flow) {
+      let lastAmount = 0;
+      let lastProducts = this.check.products.filter(obj => obj.status == 2);
+      lastProducts.forEach(product => {
+        lastAmount += product.price;
+      })
+      let lastPayment = new PaymentStatus(this.owner, method, lastAmount, 0, Date.now(), lastProducts);
+      this.check.payment_flow.push(lastPayment);
+      this.check.products = [];
+      method = 'Parçalı';
+    }
+    $('#closeCheck').modal('hide');
+    let checkWillClose = new ClosedCheck(this.check.table_id, this.check.total_price + this.check.discount, 0, this.check.owner, this.check.note, this.check.status, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow);
+    this.mainService.addData('closed_checks', checkWillClose).then(res => {
+      this.updateSellingReport(method);
+    });
+    if (this.check._id !== undefined) {
+      this.mainService.removeData('checks', this.check._id);
+    }
+    if (this.check.type == 1) {
+      this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+      this.updateTableReport(this.check);
+      this.router.navigate(['/store']);
+    } else {
+      this.router.navigate(['']);
+    }
+    if(this.check.type == 2){
+      this.logService.createLog(logType.CHECK_CLOSED, this.ownerId, `${this.owner}'tarafından ${this.check.table_id} Hesabı ${method} ödeme alınarak kapatıldı.`)
+    }else{
+      this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner}'tarafından ${this.table.name} Masası '${method}' ödeme alınarak kapatıldı.`)
+    }
+    this.message.sendMessage(`Hesap ${this.check.total_price + this.check.discount} TL tutarında ödeme alınarak kapatıldı`)
+  }
+
+  updateSellingReport(method: string) {
+    if (method !== 'Parçalı') {
+      this.mainService.getAllBy('reports', { connection_id: method }).then(res => {
+        if (res.docs.length > 0) {
+          let doc = res.docs[0];
+          doc.count++;
+          doc.weekly_count[this.day]++;
+          doc.amount += this.check.total_price + this.check.discount;
+          doc.weekly[this.day] += this.check.total_price + this.check.discount;
+          doc.update_time = Date.now();
+          this.mainService.updateData('reports', doc._id, doc);
+        }
+      });
+    } else {
+      this.check.payment_flow.forEach((obj, index) => {
+        this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
+          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+            doc.count++;
+            doc.weekly_count[this.day]++;
+            doc.amount += obj.amount;
+            doc.weekly[this.day] += obj.amount;
+            doc.update_time = Date.now();
+            return doc;
+          });
+        });
+      });
+    }
+  }
+
+  updateTableReport(check: Check) {
+    this.mainService.getAllBy('reports', { connection_id: check.table_id }).then(res => {
+      let report = res.docs[0];
+      report.count++;
+      report.amount += this.check.total_price + this.check.discount;
+      report.update_time = Date.now();
+      report.weekly[this.day] += this.check.total_price + this.check.discount;
+      report.weekly_count[this.day]++;
+      this.mainService.updateData('reports', report._id, report);
+    });
   }
 
   togglePayed() {
@@ -403,6 +483,7 @@ export class SellingScreenComponent implements OnInit {
   }
 
   //// 28900848 Protocol DAD
+  //// CODENAME:BELALIM
 
   undoChanges() {
     if (this.selectedProduct) {

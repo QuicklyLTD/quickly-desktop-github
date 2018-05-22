@@ -18,7 +18,6 @@ export class PrinterService {
     this.electron.ipcRenderer.on('error', (event, message) => {
       this.messageService.sendMessage(message);
     });
-    // this.storeInfo = JSON.parse(localStorage['RestaurantInfo']);
   }
 
   printTest(device) {
@@ -61,7 +60,6 @@ export class PrinterService {
         let things = check.payment_flow.map(obj => obj.payed_products);
         things.forEach(element => {
           payed = payed.concat(element);
-          console.log(payed);
         });
       } else {
         payed = check.payment_flow[0].payed_products;

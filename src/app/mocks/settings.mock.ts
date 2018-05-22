@@ -32,3 +32,13 @@ export class Printer {
         public device_port: number,
     ) { }
 }
+export class PaymentMethod {
+    constructor(
+        public name: string,
+        public description: string,
+        public color: string,
+        public icon: string,
+        public type: number,
+        public status: number
+    ) { }
+}

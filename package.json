@@ -109,6 +109,7 @@
     "mkdirp": "0.5.1",
     "npm-run-all": "4.1.1",
     "npx": "9.7.1",
+    "node-sass": "^4.9.0",
     "postcss-loader": "2.0.6",
     "postcss-url": "7.1.2",
     "protractor": "5.1.2",
