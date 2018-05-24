@@ -291,6 +291,7 @@ export class SellingScreenComponent implements OnInit {
       method = 'Parçalı';
     }
     $('#closeCheck').modal('hide');
+    this.updateActivityReport();
     let checkWillClose = new ClosedCheck(this.check.table_id, this.check.total_price + this.check.discount, 0, this.check.owner, this.check.note, this.check.status, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow);
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.updateSellingReport(method);
@@ -305,12 +306,36 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.router.navigate(['']);
     }
-    if(this.check.type == 2){
-      this.logService.createLog(logType.CHECK_CLOSED, this.ownerId, `${this.owner}'tarafından ${this.check.table_id} Hesabı ${method} ödeme alınarak kapatıldı.`)
-    }else{
-      this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner}'tarafından ${this.table.name} Masası '${method}' ödeme alınarak kapatıldı.`)
+    if (this.check.type == 2) {
+      this.logService.createLog(logType.CHECK_CLOSED, this.ownerId, `${this.owner} tarafından ${this.check.table_id} Hesabı ${this.check.total_price} TL ${method} ödeme alınarak kapatıldı.`)
+    } else {
+      this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner} tarafından ${this.table.name} Masası ${this.check.total_price} TL '${method}' ödeme alınarak kapatıldı.`)
     }
-    this.message.sendMessage(`Hesap ${this.check.total_price + this.check.discount} TL tutarında ödeme alınarak kapatıldı`)
+    this.message.sendMessage(`Hesap ${this.check.total_price} TL tutarında ödeme alınarak kapatıldı`);
+  }
+
+  updateActivityReport() {
+    this.mainService.getAllBy('checks', {}).then(res => {
+      let checks_total_amount = 0;
+      let checks_total_count;
+      if (res.docs.length == 0) {
+        checks_total_amount = this.check.total_price;
+        checks_total_count = 1;
+      } else {
+        checks_total_amount = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
+        checks_total_count = res.docs.length;
+      }
+      let activity_value = checks_total_amount / checks_total_count;
+      let activity_count = (checks_total_count * 100) / this.tables.length;
+      this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+        let sellingAct = res.docs[0];
+        let date = new Date();
+        sellingAct.activity.push(Math.round(activity_value));
+        sellingAct.activity_count.push(Math.round(activity_count));
+        sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+        this.mainService.updateData('reports', sellingAct._id, sellingAct);
+      });
+    });
   }
 
   updateSellingReport(method: string) {
@@ -449,7 +474,8 @@ export class SellingScreenComponent implements OnInit {
         });
       } else {
         $('#cancelProduct').modal('hide');
-        let checkToCancel = new ClosedCheck(this.check.table_id, this.check.total_price, 0, this.owner, this.check.note, 3, this.check.products, Date.now(), 3, 'İkram', this.check.payment_flow);
+        let canceledTotalPrice = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
+        let checkToCancel = new ClosedCheck(this.check.table_id, canceledTotalPrice, 0, this.owner, this.check.note, 3, this.check.products, Date.now(), 3, 'İkram', []);
         checkToCancel.description = 'Bütün Ürünler İptal Edildi';
         this.mainService.addData('closed_checks', checkToCancel).then(res => {
           this.message.sendMessage('Hesap İptal Edildi');
