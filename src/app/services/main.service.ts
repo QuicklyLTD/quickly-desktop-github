@@ -228,9 +228,7 @@ export class MainService {
             console.log(index);
             let db = element.db_name;
             if (db !== undefined) {
-              if (db == 'settings' && element.key == 'ServerSettings') {
-                // Do nothing... 
-              } else {
+              if (db !== 'settings' && element.key !== 'ServerSettings') {
                 delete element.db_name;
                 delete element.db_seq;
                 delete element._rev;

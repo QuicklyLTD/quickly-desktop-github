@@ -91,6 +91,9 @@
                             <p class="text-danger mt-2">İkram Hesap Toplam:
                               <span class="pull-right">{{freeTotal}} TL</span>
                             </p>
+                            <p class="text-primary mt-2">İptal Hesap Toplam:
+                              <span class="pull-right">{{canceledTotal}} TL</span>
+                            </p>
                           </strong>
                         </div>
                         <div class="card-footer">
@@ -98,13 +101,13 @@
                             <span class="pull-right">{{activeTotal}} TL</span>
                           </p>
                           <p class="mb-0">Kapalı Hesap Toplam:
-                            <span class="pull-right">{{closedTotal}} TL</span>
+                            <span class="pull-right">{{closedTotal - canceledTotal}} TL</span>
                           </p>
                         </div>
                         <div class="card-footer">
                           <strong>
                             <p class="mb-0">Cari Hesap Toplam:
-                              <span class="pull-right">{{generalTotal}} TL</span>
+                              <span class="pull-right">{{generalTotal - canceledTotal}} TL</span>
                             </p>
                           </strong>
                         </div>

@@ -14,6 +14,7 @@ export class ReportsComponent implements OnInit {
   selected: number;
   closedTotal: number;
   freeTotal: number;
+  canceledTotal: number;
   activeTotal: number;
   generalTotal: number;
   sellingActivity: Activity;
@@ -46,6 +47,7 @@ export class ReportsComponent implements OnInit {
     this.activeTotal = 0;
     this.generalTotal = 0;
     this.freeTotal = 0;
+    this.canceledTotal = 0;
     this.selected = undefined;
     this.ChartLabels = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
     this.ChartColors = [
@@ -88,6 +90,7 @@ export class ReportsComponent implements OnInit {
         this.activeTotal = activeChecks.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
       }
     });
+
     this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
       let report: Array<Report> = res.docs;
       report = report.filter(obj => obj.connection_id !== 'Genel').sort((a, b) => b.connection_id.localeCompare(a.connection_id));
@@ -96,6 +99,7 @@ export class ReportsComponent implements OnInit {
           this.closedTotal += element.weekly[this.day];
         } else {
           this.freeTotal += element.weekly[this.day];
+
         }
         this.pieData.push(element.weekly[this.day]);
         this.pieLabels.push(element.connection_id);
@@ -107,6 +111,12 @@ export class ReportsComponent implements OnInit {
           this.generalTotal = this.closedTotal + this.activeTotal;
         };
       });
+    });
+
+    this.mainService.getAllBy('closed_checks', { type: 3 }).then(res => {
+      if(res.docs.length > 0){
+        this.canceledTotal = res.docs.map((obj) => obj.total_price).reduce((a, b) => a + b);
+      }
     });
   }
 }
