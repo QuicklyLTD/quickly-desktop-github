@@ -24,6 +24,7 @@ export class PaymentScreenComponent implements OnInit {
   userName: string;
   payedShow: boolean;
   payedTitle: string;
+  canceledProducts: Array<CheckProduct>;
   numboard: Array<any>;
   numpad: string;
   isFirstTime: boolean;
@@ -395,6 +396,7 @@ export class PaymentScreenComponent implements OnInit {
         this.check_type = 'Fast';
         this.table = (this.check.note == '' ? 'Hızlı Satış' : this.check.note);
       }
+      this.canceledProducts = this.check.products.filter(obj => obj.status == 3);
       this.check.products = this.check.products.filter(obj => obj.status == 2);
     });
     this.mainService.getAllBy('tables', {}).then(res => { this.tables_count = res.docs.length; });

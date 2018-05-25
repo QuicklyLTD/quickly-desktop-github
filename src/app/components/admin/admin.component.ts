@@ -169,6 +169,9 @@ export class AdminComponent implements OnInit {
     let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: '192.168.0.1', ip_port: 3000, key: 'test' }, 'Sunucu Ayarları', Date.now());
     this.mainService.addData('settings', serverSettings);
     this.mainService.addData('settings', dateSettings);
+
+    // this.mainService.addData('reports', new Report('Store', 'İptal', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'İptal Satış Raporu', Date.now()));
+    
   }
 
   testEndDay() {
