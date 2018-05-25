@@ -97,6 +97,44 @@ export class StoreReportsComponent implements OnInit {
     });
   }
 
+  reOpenCheck(check: ClosedCheck) {
+    let checkWillReOpen;
+    let discount = 0;
+    if (check.payment_flow) {
+      check.payment_flow.forEach(element => {
+        discount += element.amount;
+      });
+      checkWillReOpen = new Check('Hızlı Satış', 0, discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), 2, check.payment_flow);
+    } else {
+      checkWillReOpen = new Check('Hızlı Satış', check.total_price, check.discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), 2, check.payment_flow);
+    }
+    this.mainService.addData('checks', checkWillReOpen).then(res => {
+      this.mainService.removeData('closed_checks', check._id).then(res => {
+        this.fillData();
+        $('#checkDetail').modal('hide');
+        this.messageService.sendAlert('Başarılı !', 'Hesap Geri Açıldı', 'success');
+      });
+    });
+    if (check.payment_method !== 'Parçalı') {
+      this.mainService.getAllBy('reports', { connection_id: check.payment_method }).then(res => {
+        this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+          doc.weekly[this.day] -= check.total_price;
+          doc.weekly_count[this.day]--;
+          return doc;
+        });
+      });
+    } else {
+      check.payment_flow.forEach(element => {
+        this.mainService.getAllBy('reports', { connection_id: element.method }).then(res => {
+          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+            doc.weekly[this.day] -= element.amount;
+            return doc;
+          });
+        });
+      });
+    }
+  }
+
   editCheck(form: NgForm) {
     let Form = form.value;
     if (this.checkDetail.payment_method !== Form.payment_method) {

@@ -351,12 +351,13 @@
         </div>
       </div>
       <div class="modal-footer pr-2 text-center">
-        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">
+        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail"
+          class="btn btn-danger btn-lg">
           <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
         <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
           <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
-        <button *ngIf="checkDetail?.type !== 3" type="button" [disabled]="checkDetail?.payment_method == 'Parçalı'" class="btn btn-success btn-lg mr-1"
-          data-toggle="modal" data-dismiss="modal" data-target="#editCheck">
+        <button *ngIf="checkDetail?.type !== 3" type="button" class="btn btn-success btn-lg mr-1" data-toggle="modal" data-dismiss="modal"
+          data-target="#editCheck">
           <i class="fa fa-edit" aria-hidden="true"></i> Hesap Düzelt</button>
       </div>
     </div>
@@ -390,7 +391,7 @@
 </div>
 
 <div *ngIf="checkDetail" class="modal fade" id="editCheck" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-md" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modelTitleId">Hesap Düzenle</h4>
@@ -399,7 +400,7 @@
         </button>
       </div>
       <form #checkEdit="ngForm" (ngSubmit)="editCheck(checkEdit)">
-        <div class="modal-body">
+        <div *ngIf="!checkDetail?.payment_flow" class="modal-body">
           <div class="form-group">
             <div class="input-group">
               <div class="input-group-addon">Hesap Tutarı</div>
@@ -419,8 +420,34 @@
             </div>
           </div>
         </div>
+        <div *ngIf="checkDetail?.payment_flow" class="modal-body">
+          <div *ngFor="let payment of checkDetail?.payment_flow; let i = index">
+            <h3>{{payment.method}}</h3>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-addon">Hesap Tutarı</div>
+                <input type="number" class="form-control form-control-lg" name="{{i}}-amount" [ngModel]="payment.amount">
+                <div class="input-group-addon normal">TL</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-addon">Hesap Tipi</div>
+                <select name="{{i}}-method" class="form-control form-control-lg" [ngModel]="payment.method">
+                  <option>Nakit</option>
+                  <option>Kart</option>
+                  <option>Kupon</option>
+                  <option>İkram</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="button" (click)="reOpenCheck(checkDetail)" class="btn btn-info btn-lg" data-dismiss="modal">
+            <i class="fa fa-undo"></i>
+            Hesabı Geri Aç</button>
           <button type="submit" class="btn btn-success btn-lg">
             <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
         </div>
