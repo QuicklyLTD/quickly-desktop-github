@@ -270,8 +270,8 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div *ngFor="let reason of cancelReasons" class="col">
-            <button type="button" class="btn btn-lg btn-danger btn-block" (click)="cancelProduct(reason)">{{reason}}</button>
+          <div *ngFor="let reason of cancelReasons" class="col pl-2 pr-2">
+            <button type="button" class="btn btn-lg btn-danger btn-block sellButton text-white" (click)="cancelProduct(reason)">{{reason}}</button>
           </div>
         </div>
       </div>
