@@ -421,26 +421,11 @@
           </div>
         </div>
         <div *ngIf="checkDetail?.payment_flow" class="modal-body">
+          <p>Düzenlemek istediğiniz ödemeyi seçin</p>
           <div *ngFor="let payment of checkDetail?.payment_flow; let i = index">
-            <h3>{{payment.method}}</h3>
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-addon">Hesap Tutarı</div>
-                <input type="number" class="form-control form-control-lg" name="{{i}}-amount" [ngModel]="payment.amount">
-                <div class="input-group-addon normal">TL</div>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-addon">Hesap Tipi</div>
-                <select name="{{i}}-method" class="form-control form-control-lg" [ngModel]="payment.method">
-                  <option>Nakit</option>
-                  <option>Kart</option>
-                  <option>Kupon</option>
-                  <option>İkram</option>
-                </select>
-              </div>
-            </div>
+            <button type="button" class="btn btn-block btn-lg btn-secondary text-left" (click)="editPayment(i)">{{payment.method}}
+              <span class="pull-right">{{payment.amount}} TL</span>
+            </button>
           </div>
         </div>
         <div class="modal-footer">
@@ -448,8 +433,48 @@
           <button type="button" (click)="reOpenCheck(checkDetail)" class="btn btn-info btn-lg" data-dismiss="modal">
             <i class="fa fa-undo"></i>
             Hesabı Geri Aç</button>
-          <button type="submit" class="btn btn-success btn-lg">
+          <button *ngIf="!checkDetail?.payment_flow" type="submit" class="btn btn-success btn-lg">
             <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="paymentDetail" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Ödeme Düzenle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #paymentEdit="ngForm" (ngSubmit)="changePayment(paymentEdit)">
+        <div class="modal-body">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">Ödeme Tutarı</div>
+              <input type="number" class="form-control form-control-lg" name="amount" [ngModel]="selectedPayment?.amount">
+              <div class="input-group-addon normal">TL</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">Ödeme Tipi</div>
+              <select name="method" class="form-control form-control-lg" [ngModel]="selectedPayment?.method">
+                <option>Nakit</option>
+                <option>Kart</option>
+                <option>Kupon</option>
+                <option>İkram</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal" data-toggle="modal" data-target="#editCheck">İptal</button>
+          <button type="submit" class="btn btn-success btn-lg">
+            <i class="fa fa-check"></i> Değiştir</button>
         </div>
       </form>
     </div>

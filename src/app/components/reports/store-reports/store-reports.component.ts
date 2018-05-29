@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MainService } from '../../../services/main.service';
 import { PrinterService } from '../../../providers/printer.service';
-import { ClosedCheck, Check } from '../../../mocks/check.mock';
+import { ClosedCheck, Check, PaymentStatus } from '../../../mocks/check.mock';
 import { SettingsService } from '../../../services/settings.service';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
@@ -22,6 +22,7 @@ export class StoreReportsComponent implements OnInit {
   NotPayedChecks: Array<ClosedCheck>;
   checkDetail: any;
   selectedCat: any;
+  selectedPayment: PaymentStatus;
   NormalTotal: number = 0;
   FastTotal: number = 0;
   printers: Array<any>;
@@ -182,13 +183,37 @@ export class StoreReportsComponent implements OnInit {
   }
 
   cancelCheck(id, note) {
-    let isOK = confirm('Kapanmış Hesap İptal Edilecek. Bu İşlem Geri Alınamaz!');
-    if (isOK) {
-      this.mainService.updateData('closed_checks', id, { description: note, type: 3 }).then(res => {
-        this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price} TL tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`)
-        this.fillData();
-        $('#cancelDetail').modal('hide');
-      });
+    this.messageService.sendConfirm('Kapanmış Hesap İptal Edilecek! Bu işlem geri alınamaz!').then(isOK => {
+      if (isOK) {
+        this.mainService.updateData('closed_checks', id, { description: note, type: 3 }).then(res => {
+          this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price} TL tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`)
+          this.fillData();
+          $('#cancelDetail').modal('hide');
+        });
+      }
+    });
+  }
+
+  editPayment(i: number) {
+    $('#editCheck').modal('hide');
+    this.selectedPayment = this.checkDetail.payment_flow[i];
+    $('#paymentDetail').modal('show');
+  }
+
+  changePayment(paymentDetail: NgForm) {
+    let Form = paymentDetail.value;
+    if(Form.method !== this.selectedPayment.method){
+
+
+
+
+
+    }else{
+
+
+
+
+
     }
   }
 
