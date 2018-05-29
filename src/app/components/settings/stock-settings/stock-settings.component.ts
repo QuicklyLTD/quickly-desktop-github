@@ -49,15 +49,16 @@ export class StockSettingsComponent implements OnInit {
   }
 
   removeStock(id) {
-    let isOk = confirm('Kaydı Silmek Üzeresiniz. Bu İşlem Geri Alınamaz');
-    if (isOk) {
-      this.mainService.removeData('stocks', id).then(res => {
-        this.logService.createLog(logType.STOCK_DELETED,res.id,`${this.stockDetailForm.name} adlı Stok silindi.`);
-        this.fillData();
-        $('#stock').modal('hide');
-        this.messageService.sendMessage('Kategori İsmi Belirtmelisiniz!');
-      });
-    }
+    this.messageService.sendConfirm('Kaydı Silmek Üzeresiniz. Bu İşlem Geri Alınamaz').then(isOk => {
+      if (isOk) {
+        this.mainService.removeData('stocks', id).then(res => {
+          this.logService.createLog(logType.STOCK_DELETED, res.id, `${this.selectedStock.name} adlı Stok silindi.`);
+          this.fillData();
+          $('#stock').modal('hide');
+          this.messageService.sendMessage('Kategori İsmi Belirtmelisiniz!');
+        });
+      }
+    })
   }
 
   getStockDetail(stock) {
