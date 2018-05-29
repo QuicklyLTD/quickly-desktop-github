@@ -98,16 +98,16 @@ export class PaymentScreenComponent implements OnInit {
         if (isAnyEqual) {
           let equalProduct = this.productsWillPay.filter(obj => obj.price == this.payedPrice)[0];
           let indexOfEqual = this.productsWillPay.findIndex(obj => obj == equalProduct);
-          newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), [equalProduct]);
+          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), [equalProduct]);
           this.productsWillPay.splice(indexOfEqual, 1);
         } else if (isAnyGreat) {
           let greatOne = this.productsWillPay.sort((a, b) => b.price - a.price)[0];
           let greatOneCopy = Object.assign({}, greatOne);
           greatOneCopy.price = this.payedPrice;
-          newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), [greatOneCopy]);
+          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), [greatOneCopy]);
           greatOne.price -= this.payedPrice;
         } else if (isAnyLittle) {
-          newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), []);
+          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), []);
           let priceCount = this.payedPrice;
           let willRemove = 0;
           this.productsWillPay = this.productsWillPay.filter(obj => obj).sort((a, b) => b.price - a.price);
@@ -143,7 +143,7 @@ export class PaymentScreenComponent implements OnInit {
         this.check.payment_flow = [];
       }
       this.check.payment_flow.push(newPayment);
-      this.check.discount += this.currentAmount;
+      this.check.discount += newPayment.amount;
       this.payedPrice = 0;
       this.mainService.updateData('checks', this.id, this.check).then(res => {
         if (res.ok) {
