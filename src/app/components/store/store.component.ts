@@ -18,7 +18,7 @@ export class StoreComponent implements OnInit {
 
   constructor(private mainService: MainService) {
     this.fillData();
-   }
+  }
 
   ngOnInit() {
     this.changes = this.mainService.LocalDB['tables'].changes({ since: 'now', live: true }).on('change', (change) => {
@@ -26,6 +26,10 @@ export class StoreComponent implements OnInit {
         this.tables = result.docs;
         this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
         this.tableViews = this.tables;
+        if (localStorage.getItem('selectedFloor')) {
+          let selectedID = JSON.parse(localStorage['selectedFloor']);
+          this.getTablesBy(selectedID);
+        }
       });
     });
   }
@@ -35,8 +39,15 @@ export class StoreComponent implements OnInit {
   }
 
   getTablesBy(id: string) {
-    this.selected = id;
-    this.tableViews = this.tables.filter(obj => obj.floor_id == id);
+    if (id !== 'All') {
+      this.selected = id;
+      localStorage.setItem('selectedFloor', JSON.stringify(id));
+      this.tableViews = this.tables.filter(obj => obj.floor_id == id);
+    } else {
+      this.selected = '';
+      this.tableViews = this.tables;
+      localStorage.removeItem('selectedFloor');
+    }
   }
 
   filterTables(value: string) {
@@ -57,6 +68,10 @@ export class StoreComponent implements OnInit {
       this.tables = result.docs;
       this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
       this.tableViews = this.tables;
+      if (localStorage.getItem('selectedFloor')) {
+        let selectedID = JSON.parse(localStorage['selectedFloor']);
+        this.getTablesBy(selectedID);
+      }
     });
   }
 }
