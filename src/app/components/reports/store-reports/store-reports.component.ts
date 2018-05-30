@@ -23,6 +23,7 @@ export class StoreReportsComponent implements OnInit {
   checkDetail: any;
   selectedCat: any;
   selectedPayment: PaymentStatus;
+  selectedPaymentIndex: number;
   NormalTotal: number = 0;
   FastTotal: number = 0;
   printers: Array<any>;
@@ -197,23 +198,63 @@ export class StoreReportsComponent implements OnInit {
   editPayment(i: number) {
     $('#editCheck').modal('hide');
     this.selectedPayment = this.checkDetail.payment_flow[i];
+    this.selectedPaymentIndex = i;
     $('#paymentDetail').modal('show');
   }
 
   changePayment(paymentDetail: NgForm) {
     let Form = paymentDetail.value;
-    if(Form.method !== this.selectedPayment.method){
-
-
-
-
-
-    }else{
-
-
-
-
-
+    if (Form.method !== this.selectedPayment.method) {
+      this.mainService.getAllBy('reports', { connection_id: this.selectedPayment.method }).then(res => {
+        let docReport = res.docs[0];
+        this.mainService.changeData('reports', docReport._id, (doc) => {
+          doc.weekly[this.day] -= this.selectedPayment.amount;
+          doc.weekly_count[this.day]--
+          return doc;
+        });
+        this.mainService.getAllBy('reports', { connection_id: Form.method }).then(res => {
+          let docReport = res.docs[0];
+          this.mainService.changeData('reports', docReport._id, (doc) => {
+            doc.weekly[this.day] += Form.amount;
+            doc.weekly_count[this.day]++
+            return doc;
+          });
+        }).then(res => {
+          this.checkDetail.total_price -= this.selectedPayment.amount;
+          this.checkDetail.total_price += Form.amount;
+          this.selectedPayment.amount = Form.amount;
+          this.selectedPayment.method = Form.method;
+          this.mainService.updateData('closed_checks', this.checkDetail._id, { total_price: this.checkDetail.total_price, payment_flow: this.checkDetail.payment_flow }).then(res => {
+            this.messageService.sendMessage('Hesap Düzenlendi!');
+            this.fillData();
+            $('#editCheck').modal('show');
+            $('#paymentDetail').modal('hide');
+          });
+        });
+      });
+    } else {
+      if (this.selectedPayment.amount !== Form.amount) {
+        this.mainService.getAllBy('reports', { connection_id: this.selectedPayment.method }).then(res => {
+          let docReport = res.docs[0];
+          this.mainService.changeData('reports', docReport._id, (doc) => {
+            doc.weekly[this.day] -= this.selectedPayment.amount;
+            doc.weekly[this.day] += Form.amount;
+            return doc;
+          }).then(res => {
+            this.checkDetail.total_price -= this.selectedPayment.amount;
+            this.checkDetail.total_price += Form.amount;
+            this.selectedPayment.amount = Form.amount;
+            this.mainService.updateData('closed_checks', this.checkDetail._id, { total_price: this.checkDetail.total_price, payment_flow: this.checkDetail.payment_flow }).then(res => {
+              this.messageService.sendMessage('Hesap Düzenlendi!');
+              this.fillData();
+              $('#editCheck').modal('show');
+              $('#paymentDetail').modal('hide');
+            });
+          });
+        });
+      } else {
+        return false;
+      }
     }
   }
 

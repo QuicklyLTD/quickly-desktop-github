@@ -15,6 +15,7 @@ import { LogService, logType } from '../../../services/log.service';
   styleUrls: ['./payment-screen.component.scss'],
   providers: [SettingsService]
 })
+
 export class PaymentScreenComponent implements OnInit {
   id: string;
   check: Check;
