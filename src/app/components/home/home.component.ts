@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MainService } from '../../services/main.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
 
 @Component({

@@ -1,10 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Stock, StockCategory } from '../../../mocks/stocks.mock';
-import { Report } from '../../../mocks/report.mock';
-import { MainService } from '../../../services/main.service';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
+import { MainService } from '../../../services/main.service';
 
 @Component({
   selector: 'app-stock-settings',

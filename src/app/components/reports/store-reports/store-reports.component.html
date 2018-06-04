@@ -391,7 +391,7 @@
 </div>
 
 <div *ngIf="checkDetail" class="modal fade" id="editCheck" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modelTitleId">Hesap Düzenle</h4>
@@ -423,13 +423,12 @@
         <div *ngIf="checkDetail?.payment_flow" class="modal-body">
           <p>Düzenlemek istediğiniz ödemeyi seçin</p>
           <div *ngFor="let payment of checkDetail?.payment_flow; let i = index">
-            <button type="button" class="btn btn-block btn-lg btn-secondary text-left" (click)="editPayment(i)">{{payment.method}}
+            <button type="button" class="btn btn-block btn-lg btn-secondary text-left mb-1" (click)="editPayment(i)">{{payment.method}}
               <span class="pull-right">{{payment.amount}} TL</span>
             </button>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
           <button type="button" (click)="reOpenCheck(checkDetail)" class="btn btn-info btn-lg" data-dismiss="modal">
             <i class="fa fa-undo"></i>
             Hesabı Geri Aç</button>

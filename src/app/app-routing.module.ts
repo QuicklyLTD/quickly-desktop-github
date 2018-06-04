@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { SetupComponent } from './components/setup/setup.component';
-import { SettingsComponent } from './components/settings/settings.component'
-import { LoginComponent } from './components/login/login.component';
-import { CashboxComponent } from './components/cashbox/cashbox.component';
-import { ReportsComponent } from './components/reports/reports.component';
-import { StoreComponent } from './components/store/store.component';
-import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
-import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
-import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
-import { AdminComponent } from './components/admin/admin.component';
+import { RouterModule, Routes } from '@angular/router';
 import { ActivationComponent } from './components/activation/activation.component';
-import { CanActivateViaAuthGuard, AnonymousCanActivate, SetupFinished, DayStarted } from './guards/auth.guard.service';
+import { AdminComponent } from './components/admin/admin.component';
+import { CashboxComponent } from './components/cashbox/cashbox.component';
+import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
+import { HomeComponent } from './components/home/home.component';
+import { LoginComponent } from './components/login/login.component';
+import { ReportsComponent } from './components/reports/reports.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { SetupComponent } from './components/setup/setup.component';
+import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
+import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
+import { StoreComponent } from './components/store/store.component';
+import { AnonymousCanActivate, CanActivateViaAuthGuard, DayStarted, SetupFinished } from './guards/auth.guard.service';
 import { AuthService } from "./services/auth.service";
 
 const routes: Routes = [

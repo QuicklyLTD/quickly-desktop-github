@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ElectronService } from './providers/electron.service';
-import { MainService } from './services/main.service';
 import { MessageService } from './providers/message.service';
-import { SettingsService } from './services/settings.service';
 import { ApplicationService } from './services/application.service';
+import { MainService } from './services/main.service';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ import { ApplicationService } from './services/application.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.2.5';
+  version = '1.2.7';
   date: number;
   windowStatus: boolean;
   connectionStatus: boolean;

@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { MainService } from '../../../services/main.service';
-import { PrinterService } from '../../../providers/printer.service';
-import { ClosedCheck, Check, PaymentStatus } from '../../../mocks/check.mock';
-import { SettingsService } from '../../../services/settings.service';
-import { MessageService } from '../../../providers/message.service';
-import { LogService, logType } from '../../../services/log.service';
+import { Check, ClosedCheck, PaymentStatus } from '../../../mocks/check.mock';
 import { Log } from '../../../mocks/log.mock';
+import { MessageService } from '../../../providers/message.service';
+import { PrinterService } from '../../../providers/printer.service';
+import { LogService, logType } from '../../../services/log.service';
+import { MainService } from '../../../services/main.service';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-store-reports',

@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { MainService } from '../../../services/main.service';
+import { Printer } from 'app/mocks/settings.mock';
+import { Category, Ingredient, Product, ProductSpecs, Recipe, SubCategory } from '../../../mocks/product.mock';
 import { Report } from '../../../mocks/report.mock';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
-import { Product, Category, SubCategory, ProductGroup, ProductSpecs, Recipe, Ingredient } from '../../../mocks/product.mock';
-import { Printer } from 'app/mocks/settings.mock';
+import { MainService } from '../../../services/main.service';
 
 @Component({
   selector: 'app-menu-settings',

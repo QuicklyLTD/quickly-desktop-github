@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Report } from '../../../mocks/report.mock'
-import { MainService } from '../../../services/main.service';
 import { Log, logType } from '../../../mocks/log.mock';
+import { Report } from '../../../mocks/report.mock';
+import { MainService } from '../../../services/main.service';
 @Component({
   selector: 'app-user-reports',
   templateUrl: './user-reports.component.html',

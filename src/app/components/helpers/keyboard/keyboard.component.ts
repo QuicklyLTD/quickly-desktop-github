@@ -1,7 +1,7 @@
-import { Component, OnInit, ElementRef, Renderer } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { KeyboardService } from '../../../providers/keyboard.service';
 import { Subscription } from 'rxjs/Subscription';
+import { KeyboardService } from '../../../providers/keyboard.service';
 import { SettingsService } from '../../../services/settings.service';
 
 @Component({

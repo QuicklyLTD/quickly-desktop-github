@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { MainService } from '../../services/main.service';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Settings } from '../../mocks/settings.mock';
 import { HttpService } from '../../services/http.service';
+import { MainService } from '../../services/main.service';
 
 @Component({
   selector: 'app-admin',

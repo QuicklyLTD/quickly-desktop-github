@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { MainService } from '../../../services/main.service';
-import { Report } from '../../../mocks/report.mock';
-import { ClosedCheck } from '../../../mocks/check.mock';
+import { Component, Input, OnInit } from '@angular/core';
 import { Cashbox } from '../../../mocks/cashbox.mock';
-import { EndDay, BackupData } from '../../../mocks/endoftheday.mock';
+import { ClosedCheck } from '../../../mocks/check.mock';
+import { BackupData, EndDay } from '../../../mocks/endoftheday.mock';
+import { Report } from '../../../mocks/report.mock';
 import { ElectronService } from '../../../providers/electron.service';
+import { MainService } from '../../../services/main.service';
 
 @Component({
   selector: 'app-day-detail',

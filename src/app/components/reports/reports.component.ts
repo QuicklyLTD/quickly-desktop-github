@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Activity, Report } from '../../mocks/report.mock';
 import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
-import { ClosedCheck } from '../../mocks/check.mock';
-import { Report, Activity } from '../../mocks/report.mock';
 
 @Component({
   selector: 'app-reports',

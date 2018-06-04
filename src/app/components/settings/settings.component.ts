@@ -1,5 +1,5 @@
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ElectronService } from './../../providers/electron.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-settings',

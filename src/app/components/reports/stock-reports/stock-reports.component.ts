@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Log, logType } from '../../../mocks/log.mock';
 import { Stock, StockCategory } from '../../../mocks/stocks.mock';
 import { MainService } from '../../../services/main.service';
-import { Log, logType } from '../../../mocks/log.mock';
 
 @Component({
   selector: 'app-stock-reports',

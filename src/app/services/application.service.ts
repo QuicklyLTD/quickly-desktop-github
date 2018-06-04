@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { SettingsService } from './settings.service';
 import { MessageService } from '../providers/message.service';
+import { SettingsService } from './settings.service';
 
 @Injectable()
 export class ApplicationService {

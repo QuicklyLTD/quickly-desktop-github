@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Cashbox } from '../../mocks/cashbox.mock';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
 import { MessageService } from '../../providers/message.service';
 import { LogService, logType } from '../../services/log.service';
+import { MainService } from '../../services/main.service';
+import { SettingsService } from '../../services/settings.service';
 
 
 @Component({

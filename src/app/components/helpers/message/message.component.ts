@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MessageService } from '../../../providers/message.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
+import { MessageService } from '../../../providers/message.service';
 
 @Component({
 	selector: 'app-message',

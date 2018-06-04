@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { MainService } from '../../../services/main.service';
-import { MessageService } from '../../../providers/message.service';
-import { Table, Floor, FloorSpecs } from '../../../mocks/table.mock';
 import { Report } from '../../../mocks/report.mock';
+import { Floor, FloorSpecs, Table } from '../../../mocks/table.mock';
+import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
+import { MainService } from '../../../services/main.service';
 
 @Component({
   selector: 'app-restaurant-settings',

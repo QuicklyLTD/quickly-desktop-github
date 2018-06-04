@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgForm } from '@angular/forms';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus } from '../../../mocks/check.mock';
+import { Printer } from '../../../mocks/settings.mock';
+import { MessageService } from '../../../providers/message.service';
+import { PrinterService } from '../../../providers/printer.service';
+import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
-import { MessageService } from '../../../providers/message.service';
-import { Check, CheckProduct, PaymentStatus, ClosedCheck } from '../../../mocks/check.mock';
-import { PrinterService } from '../../../providers/printer.service';
-import { Printer } from '../../../mocks/settings.mock';
-import { LogService, logType } from '../../../services/log.service';
 
 @Component({
   selector: 'app-payment-screen',

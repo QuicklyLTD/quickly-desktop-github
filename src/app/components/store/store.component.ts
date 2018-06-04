@@ -1,6 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MainService } from '../../services/main.service';
-import { Table, Floor } from '../../mocks/table.mock';
 
 @Component({
   selector: 'app-store',

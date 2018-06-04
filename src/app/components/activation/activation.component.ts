@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { SettingsService } from '../../services/settings.service';
-import { MainService } from '../../services/main.service';
 import { ElectronService } from '../../providers/electron.service';
+import { MainService } from '../../services/main.service';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-activation',

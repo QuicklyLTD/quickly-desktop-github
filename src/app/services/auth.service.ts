@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { MessageService } from "../providers/message.service";
-import { MainService } from './main.service';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
+import { MessageService } from "../providers/message.service";
+import { MainService } from './main.service';
 
 @Injectable()
 export class AuthService {

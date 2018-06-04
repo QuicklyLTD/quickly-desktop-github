@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../../mocks/user.mock';
 import { Router } from '@angular/router';
-import { MainService } from '../../services/main.service';
+import { User } from '../../mocks/user.mock';
 import { MessageService } from "../../providers/message.service";
 import { AuthService } from "../../services/auth.service";
+import { MainService } from '../../services/main.service';
 
 @Component({
   selector: 'app-login',

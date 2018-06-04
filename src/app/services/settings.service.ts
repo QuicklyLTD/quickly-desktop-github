@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { MainService } from './main.service';
+import { Subject } from 'rxjs';
 import { Settings } from '../mocks/settings.mock';
-import { Subject, Observable } from 'rxjs';
+import { MainService } from './main.service';
 
 @Injectable()
 export class SettingsService {

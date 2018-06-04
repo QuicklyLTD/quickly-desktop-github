@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
 import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
+import { ElectronService } from '../providers/electron.service';
 import { MessageService } from '../providers/message.service';
 import { TerminalService } from '../providers/terminal.service';
-import { ElectronService } from '../providers/electron.service';
 
 @Injectable()
 export class MainService {

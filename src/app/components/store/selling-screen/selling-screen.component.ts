@@ -1,17 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { MainService } from '../../../services/main.service';
-import { MessageService } from '../../../providers/message.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Table, Floor } from '../../../mocks/table.mock';
-import { Check, ClosedCheck, PaymentStatus, CheckProduct } from '../../../mocks/check.mock';
-import { Product, Recipe, SubCategory, Category, Ingredient, ProductSpecs } from '../../../mocks/product.mock';
-import { Report, Activity } from '../../../mocks/report.mock';
-import { Printer, PaymentMethod } from '../../../mocks/settings.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus } from '../../../mocks/check.mock';
+import { Category, Ingredient, Product, ProductSpecs, SubCategory } from '../../../mocks/product.mock';
+import { PaymentMethod, Printer } from '../../../mocks/settings.mock';
+import { Floor, Table } from '../../../mocks/table.mock';
 import { ElectronService } from '../../../providers/electron.service';
+import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
-import { SettingsService } from '../../../services/settings.service';
 import { LogService, logType } from '../../../services/log.service';
+import { MainService } from '../../../services/main.service';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-selling-screen',

@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { SettingsService } from '../../../services/settings.service';
-import { MessageService } from '../../../providers/message.service';
+import { Router } from '@angular/router';
+import { Printer } from '../../../mocks/settings.mock';
 import { ElectronService } from '../../../providers/electron.service';
+import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
-import { Printer, Settings } from '../../../mocks/settings.mock';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-application-settings',
