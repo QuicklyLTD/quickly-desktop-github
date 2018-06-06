@@ -15,7 +15,7 @@
                   <div class="input-group-addon normal">
                     <i class="fa fa-search" aria-hidden="true"></i>
                   </div>
-                  <input #productName type="text" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" class="form-control form-contol-sm">
+                  <input #productName type="text" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;" class="form-control form-contol-sm">
                 </div>
               </div>
             </div>
@@ -48,9 +48,9 @@
               <div class="col-xl-9 col-lg-8  pr-0 pl-0">
                 <div class="card inside-height">
                   <div *ngIf="subCatsView !== undefined && subCatsView.length > 0">
-                    <div class="card-header pt-1 pb-1 pr-4 pl-1">
+                    <div class="card-header pt-1 pb-1 pr-1 pl-1">
                       <div class="row ml-1 mr-0">
-                        <div *ngFor="let item of subCatsView" class="col p-0 pr-1 pl-1">
+                        <div *ngFor="let item of subCatsView" class="col p-0 pr-1 pl-1 mb-1">
                           <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning btn-block">
                             <b>{{item.name}}</b>
                           </button>
@@ -187,7 +187,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal" id="noteModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -212,8 +212,8 @@
   </div>
 </div>
 
-<div class="modal fade" id="specsModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+<div class="modal" id="specsModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{selectedProduct?.name}}
@@ -224,9 +224,9 @@
       </div>
       <div *ngIf="productSpecs?.length > 0" class="modal-body">
         <div class="row">
-          <div *ngFor="let spec of productSpecs" class="col pr-2 pl-2">
+          <div *ngFor="let spec of productSpecs" class="col pr-2 pl-2 mb-2">
             <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="changeSpecs(spec)">{{spec.spec_name}}
-              <small>{{spec.spec_price}} TL</small>
+              <small class="spec-price">{{spec.spec_price}} TL</small>
             </button>
           </div>
         </div>
@@ -235,7 +235,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="checkNote" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal" id="checkNote" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -259,7 +259,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="cancelProduct" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal" id="cancelProduct" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -282,7 +282,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="splitTable" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal" id="splitTable" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-big" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -332,7 +332,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="productSpecs" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal" id="productSpecs" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -377,7 +377,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="closeCheck" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal" id="closeCheck" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">

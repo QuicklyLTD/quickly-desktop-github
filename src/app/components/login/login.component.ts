@@ -4,11 +4,13 @@ import { User } from '../../mocks/user.mock';
 import { MessageService } from "../../providers/message.service";
 import { AuthService } from "../../services/auth.service";
 import { MainService } from '../../services/main.service';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  providers: [SettingsService]
 })
 
 export class LoginComponent implements OnInit {
@@ -17,13 +19,23 @@ export class LoginComponent implements OnInit {
   message: string;
   user: User;
   docs: any;
+  fastSelling: boolean = false;
 
-  constructor(private mainService: MainService, private messageService: MessageService, private authService: AuthService, private router: Router) { }
+  constructor(private mainService: MainService, private messageService: MessageService, private authService: AuthService, private router: Router, private settingsService: SettingsService) { }
 
   ngOnInit() {
     this.authService.logout();
     this.buttons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     this.pinInput = '';
+    this.settingsService.AppSettings.subscribe(res => {
+      if (res) {
+        if (res.value.takeaway == 'Açık') {
+          this.fastSelling = true;
+        } else {
+          this.fastSelling = false;
+        }
+      }
+    });
   }
 
   logIn() {
@@ -34,7 +46,11 @@ export class LoginComponent implements OnInit {
         this.authService.login(this.user);
         this.authService.setPermissions();
         this.messageService.sendMessage("Hoşgeldiniz " + this.user.name);
-        this.router.navigate(['/home']);
+        if (this.fastSelling) {
+          this.router.navigate(['/selling-screen', 'Fast', 'New']);
+        } else {
+          this.router.navigate(['/store']);
+        }
         this.clearDigits();
       } else {
         this.message = "Hatalı giriş yaptınız.";

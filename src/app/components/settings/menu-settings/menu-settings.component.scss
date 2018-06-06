@@ -11,10 +11,13 @@
 .inside-height{
     height: 74.5vh;
 }
+.subCatInput{
+    text-align: center;
+}
 .subCat{
     padding:1.25em; 
     cursor:pointer; 
-    width:24%;
+    width:23.8%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

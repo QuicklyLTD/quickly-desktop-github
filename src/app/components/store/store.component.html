@@ -29,7 +29,7 @@
                     <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | date:'HH:mm'}}
                   </span>
                   <span *ngIf="table.status == 3" class="pull-right">
-                    <i class="fa fa-print" aria-hidden="true"></i> 
+                    <i class="fa fa-print" aria-hidden="true"></i>
                   </span>
                 </p>
               </div>
@@ -54,6 +54,11 @@
     </div>
   </div>
   <div id="floorHolder" class="col-lg-2">
+    <div class="card mb-2" [routerLink]="['/selling-screen','Fast', 'New']" class="card mb-2 card-info card-inverse">
+      <div class="card-block">
+        <h2><i class="fa fa-sticky-note" aria-hidden="true"></i> Hızlı Satış</h2>
+      </div>
+    </div>
     <div class="card mb-2" (click)="getTablesBy('All')" [ngClass]="{'card-danger card-inverse':selected == ''}">
       <div class="card-block">
         <h2>Tüm Masalar</h2>

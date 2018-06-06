@@ -1,20 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  providers: [SettingsService]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   title: string;
   menus: Array<any>;
-  takeaway: boolean = false;
 
-  constructor(private mainService: MainService, private router: Router, private settings: SettingsService) {
+  constructor(private mainService: MainService, private router: Router) {
     this.title = 'Panel';
     this.menus = [
       { name: 'Kasa', color: 'success', icon: 'fa-money', link: 'cashbox' },
@@ -25,20 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.settings.AppSettings.subscribe(res => {
-      if(res){
-        if(res.value.takeaway == 'Açık'){
-          this.takeaway = true;
-        }else{
-          this.takeaway = false;
-        }
-      }
-    });
-  }
 
-  goSell(url: string) {
-    $('#menuModal').modal('hide');
-    this.router.navigate([url]);
   }
 
   closeProgram() {
