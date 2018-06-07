@@ -56,6 +56,7 @@ export class SellingScreenComponent implements OnInit {
   numboard: Array<any>;
   isFirstTime: boolean;
   askForPrint: boolean;
+  askForCheckPrint: boolean;
   productSpecs: Array<ProductSpecs>;
   permissions: Object;
   day: number;
@@ -309,6 +310,15 @@ export class SellingScreenComponent implements OnInit {
       this.logService.createLog(logType.CHECK_CLOSED, this.ownerId, `${this.owner} tarafından ${this.check.table_id} Hesabı ${this.check.total_price} TL ${method} ödeme alınarak kapatıldı.`)
     } else {
       this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner} tarafından ${this.table.name} Masası ${this.check.total_price} TL '${method}' ödeme alınarak kapatıldı.`)
+    }
+    if (this.askForCheckPrint) {
+      this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
+        if (isOK) {
+          this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+        }
+      });
+    } else {
+      this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
     }
     this.message.sendMessage(`Hesap ${this.check.total_price} TL tutarında ödeme alınarak kapatıldı`);
   }
@@ -882,6 +892,11 @@ export class SellingScreenComponent implements OnInit {
         this.askForPrint = true;
       } else {
         this.askForPrint = false;
+      }
+      if (res.value.ask_print_check == 'Sor') {
+        this.askForCheckPrint = true;
+      } else {
+        this.askForCheckPrint = false;
       }
     });
   }
