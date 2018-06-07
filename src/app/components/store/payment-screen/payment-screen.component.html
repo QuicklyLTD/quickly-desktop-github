@@ -19,89 +19,89 @@
         <div class="row">
           <div class="col-lg-7 col-xl-6">
             <div class="row">
-                <div class="col-xl-6 col-lg-6 pl-1 pr-0">
-                    <div class="card inside-height">
-                      <div class="card-header">Adisyon</div>
-                      <div class="card-block p-2 check-flow">
-                        <div *ngFor="let item of check?.products; let i = index">
-                          <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="check-product text-danger mb-0">
-                            <div class="product-name">
-                              {{item.name}}
-                              <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
-                            </div>
-                            <div class="product-price">
-                              {{item.price}} TL
-                            </div>
-                          </div>
+              <div class="col-xl-6 col-lg-6 pl-1 pr-0">
+                <div class="card inside-height">
+                  <div class="card-header">Adisyon</div>
+                  <div class="card-block p-2 check-flow">
+                    <div *ngFor="let item of check?.products; let i = index">
+                      <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToList(item)" class="check-product text-danger mb-0">
+                        <div class="product-name">
+                          {{item.name}}
+                          <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                         </div>
-                      </div>
-                      <div class="card-footer p-1">
-                        <p class="pr-1 pl-1 mt-2">
-                          <strong>
-                            Kalan Toplam:
-                            <span class="pull-right">{{check?.total_price}} TL</span>
-                          </strong>
-                        </p>
-                        <button (click)="sendAllProducts()" [disabled]="check?.products.length == 0" class="btn btn-lg btn-danger btn-block text-left">Hepsini Öde
-                          <i class="fa fa-arrow-right pull-right" aria-hidden="true"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-xl-6 col-lg-6 pl-1 pr-0">
-                    <div class="card inside-height">
-                      <div class="card-header">Ödenecek Ürünler</div>
-                      <div class="card-block p-2 check-flow">
-                        <div *ngFor="let item of productsWillPay" class="animated slideInLeft">
-                          <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="check-product text-danger mb-0">
-                            <div class="product-name">
-                              {{item.name}}
-                              <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
-                            </div>
-                            <div class="product-price">
-                              {{item.price}} TL
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div *ngIf="check?.discount > 0" class="card-footer p-1">
-                        <p *ngIf="check?.discount > 0" class="pr-1 pl-1 mt-2">
-                          <strong>
-                            Önceden Ödenen Miktar:
-                            <span class="pull-right">{{check?.discount}} TL</span>
-                          </strong>
-                        </p>
-                        <button (click)="togglePayed()" class="btn btn-lg btn-secondary btn-block text-left">{{payedTitle}}
-                          <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa pull-right hidden-lg-down" aria-hidden="true"></i>
-                        </button>
-                      </div>
-                      <div *ngIf="check?.discount > 0 && payedShow" class="card-block check-flow p-2 payed-things">
-                        <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
-                          <p class="mb-0">{{payment.method}}
-                            <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
-                            <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
-                          </p>
-                          <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3">
-                            <small>{{product.name}}
-                              <span class="pull-right">{{product.price}} TL</span>
-                            </small>
-                          </p>
-                          <p *ngIf="payment.discount > 0" class="text-danger m-0">
-                            <small>
-                              <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
-                              <span class="pull-right">{{payment.discount}} TL</span>
-                            </small>
-                          </p>
-                          <p class="m-0 text-bold">
-                            <small>
-                              <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
-                              <span class="pull-right">{{payment.amount}} TL</span>
-                            </small>
-                          </p>
+                        <div class="product-price">
+                          {{item.price}} TL
                         </div>
                       </div>
                     </div>
                   </div>
+                  <div class="card-footer p-1">
+                    <p class="pr-1 pl-1 mt-2">
+                      <strong>
+                        Kalan Toplam:
+                        <span class="pull-right">{{check?.total_price}} TL</span>
+                      </strong>
+                    </p>
+                    <button (click)="sendAllProducts()" [disabled]="check?.products.length == 0" class="btn btn-lg btn-danger btn-block text-left">Hepsini Öde
+                      <i class="fa fa-arrow-right pull-right" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 pl-1 pr-0">
+                <div class="card inside-height">
+                  <div class="card-header">Ödenecek Ürünler</div>
+                  <div class="card-block p-2 check-flow">
+                    <div *ngFor="let item of productsWillPay" class="animated slideInLeft">
+                      <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="check-product text-danger mb-0">
+                        <div class="product-name">
+                          {{item.name}}
+                          <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
+                        </div>
+                        <div class="product-price">
+                          {{item.price}} TL
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="check?.discount > 0" class="card-footer p-1">
+                    <p *ngIf="check?.discount > 0" class="pr-1 pl-1 mt-2">
+                      <strong>
+                        Önceden Ödenen Miktar:
+                        <span class="pull-right">{{check?.discount}} TL</span>
+                      </strong>
+                    </p>
+                    <button (click)="togglePayed()" class="btn btn-lg btn-secondary btn-block text-left">{{payedTitle}}
+                      <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa pull-right hidden-lg-down" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <div *ngIf="check?.discount > 0 && payedShow" class="card-block check-flow p-2 payed-things">
+                    <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
+                      <p class="mb-0">{{payment.method}}
+                        <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
+                        <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
+                      </p>
+                      <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3">
+                        <small>{{product.name}}
+                          <span class="pull-right">{{product.price}} TL</span>
+                        </small>
+                      </p>
+                      <p *ngIf="payment.discount > 0" class="text-danger m-0">
+                        <small>
+                          <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
+                          <span class="pull-right">{{payment.discount}} TL</span>
+                        </small>
+                      </p>
+                      <p class="m-0 text-bold">
+                        <small>
+                          <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
+                          <span class="pull-right">{{payment.amount}} TL</span>
+                        </small>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0 hidden-lg-down">
@@ -185,10 +185,15 @@
                     <span class="pull-right">{{check?.discount + check?.total_price + priceWillPay}} TL</span>
                   </strong>
                 </p>
-                <button [disabled]="productsWillPay.length == 0 || !permissions.discount" type="button" style="flex: 2 1 auto;" data-toggle="modal" data-target="#discount"
-                  class="btn btn-secondary btn-block btn-lg">İndirim Yap
-                  <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i>
-                </button>
+                <div class="btn-group btn-group-justify btn-block">
+                  <button [disabled]="productsWillPay.length == 0 || !permissions.discount" type="button" data-toggle="modal" data-target="#discount"
+                    class="btn btn-secondary btn-block btn-lg">İndirim Yap
+                    <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i>
+                  </button>
+                  <button [disabled]="productsWillPay.length == 0 || !permissions.discount" type="button" data-toggle="modal" data-target="#otherOptions"
+                    class="btn btn-info btn-lg mt-0">İşlemler
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -258,3 +263,23 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade" id="otherOptions" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Hesap İşlemleri</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>

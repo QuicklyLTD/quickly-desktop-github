@@ -22,6 +22,9 @@ export class AdminComponent implements OnInit {
       'users_group',
       'checks',
       'closed_checks',
+      'credits',
+      'customers',
+      'orders',
       'cashbox',
       'categories',
       'sub_categories',
@@ -171,7 +174,7 @@ export class AdminComponent implements OnInit {
     this.mainService.addData('settings', dateSettings);
 
     // this.mainService.addData('reports', new Report('Store', 'İptal', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'İptal Satış Raporu', Date.now()));
-    
+
   }
 
   testEndDay() {
