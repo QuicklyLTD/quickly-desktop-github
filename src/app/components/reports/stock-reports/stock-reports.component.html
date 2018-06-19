@@ -26,7 +26,7 @@
               <p class="mb-2">
                 <strong [ngClass]="{'text-danger': stock.left_total <= 0}">{{stock.name}}</strong>
                 <small>({{stock.cat_id | general:'stocks_cat' | async}})</small>
-                <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-0'}}%</span>
+                <span class="pull-right text-muted">Stok Durumu: {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-2'}}%</span>
               </p>
               <div class="progress">
                 <div [ngClass]="{'bg-danger':stock.warning_limit >= stock.left_total}" class="progress-bar bg-warning progress-bar-striped"
@@ -34,7 +34,7 @@
                   [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
               </div>
               <small class="mt-2">
-                <span *ngIf="stock.left_total > 0"> Kalan : {{stock.left_total | number:'2.0-0'}} {{stock.unit}}</span>
+                <span *ngIf="stock.left_total > 0"> Kalan : {{stock.left_total | number:'1.0-2'}} {{stock.unit}}</span>
                 <span *ngIf="stock.left_total <= 0" class="text-danger">Tükendi!</span>
               </small>
             </blockquote>
@@ -69,12 +69,12 @@
               <td>{{i+1}}</td>
               <td>{{stock.name}}</td>
               <td>{{stock.first_quantity}}x</td>
-              <td>{{stock.total*stock.first_quantity | number:'2.0-0'}} </td>
+              <td>{{stock.total*stock.first_quantity | number:'1.0-2'}} </td>
               <td>{{stock.unit}}</td>
-              <td class="table-info">{{stock.total*stock.first_quantity - stock.left_total | number:'2.0-0'}}</td>
+              <td class="table-info">{{stock.total*stock.first_quantity - stock.left_total | number:'1.0-2' }}</td>
               <td class="table-info">{{stock.unit}}</td>
               <td>{{stock.quantity}}x</td>
-              <td>{{stock.left_total | number:'2.0-0'}}</td>
+              <td>{{stock.left_total  | number:'1.0-2' }}</td>
               <td>{{stock.unit}}</td>
             </tr>
           </tbody>

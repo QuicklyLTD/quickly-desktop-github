@@ -37,7 +37,7 @@
             <tr *ngFor="let item of endDayData; let i = index;" (click)="getDetail(item)">
               <td>{{i+1}}</td>
               <td>{{item.time | date:'dd/M/y HH:mm'}}</td>
-              <td *ngIf="permissions?.end">{{item.total_income}} TL</td>
+              <td *ngIf="permissions?.end">{{item.total_income  | number:'1.0-2'}} TL</td>
               <td>{{item.check_count}} Adet</td>
               <td>{{item.owner | general:'users' | async}}</td>
             </tr>

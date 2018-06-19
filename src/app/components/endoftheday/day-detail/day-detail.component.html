@@ -10,7 +10,7 @@
                   <i class="fa fa-check" aria-hidden="true"></i>
                 </td>
                 <td>Genel Toplam:</td>
-                <td>{{detailData.total_income}} TL</td>
+                <td>{{detailData.total_income  | number:'1.0-2'}} TL</td>
               </tr>
               <tr class="text-muted" (click)="filterOldData('Checks','All')">
                 <td>
@@ -24,49 +24,49 @@
                   <i class="fa fa-money" aria-hidden="true"></i>
                 </td>
                 <td width="60%">Nakit Hesap Toplamı:</td>
-                <td>{{detailData.cash_total}} TL</td>
+                <td>{{detailData.cash_total  | number:'1.0-2'}} TL</td>
               </tr>
               <tr class="text-warning" (click)="filterOldData('Checks','Kart')">
                 <td>
                   <i class="fa fa-credit-card" aria-hidden="true"></i>
                 </td>
                 <td>Kart Hesap Toplamı:</td>
-                <td>{{detailData.card_total}} TL</td>
+                <td>{{detailData.card_total  | number:'1.0-2'}} TL</td>
               </tr>
               <tr class="text-info" (click)="filterOldData('Checks','Kupon')">
                 <td>
                   <i class="fa fa-bookmark ml-1" aria-hidden="true"></i>
                 </td>
                 <td>Kupon Hesap Toplamı:</td>
-                <td>{{detailData.coupon_total}} TL</td>
+                <td>{{detailData.coupon_total  | number:'1.0-2'}} TL</td>
               </tr>
               <tr class="text-danger" (click)="filterOldData('Checks','İkram')">
                 <td>
                   <i class="fa fa-handshake-o" aria-hidden="true"></i>
                 </td>
                 <td>İkram Hesap Toplamı:</td>
-                <td>{{detailData.free_total}} TL</td>
+                <td>{{detailData.free_total  | number:'1.0-2'}} TL</td>
               </tr>
               <tr class="text-primary" (click)="filterOldData('Checks','İptal')">
                 <td>
                   <i class="fa fa-times-rectangle" aria-hidden="true"></i>
                 </td>
                 <td>İptal Hesap Toplamı:</td>
-                <td>{{detailData.canceled_total}} TL</td>
+                <td>{{detailData.canceled_total  | number:'1.0-2'}} TL</td>
               </tr>
               <tr (click)="filterOldData('Cashbox','Gelir')">
                 <td>
                   <i class="fa fa-arrow-down" aria-hidden="true"></i>
                 </td>
                 <td>Kasa Geliri Toplamı:</td>
-                <td>{{detailData.incomes}} TL</td>
+                <td>{{detailData.incomes  | number:'1.0-2'}} TL</td>
               </tr>
               <tr (click)="filterOldData('Cashbox','Gider')">
                 <td>
                   <i class="fa fa-arrow-up" aria-hidden="true"></i>
                 </td>
                 <td>Kasa Gideri Toplamı:</td>
-                <td>{{detailData.outcomes}} TL</td>
+                <td>{{detailData.outcomes  | number:'1.0-2'}} TL</td>
               </tr>
               <tr>
                 <td>
@@ -137,7 +137,7 @@
                       <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                     </td>
                     <td>{{item.owner}}</td>
-                    <td>{{item.total_price}} TL
+                    <td>{{item.total_price  | number:'1.0-2'}} TL
                       <small *ngIf="item.discount !== 0" class="text-danger pull-right">
                         <i class="fa fa-arrow-down" aria-hidden="true"></i> {{item.discount}} TL</small>
                     </td>
@@ -164,7 +164,7 @@
                     <td>{{cash.description}}</td>
                     <td>{{cash.user}}</td>
                     <td>{{cash.time | date:'HH:mm'}}</td>
-                    <td>{{cash.cash + cash.card + cash.coupon}} TL</td>
+                    <td>{{cash.cash + cash.card + cash.coupon  | number:'1.0-2'}} TL</td>
                   </tr>
                 </tbody>
               </table>
@@ -215,7 +215,7 @@
                   </td>
                   <td width="17%">{{item.owner}}</td>
                   <td width="14%">{{item.timestamp |date:'HH:mm'}}</td>
-                  <td width="14%">{{item.price}} TL</td>
+                  <td width="14%">{{item.price  | number:'1.0-2'}} TL</td>
                 </tr>
               </tbody>
             </table>
@@ -245,7 +245,7 @@
                     </td>
                     <td width="15%">{{product.owner}}</td>
                     <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
-                    <td width="17%">{{product.price}} TL</td>
+                    <td width="17%">{{product.price  | number:'1.0-2'}} TL</td>
                   </tr>
                 </tbody>
               </table>
@@ -266,7 +266,7 @@
           <div class="card-footer">
             <b>
               <i class="fa fa-check" aria-hidden="true"></i> Ödenen Miktar:
-              <span class="pull-right">{{checkDetail?.total_price}} TL</span>
+              <span class="pull-right">{{checkDetail?.total_price  | number:'1.0-2' }} TL</span>
             </b>
           </div>
         </div>
@@ -302,7 +302,7 @@
                     </td>
                     <td>Nakit:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.cash}} TL</span>
+                      <span class="pull-right">{{cashDetail?.cash  | number:'1.0-2' }} TL</span>
                     </td>
                   </tr>
                   <tr class="table-warning">
@@ -311,7 +311,7 @@
                     </td>
                     <td>Kart:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.card}} TL</span>
+                      <span class="pull-right">{{cashDetail?.card  | number:'1.0-2' }} TL</span>
                     </td>
                   </tr>
                   <tr class="table-info">
@@ -320,7 +320,7 @@
                     </td>
                     <td>Kupon:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.coupon}} TL</span>
+                      <span class="pull-right">{{cashDetail?.coupon  | number:'1.0-2' }} TL</span>
                     </td>
                   </tr>
                   <tr>
@@ -329,7 +329,7 @@
                     </td>
                     <td>Toplam:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card}} TL</span>
+                      <span class="pull-right">{{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card  | number:'1.0-2' }} TL</span>
                     </td>
                   </tr>
                 </tbody>

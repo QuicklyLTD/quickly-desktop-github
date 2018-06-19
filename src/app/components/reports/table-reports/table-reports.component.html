@@ -76,7 +76,7 @@
               <td>{{i+1}}</td>
               <td>{{item.connection_id | general: 'tables' | async}}</td>
               <td>{{item.count}} Adet</td>
-              <td>{{item.amount}} TL</td>
+              <td>{{item.amount  | number:'1.0-2'}} TL</td>
               <td>{{item.update_time | date: 'd/M/y HH:mm'}}</td>
             </tr>
           </tbody>

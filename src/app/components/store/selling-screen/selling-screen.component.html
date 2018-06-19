@@ -15,7 +15,8 @@
                   <div class="input-group-addon normal">
                     <i class="fa fa-search" aria-hidden="true"></i>
                   </div>
-                  <input #productName type="text" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;" class="form-control form-contol-sm">
+                  <input #productName type="text" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;"
+                    class="form-control form-contol-sm">
                 </div>
               </div>
             </div>
@@ -94,7 +95,7 @@
                       {{item.name}}
                       <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                     </div>
-                    <div class="product-price">{{item.price}} TL</div>
+                    <div class="product-price">{{item.price | number:'1.0-2' }} TL</div>
                   </div>
                   <div *ngIf="selectedIndex == i && item.status !== 1">
                     <small>
@@ -118,7 +119,7 @@
                   </p>
                   <p *ngFor="let product of payment.payed_products" class="text-muted m-0  pl-3">
                     <small>{{product.name}}
-                      <span class="pull-right">{{product.price}} TL</span>
+                      <span class="pull-right">{{product.price | number:'1.0-2'}} TL</span>
                     </small>
                   </p>
                   <p *ngIf="payment.discount > 0" class="text-danger m-0">
@@ -130,7 +131,7 @@
                   <p class="m-0 text-bold">
                     <small>
                       <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
-                      <span class="pull-right">{{payment.amount}} TL</span>
+                      <span class="pull-right">{{payment.amount | number:'1.0-2'}} TL</span>
                     </small>
                   </p>
                 </div>
@@ -141,12 +142,12 @@
                 </p>
                 <p *ngIf="check.discount > 0" class="mb-0">
                   <strong>Kalan Toplam:
-                    <span class="pull-right">{{check.total_price}} TL</span>
+                    <span class="pull-right">{{check.total_price | number:'1.0-2'}} TL</span>
                   </strong>
                 </p>
                 <p class="text-primary mb-2">
                   <strong>Hesap Toplamı:
-                    <span class="pull-right">{{check.discount + check.total_price}} TL</span>
+                    <span class="pull-right">{{check.discount + check.total_price | number:'1.0-2'}} TL</span>
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block" data-toggle="buttons">
@@ -361,7 +362,7 @@
           <div class="card-footer">
             <b>
               <h2 class="mb-0">Tutar:
-                <span class="pull-right">{{(numpad*productWithSpecs?.price) / productStock?.amount }} TL</span>
+                <span class="pull-right">{{(numpad*productWithSpecs?.price) / productStock?.amount | number: '1.0-2' }} TL</span>
               </h2>
             </b>
           </div>

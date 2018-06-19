@@ -14,7 +14,7 @@
               </td>
               <td colspan="5">
                 <b>
-                  <span class="pull-right">Toplam: {{sellingIncomes}} TL</span>
+                  <span class="pull-right">Toplam: {{sellingIncomes  | number:'1.0-2' }} TL</span>
                 </b>
               </td>
             </tr>
@@ -40,7 +40,7 @@
               <td>{{cash.description}}</td>
               <td>{{cash.user}}</td>
               <td>{{cash.time | date:'HH:mm'}}</td>
-              <td>{{cash.cash + cash.card + cash.coupon}} TL</td>
+              <td>{{cash.cash + cash.card + cash.coupon  | number:'1.0-2'}} TL</td>
             </tr>
           </tbody>
         </table>
@@ -48,13 +48,13 @@
       <div class="card-footer">
         <div class="row">
           <div class="col-lg-4">
-            <h4 class="text-success">Gelir: {{incomes}} TL</h4>
+            <h4 class="text-success">Gelir: {{incomes  | number:'1.0-2'}} TL</h4>
           </div>
           <div class="col-lg-4 text-center">
-            <h4 class="text-danger">Gider: {{outcomes}} TL</h4>
+            <h4 class="text-danger">Gider: {{outcomes  | number:'1.0-2'}} TL</h4>
           </div>
           <div class="col-lg-4">
-            <h4 class="pull-right text-primary">Toplam: {{leftTotal}} TL</h4>
+            <h4 class="pull-right text-primary">Toplam: {{leftTotal  | number:'1.0-2'}} TL</h4>
           </div>
         </div>
       </div>

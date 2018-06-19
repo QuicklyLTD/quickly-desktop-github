@@ -30,7 +30,7 @@
                           <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                         </div>
                         <div class="product-price">
-                          {{item.price}} TL
+                          {{item.price | number:'1.0-2'}} TL
                         </div>
                       </div>
                     </div>
@@ -39,7 +39,7 @@
                     <p class="pr-1 pl-1 mt-2">
                       <strong>
                         Kalan Toplam:
-                        <span class="pull-right">{{check?.total_price}} TL</span>
+                        <span class="pull-right">{{check?.total_price | number:'1.0-2'}} TL</span>
                       </strong>
                     </p>
                     <button (click)="sendAllProducts()" [disabled]="check?.products.length == 0" class="btn btn-lg btn-danger btn-block text-left">Hepsini Öde
@@ -59,7 +59,7 @@
                           <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                         </div>
                         <div class="product-price">
-                          {{item.price}} TL
+                          {{item.price | number:'1.0-2'}} TL
                         </div>
                       </div>
                     </div>
@@ -83,7 +83,7 @@
                       </p>
                       <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3">
                         <small>{{product.name}}
-                          <span class="pull-right">{{product.price}} TL</span>
+                          <span class="pull-right">{{product.price | number:'1.0-2'}} TL</span>
                         </small>
                       </p>
                       <p *ngIf="payment.discount > 0" class="text-danger m-0">
@@ -95,7 +95,7 @@
                       <p class="m-0 text-bold">
                         <small>
                           <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
-                          <span class="pull-right">{{payment.amount}} TL</span>
+                          <span class="pull-right">{{payment.amount | number:'1.0-2'}} TL</span>
                         </small>
                       </p>
                     </div>
@@ -130,31 +130,31 @@
                 <h3 class="mb-1 mt-1 will-pay">
                   <b>Ödenecek Miktar:</b>
                   <span class="text-primary pull-right">
-                    <strong>{{currentAmount}} TL</strong>
+                    <strong>{{currentAmount | number:'1.0-2' }} TL</strong>
                   </span>
                 </h3>
               </div>
               <div class="card-block p-2">
                 <h4 *ngIf="currentAmount > 0" class="mb-0">Ürünlerin Toplamı:
                   <span class="text-primary pull-right">
-                    <b>{{priceWillPay}} TL</b>
+                    <b>{{priceWillPay | number:'1.0-2'}} TL</b>
                   </span>
                 </h4>
                 <h4 *ngIf="payedPrice > 0" class="mt-0 mb-1">Alınan Miktar:
                   <span class="text-success pull-right">
-                    <b>{{payedPrice}} TL</b>
+                    <b>{{payedPrice | number:'1.0-2'}} TL</b>
                   </span>
                 </h4>
                 <h4 *ngIf="discount !== undefined" class="mb-1">İndirim Tutarı:
                   <span class="text-danger pull-right">
-                    <small>{{discount | number:'2.0-0' }} %</small> -
+                    <small>{{discount | number:'1.0-2' }} %</small> -
                     <b>{{discountAmount}} TL</b>
                   </span>
                 </h4>
                 <h4 *ngIf="payedPrice > 0 && changePrice !== 0" class="mb-1">{{changeMessage}}:
                   <span class="text-warning pull-right">
                     <b>{{(changePrice
-                      < 0 ? changePrice*-1 : changePrice)}} TL </b>
+                      < 0 ? changePrice*-1 : changePrice) | number:'1.0-2' }} TL </b>
                   </span>
                 </h4>
               </div>
@@ -182,7 +182,7 @@
               <div class="card-footer p-1">
                 <p class="pr-1 pl-1 mt-2">
                   <strong>Hesap Genel Toplamı:
-                    <span class="pull-right">{{check?.discount + check?.total_price + priceWillPay}} TL</span>
+                    <span class="pull-right">{{check?.discount + check?.total_price + priceWillPay | number:'1.0-2'}} TL</span>
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block">
@@ -266,20 +266,20 @@
 
 
 <div class="modal fade" id="otherOptions" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Hesap İşlemleri</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Hesap İşlemleri</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
 
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
       </div>
     </div>
   </div>
+</div>

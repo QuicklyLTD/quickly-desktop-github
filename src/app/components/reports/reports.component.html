@@ -80,34 +80,34 @@
                         <div class="card-block">
                           <strong>
                             <p class="text-success mt-1">Nakit Hesap Toplam:
-                              <span class="pull-right">{{pieData[0]}} TL</span>
+                              <span class="pull-right">{{pieData[0] | number:'1.0-2' }} TL</span>
                             </p>
                             <p class="text-warning mt-2">Kart Hesap Toplam:
-                              <span class="pull-right">{{pieData[2]}} TL</span>
+                              <span class="pull-right">{{pieData[2] | number:'1.0-2'}} TL</span>
                             </p>
                             <p class="text-info mt-2">Kupon Hesap Toplam:
-                              <span class="pull-right">{{pieData[1]}} TL</span>
+                              <span class="pull-right">{{pieData[1] | number:'1.0-2'}} TL</span>
                             </p>
                             <p class="text-danger mt-2">İkram Hesap Toplam:
-                              <span class="pull-right">{{freeTotal}} TL</span>
+                              <span class="pull-right">{{freeTotal | number:'1.0-2'}} TL</span>
                             </p>
                             <p class="text-primary mt-2">İptal Hesap Toplam:
-                              <span class="pull-right">{{canceledTotal}} TL</span>
+                              <span class="pull-right">{{canceledTotal | number:'1.0-2'}} TL</span>
                             </p>
                           </strong>
                         </div>
                         <div class="card-footer">
                           <p>Açık Hesap Toplam:
-                            <span class="pull-right">{{activeTotal}} TL</span>
+                            <span class="pull-right">{{activeTotal | number:'1.0-2'}} TL</span>
                           </p>
                           <p class="mb-0">Kapalı Hesap Toplam:
-                            <span class="pull-right">{{closedTotal - canceledTotal}} TL</span>
+                            <span class="pull-right">{{closedTotal - canceledTotal | number:'1.0-2'}} TL</span>
                           </p>
                         </div>
                         <div class="card-footer">
                           <strong>
                             <p class="mb-0">Cari Hesap Toplam:
-                              <span class="pull-right">{{generalTotal - canceledTotal}} TL</span>
+                              <span class="pull-right">{{generalTotal - canceledTotal | number:'1.0-2'}} TL</span>
                             </p>
                           </strong>
                         </div>

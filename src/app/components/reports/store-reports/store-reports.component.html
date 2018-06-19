@@ -75,7 +75,7 @@
                       <td>{{check.table_id | general:'tables' | async}}
                         <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
-                      <td>{{check.total_price + check.discount}} TL
+                      <td>{{check.total_price + check.discount  | number:'1.0-2'}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
                         </small>
@@ -90,7 +90,7 @@
               <div class="card-footer">
                 <strong>
                   Normal Hesap Toplamı:
-                  <span class="pull-right">{{NormalTotal}} TL</span>
+                  <span class="pull-right">{{NormalTotal  | number:'1.0-2' }} TL</span>
                 </strong>
               </div>
             </div>
@@ -159,7 +159,7 @@
                       <td>{{check.table_id}}
                         <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
-                      <td>{{check.total_price + check.discount}} TL
+                      <td>{{check.total_price + check.discount  | number:'1.0-2'}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
                         </small>
@@ -174,7 +174,7 @@
               <div class="card-footer">
                 <strong>
                   Hızlı Hesap Toplamı:
-                  <span class="pull-right">{{FastTotal}} TL</span>
+                  <span class="pull-right">{{FastTotal  | number:'1.0-2' }} TL</span>
                 </strong>
               </div>
             </div>
@@ -214,7 +214,7 @@
                   </td>
                   <td>{{check.description}}</td>
                   <td>{{check.payment_method}}</td>
-                  <td>{{check.total_price}} TL</td>
+                  <td>{{check.total_price  | number:'1.0-2' }} TL</td>
                   <td>{{check.timestamp | date:"HH:mm" }}</td>
                   <td>{{check.owner}}</td>
                 </tr>
@@ -294,7 +294,7 @@
                   </td>
                   <td width="17%">{{item.owner}}</td>
                   <td width="14%">{{item.timestamp |date:'HH:mm'}}</td>
-                  <td width="17%">{{item.price}} TL</td>
+                  <td width="17%">{{item.price  | number:'1.0-2'}} TL</td>
                 </tr>
               </tbody>
             </table>
@@ -305,7 +305,7 @@
                   <th>{{item.owner}}</th>
                   <th>{{item.method}}</th>
                   <th>{{item.timestamp | date:'HH:mm'}}</th>
-                  <th>{{item.amount + item.discount}} TL</th>
+                  <th>{{item.amount + item.discount  | number:'1.0-2'}} TL</th>
                 </thead>
                 <tbody>
                   <tr *ngIf="item.discount > 0" class="table-info">
@@ -324,7 +324,7 @@
                     </td>
                     <td width="15%">{{product.owner}}</td>
                     <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
-                    <td width="17%">{{product.price}} TL</td>
+                    <td width="17%">{{product.price  | number:'1.0-2'}} TL</td>
                   </tr>
                 </tbody>
               </table>
@@ -345,7 +345,7 @@
           <div class="card-footer">
             <b>
               <i class="fa fa-check" aria-hidden="true"></i> Ödenen Miktar:
-              <span class="pull-right">{{checkDetail?.total_price}} TL</span>
+              <span class="pull-right">{{checkDetail?.total_price  | number:'1.0-2'}} TL</span>
             </b>
           </div>
         </div>
@@ -424,7 +424,7 @@
           <p>Düzenlemek istediğiniz ödemeyi seçin</p>
           <div *ngFor="let payment of checkDetail?.payment_flow; let i = index">
             <button type="button" class="btn btn-block btn-lg btn-secondary text-left mb-1" (click)="editPayment(i)">{{payment.method}}
-              <span class="pull-right">{{payment.amount}} TL</span>
+              <span class="pull-right">{{payment.amount  | number:'1.0-2'}} TL</span>
             </button>
           </div>
         </div>
