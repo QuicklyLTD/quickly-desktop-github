@@ -16,7 +16,7 @@ import { SettingsService } from './services/settings.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.2.7';
+  version = '1.2.8';
   date: number;
   windowStatus: boolean;
   connectionStatus: boolean;
