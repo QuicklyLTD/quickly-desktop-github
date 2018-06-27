@@ -73,8 +73,8 @@
               <td>{{stock.unit}}</td>
               <td class="table-info">{{stock.total*stock.first_quantity - stock.left_total | number:'1.0-2' }}</td>
               <td class="table-info">{{stock.unit}}</td>
-              <td>{{stock.quantity}}x</td>
-              <td>{{stock.left_total  | number:'1.0-2' }}</td>
+              <td>{{stock.quantity | number:'1.0-2' }}x</td>
+              <td>{{stock.left_total | number:'1.0-2' }}</td>
               <td>{{stock.unit}}</td>
             </tr>
           </tbody>

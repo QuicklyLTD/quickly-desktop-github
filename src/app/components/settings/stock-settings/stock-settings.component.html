@@ -160,8 +160,8 @@
                         <td>{{item.name}}</td>
                         <td>{{item.first_quantity}}x</td>
                         <td>{{item.total}} {{item.unit}}</td>
-                        <td>{{item.quantity}}x</td>
-                        <td>{{item.left_total | number:'2.0-0'}}</td>
+                        <td>{{item.quantity | number:'1.0-2'}}x</td>
+                        <td>{{item.left_total | number:'1.0-2'}}</td>
                         <td>{{item.unit}}</td>
                       </tr>
                     </tbody>
