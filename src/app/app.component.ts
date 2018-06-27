@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ElectronService } from './providers/electron.service';
 import { MessageService } from './providers/message.service';
 import { ApplicationService } from './services/application.service';
+import { AuthService } from './services/auth.service';
 import { MainService } from './services/main.service';
 import { SettingsService } from './services/settings.service';
 
@@ -22,7 +23,7 @@ export class AppComponent implements OnInit {
   connectionStatus: boolean;
   setupFinished: boolean;
 
-  constructor(private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService) {
+  constructor(private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService) {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
@@ -30,6 +31,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     if (this.electronService.isElectron()) {
+      this.settingsService.setLocalStorage();
       this.startApp();
     }
     setInterval(() => {
@@ -47,9 +49,9 @@ export class AppComponent implements OnInit {
             this.settingsService.DateSettings.subscribe(res => {
               if (new Date().getDay() !== res.value.day) {
                 if (res.value.started) {
-                  this.messageService.sendAlert('Dikkat!','Gün Sonu Yapılmamış.','warning');
+                  this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
                 } else {
-                  this.messageService.sendAlert('Dikkat!','Gün Başı Yapmalısınız.','warning');
+                  this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
                 }
               }
             });
@@ -91,8 +93,7 @@ export class AppComponent implements OnInit {
   exitProgram() {
     let isOK = confirm('Programdan Çıkmak Üzeresiniz..');
     if (isOK) {
-      localStorage.removeItem('userType');
-      localStorage.removeItem('userName');
+      this.authService.logout();
       this.electronService.exitProgram();
     }
   }

@@ -304,6 +304,8 @@ export class SellingScreenComponent implements OnInit {
       this.updateTableReport(this.check);
       this.router.navigate(['/store']);
     } else {
+      this.updateUserReport();
+      this.updateProductReport(this.countData);
       this.router.navigate(['']);
     }
     if (this.check.type == 2) {
@@ -720,6 +722,24 @@ export class SellingScreenComponent implements OnInit {
               this.mainService.updateData('tables', this.selectedTable._id, { status: 2, timestamp: Date.now() }).then(res => {
                 if (res.ok) {
                   if (this.check.products.length == 0) {
+                    if(this.check.payment_flow){
+                      let payedDiscounts = 0;
+                      this.check.payment_flow.forEach((obj, index) => {
+                        payedDiscounts += obj.discount;
+                        this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
+                          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+                            doc.count++;
+                            doc.weekly_count[this.day]++;
+                            doc.amount += obj.amount;
+                            doc.weekly[this.day] += obj.amount;
+                            doc.update_time = Date.now();
+                            return doc;
+                          });
+                        });
+                      });
+                      let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
+                      this.mainService.addData('closed_checks', checksForPayed);
+                    }
                     this.mainService.removeData('checks', this.check._id).then(res => {
                       if (res.ok) {
                         $('#splitTable').modal('hide');
@@ -755,6 +775,24 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.updateData('checks', otherCheck._id, otherCheck).then(res => {
           if (res.ok) {
             if (this.check.products.length == 0) {
+              if(this.check.payment_flow){
+                let payedDiscounts = 0;
+                this.check.payment_flow.forEach((obj, index) => {
+                  payedDiscounts += obj.discount;
+                  this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
+                    this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
+                      doc.count++;
+                      doc.weekly_count[this.day]++;
+                      doc.amount += obj.amount;
+                      doc.weekly[this.day] += obj.amount;
+                      doc.update_time = Date.now();
+                      return doc;
+                    });
+                  });
+                });
+                let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
+                this.mainService.addData('closed_checks', checksForPayed);
+              }
               this.mainService.removeData('checks', this.check._id).then(res => {
                 if (res.ok) {
                   $('#splitTable').modal('hide');

@@ -19,11 +19,6 @@ export class MainService {
   /////////////////////////////////
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
-  /////////////////////////////////
-  // printers: Array<any>;
-  // categories: Array<any>;
-  // tables: Array<any>;
-
 
   constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
     PouchDB.plugin(PouchDBFind);
@@ -76,17 +71,6 @@ export class MainService {
         }
       }
     });
-
-    // this.getAllBy('settings', { key: 'Printers' }).then(res => {
-    //   this.printers = res.docs[0].value;
-    // });
-    // this.getAllBy('categories', {}).then(res => {
-    //   this.categories = res.docs;
-    // });
-    // this.getAllBy('tables', {}).then(res => {
-    //   this.tables = res.docs;
-    // });
-
   }
 
   getAllData(db: string, $limit) {
@@ -179,19 +163,10 @@ export class MainService {
       changes.forEach((element, index) => {
         if (!element._deleted) {
           let db = element.db_name;
-          if (db == 'settings' && element.key == 'ServerSettings') {
-            // Do nothing... 
-          } else {
+          if (element.key !== 'ServerSettings') {
             delete element._rev;
             delete element._revisions;
             delete element.db_seq;
-            // if (db == 'checks') {
-            //   this.terminal.printOrders(this.printers, this.categories, element, this.tables);
-            //   element.products.forEach(element => {
-            //     element.status = 2;
-            //   });
-            //   setTimeout(() => { this.updateData('checks', element._id, element); }, 2000);
-            // }
             delete element.db_name;
             this.LocalDB[db].upsert(element._id, (doc) => {
               return Object.assign(doc, element);
@@ -227,10 +202,9 @@ export class MainService {
         const docs = res.docs;
         if (docs.length > 0) {
           docs.forEach((element, index) => {
-            console.log(index);
             let db = element.db_name;
             if (db !== undefined) {
-              if (db !== 'settings' && element.key !== 'ServerSettings') {
+              if (element.key !== 'ServerSettings') {
                 delete element.db_name;
                 delete element.db_seq;
                 delete element._rev;

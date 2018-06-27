@@ -36,8 +36,6 @@ export class SettingsService {
       this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings'));
       this.DateSettings.next(this.Settings.find((setting) => setting.key == 'DateSettings'));
     });
-
-    this.setLocalStorage();
   }
 
   getUser(value) {

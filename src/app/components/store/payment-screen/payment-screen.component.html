@@ -154,7 +154,7 @@
                 <h4 *ngIf="payedPrice > 0 && changePrice !== 0" class="mb-1">{{changeMessage}}:
                   <span class="text-warning pull-right">
                     <b>{{(changePrice
-                      < 0 ? changePrice*-1 : changePrice) | number:'1.0-2' }} TL </b>
+                      < 0 ? changePrice*-1 : changePrice) | number: '1.0-2' }} TL </b>
                   </span>
                 </h4>
               </div>
@@ -190,8 +190,7 @@
                     class="btn btn-secondary btn-block btn-lg">İndirim Yap
                     <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i>
                   </button>
-                  <button [disabled]="productsWillPay.length == 0 || !permissions.discount" type="button" data-toggle="modal" data-target="#otherOptions"
-                    class="btn btn-info btn-lg mt-0">İşlemler
+                  <button disabled type="button" data-toggle="modal" data-target="#otherOptions" class="btn btn-info btn-lg mt-0">İşlemler
                   </button>
                 </div>
               </div>
