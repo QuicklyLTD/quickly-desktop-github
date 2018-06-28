@@ -141,7 +141,7 @@
                       <small *ngIf="item.discount !== 0" class="text-danger pull-right">
                         <i class="fa fa-arrow-down" aria-hidden="true"></i> {{item.discount}} TL</small>
                     </td>
-                    <td>{{item.timestamp | date:'HH:MM'}}</td>
+                    <td>{{item.timestamp | date:'HH:mm'}}</td>
                     <td>{{item.payment_method}}</td>
                   </tr>
                 </tbody>
@@ -339,7 +339,7 @@
           <div class="card-footer">
             <i class="fa fa-user" aria-hidden="true"></i> {{cashDetail?.user}}
             <span class="pull-right">
-              {{cashDetail?.time | date:'HH:MM'}}
+              {{cashDetail?.time | date:'HH:mm'}}
             </span>
           </div>
         </div>
