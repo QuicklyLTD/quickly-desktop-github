@@ -62,12 +62,17 @@ export class AppComponent implements OnInit {
                   this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
                   this.mainService.syncToServer();
                 } else if (configrations.type == 1) {
-                  this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', change => {
-                    this.router.navigate(['/endoftheday_no_guard']).then(res => {
+                  this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
+                    this.router.navigate(['/endoftheday_no_guard']).then(() => {
                       $('#endDayModal').modal('show');
-                      setTimeout(() => {
-                        this.electronService.shellCommand('shutdown now');
-                      }, 30000);
+                      this.mainService.syncToRemote().cancel();
+                      this.mainService.replicateDB(configrations).on('complete', () => {
+                        $('#endDayModal').modal('hide');
+                        this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+                        setTimeout(() => {
+                           this.electronService.shellCommand('shutdown now');
+                        }, 10000);
+                      });
                     });
                   });
                 }
