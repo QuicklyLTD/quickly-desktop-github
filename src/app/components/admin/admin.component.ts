@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Settings } from '../../mocks/settings.mock';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
 
@@ -146,6 +145,8 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
+    this.mainService.clearAll(this.selectedDB, {});
+    this.mainService.clearAll('allData', { db_name: this.selectedDB });
     // this.mainService.getAllBy('products', {}).then(res => {
     //   const products = res.docs;
     //   products.forEach(element => {
@@ -168,13 +169,11 @@ export class AdminComponent implements OnInit {
     //     console.log('Settings', res.ok);
     //   });
     // });
-    let dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() }, 'Tarih-Zaman Ayarları', Date.now());
-    let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: '192.168.0.1', ip_port: 3000, key: 'test' }, 'Sunucu Ayarları', Date.now());
-    this.mainService.addData('settings', serverSettings);
-    this.mainService.addData('settings', dateSettings);
-
+    // let dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() }, 'Tarih-Zaman Ayarları', Date.now());
+    // let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: '192.168.0.1', ip_port: 3000, key: 'test' }, 'Sunucu Ayarları', Date.now());
+    // this.mainService.addData('settings', serverSettings);
+    // this.mainService.addData('settings', dateSettings);
     // this.mainService.addData('reports', new Report('Store', 'İptal', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'İptal Satış Raporu', Date.now()));
-
   }
 
   testEndDay() {

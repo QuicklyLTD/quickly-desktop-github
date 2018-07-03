@@ -124,6 +124,16 @@ export class MainService {
     return this.LocalDB[db].put(doc);
   }
 
+  clearAll(db: string, $schema: any) {
+    return this.getAllBy(db, $schema).then(res => {
+      return res.docs.map(obj => {
+        return { _id: obj._id, _rev: obj._rev, _deleted: true };
+      });
+    }).then(deleteDocs => {
+      return this.LocalDB[db].bulkDocs(deleteDocs);
+    });
+  }
+
   createIndex(db: string) {
     this.LocalDB[db].createIndex({
       index: {
@@ -146,7 +156,7 @@ export class MainService {
         let cData = Object.assign({ db_name: local_db, db_seq: change.seq }, change.doc);
         this.LocalDB['allData'].putIfNotExists(cData).then((res: any) => {
           if (!res.updated) {
-            this.LocalDB['allData'].upsert(res.id, function (doc) {
+            this.LocalDB['allData'].upsert(res.id, function () {
               return cData;
             });
           }
@@ -160,7 +170,7 @@ export class MainService {
   handleChanges(sync) {
     const changes = sync.change.docs;
     if (sync.direction === 'pull') {
-      changes.forEach((element, index) => {
+      changes.forEach((element) => {
         if (!element._deleted) {
           let db = element.db_name;
           if (element.key !== 'ServerSettings') {
