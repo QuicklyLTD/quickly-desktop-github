@@ -59,7 +59,7 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.discounts = [5, 10, 15, 20, 25];
+    this.discounts = [10, 15, 20, 25, 50];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "✔"]];
     this.setDefault();
     this.payedShow = false;
