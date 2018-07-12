@@ -1,8 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
-import * as fs from 'fs';
-
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',

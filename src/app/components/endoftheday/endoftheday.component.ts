@@ -9,6 +9,7 @@ import { MessageService } from '../../providers/message.service';
 import { PrinterService } from '../../providers/printer.service';
 import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
+import { HttpService } from '../../services/http.service';
 
 @Component({
   selector: 'app-endoftheday',
@@ -35,7 +36,7 @@ export class EndofthedayComponent implements OnInit {
   progress: string;
   permissions: any;
 
-  constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settingsService: SettingsService) {
+  constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settingsService: SettingsService, private httpService: HttpService) {
     this.settingsService.DateSettings.subscribe(res => {
       this.isStarted = res.value.started;
       this.day = res.value.day;
@@ -177,7 +178,6 @@ export class EndofthedayComponent implements OnInit {
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', this.reports);
       this.backupData.push(reportsBackup);
-      ////////////////////////////////////////////////////////////////////
       const activities = res.docs.filter(obj => obj.type == 'Activity');
       const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
       storeData.forEach(element => {
@@ -250,6 +250,48 @@ export class EndofthedayComponent implements OnInit {
         this.electronService.reloadProgram();
       }, 10000);
     });
+  }
+
+  purgeData() {
+    this.mainService.syncToRemote().cancel();
+    this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
+      let restaurantID = res.docs[0].value.id;
+      this.mainService.getAllBy('allData', {}).then(res => {
+        let token = localStorage.getItem("AccessToken");
+        this.httpService.post(`v1/management/restaurants/${restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
+          console.log(res.json());
+          Object.keys(this.mainService.LocalDB).forEach(db_name => {
+            if (db_name !== 'settings') {
+              this.mainService.destroyDB(db_name).then(res => {
+                console.log(db_name, res);
+              });
+            }
+          });
+        });
+      })
+    });
+  }
+
+  sendData() {
+    let token = localStorage.getItem("AccessToken");
+    let restaurantID = JSON.parse(localStorage['RestaurantInfo']).id;
+    this.httpService.post(`v1/management/restaurants/${restaurantID}/report_generator/`, { timestamp: Date.now(), data: { hello: 'test' } }, token).subscribe(res => {
+      console.log(res);
+    });
+  }
+
+  getNewToken() {
+    let oldToken = localStorage['AccessToken'];
+    this.httpService.post('token/refresh/', { token: oldToken })
+      .subscribe(res => {
+        if (res.ok) {
+          const token = res.json().token;
+          localStorage.setItem('AccessToken', token);
+          alert('İşlem Başarılı');
+        } else {
+          alert('Başarısız');
+        }
+      });
   }
 
   fillData() {
