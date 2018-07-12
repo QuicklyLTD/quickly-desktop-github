@@ -50,8 +50,6 @@ import { MessageService } from "./providers/message.service";
 import { PrinterService } from "./providers/printer.service"
 import { ElectronService } from './providers/electron.service';
 import { TerminalService } from './providers/terminal.service';
-//////  Guards
-import { CanActivateViaAuthGuard } from './guards/auth.guard.service';
 //////  Pipes
 import { GeneralPipe } from './pipes/general.pipe';
 //////  Helpers
@@ -59,8 +57,6 @@ import { KeyboardComponent } from './components/helpers/keyboard/keyboard.compon
 import { MessageComponent } from './components/helpers/message/message.component';
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
-
-
 
 //// Error Handler Sentry
 // import * as Raven from 'raven-js';

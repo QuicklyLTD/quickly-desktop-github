@@ -32,12 +32,36 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     if (this.electronService.isElectron()) {
       this.settingsService.setLocalStorage();
+      // this.initAppData();
       this.startApp();
     }
     setInterval(() => {
       this.date = Date.now();
       this.connectionStatus = this.aplicationService.connectionStatus();
     }, 5000);
+  }
+
+  initAppData() {
+    let db_names = Object.keys(this.mainService.LocalDB);
+    this.electronService.fileSystem.readFile(this.electronService.appRealPath + '/data/all.txt', (err, data) => {
+      if (!err) {
+        const realData = JSON.parse(data.toString('utf-8'));
+        db_names.forEach(element => {
+          let db_data = realData.filter(obj => obj.db_name == element);
+          db_data.map(obj => {
+            delete obj['db_name'];
+            delete obj['db_seq'];
+          })
+          if (db_data.length > 0) {
+            this.mainService.putAll(element, db_data);
+            console.log(element, db_data);
+          }
+        });
+        this.startApp();
+      } else {
+        console.log('Dosya Yok')
+      }
+    });
   }
 
   startApp() {
@@ -70,7 +94,7 @@ export class AppComponent implements OnInit {
                         $('#endDayModal').modal('hide');
                         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
                         setTimeout(() => {
-                           this.electronService.shellCommand('shutdown now');
+                          this.electronService.shellCommand('shutdown now');
                         }, 10000);
                       });
                     });
@@ -80,7 +104,6 @@ export class AppComponent implements OnInit {
               this.mainService.syncToRemote();
             });
           } else {
-            console.log('Aktif Değil');
             this.setupFinished = false;
             this.router.navigate(['/activation']);
           }

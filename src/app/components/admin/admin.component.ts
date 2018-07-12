@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
+import * as fs from 'fs';
 
 @Component({
   selector: 'app-admin',
@@ -16,31 +17,7 @@ export class AdminComponent implements OnInit {
   @ViewChild('editArea') editArea: ElementRef;
 
   constructor(private mainService: MainService, private httpService: HttpService) {
-    this.databases = [
-      'users',
-      'users_group',
-      'checks',
-      'closed_checks',
-      'credits',
-      'customers',
-      'orders',
-      'cashbox',
-      'categories',
-      'sub_categories',
-      'occations',
-      'products',
-      'recipes',
-      'floors',
-      'tables',
-      'stocks',
-      'stocks_cat',
-      'endday',
-      'reports',
-      'settings',
-      'logs',
-      'allData'
-    ];
-
+    this.databases = Object.keys(this.mainService.LocalDB);
   }
 
   ngOnInit() {
@@ -145,35 +122,93 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
-    this.mainService.clearAll(this.selectedDB, {});
-    this.mainService.clearAll('allData', { db_name: this.selectedDB });
-    // this.mainService.getAllBy('products', {}).then(res => {
-    //   const products = res.docs;
-    //   products.forEach(element => {
-    //     this.mainService.updateData('products', element._id, { type: 1 }).then(res => {
-    //       console.log('Products', res.ok);
+    this.mainService.syncToRemote().cancel();
+    this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
+      let restaurantID = res.docs[0].value.id;
+      this.mainService.getAllBy('allData', {}).then(res => {
+        let token = localStorage.getItem("AccessToken");
+        this.httpService.post(`v1/management/restaurants/${restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
+          console.log(res.json());
+          Object.keys(this.mainService.LocalDB).forEach(db_name => {
+            if (db_name !== 'settings') {
+              this.mainService.destroyDB(db_name).then(res => {
+                console.log(db_name, res);
+              });
+            }
+          });
+        });
+      })
+    });
+
+    // this.mainService.getAllBy('allData', {}).then(res => {
+    //   return res.docs.map((obj) => {
+    //     delete obj._rev;
+    //     return obj;
+    //   })
+    // }).then((cleanDocs: Array<any>) => {
+    //   fs.writeFile('./data/all.txt', JSON.stringify(cleanDocs), err => {
+    //     console.log(err);
+    //   })
+    // });;
+
+    // let db_names = Object.keys(this.mainService.LocalDB);
+    // fs.readFile('./data/all.txt', (err, data) => {
+    //   const realData = JSON.parse(data.toString('utf-8'));
+    //   this.mainService.putAll('allData', realData).then(res => {
+    //     db_names.forEach(element => {
+    //       if (element !== 'allData') {
+    //         let db_data = realData.filter(obj => obj.db_name == element);
+    //         db_data.map(obj => {
+    //           delete obj['db_name'];
+    //           delete obj['db_seq'];
+    //           return obj;
+    //         });
+    //         if (element !== 'settings') {
+    //           console.log(element, db_data)
+    //           this.mainService.putAll(element, db_data).then(res => {
+    //             console.log(element, res)
+    //           });
+    //         }
+    //       }
     //     });
     //   });
+    // })
+
+    // Object.keys(this.mainService.LocalDB).forEach(db_name => {
+    //   this.mainService.destroyDB(db_name);
     // });
-    // this.mainService.getAllBy('categories', {}).then(res => {
-    //   const categories = res.docs;
-    //   categories.forEach(element => {
-    //     this.mainService.updateData('categories', element._id, { tags: '' }).then(res => {
-    //       console.log('Categories', res.ok);
-    //     });
-    //   });
+
+    // this.mainService.createIndex('allData', ['db_name']).then(res => {
+    //   console.log(res);
     // });
-    // this.mainService.getAllBy('settings', { key: "AppSettings" }).then(res => {
-    //   const appSettings = res.docs[0];
-    //   this.mainService.updateData('settings', appSettings._id, { last_day: 0 }).then(res => {
-    //     console.log('Settings', res.ok);
-    //   });
+
+
+    // let t1 = performance.now();
+    // this.mainService.getAllData('closed_checks').then(res => {
+    //   console.log(res.rows.map(obj => { return obj.doc }));
+    //   let t2 = performance.now();
+    //   console.log('Bulk', t2 - t1);
+    // })
+    // this.mainService.getAllBy('closed_checks', {}).then(res => {
+    //   console.log('Pro', res.docs);
+    //   let t2 = performance.now();
+    //   console.log('Normal', t2 - t1);
     // });
-    // let dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() }, 'Tarih-Zaman Ayarları', Date.now());
-    // let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: '192.168.0.1', ip_port: 3000, key: 'test' }, 'Sunucu Ayarları', Date.now());
-    // this.mainService.addData('settings', serverSettings);
-    // this.mainService.addData('settings', dateSettings);
-    // this.mainService.addData('reports', new Report('Store', 'İptal', 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'İptal Satış Raporu', Date.now()));
+
+
+    // fs.readFile('./data/all.txt', (err, data) => {
+    //   const rdata = JSON.parse(data.toString('utf-8'));
+    //   let products = rdata.filter(obj => obj.db_name == 'products');
+    //   console.log('File', products);
+    //   let t2 = performance.now();
+    //   console.log(t2 - t1);
+    // })
+
+    // this.mainService.getAllBy('allData', { db_name: 'products' }).then(res => {
+    //   console.log('All', res.docs);
+    //   let t2 = performance.now();
+    //   console.log(t2 - t1);
+    // });
   }
 
   testEndDay() {

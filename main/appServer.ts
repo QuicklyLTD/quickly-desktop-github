@@ -1,4 +1,4 @@
-import { ipcMain, webContents } from 'electron';
+import { ipcMain } from 'electron';
 import * as PouchDB from 'pouchdb';
 import * as InMemory from 'pouchdb-adapter-memory';
 import * as express from 'express';

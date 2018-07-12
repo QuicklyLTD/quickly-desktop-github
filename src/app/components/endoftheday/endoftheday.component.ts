@@ -131,21 +131,10 @@ export class EndofthedayComponent implements OnInit {
       } catch (error) {
         console.log('İptal Hesap Bulunamadı..')
       }
-      // this.mainService.localSyncBeforeRemote('closed_checks').on('complete', (info) => {
-      //   this.progress = 'Kapatılan Hesaplar Temizlendi...';
-      //   this.mainService.compactDB('closed_checks').then(() => {
-      //     this.stepCashbox();
-      //   });
-      // });
-      // this.checks.forEach((element, index) => {
-      //   this.mainService.removeDoc('closed_checks', element);
-      // });
-      this.mainService.clearAll('closed_checks', {});
-      this.mainService.clearAll('allData', { db_name: 'closed_checks' }).then(() => {
+      this.mainService.removeAll('closed_checks', {});
+      this.mainService.removeAll('allData', { db_name: 'closed_checks' }).then(() => {
         this.progress = 'Kapatılan Hesaplar Temizlendi...';
-        this.mainService.compactDB('closed_checks').then(() => {
-          this.stepCashbox();
-        });
+        this.stepCashbox();
       });
       this.endDayReport.canceled_total = canceledTotal;
       this.endDayReport.check_count = this.checks.length;
@@ -158,21 +147,10 @@ export class EndofthedayComponent implements OnInit {
       this.cashbox = res.docs;
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
-      // this.mainService.localSyncBeforeRemote('cashbox').on('complete', (info) => {
-      //   this.progress = 'Kasa Verileri Temizlendi...';
-      //   this.mainService.compactDB('cashbox').then(() => {
-      //     this.stepReports();
-      //   });
-      // });
-      // this.cashbox.forEach((element, index) => {
-      //   this.mainService.removeDoc('cashbox', element);
-      // });
-      this.mainService.clearAll('cashbox', {});
-      this.mainService.clearAll('allData', { db_name: 'cashbox' }).then(() => {
+      this.mainService.removeAll('cashbox', {});
+      this.mainService.removeAll('allData', { db_name: 'cashbox' }).then(() => {
         this.progress = 'Kasa Verileri Temizlendi...';
-        this.mainService.compactDB('cashbox').then(() => {
-          this.stepReports();
-        });
+        this.stepReports();
       });
       let incomes = 0;
       let outcomes = 0;
@@ -216,9 +194,7 @@ export class EndofthedayComponent implements OnInit {
       this.endDayReport.total_income = this.total;
       this.mainService.localSyncBeforeRemote('reports').on('complete', () => {
         this.progress = 'Raporlar Temizlendi...';
-        this.mainService.compactDB('reports').then(() => {
-          this.stepLogs();
-        });
+        this.stepLogs();
       });
       activities.forEach(element => {
         this.mainService.changeData('reports', element._id, (doc) => {
@@ -247,19 +223,11 @@ export class EndofthedayComponent implements OnInit {
       this.logs = res.docs;
       const logsBackup = new BackupData('logs', this.logs);
       this.backupData.push(logsBackup);
-      this.mainService.clearAll('logs', {});
-      this.mainService.clearAll('allData', { db_name: 'logs' }).then(() => {
+      this.mainService.removeAll('logs', {});
+      this.mainService.removeAll('allData', { db_name: 'logs' }).then(() => {
         this.progress = 'Kayıtlar Temizlendi...';
-        this.mainService.compactDB('logs').then(() => {
-          this.stepFinal();
-        });
+        this.stepFinal();
       });
-
-      // this.mainService.localSyncBeforeRemote('logs').on('complete', () => {
-      // });
-      // this.logs.forEach(element => {
-      //   this.mainService.removeDoc('logs', element);
-      // });
     });
   }
 
@@ -267,22 +235,20 @@ export class EndofthedayComponent implements OnInit {
     this.endDayReport.time = Date.now();
     this.endDayReport.data_file = this.endDayReport.time + '.qdat';
     this.progress = 'Gün Sonu Tamamlanıyor...';
-    this.mainService.compactDB('allData').then(() => {
-      this.mainService.addData('endday', this.endDayReport).then(() => {
-        this.electronService.backupData(this.backupData, this.endDayReport.time);
-        this.printerService.printReport(this.printers[0], this.endDayReport);
-        this.progress = 'Gün Sonu Tamamlandı !';
-        let dateData = { started: false, day: this.day, time: Date.now() };
-        this.settingsService.setAppSettings('DateSettings', dateData);
-        localStorage.setItem('DayStatus', JSON.stringify(dateData));
-        this.fillData();
-        this.isStarted = false;
-        setTimeout(() => {
-          $('#endDayModal').modal('hide');
-          this.messageService.sendMessage('Program yeniden başlatılacak.');
-          this.electronService.reloadProgram();
-        }, 10000);
-      });
+    this.mainService.addData('endday', this.endDayReport).then(() => {
+      this.electronService.backupData(this.backupData, this.endDayReport.time);
+      this.printerService.printReport(this.printers[0], this.endDayReport);
+      this.progress = 'Gün Sonu Tamamlandı !';
+      let dateData = { started: false, day: this.day, time: Date.now() };
+      this.settingsService.setAppSettings('DateSettings', dateData);
+      localStorage.setItem('DayStatus', JSON.stringify(dateData));
+      this.fillData();
+      this.isStarted = false;
+      setTimeout(() => {
+        $('#endDayModal').modal('hide');
+        this.messageService.sendMessage('Program yeniden başlatılacak.');
+        this.electronService.reloadProgram();
+      }, 10000);
     });
   }
 
