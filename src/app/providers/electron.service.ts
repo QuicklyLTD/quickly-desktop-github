@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { app, remote, screen, shell, Remote, App, BrowserWindow, WebContents, ipcRenderer, webFrame } from 'electron';
 import * as fs from 'fs';
 import * as https from 'https';
-import * as path from 'path';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as crypto from 'crypto';
@@ -10,15 +9,17 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class ElectronService {
-  electronRemote: Remote;
   app: App;
   appWindow: BrowserWindow;
   appWebContents: WebContents;
   appPath: string;
   appRealPath: string;
+  electronRemote: Remote;
+  fileSystem: typeof fs;
   ipcRenderer: typeof ipcRenderer;
   ipAddress: Array<string>;
   webFrame: typeof webFrame;
+
 
   constructor() {
     this.app = remote.app
@@ -28,6 +29,7 @@ export class ElectronService {
     this.appRealPath = window.process.cwd();
     this.ipcRenderer = ipcRenderer;
     this.webFrame = webFrame;
+    this.fileSystem = fs;
   }
 
   isElectron() {
@@ -78,6 +80,10 @@ export class ElectronService {
     });
   }
 
+  initApplicationData() {
+
+  }
+
   backupData(data, date) {
     let json = JSON.stringify(data);
     fs.exists(this.appRealPath + '/data/backup/', (exists) => {
@@ -120,23 +126,28 @@ export class ElectronService {
       });
     });
   }
-  
+
   fullScreen(status: boolean) {
     this.appWindow.setFullScreen(status);
   }
+
   shellCommand(command: string) {
     childProcess.exec(command);
   }
+
   reloadProgram() {
     this.appWindow.reload();
   }
-  relaunchProgram(){
+
+  relaunchProgram() {
     this.app.relaunch();
     this.app.quit();
   }
+
   exitProgram() {
     this.app.quit();
   }
+
   openDevTools() {
     this.appWebContents.openDevTools();
   }

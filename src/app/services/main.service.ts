@@ -3,9 +3,6 @@ import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
-import { ElectronService } from '../providers/electron.service';
-import { MessageService } from '../providers/message.service';
-import { TerminalService } from '../providers/terminal.service';
 
 @Injectable()
 export class MainService {
@@ -20,33 +17,35 @@ export class MainService {
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
 
-  constructor(private messageService: MessageService, private terminal: TerminalService, private electron: ElectronService) {
+  constructor() {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
 
+    const db_opts = { revs_limit: 3, auto_compaction: true };
+
     this.LocalDB = {
-      users: new PouchDB('local_users'),
-      users_group: new PouchDB('local_users_group'),
-      checks: new PouchDB('local_checks'),
-      closed_checks: new PouchDB('local_closed_checks'),
-      credits: new PouchDB('local_credits'),
-      customers: new PouchDB('local_customers'),
-      orders: new PouchDB('local_orders'),
-      cashbox: new PouchDB('local_cashbox'),
-      categories: new PouchDB('local_categories'),
-      sub_categories: new PouchDB('local_sub_cats'),
-      occations: new PouchDB('local_occations'),
-      products: new PouchDB('local_products'),
-      recipes: new PouchDB('local_recipes'),
-      floors: new PouchDB('local_floors'),
-      tables: new PouchDB('local_tables'),
-      stocks: new PouchDB('local_stocks'),
-      stocks_cat: new PouchDB('local_stocks_cat'),
-      endday: new PouchDB('local_endday'),
-      reports: new PouchDB('local_reports'),
-      settings: new PouchDB('local_settings'),
-      logs: new PouchDB('local_logs'),
-      allData: new PouchDB('local_alldata')
+      users: new PouchDB('local_users', db_opts),
+      users_group: new PouchDB('local_users_group', db_opts),
+      checks: new PouchDB('local_checks', db_opts),
+      closed_checks: new PouchDB('local_closed_checks', db_opts),
+      credits: new PouchDB('local_credits', db_opts),
+      customers: new PouchDB('local_customers', db_opts),
+      orders: new PouchDB('local_orders', db_opts),
+      cashbox: new PouchDB('local_cashbox', db_opts),
+      categories: new PouchDB('local_categories', db_opts),
+      sub_categories: new PouchDB('local_sub_cats', db_opts),
+      occations: new PouchDB('local_occations', db_opts),
+      products: new PouchDB('local_products', db_opts),
+      recipes: new PouchDB('local_recipes', db_opts),
+      floors: new PouchDB('local_floors', db_opts),
+      tables: new PouchDB('local_tables', db_opts),
+      stocks: new PouchDB('local_stocks', db_opts),
+      stocks_cat: new PouchDB('local_stocks_cat', db_opts),
+      endday: new PouchDB('local_endday', db_opts),
+      reports: new PouchDB('local_reports', db_opts),
+      settings: new PouchDB('local_settings', db_opts),
+      logs: new PouchDB('local_logs', db_opts),
+      allData: new PouchDB('local_alldata', db_opts)
     };
 
     this.getAllBy('settings', { key: 'AuthInfo' }).then(res => {
@@ -55,7 +54,7 @@ export class MainService {
         this.hostname = 'http://' + this.authInfo.app_remote + ':' + this.authInfo.app_port;
         this.ajax_opts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
         this.db_prefix = this.authInfo.app_db;
-        this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajax_opts);
+        this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, Object.assign({}, db_opts, this.ajax_opts));
       }
     });
 
@@ -73,18 +72,18 @@ export class MainService {
     });
   }
 
-  getAllData(db: string, $limit) {
-    return this.LocalDB[db].allDocs({ include_docs: true, limit: $limit });
-  }
-
-  getData(db: string, id: string) {
-    return this.LocalDB[db].get(id);
+  getAllData(db: string) {
+    return this.LocalDB[db].allDocs({ include_docs: true });
   }
 
   getAllBy(db: string, $schema) {
     return this.LocalDB[db].find({
       selector: $schema
     });
+  }
+
+  getData(db: string, id: string) {
+    return this.LocalDB[db].get(id);
   }
 
   addData(db, schema) {
@@ -116,15 +115,19 @@ export class MainService {
     });
   }
 
-  removeDoc(db: string, doc: any) {
-    return this.LocalDB[db].remove(doc);
-  }
-
   putDoc(db: string, doc: any) {
     return this.LocalDB[db].put(doc);
   }
 
-  clearAll(db: string, $schema: any) {
+  removeDoc(db: string, doc: any) {
+    return this.LocalDB[db].remove(doc);
+  }
+
+  putAll(db: string, docs: Array<any>) {
+    return this.LocalDB[db].bulkDocs(docs);
+  }
+
+  removeAll(db: string, $schema: any) {
     return this.getAllBy(db, $schema).then(res => {
       return res.docs.map(obj => {
         return { _id: obj._id, _rev: obj._rev, _deleted: true };
@@ -134,15 +137,19 @@ export class MainService {
     });
   }
 
-  createIndex(db: string) {
-    this.LocalDB[db].createIndex({
+  createIndex(db: string, fields: Array<string>) {
+    return this.LocalDB[db].createIndex({
       index: {
-        fields: ['description', 'time', 'cash', 'card', 'coupon']
+        fields: fields
       }
     });
   }
 
-  compactDB(db) {
+  destroyDB(db: string) {
+    return this.LocalDB[db].destroy();
+  }
+
+  compactDB(db: string) {
     return this.LocalDB[db].compact();
   }
 
@@ -162,8 +169,6 @@ export class MainService {
           }
         });
       }
-    }).on('error', (err) => {
-      console.error('Change Error', err);
     });
   }
 
@@ -184,20 +189,17 @@ export class MainService {
           }
         } else {
           Object.keys(this.LocalDB).forEach(db => {
-            this.LocalDB[db].get(element._id).then((doc) => {
-              if (doc) {
-                this.LocalDB[db].remove(doc);
-              }
-            }).catch(err => { });
+            if (db !== 'allData') {
+              this.LocalDB[db].get(element._id).then((doc) => {
+                if (doc) {
+                  this.LocalDB[db].remove(doc);
+                }
+              }).catch(err => { });
+            }
           });
         }
       });
     }
-  }
-
-  replicateDB(db_configrations) {
-    let db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
-    return db.replicate.to(this.LocalDB['allData']);
   }
 
   syncToLocal(database?: string) {
@@ -230,6 +232,11 @@ export class MainService {
         }
       });
     });
+  }
+
+  replicateDB(db_configrations) {
+    let db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
+    return db.replicate.to(this.LocalDB['allData']);
   }
 
   syncToServer() {
