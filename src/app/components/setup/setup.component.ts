@@ -59,7 +59,7 @@ export class SetupComponent implements OnInit {
             this.progressBar(5);
           })
           .on('change', (sync) => {
-            this.statusMessage = `Dökümanlar Senkorinize Ediliyor.. - ${sync.docs_written}`;
+            this.statusMessage = `${sync.docs_written} - Senkorinize Ediliyor `;
           })
           .on('complete', info => {
             this.mainService.syncToLocal().then(res => {
