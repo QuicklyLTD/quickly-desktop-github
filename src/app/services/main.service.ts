@@ -2,26 +2,26 @@ import { Injectable } from '@angular/core';
 import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
+import * as PouchDBResolve from 'pouch-resolve-conflicts';
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
 
 @Injectable()
 export class MainService {
-  LocalDB: object;
+  LocalDB: Object;
   RemoteDB: PouchDB.Database;
   ServerDB: PouchDB.Database;
-  /////////////////////////////////
+  authInfo: AuthInfo;
+  serverInfo: ServerInfo;
   hostname: string;
   db_prefix: string;
   ajax_opts: object;
-  /////////////////////////////////
-  authInfo: AuthInfo;
-  serverInfo: ServerInfo;
 
   constructor() {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
+    PouchDB.plugin(PouchDBResolve);
 
-    const db_opts = { revs_limit: 3, auto_compaction: true };
+    const db_opts = { revs_limit: 1, auto_compaction: true };
 
     this.LocalDB = {
       users: new PouchDB('local_users', db_opts),
@@ -45,7 +45,7 @@ export class MainService {
       reports: new PouchDB('local_reports', db_opts),
       settings: new PouchDB('local_settings', db_opts),
       logs: new PouchDB('local_logs', db_opts),
-      allData: new PouchDB('local_alldata', db_opts)
+      allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
 
     this.getAllBy('settings', { key: 'AuthInfo' }).then(res => {
@@ -54,7 +54,7 @@ export class MainService {
         this.hostname = 'http://' + this.authInfo.app_remote + ':' + this.authInfo.app_port;
         this.ajax_opts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
         this.db_prefix = this.authInfo.app_db;
-        this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, Object.assign({}, db_opts, this.ajax_opts));
+        this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajax_opts);
       }
     });
 
@@ -153,6 +153,35 @@ export class MainService {
     return this.LocalDB[db].compact();
   }
 
+
+  initDatabases() {
+    const db_opts = { revs_limit: 1, auto_compaction: true };
+    this.LocalDB = {
+      users: new PouchDB('local_users', db_opts),
+      users_group: new PouchDB('local_users_group', db_opts),
+      checks: new PouchDB('local_checks', db_opts),
+      closed_checks: new PouchDB('local_closed_checks', db_opts),
+      credits: new PouchDB('local_credits', db_opts),
+      customers: new PouchDB('local_customers', db_opts),
+      orders: new PouchDB('local_orders', db_opts),
+      cashbox: new PouchDB('local_cashbox', db_opts),
+      categories: new PouchDB('local_categories', db_opts),
+      sub_categories: new PouchDB('local_sub_cats', db_opts),
+      occations: new PouchDB('local_occations', db_opts),
+      products: new PouchDB('local_products', db_opts),
+      recipes: new PouchDB('local_recipes', db_opts),
+      floors: new PouchDB('local_floors', db_opts),
+      tables: new PouchDB('local_tables', db_opts),
+      stocks: new PouchDB('local_stocks', db_opts),
+      stocks_cat: new PouchDB('local_stocks_cat', db_opts),
+      endday: new PouchDB('local_endday', db_opts),
+      reports: new PouchDB('local_reports', db_opts),
+      settings: new PouchDB('local_settings', db_opts),
+      logs: new PouchDB('local_logs', db_opts),
+      allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
+    };
+  }
+
   localSyncBeforeRemote(local_db) {
     return this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
       if (change.deleted) {
@@ -202,6 +231,35 @@ export class MainService {
     }
   }
 
+  loadAppData() {
+    return new Promise((resolve, reject) => {
+      this.getAllBy('allData', {}).then(res => {
+        const docs = res.docs;
+        if (docs.length > 0) {
+          docs.forEach((element, index) => {
+            let db = element.db_name;
+            if (db !== undefined) {
+              if (db !== 'settings') {
+                delete element.db_name;
+                delete element.db_seq;
+                delete element._rev;
+                this.LocalDB[db].put(element).then(res => {
+                  if (docs.length == index + 1) {
+                    resolve(true);
+                  }
+                }).catch(err => {
+                  console.log(db, element)
+                });
+              }
+            }
+          });
+        } else {
+          reject(false);
+        }
+      });
+    });
+  }
+
   syncToLocal(database?: string) {
     let selector;
     if (database) {
@@ -220,15 +278,18 @@ export class MainService {
                 delete element.db_name;
                 delete element.db_seq;
                 delete element._rev;
-                this.LocalDB[db].put(element);
-              }
-              if (docs.length == index + 1) {
-                resolve(true);
+                this.LocalDB[db].put(element).then(res => {
+                  if (docs.length == index + 1) {
+                    resolve(true);
+                  }
+                }).catch(err => {
+                  console.log(db, element)
+                });
               }
             }
           });
         } else {
-          reject({ ok: false });
+          reject(false);
         }
       });
     });
@@ -239,8 +300,12 @@ export class MainService {
     return db.replicate.to(this.LocalDB['allData']);
   }
 
+  replicateFrom() {
+    return this.RemoteDB.replicate.to(this.LocalDB['allData']);
+  }
+
   syncToServer() {
-    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true, heartbeat: 2500 }).on('change', (sync) => { this.handleChanges(sync) });
   }
 
   syncToRemote() {
