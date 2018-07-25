@@ -61,6 +61,7 @@ export class SellingScreenComponent implements OnInit {
   permissions: Object;
   day: number;
   paymentMethods: Array<PaymentMethod>;
+  changes: any;
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
@@ -95,6 +96,9 @@ export class SellingScreenComponent implements OnInit {
     });
     this.permissions = JSON.parse(localStorage['userPermissions']);
     this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
+    if (localStorage.getItem('selectedFloor')) {
+      this.selectedFloor = JSON.parse(localStorage['selectedFloor']);
+    }
   }
 
   ngOnInit() {
@@ -105,6 +109,22 @@ export class SellingScreenComponent implements OnInit {
       'Yanlış Sipariş',
       'Müşteri İstemedi',
     ];
+    this.changes = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', (change) => {
+      if (change.id == this.check_id) {
+        if (!change.deleted) {
+          this.mainService.getData('checks', change.id).then(res => {
+            this.check = res;
+            this.id = res.table_id;
+          })
+        } else {
+          this.router.navigate(['/store']);
+        }
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.changes.cancel();
   }
 
   goPayment() {
@@ -363,16 +383,22 @@ export class SellingScreenComponent implements OnInit {
         }
       });
     } else {
-      this.check.payment_flow.forEach((obj, index) => {
-        this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
-          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
-            doc.count++;
-            doc.weekly_count[this.day]++;
-            doc.amount += obj.amount;
-            doc.weekly[this.day] += obj.amount;
-            doc.update_time = Date.now();
-            return doc;
-          });
+      this.mainService.getAllBy('reports', { type: "Store" }).then(res => {
+        let sellingReports = res.docs;
+        this.check.payment_flow.forEach((obj, index) => {
+          let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
+          reportWillChange.count++;
+          reportWillChange.weekly_count[this.day]++;
+          reportWillChange.amount += obj.amount;
+          reportWillChange.weekly[this.day] += obj.amount;
+          reportWillChange.update_time = Date.now();
+          if (this.check.payment_flow.length == index + 1) {
+            sellingReports.forEach((report, dd) => {
+              if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
+                this.mainService.updateData('reports', report._id, report);
+              }
+            });
+          }
         });
       });
     }
@@ -494,17 +520,23 @@ export class SellingScreenComponent implements OnInit {
         });
         if (this.check.payment_flow) {
           let payedDiscounts = 0;
-          this.check.payment_flow.forEach((obj, index) => {
-            payedDiscounts += obj.discount;
-            this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
-              this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
-                doc.count++;
-                doc.weekly_count[this.day]++;
-                doc.amount += obj.amount;
-                doc.weekly[this.day] += obj.amount;
-                doc.update_time = Date.now();
-                return doc;
-              });
+          this.mainService.getAllBy('reports', { type: "Store" }).then(res => {
+            let sellingReports = res.docs;
+            this.check.payment_flow.forEach((obj, index) => {
+              payedDiscounts += obj.discount;
+              let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
+              reportWillChange.count++;
+              reportWillChange.weekly_count[this.day]++;
+              reportWillChange.amount += obj.amount;
+              reportWillChange.weekly[this.day] += obj.amount;
+              reportWillChange.update_time = Date.now();
+              if (this.check.payment_flow.length == index + 1) {
+                sellingReports.forEach((report, dd) => {
+                  if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
+                    this.mainService.updateData('reports', report._id, report);
+                  }
+                });
+              }
             });
           });
           let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
@@ -722,7 +754,7 @@ export class SellingScreenComponent implements OnInit {
               this.mainService.updateData('tables', this.selectedTable._id, { status: 2, timestamp: Date.now() }).then(res => {
                 if (res.ok) {
                   if (this.check.products.length == 0) {
-                    if(this.check.payment_flow){
+                    if (this.check.payment_flow) {
                       let payedDiscounts = 0;
                       this.check.payment_flow.forEach((obj, index) => {
                         payedDiscounts += obj.discount;
@@ -775,7 +807,7 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.updateData('checks', otherCheck._id, otherCheck).then(res => {
           if (res.ok) {
             if (this.check.products.length == 0) {
-              if(this.check.payment_flow){
+              if (this.check.payment_flow) {
                 let payedDiscounts = 0;
                 this.check.payment_flow.forEach((obj, index) => {
                   payedDiscounts += obj.discount;
@@ -920,7 +952,11 @@ export class SellingScreenComponent implements OnInit {
       this.tables = res.docs;
       this.table = this.tables.filter(obj => obj._id == this.id)[0];
       this.tables = this.tables.filter(obj => obj._id !== this.id).sort((a, b) => a.name.localeCompare(b.name));
-      this.tablesView = this.tables;
+      if (this.selectedFloor) {
+        this.tablesView = this.tables.filter(obj => obj.floor_id == this.selectedFloor);
+      } else {
+        this.tablesView = this.tables;
+      }
     });
     this.mainService.getAllBy('floors', {}).then(res => {
       this.floors = res.docs;

@@ -145,25 +145,19 @@ export class PaymentScreenComponent implements OnInit {
       this.check.payment_flow.push(newPayment);
       this.check.discount += newPayment.amount;
       this.payedPrice = 0;
-      this.mainService.updateData('checks', this.id, this.check).then(res => {
-        if (res.ok) {
-          if (this.changePrice >= 0) {
-            this.fillData();
-            this.setDefault();
-            this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
-          } else {
-            delete this.check._rev;
-            this.messageService.sendMessage(`Ürünlerin ${newPayment.amount} TL'si ${method} olarak ödendi`);
-            this.discount = undefined;
-            this.discountAmount = 0;
-          }
-          this.logService.createLog(logType.CHECK_CREATED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
-          this.togglePayed();
-        }
-      });
+      if (this.changePrice >= 0) {
+        this.setPayment();
+        this.messageService.sendMessage(`Ürünler ${method} olarak ödendi`);
+      } else {
+        delete this.check._rev;
+        this.messageService.sendMessage(`Ürünlerin ${newPayment.amount} TL'si ${method} olarak ödendi`);
+        this.discount = undefined;
+        this.discountAmount = 0;
+      }
+      this.logService.createLog(logType.CHECK_CREATED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
+      this.togglePayed();
       this.isFirstTime = true;
     }
-    this.updateActivityReport();
   }
 
   closeCheck(method: string) {
@@ -199,6 +193,7 @@ export class PaymentScreenComponent implements OnInit {
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
+        this.updateActivityReport();
         this.mainService.removeData('checks', this.check._id).then(res => {
           if (this.check.type == 1) {
             this.mainService.updateData('tables', this.check.table_id, { status: 1 });
@@ -240,6 +235,8 @@ export class PaymentScreenComponent implements OnInit {
     this.check.total_price -= product.price;
     this.priceWillPay += product.price;
     this.numpad = this.priceWillPay.toString();
+    this.payedShow = false;
+    this.payedTitle = 'Alınan Ödemeleri Göster';
     this.setChange();
   }
 
@@ -323,6 +320,17 @@ export class PaymentScreenComponent implements OnInit {
     this.discount = undefined;
   }
 
+  setPayment() {
+    this.productsWillPay = [];
+    this.discountAmount = 0;
+    this.changePrice = 0;
+    this.currentAmount = 0;
+    this.priceWillPay = 0;
+    this.numpad = '';
+    this.isFirstTime = true;
+    this.discount = undefined;
+  }
+
   updateSellingReport(method: string) {
     if (method !== 'Parçalı') {
       this.mainService.getAllBy('reports', { connection_id: method }).then(res => {
@@ -337,16 +345,22 @@ export class PaymentScreenComponent implements OnInit {
         }
       });
     } else {
-      this.check.payment_flow.forEach((obj, index) => {
-        this.mainService.getAllBy('reports', { connection_id: obj.method }).then(res => {
-          this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
-            doc.count++;
-            doc.weekly_count[this.day]++;
-            doc.amount += obj.amount;
-            doc.weekly[this.day] += obj.amount;
-            doc.update_time = Date.now();
-            return doc;
-          });
+      this.mainService.getAllBy('reports', { type: "Store" }).then(res => {
+        let sellingReports = res.docs;
+        this.check.payment_flow.forEach((obj, index) => {
+          let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
+          reportWillChange.count++;
+          reportWillChange.weekly_count[this.day]++;
+          reportWillChange.amount += obj.amount;
+          reportWillChange.weekly[this.day] += obj.amount;
+          reportWillChange.update_time = Date.now();
+          if (this.check.payment_flow.length == index + 1) {
+            sellingReports.forEach((report, dd) => {
+              if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
+                this.mainService.updateData('reports', report._id, report);
+              }
+            });
+          }
         });
       });
     }
