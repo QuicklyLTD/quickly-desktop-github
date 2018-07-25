@@ -32,7 +32,6 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     if (this.electronService.isElectron()) {
       this.settingsService.setLocalStorage();
-      // this.initAppData();
       this.startApp();
     }
     setInterval(() => {
@@ -87,16 +86,34 @@ export class AppComponent implements OnInit {
                   this.mainService.syncToServer();
                 } else if (configrations.type == 1) {
                   this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
+                    this.mainService.syncToRemote().cancel();
                     this.router.navigate(['/endoftheday_no_guard']).then(() => {
                       $('#endDayModal').modal('show');
-                      this.mainService.syncToRemote().cancel();
-                      this.mainService.replicateDB(configrations).on('complete', () => {
-                        $('#endDayModal').modal('hide');
-                        this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
-                        setTimeout(() => {
-                          this.electronService.shellCommand('shutdown now');
-                        }, 10000);
-                      });
+                      setTimeout(() => {
+                        Object.keys(this.mainService.LocalDB).forEach(db => {
+                          if (db !== 'settings') {
+                            this.mainService.destroyDB(db).then(res => {
+                              console.log(db, res);
+                              if (db == 'allData') {
+                                this.mainService.initDatabases();
+                                setTimeout(() => {
+                                  this.mainService.replicateDB(configrations).on('complete', () => {
+                                    this.mainService.loadAppData().then(res => {
+                                      if (res) {
+                                        $('#endDayModal').modal('hide');
+                                        this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+                                        setTimeout(() => {
+                                          // this.electronService.shellCommand('shutdown now');
+                                        }, 5000);
+                                      }
+                                    })
+                                  });
+                                }, 175000);
+                              }
+                            });
+                          }
+                        })
+                      }, 10000);
                     });
                   });
                 }

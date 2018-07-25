@@ -21,6 +21,7 @@ import { HttpService } from '../../services/http.service';
 export class EndofthedayComponent implements OnInit {
   isStarted: boolean;
   day: number;
+  dateToReport: number;
   printers: any;
   owner: string;
   endDayReport: EndDay;
@@ -35,18 +36,24 @@ export class EndofthedayComponent implements OnInit {
   lastDay: any;
   progress: string;
   permissions: any;
+  appType: any;
+  token: string;
+  restaurantID: string;
 
   constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settingsService: SettingsService, private httpService: HttpService) {
+    this.token = localStorage.getItem("AccessToken");
+    this.owner = this.settingsService.getUser('id');
+    this.permissions = JSON.parse(localStorage.getItem('userPermissions'));
     this.settingsService.DateSettings.subscribe(res => {
       this.isStarted = res.value.started;
       this.day = res.value.day;
+      this.dateToReport = res.value.time;
     })
-    this.owner = this.settingsService.getUser('id');
     this.endDayReport = new EndDay(Date.now(), this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
-    this.settingsService.AppSettings.subscribe(res => {
-      this.lastDay = res.value.last_day;
-    });
-    this.permissions = JSON.parse(localStorage.getItem('userPermissions'));
+    this.settingsService.AppSettings.subscribe(res => this.lastDay = res.value.last_day);
+    this.settingsService.RestaurantInfo.subscribe(res => this.restaurantID = res.value.id);
+    this.settingsService.ServerSettings.subscribe(res => this.appType = res.value);
+    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
   }
 
   ngOnInit() {
@@ -109,9 +116,11 @@ export class EndofthedayComponent implements OnInit {
       this.mainService.getAllBy('checks', {}).then((res) => {
         if (res.docs.length == 0) {
           $('#endDayModal').modal('show');
-          this.stepChecks();
+          setTimeout(() => {
+            this.stepChecks();
+          }, 2000)
         } else {
-          alert('Ödemesi Alınmamış Hesaplar Var..!');
+          this.messageService.sendAlert('Dikkat!', 'Ödenmesi alınmamış hesaplar var!', 'warning');
         }
       });
     } else {
@@ -234,64 +243,124 @@ export class EndofthedayComponent implements OnInit {
   stepFinal() {
     this.endDayReport.time = Date.now();
     this.endDayReport.data_file = this.endDayReport.time + '.qdat';
-    this.progress = 'Gün Sonu Tamamlanıyor...';
+    this.progress = 'Yerel Süreç Tamamlanıyor...';
     this.mainService.addData('endday', this.endDayReport).then(() => {
+
       this.electronService.backupData(this.backupData, this.endDayReport.time);
       this.printerService.printReport(this.printers[0], this.endDayReport);
-      this.progress = 'Gün Sonu Tamamlandı !';
       let dateData = { started: false, day: this.day, time: Date.now() };
       this.settingsService.setAppSettings('DateSettings', dateData);
       localStorage.setItem('DayStatus', JSON.stringify(dateData));
       this.fillData();
       this.isStarted = false;
+
       setTimeout(() => {
-        $('#endDayModal').modal('hide');
-        this.messageService.sendMessage('Program yeniden başlatılacak.');
-        this.electronService.reloadProgram();
-      }, 10000);
+        this.mainService.syncToRemote().cancel();
+        this.mainService.syncToServer().cancel();
+        this.progress = 'Veritabanı Yedekleniyor!';
+        this.coverData();
+      }, 5000);
     });
   }
 
-  purgeData() {
-    this.mainService.syncToRemote().cancel();
-    this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
-      let restaurantID = res.docs[0].value.id;
-      this.mainService.getAllBy('allData', {}).then(res => {
-        let token = localStorage.getItem("AccessToken");
-        this.httpService.post(`v1/management/restaurants/${restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
-          console.log(res.json());
-          Object.keys(this.mainService.LocalDB).forEach(db_name => {
-            if (db_name !== 'settings') {
-              this.mainService.destroyDB(db_name).then(res => {
-                console.log(db_name, res);
-              });
-            }
-          });
-        });
+  coverData() {
+    this.mainService.getAllBy('allData', {}).then(res => {
+      return res.docs.map((obj) => {
+        delete obj._rev;
+        return obj;
       })
-    });
+    }).then((cleanDocs: Array<any>) => {
+      this.electronService.fileSystem.writeFile(this.electronService.appRealPath + '/data/db.dat', JSON.stringify(cleanDocs), err => {
+        if (!err) {
+          this.progress = 'Veritabanı Yedeği Alındı!';
+          this.refreshToken();
+        }
+      })
+    })
   }
 
-  sendData() {
-    let token = localStorage.getItem("AccessToken");
-    let restaurantID = JSON.parse(localStorage['RestaurantInfo']).id;
-    this.httpService.post(`v1/management/restaurants/${restaurantID}/report_generator/`, { timestamp: Date.now(), data: { hello: 'test' } }, token).subscribe(res => {
-      console.log(res);
-    });
-  }
-
-  getNewToken() {
-    let oldToken = localStorage['AccessToken'];
-    this.httpService.post('token/refresh/', { token: oldToken })
+  refreshToken() {
+    this.httpService.post('token/refresh/', { token: this.token })
       .subscribe(res => {
         if (res.ok) {
           const token = res.json().token;
           localStorage.setItem('AccessToken', token);
-          alert('İşlem Başarılı');
+          this.purgeData(token);
         } else {
-          alert('Başarısız');
+          this.messageService.sendAlert('Hata!', 'Sunucudan İzin Alınamadı', 'danger');
         }
       });
+  }
+
+  purgeData(token) {
+    this.mainService.getAllBy('allData', {}).then(res => {
+      this.httpService.post(`v1/management/restaurants/${this.restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
+        if (res.ok) {
+          this.progress = 'Uzak Sunucu İsteği Onaylandı!';
+          Object.keys(this.mainService.LocalDB).forEach((db_name) => {
+            if (db_name !== 'settings') {
+              this.mainService.destroyDB(db_name).then(res => {
+                console.log(db_name, res);
+                if (db_name == "allData") {
+                  this.mainService.initDatabases();
+                  this.mainService.replicateFrom()
+                    .on('active', () => {
+                      this.progress = 'Veriler Sıfırlanıyor...';
+                    })
+                    .on('complete', (info) => {
+                      this.progress = 'Gün Sonu Tamamlanıyor..';
+                      this.mainService.loadAppData().then(res => {
+                        if (res) {
+                          $('#endDayModal').modal('hide');
+                          this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+                          setTimeout(() => {
+                            this.electronService.relaunchProgram();
+                          }, 5000);
+                        }
+                      })
+                    }).catch(err => {
+                      console.log(err);
+                    });
+                }
+              });
+            }
+          });
+        } else {
+          this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+          setTimeout(() => {
+            this.electronService.relaunchProgram();
+          }, 5000);
+          // const serverSelectedRevs = res.json();
+          // this.electronService.fileSystem.readFile(this.electronService.appRealPath + '/data/db.dat', 'utf-8', (err, data) => {
+          //   if (!err) {
+          //     let appData = JSON.parse(data);
+          //     appData.map(obj => {
+          //       obj._rev = serverSelectedRevs.find(serverRes => serverRes[1] == obj._id)[2];
+          //     });
+          //     this.mainService.putAll('allData', appData).then(res => {
+          //       this.progress = 'Gün Sonu Tamamlanıyor..';
+          //       this.loadAppData().then(res => {
+          //         if (res) {
+          //           $('#endDayModal').modal('hide');
+          //           this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+          //           setTimeout(() => {
+          //             this.electronService.relaunchProgram();
+          //           }, 5000);
+          //         }
+          //       })
+          //     });
+          //   }
+          // });
+        }
+      });
+    })
+  }
+
+
+  sendData() {
+    this.httpService.post(`v1/management/restaurants/${this.restaurantID}/report_generator/`, { timestamp: this.dateToReport, data: this.backupData }, this.token).subscribe(res => {
+      console.log(res);
+    });
   }
 
   fillData() {
@@ -299,6 +368,5 @@ export class EndofthedayComponent implements OnInit {
       this.endDayData = result.docs;
       this.endDayData = this.endDayData.sort((a, b) => b.time - a.time);
     });
-    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
   }
 }
