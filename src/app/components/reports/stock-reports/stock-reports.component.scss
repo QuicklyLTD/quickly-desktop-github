@@ -1,0 +1,6 @@
+.stocksCard:nth-of-type(even){
+    padding-left: 0.25rem;
+}
+.stocksCard:nth-of-type(odd){
+    padding-right: 0.25rem;
+}
