@@ -309,12 +309,12 @@
             </div>
           </div>
           <div class="col-lg-2 pl-2 pr-2">
-            <div (click)="tablesView = tables; selectedFloor = undefined" [ngClass]="{'card-danger text-white':selectedFloor == undefined}"
+            <!-- <div (click)="tablesView = tables; selectedFloor = undefined" [ngClass]="{'card-danger text-white':selectedFloor == undefined}"
               class="card mb-2">
               <div class="card-block p-2 pt-3">
                 <h2 style="font-size:1.7vw">Tüm Masalar</h2>
               </div>
-            </div>
+            </div> -->
             <div *ngFor="let floor of floors" [ngClass]="{'card-danger text-white':selectedFloor == floor._id}" (click)="filterTables(floor._id)"
               class="card mb-2">
               <div class="card-block p-2 pt-3">
