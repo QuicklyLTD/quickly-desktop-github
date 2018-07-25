@@ -4,13 +4,12 @@ import * as InMemory from 'pouchdb-adapter-memory';
 import * as express from 'express';
 import * as expressPouch from 'express-pouchdb';
 
-let server
+let server;
 PouchDB.plugin(InMemory);
 
 ipcMain.once('appServer', (event, token, port) => {
     const app = express();
-    app.use(`/${token}/`, expressPouch(PouchDB.defaults({ adapter: 'memory' }), { logPath: './data/log.txt', configPath: './data/config.json' }));
-    const appServer = new PouchDB('./data/appServer');
+    app.use(`/${token}/`, expressPouch(PouchDB.defaults({ adapter: 'memory', revs_limit: 3, auto_compaction: false }), { logPath: './data/log.txt', configPath: './data/config.json' }));
     server = app.listen(port);
 });
 
