@@ -39,18 +39,18 @@
       <div class="col-xl-2 col-lg-3 pl-0">
         <div class="card inside-height">
           <div class="card-header">
-            Satış Raporları
+            İşlemler
           </div>
           <div class="card-block p-0">
-            <div class="list-group">
-              <button *ngFor="let item of storeReports" type="button" (click)="selectedDB = 'reports';showDocument(item);" class="list-group-item list-group-item-action list-eq">{{item.connection_id}}</button>
-            </div>
+          </div>
+          <div class="card-footer p-1">
+            <button [disabled]="selectedDB == undefined" (click)="resolveDB()" class="btn btn-quickly btn-md btn-block">Veritabanı Düzelt</button>
           </div>
           <div class="card-footer p-1">
             <button [disabled]="selectedDB == undefined" (click)="clearDB()" class="btn btn-secondary btn-md btn-block">Veritabanı Boşalt</button>
           </div>
           <div class="card-footer p-1">
-            <button [disabled]="selectedDB == undefined" (click)="compactDB()" class="btn btn-default btn-md btn-block">Veritabanı Temizle</button>
+            <button [disabled]="selectedDB == undefined" (click)="compactDB()" class="btn btn-default btn-md btn-block">Veritabanı Sıkıştır</button>
           </div>
           <div class="card-footer p-1">
             <button (click)="resetReports()" class="btn btn-danger btn-md btn-block">Raporları Sıfırla</button>

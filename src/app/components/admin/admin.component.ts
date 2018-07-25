@@ -1,11 +1,14 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
+import * as fs from 'fs';
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
+
 export class AdminComponent implements OnInit {
   databases: Array<string>;
   documents: any;
@@ -19,9 +22,7 @@ export class AdminComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
-      this.storeReports = res.docs;
-    })
+
   }
 
   syncData() {
@@ -119,24 +120,53 @@ export class AdminComponent implements OnInit {
       });
   }
 
-  updateProgram() {
-    this.mainService.syncToRemote().cancel();
-    this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
-      let restaurantID = res.docs[0].value.id;
-      this.mainService.getAllBy('allData', {}).then(res => {
-        let token = localStorage.getItem("AccessToken");
-        this.httpService.post(`v1/management/restaurants/${restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
-          console.log(res.json());
-          Object.keys(this.mainService.LocalDB).forEach(db_name => {
-            if (db_name !== 'settings') {
-              this.mainService.destroyDB(db_name).then(res => {
-                console.log(db_name, res);
-              });
+  resolveDB() {
+    this.mainService.LocalDB[this.selectedDB].allDocs({ include_docs: true, conflicts: true }).then(res => {
+      let test = res.rows.map(obj => { return obj.doc });
+      test.forEach(element => {
+        if (element.hasOwnProperty('_conflicts')) {
+          console.log(element);
+          this.mainService.LocalDB[this.selectedDB].resolveConflicts(element, (a, b) => {
+            if (element.hasOwnProperty('timestamp')) {
+              if (a.timestamp > b.timestamp) return a;
+              if (b.timestamp > a.timestamp) return b;
+            } else if (element.hasOwnProperty('update_time')) {
+              if (a.update_time > b.update_time) return a;
+              if (b.update_time > a.update_time) return b;
+            } else if (element.hasOwnProperty('time')) {
+              if (a.time > b.time) return a;
+              if (b.time > a.time) return b;
             }
-          });
-        });
-      })
-    });
+            return a;
+          }).then(res => {
+            console.log(res);
+          }).catch(err => {
+            console.log(err);
+          })
+        }
+      });
+    })
+  }
+
+  updateProgram() {
+    // this.mainService.syncToRemote().cancel();
+    // this.mainService.syncToServer().cancel();
+    // this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
+    //   let restaurantID = res.docs[0].value.id;
+    //   this.mainService.getAllBy('allData', {}).then(res => {
+    //     let token = localStorage.getItem("AccessToken");
+    //     this.httpService.post(`v1/management/restaurants/${restaurantID}/reset_database/`, { docs: [] }, token).subscribe(res => {
+    //       console.log(res.json());
+    //       Object.keys(this.mainService.LocalDB).forEach(db_name => {
+    //         if (db_name !== 'settings') {
+    //           this.mainService.destroyDB(db_name).then(res => {
+    //             console.log(db_name, res);
+    //           });
+    //         }
+    //       });
+    //     });
+    //   })
+    // });
 
     // this.mainService.getAllBy('allData', {}).then(res => {
     //   return res.docs.map((obj) => {
@@ -144,31 +174,25 @@ export class AdminComponent implements OnInit {
     //     return obj;
     //   })
     // }).then((cleanDocs: Array<any>) => {
+    //   console.log(cleanDocs.length);
     //   fs.writeFile('./data/all.txt', JSON.stringify(cleanDocs), err => {
     //     console.log(err);
     //   })
     // });;
 
-    // let db_names = Object.keys(this.mainService.LocalDB);
     // fs.readFile('./data/all.txt', (err, data) => {
-    //   const realData = JSON.parse(data.toString('utf-8'));
-    //   this.mainService.putAll('allData', realData).then(res => {
-    //     db_names.forEach(element => {
-    //       if (element !== 'allData') {
-    //         let db_data = realData.filter(obj => obj.db_name == element);
-    //         db_data.map(obj => {
-    //           delete obj['db_name'];
-    //           delete obj['db_seq'];
-    //           return obj;
-    //         });
-    //         if (element !== 'settings') {
-    //           console.log(element, db_data)
-    //           this.mainService.putAll(element, db_data).then(res => {
-    //             console.log(element, res)
-    //           });
-    //         }
-    //       }
-    //     });
+    //   let realData = JSON.parse(data.toString('utf-8'));
+    //   let filteredData = realData
+    //     .filter(obj => obj.db_name !== "settings")
+    //     .filter(obj => obj.db_name !== "users")
+    //     .filter(obj => obj.db_name !== "users_group")
+    //     .filter(obj => obj.type !== "Store")
+    //     .filter(obj => obj.type !== "User")
+    //     .filter(obj => obj.type !== "Activity");
+    //   this.mainService.putAll('allData', filteredData).then(res => {
+    //     this.mainService.syncToLocal().then(res => {
+    //       console.log(res);
+    //     })
     //   });
     // })
 
