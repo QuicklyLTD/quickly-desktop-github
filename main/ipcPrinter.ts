@@ -67,7 +67,7 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
         printer.size(1, 1).text(line);
         printer
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-          .control('LF')
+          .control('LF').control('LF').control('LF')
           .cut()
           .beep(3, 2)
           .close();
@@ -108,13 +108,16 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               if (check.products[prop].status !== 3) {
                 let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
+                if (check.products[prop].note !== '') {
+                  printer.text('      Not: ' + check.products[prop].note, '857');
+                }
               }
             }
             printer
               .text(line)
               .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
               .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-              .control('LF');
+              .control('LF').control('LF');
           }
           if (check.payment_flow) {
             if (check.type == 1) {
@@ -130,6 +133,9 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               if (check.payed_products[prop].status !== 3) {
                 let text = fitText((check.payed_products[prop].count >= 10 ? check.payed_products[prop].count : ' ' + check.payed_products[prop].count) + ' x  ' + check.payed_products[prop].name, check.payed_products[prop].price + ' TL' + '   ' + (check.payed_products[prop].total_price.toString().length > 3 ? check.payed_products[prop].total_price : (check.payed_products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.payed_products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
+                if (check.payed_products[prop].note !== '') {
+                  printer.text('      Not: ' + check.payed_products[prop].note, '857');
+                }
               }
             }
             printer
@@ -150,7 +156,7 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
-            .control('LF')
+            .control('LF').control('LF').control('LF')
             .cut()
             .beep(2, 3)
             .close();
@@ -197,7 +203,7 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
-            .control('LF')
+            .control('LF').control('LF').control('LF')
             .cut()
             .beep(2, 3)
             .close();
@@ -235,7 +241,7 @@ ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
           .size(1, 1)
           .text(line)
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-          .control('LF')
+          .control('LF').control('LF').control('LF')
           .cut()
           .beep(1, 6)
           .beep(1, 3)
@@ -262,6 +268,7 @@ ipcMain.on('printReport', (event, device, data, logo) => {
               .align('ct')
               .image(image, 'd24')
               .size(2, 2)
+              .control('LF').control('LF')
               .text('Gün Sonu Raporu', '857')
               .control('LF')
               .align('lt')
@@ -310,7 +317,7 @@ ipcMain.on('printReport', (event, device, data, logo) => {
               .control('LF')
               .text(fitText('Tarih:', date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
               .text(fitText('Saat:', date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-              .control('LF')
+              .control('LF').control('LF').control('LF')
               .cut()
               .close();
           }
@@ -323,8 +330,6 @@ ipcMain.on('printReport', (event, device, data, logo) => {
     console.log(error)
   }
 });
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function repeat(pattern, count) {
   if (count < 1) return '';
