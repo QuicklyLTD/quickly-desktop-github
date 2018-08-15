@@ -44,6 +44,7 @@ import { SettingsService } from './services/settings.service';
 import { AuthService } from './services/auth.service';
 import { LogService } from './services/log.service';
 import { HttpService } from './services/http.service';
+import { ConflictService } from './services/conflict.service';
 //////  Providers
 import { KeyboardService } from './providers/keyboard.service';
 import { MessageService } from "./providers/message.service";
@@ -57,6 +58,7 @@ import { KeyboardComponent } from './components/helpers/keyboard/keyboard.compon
 import { MessageComponent } from './components/helpers/message/message.component';
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
+import { ButtonDirective } from './directives/button.directive';
 
 //// Error Handler Sentry
 // import * as Raven from 'raven-js';
@@ -98,6 +100,7 @@ import { KeyboardDirective } from './directives/keyboard.directive';
     AdminComponent,
     DayDetailComponent,
     ActivationComponent,
+    ButtonDirective,
   ],
   imports: [
     BrowserModule,
@@ -118,6 +121,7 @@ import { KeyboardDirective } from './directives/keyboard.directive';
     KeyboardService,
     PrinterService,
     TerminalService,
+    ConflictService,
     HttpService
   ],
   bootstrap: [AppComponent]

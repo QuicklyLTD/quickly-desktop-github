@@ -160,7 +160,8 @@
             </div>
           </div>
           <div class="col-xl-1 col-lg-1 pr-0 pl-1">
-            <button (click)="sendCheck()" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sellButton">
+            <button (click)="sendCheck()" [oneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0"
+              class="btn btn-success btn-block sellButton">
               <i class="fa fa-paper-plane fa-5x"></i>
             </button>
             <button data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1"
@@ -178,7 +179,7 @@
               data-target="#splitTable" class="btn btn-info btn-block sellButton">
               <i class="fa fa-exchange fa-5x"></i>
             </button>
-            <button (click)="printCheck()" [disabled]="check.products.length == 0 || check.status == 0" class="btn bg-inverse btn-block sellButton">
+            <button (click)="printCheck()" oneShot [disabled]="check.products.length == 0 || check.status == 0" class="btn bg-inverse btn-block sellButton">
               <i style="color:lightgray !important;" class="fa fa-print fa-5x"></i>
             </button>
           </div>
@@ -326,8 +327,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button *ngIf="onProductChange" type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün Taşı</button>
-        <button *ngIf="!onProductChange" type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa Değiştir</button>
+        <button *ngIf="onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün Taşı</button>
+        <button *ngIf="!onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa Değiştir</button>
       </div>
     </div>
   </div>
@@ -390,7 +391,7 @@
       <div class="modal-body">
         <div class="row">
           <div *ngFor="let method of paymentMethods" class="col pr-2 pl-2">
-            <button [ngStyle]="{'color': method.color}" (click)="closeCheck(method.name)" class="btn btn-secondary btn-block btn-lg sellButton">
+            <button oneShot [ngStyle]="{'color': method.color}" (click)="closeCheck(method.name)" class="btn btn-secondary btn-block btn-lg sellButton">
               <i class="fa {{method.icon}}"></i>
               <p class="mt-1 mb-1">
                 <b>{{method.name}}</b>
