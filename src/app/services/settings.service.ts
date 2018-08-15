@@ -68,7 +68,7 @@ export class SettingsService {
   }
 
   setAppSettings(Key: string, SettingsData) {
-    let AppSettings = new Settings(Key, SettingsData, 'Uygulama Ayarları', Date.now());
+    let AppSettings = new Settings(Key, SettingsData, Key, Date.now());
     return this.mainService.getAllBy('settings', { key: Key }).then(res => {
       return this.mainService.updateData('settings', res.docs[0]._id, AppSettings);
     });
