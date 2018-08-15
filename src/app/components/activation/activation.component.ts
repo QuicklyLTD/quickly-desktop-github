@@ -20,12 +20,6 @@ export class ActivationComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', change => {
-      setTimeout(() => {
-        this.electronService.relaunchProgram();
-      }, 5000)
-    });
-  }
+  ngOnInit() { }
 
 }
