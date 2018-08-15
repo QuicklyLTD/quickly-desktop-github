@@ -3,13 +3,17 @@ import * as PouchDB from 'pouchdb-browser';
 import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
 import * as PouchDBResolve from 'pouch-resolve-conflicts';
+import * as PouchDBInMemory from 'pouchdb-adapter-memory';
+
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
 
 @Injectable()
 export class MainService {
   LocalDB: Object;
-  RemoteDB: PouchDB.Database;
-  ServerDB: PouchDB.Database;
+  RemoteDB: PouchDB.Database | any;
+  ServerDB: PouchDB.Database | any;
+  MemoryDB: PouchDB.Database | any;
+
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
   hostname: string;
@@ -20,6 +24,7 @@ export class MainService {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
     PouchDB.plugin(PouchDBResolve);
+    PouchDB.plugin(PouchDBInMemory);
 
     const db_opts = { revs_limit: 1, auto_compaction: true };
 
@@ -47,6 +52,8 @@ export class MainService {
       logs: new PouchDB('local_logs', db_opts),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
+
+    // this.MemoryDB = new PouchDB('inMemory', { adapter: 'memory' });
 
     this.getAllBy('settings', { key: 'AuthInfo' }).then(res => {
       if (res.docs.length > 0) {
@@ -87,31 +94,47 @@ export class MainService {
   }
 
   addData(db, schema) {
-    this.LocalDB[db].post(schema);
+    this.LocalDB[db].post(schema).catch(err => {
+      console.log('addData-Local', err);
+    });;
     delete schema._rev;
-    return this.LocalDB['allData'].put(Object.assign({ db_name: db, db_seq: 0 }, schema));
+    return this.LocalDB['allData'].put(Object.assign({ db_name: db, db_seq: 0 }, schema)).catch(err => {
+      console.log('addData-All', err);
+    });
   }
 
   changeData(db, id, schema: any) {
-    this.LocalDB['allData'].upsert(id, schema);
-    return this.LocalDB[db].upsert(id, schema);
+    this.LocalDB['allData'].upsert(id, schema).catch(err => {
+      console.log('changeData-Local', err);
+    });
+    return this.LocalDB[db].upsert(id, schema).catch(err => {
+      console.log('changeData-All', err);
+    });;
   }
 
   updateData(db: string, id, schema) {
     return this.LocalDB[db].get(id).then((doc) => {
       this.LocalDB['allData'].upsert(id, function (doc) {
         return Object.assign(doc, schema);
+      }).catch(err => {
+        console.log('updateData-All', err);
       });
-      return this.LocalDB[db].put(Object.assign(doc, schema));
+      return this.LocalDB[db].put(Object.assign(doc, schema)).catch(err => {
+        console.log('updateData-All', err);
+      });
     });
   }
 
   removeData(db: string, id: string) {
     return this.LocalDB[db].get(id).then((doc) => {
       this.LocalDB['allData'].get(id).then((doc) => {
-        this.LocalDB['allData'].remove(doc);
+        this.LocalDB['allData'].remove(doc).catch(err => {
+          console.log('removeData-All', err);
+        });
       });
-      return this.LocalDB[db].remove(doc);
+      return this.LocalDB[db].remove(doc).catch(err => {
+        console.log('removeData-Local', err);
+      });
     });
   }
 
@@ -152,7 +175,6 @@ export class MainService {
   compactDB(db: string) {
     return this.LocalDB[db].compact();
   }
-
 
   initDatabases() {
     const db_opts = { revs_limit: 1, auto_compaction: true };
@@ -214,18 +236,18 @@ export class MainService {
             delete element.db_name;
             this.LocalDB[db].upsert(element._id, (doc) => {
               return Object.assign(doc, element);
+            }).catch(err => {
+              console.log(err);
             });
           }
         } else {
-          Object.keys(this.LocalDB).forEach(db => {
+          for (let db in this.LocalDB) {
             if (db !== 'allData') {
               this.LocalDB[db].get(element._id).then((doc) => {
-                if (doc) {
-                  this.LocalDB[db].remove(doc);
-                }
+                if (doc) return this.LocalDB[db].remove(doc);
               }).catch(err => { });
             }
-          });
+          }
         }
       });
     }
@@ -261,6 +283,7 @@ export class MainService {
   }
 
   syncToLocal(database?: string) {
+    let serverConfigration;
     let selector;
     if (database) {
       selector = { db_name: database };
@@ -280,11 +303,16 @@ export class MainService {
                 delete element._rev;
                 this.LocalDB[db].put(element).then(res => {
                   if (docs.length == index + 1) {
-                    resolve(true);
+                    resolve(serverConfigration);
                   }
                 }).catch(err => {
                   console.log(db, element)
                 });
+              } else {
+                delete element.db_name;
+                delete element.db_seq;
+                delete element._rev;
+                serverConfigration = element
               }
             }
           });
@@ -305,10 +333,27 @@ export class MainService {
   }
 
   syncToServer() {
-    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true, heartbeat: 2500 }).on('change', (sync) => { this.handleChanges(sync) });
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true, heartbeat: 2500 })
+      .on('change', (sync) => { this.handleChanges(sync) })
+    // .on('active', () => { console.log('Server Active') })
+    // .on('paused', (err) => { console.log('Server Paused', err) })
+    // .on('error', (err) => { console.error('Server Error', err) });
   }
 
   syncToRemote() {
-    return PouchDB.sync(this.LocalDB['allData'], this.RemoteDB, { live: true, retry: true }).on('change', (sync) => { this.handleChanges(sync) });
+    let rOpts: PouchDB.Replication.ReplicateOptions = { live: true, retry: true };
+    if (this.serverInfo.type == 1) {
+      rOpts = {
+        live: true, retry: true, heartbeat: 2500, back_off_function: (delay) => {
+          delay = 1000;
+          return delay;
+        }
+      };
+    }
+    return PouchDB.sync(this.LocalDB['allData'], this.RemoteDB, rOpts)
+      .on('change', (sync) => { this.handleChanges(sync) })
+    // .on('active', () => { console.log('Remote Active') })
+    // .on('paused', (err) => { console.log('Remote Paused', err) })
+    // .on('error', (err) => { console.error('Remote Error', err) });
   }
 }
