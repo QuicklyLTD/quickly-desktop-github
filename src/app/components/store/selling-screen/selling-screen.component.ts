@@ -216,12 +216,12 @@ export class SellingScreenComponent implements OnInit {
   }
 
   confirmCheck() {
-    this.check.products.forEach(element => {
+    this.router.navigate(['/store']);
+    this.check.products.map(element => {
       if (element.status === 1) {
         element.status = 2;
       }
     });
-    this.router.navigate(['/store']);
     if (this.check.status !== 0) {
       if (this.check.type == 1) {
         this.mainService.updateData('tables', this.id, { status: 2 });
@@ -311,7 +311,6 @@ export class SellingScreenComponent implements OnInit {
       method = 'Parçalı';
     }
     $('#closeCheck').modal('hide');
-    this.updateActivityReport();
     let checkWillClose = new ClosedCheck(this.check.table_id, this.check.total_price + this.check.discount, 0, this.check.owner, this.check.note, this.check.status, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow);
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.updateSellingReport(method);
@@ -336,37 +335,13 @@ export class SellingScreenComponent implements OnInit {
     if (this.askForCheckPrint) {
       this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
         if (isOK) {
-          this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+          this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
         }
       });
     } else {
-      this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+      this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
     }
     this.message.sendMessage(`Hesap ${this.check.total_price} TL tutarında ödeme alınarak kapatıldı`);
-  }
-
-  updateActivityReport() {
-    this.mainService.getAllBy('checks', {}).then(res => {
-      let checks_total_amount = 0;
-      let checks_total_count;
-      if (res.docs.length == 0) {
-        checks_total_amount = this.check.total_price;
-        checks_total_count = 1;
-      } else {
-        checks_total_amount = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
-        checks_total_count = res.docs.length;
-      }
-      let activity_value = checks_total_amount / checks_total_count;
-      let activity_count = (checks_total_count * 100) / this.tables.length;
-      this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
-        let sellingAct = res.docs[0];
-        let date = new Date();
-        sellingAct.activity.push(Math.round(activity_value));
-        sellingAct.activity_count.push(Math.round(activity_count));
-        sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
-        this.mainService.updateData('reports', sellingAct._id, sellingAct);
-      });
-    });
   }
 
   updateSellingReport(method: string) {
@@ -639,7 +614,7 @@ export class SellingScreenComponent implements OnInit {
   }
 
   updateProductReport(data) {
-    data.forEach(obj => {
+    data.forEach((obj, index) => {
       this.mainService.getAllBy('reports', { connection_id: obj.product }).then(res => {
         let report = res.docs[0];
         this.mainService.changeData('reports', report._id, (doc) => {
