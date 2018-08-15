@@ -275,7 +275,7 @@
               </div>
             </div>
             <div class="col-lg-7 pl-1">
-              <blockquote *ngIf="onUpdate && selectedStock" class="blockquote mb-0">
+              <blockquote *ngIf="onUpdate && selectedStock" class="blockquote mb-0 pr-1 pl-1">
                 <p class="mb-2">
                   <strong [ngClass]="{'text-danger': selectedStock.left_total <= 0}">{{selectedStock.name}}</strong>
                   <small>({{selectedStock.cat_id | general:'stocks_cat' | async}})</small>
