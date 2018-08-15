@@ -19,7 +19,6 @@ export class PaymentScreenComponent implements OnInit {
   id: string;
   check: Check;
   table: string;
-  tables_count: number;
   userId: string;
   userName: string;
   payedShow: boolean;
@@ -44,6 +43,7 @@ export class PaymentScreenComponent implements OnInit {
   onClosing: boolean;
   permissions: Object;
   day: number;
+  changes: any;
   @ViewChild('discountInput') discountInput: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private settingsService: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
@@ -67,9 +67,21 @@ export class PaymentScreenComponent implements OnInit {
     this.userId = this.settingsService.getUser('id');
     this.userName = this.settingsService.getUser('name');
     this.onClosing = false;
+    this.changes = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', (change) => {
+      if (change.id == this.id) {
+        if (!change.deleted) {
+          this.mainService.getData('checks', change.id).then(res => {
+            this.fillData();
+          })
+        } else {
+          this.router.navigate(['/store']);
+        }
+      }
+    });
   }
 
   ngOnDestroy() {
+    this.changes.cancel();
     if (this.onClosing) {
       this.productsWillPay.forEach(element => {
         this.check.products.push(element);
@@ -193,7 +205,6 @@ export class PaymentScreenComponent implements OnInit {
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
-        this.updateActivityReport();
         this.mainService.removeData('checks', this.check._id).then(res => {
           if (this.check.type == 1) {
             this.mainService.updateData('tables', this.check.table_id, { status: 1 });
@@ -366,23 +377,6 @@ export class PaymentScreenComponent implements OnInit {
     }
   }
 
-  updateActivityReport() {
-    this.mainService.getAllBy('checks', {}).then(res => {
-      let checks_total_amount = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
-      let checks_total_count = res.docs.length;
-      let activity_value = checks_total_amount / checks_total_count;
-      let activity_count = (checks_total_count * 100) / this.tables_count;
-      this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
-        let sellingAct = res.docs[0];
-        let date = new Date();
-        sellingAct.activity.push(Math.round(activity_value));
-        sellingAct.activity_count.push(Math.round(activity_count));
-        sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
-        this.mainService.updateData('reports', sellingAct._id, sellingAct);
-      });
-    });
-  }
-
   updateTableReport(check: Check) {
     this.mainService.getAllBy('reports', { connection_id: check.table_id }).then(res => {
       let report = res.docs[0];
@@ -394,7 +388,6 @@ export class PaymentScreenComponent implements OnInit {
       this.mainService.updateData('reports', report._id, report);
     });
   }
-
 
   fillData() {
     this.mainService.getData('checks', this.id).then(res => {
@@ -413,7 +406,6 @@ export class PaymentScreenComponent implements OnInit {
       this.canceledProducts = this.check.products.filter(obj => obj.status == 3);
       this.check.products = this.check.products.filter(obj => obj.status == 2);
     });
-    this.mainService.getAllBy('tables', {}).then(res => { this.tables_count = res.docs.length; });
     this.settingsService.getAppSettings().subscribe((res: any) => {
       if (res.value.ask_print_check == 'Sor') {
         this.askForPrint = true;
