@@ -32,7 +32,7 @@ export class StoreComponent implements OnInit {
       });
     });
   }
-
+  
   ngOnDestroy() {
     this.changes.cancel();
   }
