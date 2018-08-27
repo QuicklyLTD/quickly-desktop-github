@@ -32,7 +32,7 @@ export class StoreComponent implements OnInit {
       });
     });
   }
-  
+
   ngOnDestroy() {
     this.changes.cancel();
   }
@@ -65,7 +65,7 @@ export class StoreComponent implements OnInit {
     })
     this.mainService.getAllBy('tables', {}).then((result) => {
       this.tables = result.docs;
-      this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
+      this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name, 'tr', { numeric: true, sensitivity: 'base' }));
       this.tableViews = this.tables;
       if (localStorage.getItem('selectedFloor')) {
         let selectedID = JSON.parse(localStorage['selectedFloor']);
