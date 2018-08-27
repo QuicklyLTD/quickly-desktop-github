@@ -79,7 +79,6 @@ export class PrinterService {
     let newCheck = Object.assign({}, check);
     newCheck.products = ordersArray;
     newCheck.payed_products = payedArray;
-    console.log(newCheck);
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, '');
   }
 

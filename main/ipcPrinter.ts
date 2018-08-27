@@ -29,7 +29,6 @@ ipcMain.on('printTest', (event, device) => {
           .control('LF')
           .text('Quickly', '857')
           .control('LF')
-          .control('LF')
           .cut()
           .beep(3, 2)
           .close();
@@ -67,7 +66,7 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
         printer.size(1, 1).text(line);
         printer
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-          .control('LF').control('LF').control('LF')
+          .control('LF')
           .cut()
           .beep(3, 2)
           .close();
@@ -96,6 +95,7 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .align('ct')
             .size(1, 1)
             .image(image, 'd24')
+            .control('LF')
             .text('Quickly')
             .text('www.quickly.com.tr')
             .align('lt')
@@ -117,7 +117,7 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               .text(line)
               .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
               .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-              .control('LF').control('LF');
+              .control('LF');
           }
           if (check.payment_flow) {
             if (check.type == 1) {
@@ -140,7 +140,6 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             }
             printer
               .text(line);
-
             if (check.products.length == 0) {
               printer
                 .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
@@ -156,9 +155,8 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
-            .control('LF').control('LF').control('LF')
+            .beep(3, 2)
             .cut()
-            .beep(2, 3)
             .close();
         }
       });
@@ -203,7 +201,7 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
-            .control('LF').control('LF').control('LF')
+            .control('LF')
             .cut()
             .beep(2, 3)
             .close();
@@ -241,7 +239,7 @@ ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
           .size(1, 1)
           .text(line)
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-          .control('LF').control('LF').control('LF')
+          .control('LF')
           .cut()
           .beep(1, 6)
           .beep(1, 3)
@@ -317,7 +315,7 @@ ipcMain.on('printReport', (event, device, data, logo) => {
               .control('LF')
               .text(fitText('Tarih:', date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
               .text(fitText('Saat:', date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-              .control('LF').control('LF').control('LF')
+              .control('LF')
               .cut()
               .close();
           }
