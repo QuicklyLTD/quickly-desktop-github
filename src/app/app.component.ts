@@ -116,13 +116,10 @@ export class AppComponent implements OnInit {
                       $('#endDayModal').modal('show');
                       setTimeout(() => {
                         let databasesArray = Object.keys(this.mainService.LocalDB);
-                        databasesArray.forEach((db, index) => {
-                          this.mainService.destroyDB(db).then(res => {
-                            console.log(db, res);
-                            if (index == databasesArray.length - 1) {
-                              setTimeout(() => {
-                                this.mainService.initDatabases();
-                              }, 5000)
+                        this.mainService.destroyDB(databasesArray).then(res => {
+                          if (res.ok) {
+                            setTimeout(() => {
+                              this.mainService.initDatabases();
                               setTimeout(() => {
                                 this.mainService.replicateDB(configrations).on('complete', () => {
                                   this.mainService.syncToLocal().then(res => {
@@ -140,10 +137,10 @@ export class AppComponent implements OnInit {
                                     }
                                   })
                                 });
-                              }, 50000);
-                            }
-                          });
-                        })
+                              }, 60000);
+                            }, 5000)
+                          }
+                        });
                       }, 10000);
                     });
                   });
@@ -174,14 +171,16 @@ export class AppComponent implements OnInit {
     setInterval(() => {
       this.mainService.getAllBy('tables', {}).then(tables => {
         this.mainService.getAllBy('checks', {}).then(res => {
+          let checks_total_count = res.docs.length;
           let checks_total_amount;
+          let activity_value
           try {
             checks_total_amount = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
+            activity_value = checks_total_amount / checks_total_count;
           } catch (error) {
             checks_total_amount = 0;
+            activity_value = 0
           }
-          let checks_total_count = res.docs.length;
-          let activity_value = checks_total_amount / checks_total_count;
           let activity_count = (checks_total_count * 100) / tables.docs.length;
           this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
             let sellingAct = res.docs[0];

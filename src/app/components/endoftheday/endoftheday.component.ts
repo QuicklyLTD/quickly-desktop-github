@@ -38,6 +38,7 @@ export class EndofthedayComponent implements OnInit {
   progress: string;
   permissions: any;
   appType: any;
+  serverSet: any;
   token: string;
   restaurantID: string;
 
@@ -60,7 +61,10 @@ export class EndofthedayComponent implements OnInit {
     this.endDayReport = new EndDay(Date.now(), this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
     this.settingsService.AppSettings.subscribe(res => this.lastDay = res.value.last_day);
     this.settingsService.RestaurantInfo.subscribe(res => this.restaurantID = res.value.id);
-    this.settingsService.ServerSettings.subscribe(res => this.appType = res.value);
+    this.settingsService.ServerSettings.subscribe(res => {
+      this.serverSet = res;
+      this.appType = res.value
+    });
     this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
     this.fillData();
   }
@@ -315,13 +319,10 @@ export class EndofthedayComponent implements OnInit {
         if (res.ok) {
           this.progress = 'Uzak Sunucu İsteği Onaylandı!';
           let databasesArray = Object.keys(this.mainService.LocalDB)
-          databasesArray.forEach((db_name, index) => {
-            this.mainService.destroyDB(db_name).then(res => {
-              console.log(db_name, res);
-              if (index == databasesArray.length - 1) {
-                setTimeout(() => {
-                  this.mainService.initDatabases();
-                }, 2000)
+          this.mainService.destroyDB(databasesArray).then(res => {
+            if (res.ok) {
+              setTimeout(() => {
+                this.mainService.initDatabases();
                 setTimeout(() => {
                   this.mainService.replicateFrom()
                     .on('active', () => {
@@ -329,9 +330,10 @@ export class EndofthedayComponent implements OnInit {
                     })
                     .on('complete', (info) => {
                       this.progress = 'Gün Sonu Tamamlanıyor..';
-                      this.mainService.syncToLocal().then(serverConf => {
-                        if (serverConf) {
-                          this.mainService.putDoc('settings', serverConf).then(res => {
+                      this.mainService.syncToLocal().then(res => {
+                        if (res) {
+                          delete this.serverSet._rev;
+                          this.mainService.putDoc('settings', this.serverSet).then(res => {
                             if (res.ok) {
                               $('#endDayModal').modal('hide');
                               this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
@@ -343,11 +345,11 @@ export class EndofthedayComponent implements OnInit {
                         }
                       })
                     }).catch(err => {
-                      console.log(db_name, err);
+                      console.log(err);
                     });
-                }, 2000)
-              }
-            });
+                }, 3000)
+              }, 2000)
+            }
           });
         }
       }, err => {

@@ -6,6 +6,7 @@ import * as PouchDBResolve from 'pouch-resolve-conflicts';
 import * as PouchDBInMemory from 'pouchdb-adapter-memory';
 
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
+import { element } from 'protractor';
 
 @Injectable()
 export class MainService {
@@ -168,8 +169,26 @@ export class MainService {
     });
   }
 
-  destroyDB(db: string) {
-    return this.LocalDB[db].destroy();
+  destroyDB(db: string | Array<string>) {
+    if (Array.isArray(db)) {
+      return new Promise((resolve, reject) => {
+        db.forEach((db_name, index) => {
+          this.LocalDB[db_name].destroy().then(res => {
+            if (res.ok) {
+              console.log(db_name, 'DB destroyed.');
+              if (db.length == index + 1) {
+                resolve({ ok: true });
+              }
+            } else {
+              console.error(db_name, 'DB not destroyed!');
+              reject({ ok: false })
+            }
+          })
+        })
+      });
+    } else {
+      return this.LocalDB[db].destroy();
+    }
   }
 
   compactDB(db: string) {
@@ -283,7 +302,6 @@ export class MainService {
   }
 
   syncToLocal(database?: string) {
-    let serverConfigration;
     let selector;
     if (database) {
       selector = { db_name: database };
@@ -303,16 +321,11 @@ export class MainService {
                 delete element._rev;
                 this.LocalDB[db].put(element).then(res => {
                   if (docs.length == index + 1) {
-                    resolve(serverConfigration);
+                    resolve(true);
                   }
                 }).catch(err => {
                   console.log(db, element)
                 });
-              } else {
-                delete element.db_name;
-                delete element.db_seq;
-                delete element._rev;
-                serverConfigration = element
               }
             }
           });
