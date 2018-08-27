@@ -60,27 +60,56 @@
           </div>
         </div>
       </div>
-      <div class="card-block p-0 tab-height flow">
-        <table class="table table-bordered table-striped table-hover">
-          <thead class="thead-inverse">
-            <tr>
-              <th width="5%">#</th>
-              <th width="30%">Masa</th>
-              <th width="20%">Hesap Sayısı</th>
-              <th width="20%">Toplam Gelir</th>
-              <th width="25%">Son Güncellenme</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of tablesList; let i = index" (click)="getItemReport(item)">
-              <td>{{i+1}}</td>
-              <td>{{item.connection_id | general: 'tables' | async}}</td>
-              <td>{{item.count}} Adet</td>
-              <td>{{item.amount  | number:'1.0-2'}} TL</td>
-              <td>{{item.update_time | date: 'd/M/y HH:mm'}}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="card-block p-0 tab-height">
+        <div class="row">
+          <div class="col-lg-3 pr-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Bölümler
+              </div>
+              <div class="card-block p-0 flow">
+                <div class="list-group">
+                  <button type="button" (click)="fillData();" [ngClass]="{'list-group-item-warning' : selectedCat == undefined}" class="list-group-item list-group-item-action list-eq">
+                    Bütün Bölümler
+                  </button>
+                  <button *ngFor="let cat of floorsList" type="button" [ngClass]="{'list-group-item-warning' : selectedCat == cat._id}"
+                    (click)="getReportsByCategory(cat._id)" class="list-group-item list-group-item-action list-eq">
+                    {{cat.name}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-9 pl-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Masalar
+              </div>
+              <div class="card-block p-0 flow">
+                <table class="table table-bordered table-striped table-hover">
+                  <thead class="thead-inverse">
+                    <tr>
+                      <th width="5%">#</th>
+                      <th width="30%">Masa</th>
+                      <th width="20%">Hesap Sayısı</th>
+                      <th width="20%">Toplam Gelir</th>
+                      <th width="25%">Son Güncellenme</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of tablesList; let i = index" (click)="getItemReport(item)">
+                      <td>{{i+1}}</td>
+                      <td>{{item.connection_id | general: 'tables' | async}}</td>
+                      <td>{{item.count}} Adet</td>
+                      <td>{{item.amount | number:'1.0-2'}} TL</td>
+                      <td>{{item.update_time | date: 'd/M/y HH:mm'}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım

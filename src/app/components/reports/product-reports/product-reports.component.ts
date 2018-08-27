@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Log, logType } from '../../../mocks/log.mock';
 import { Report } from '../../../mocks/report.mock';
 import { MainService } from '../../../services/main.service';
+import { Category } from '../../../mocks/product.mock';
 
 @Component({
   selector: 'app-product-reports',
@@ -9,6 +10,8 @@ import { MainService } from '../../../services/main.service';
   styleUrls: ['./product-reports.component.scss']
 })
 export class ProductReportsComponent implements OnInit {
+  categoriesList: Array<Category>;
+  selectedCat: string;
   generalList: Array<Report>;
   productList: Array<Report>;
   productLogs: Array<Log>;
@@ -72,7 +75,6 @@ export class ProductReportsComponent implements OnInit {
   getItemReport(report: Report) {
     this.DetailLoaded = false;
     this.ItemReport = report;
-    let detailLabel;
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
@@ -107,9 +109,24 @@ export class ProductReportsComponent implements OnInit {
     }
     newArray = newArray.sort((a, b) => b.count - a.count);
     this.productList = newArray;
+    if (this.selectedCat) {
+      this.mainService.getAllBy('products', { cat_id: this.selectedCat }).then(res => {
+        let products_ids = res.docs.map(obj => obj._id);
+        this.productList = this.productList.filter(obj => products_ids.includes(obj.connection_id));
+      })
+    }
+  }
+
+  getReportsByCategory(cat_id: string) {
+    this.selectedCat = cat_id;
+    this.mainService.getAllBy('products', { cat_id: cat_id }).then(res => {
+      let products_ids = res.docs.map(obj => obj._id);
+      this.productList = this.generalList.filter(obj => products_ids.includes(obj.connection_id));
+    })
   }
 
   fillData(daily: boolean) {
+    this.selectedCat = undefined;
     this.ChartData = [];
     this.ChartLoaded = false;
     this.mainService.getAllBy('reports', { type: 'Product' }).then(res => {
@@ -130,6 +147,10 @@ export class ProductReportsComponent implements OnInit {
         });
       });
     });
+    this.mainService.getAllBy('categories', {}).then(res => {
+      this.categoriesList = res.docs;
+      this.categoriesList.sort((a, b) => b.order - a.order);
+    })
     this.mainService.getAllBy('logs', {}).then(res => {
       this.productLogs = res.docs.filter(obj => obj.type >= logType.PRODUCT_CREATED && obj.type <= logType.PRODUCT_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });

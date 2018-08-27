@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Log, logType } from '../../../mocks/log.mock';
 import { Report } from '../../../mocks/report.mock';
 import { MainService } from '../../../services/main.service';
+import { Floor } from '../../../mocks/table.mock';
 
 @Component({
   selector: 'app-table-reports',
@@ -11,6 +12,8 @@ import { MainService } from '../../../services/main.service';
 export class TableReportsComponent implements OnInit {
   tablesList: Array<Report>;
   generalList: Array<Report>;
+  selectedCat: string;
+  floorsList: Array<Floor>;
   tableLogs: Array<Log>;
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
@@ -102,6 +105,20 @@ export class TableReportsComponent implements OnInit {
     }
     newArray = newArray.sort((a, b) => b.count - a.count);
     this.tablesList = newArray;
+    if (this.selectedCat) {
+      this.mainService.getAllBy('tables', { floor_id: this.selectedCat }).then(res => {
+        let floors_ids = res.docs.map(obj => obj._id);
+        this.tablesList = this.tablesList.filter(obj => floors_ids.includes(obj.connection_id));
+      })
+    }
+  }
+
+  getReportsByCategory(cat_id: string) {
+    this.selectedCat = cat_id;
+    this.mainService.getAllBy('tables', { floor_id: cat_id }).then(res => {
+      let floors_ids = res.docs.map(obj => obj._id);
+      this.tablesList = this.generalList.filter(obj => floors_ids.includes(obj.connection_id));
+    })
   }
 
   getLogs() {
@@ -111,6 +128,7 @@ export class TableReportsComponent implements OnInit {
   }
 
   fillData(daily: boolean) {
+    this.selectedCat = undefined;
     this.ChartData = [];
     this.ChartLoaded = false;
     this.mainService.getAllBy('reports', { type: 'Table' }).then(res => {
@@ -134,6 +152,9 @@ export class TableReportsComponent implements OnInit {
         });
       });
     });
+    this.mainService.getAllBy('floors', {}).then(res => {
+      this.floorsList = res.docs;
+    })
   }
 
 }
