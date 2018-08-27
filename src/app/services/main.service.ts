@@ -6,7 +6,6 @@ import * as PouchDBResolve from 'pouch-resolve-conflicts';
 import * as PouchDBInMemory from 'pouchdb-adapter-memory';
 
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
-import { element } from 'protractor';
 
 @Injectable()
 export class MainService {
