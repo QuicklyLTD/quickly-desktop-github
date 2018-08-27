@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
-import { Printer } from '../mocks/settings.mock';
-import { Check } from '../mocks/check.mock';
 import * as escpos from 'escpos';
 
 @Injectable()
@@ -43,6 +41,8 @@ export class PrinterService {
   printCheck(device, table, check) {
     let ordersArray = [];
     let payedArray = [];
+    check.products = check.products.filter(obj => obj.status == 2);
+    check.total_price = check.products.map(obj => obj.price).reduce((a, b) => a + b);
     check.products.forEach(element => {
       let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
       if (contains) {
@@ -79,6 +79,7 @@ export class PrinterService {
     let newCheck = Object.assign({}, check);
     newCheck.products = ordersArray;
     newCheck.payed_products = payedArray;
+    console.log(newCheck);
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, '');
   }
 
