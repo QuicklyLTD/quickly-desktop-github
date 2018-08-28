@@ -149,6 +149,20 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
+    this.mainService.getAllBy('endday', {}).then(res => {
+      let endday = res.docs;
+      endday.forEach(element => {
+        this.mainService.changeData('endday', element._id, (doc) => {
+          let time = doc.time;
+          delete doc.time;
+          doc.timestamp = time;
+          return doc;
+        }).then(res => {
+          console.log(res);
+        });
+      });
+    })
+
     // this.mainService.syncToRemote().cancel();
     // this.mainService.syncToServer().cancel();
     // this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
