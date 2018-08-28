@@ -41,8 +41,6 @@ export class PrinterService {
   printCheck(device, table, check) {
     let ordersArray = [];
     let payedArray = [];
-    check.products = check.products.filter(obj => obj.status == 2);
-    check.total_price = check.products.map(obj => obj.price).reduce((a, b) => a + b);
     check.products.forEach(element => {
       let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
       if (contains) {

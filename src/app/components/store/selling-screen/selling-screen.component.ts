@@ -684,6 +684,8 @@ export class SellingScreenComponent implements OnInit {
   }
 
   printCheck() {
+    this.check.products = this.check.products.filter(obj => obj.status == 2);
+    this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
     if (this.table.status !== 3) {
       this.printerService.printCheck(this.printers[0], this.table.name, this.check);
       if (this.check.status > 0) {
