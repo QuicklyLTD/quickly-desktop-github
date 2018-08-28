@@ -100,7 +100,7 @@ export class CashboxComponent implements OnInit {
     this.sellingIncomes = 0;
     this.mainService.getAllBy('cashbox', {}).then(result => {
       this.cashboxData = result.docs;
-      this.cashboxData.sort((a, b) => b.time - a.time);
+      this.cashboxData.sort((a, b) => b.timestamp - a.timestamp);
       try {
         this.incomes = this.cashboxData.filter(obj => obj.type == 'Gelir').map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
       } catch (error) {

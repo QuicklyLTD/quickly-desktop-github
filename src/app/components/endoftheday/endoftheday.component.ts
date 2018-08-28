@@ -253,11 +253,11 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepFinal() {
-    this.endDayReport.time = Date.now();
-    this.endDayReport.data_file = this.endDayReport.time + '.qdat';
+    this.endDayReport.timestamp = Date.now();
+    this.endDayReport.data_file = this.endDayReport.timestamp + '.qdat';
     this.progress = 'Yerel Süreç Tamamlanıyor...';
     this.mainService.addData('endday', this.endDayReport).then(() => {
-      this.electronService.backupData(this.backupData, this.endDayReport.time);
+      this.electronService.backupData(this.backupData, this.endDayReport.timestamp);
       this.printerService.printReport(this.printers[0], this.endDayReport);
       let dateData = { started: false, day: this.day, time: Date.now() };
       this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
@@ -393,7 +393,7 @@ export class EndofthedayComponent implements OnInit {
   fillData() {
     this.mainService.getAllBy('endday', {}).then((result) => {
       this.endDayData = result.docs;
-      this.endDayData = this.endDayData.sort((a, b) => b.time - a.time);
+      this.endDayData = this.endDayData.sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }

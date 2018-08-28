@@ -1,6 +1,6 @@
 export class EndDay {
     constructor(
-       public time: number,
+       public timestamp: number,
        public owner: string,
        public total_income: number,
        public cash_total: number,

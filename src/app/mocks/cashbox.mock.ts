@@ -2,7 +2,7 @@ export class Cashbox {
   constructor(
     public type: string,
     public description: string,
-    public time: number,
+    public timestamp: number,
     public cash: number,
     public card: number,
     public coupon: number,

@@ -80,14 +80,14 @@
                   <i class="fa fa-calendar" aria-hidden="true"></i>
                 </td>
                 <td>Tarih:</td>
-                <td>{{detailData.time | date:'d/M/y'}}</td>
+                <td>{{detailData.timestamp | date:'d/M/y'}}</td>
               </tr>
               <tr>
                 <td>
                   <i class="fa fa-clock-o" aria-hidden="true"></i>
                 </td>
                 <td>Saat:</td>
-                <td>{{detailData.time | date:'HH:mm'}}</td>
+                <td>{{detailData.timestamp | date:'HH:mm'}}</td>
               </tr>
             </tbody>
           </table>
@@ -163,7 +163,7 @@
                     <td>{{i+1}}</td>
                     <td>{{cash.description}}</td>
                     <td>{{cash.user}}</td>
-                    <td>{{cash.time | date:'HH:mm'}}</td>
+                    <td>{{cash.timestamp | date:'HH:mm'}}</td>
                     <td>{{cash.cash + cash.card + cash.coupon  | number:'1.0-2'}} TL</td>
                   </tr>
                 </tbody>
@@ -339,7 +339,7 @@
           <div class="card-footer">
             <i class="fa fa-user" aria-hidden="true"></i> {{cashDetail?.user}}
             <span class="pull-right">
-              {{cashDetail?.time | date:'HH:mm'}}
+              {{cashDetail?.timestamp | date:'HH:mm'}}
             </span>
           </div>
         </div>
