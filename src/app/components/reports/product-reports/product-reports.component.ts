@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Log, logType } from '../../../mocks/log.mock';
 import { Report } from '../../../mocks/report.mock';
+import { Printer } from '../../../mocks/settings.mock';
 import { MainService } from '../../../services/main.service';
+import { SettingsService } from '../../../services/settings.service';
 import { Category } from '../../../mocks/product.mock';
+import { PrinterService } from '../../../providers/printer.service';
 
 @Component({
   selector: 'app-product-reports',
   templateUrl: './product-reports.component.html',
-  styleUrls: ['./product-reports.component.scss']
+  styleUrls: ['./product-reports.component.scss'],
+  providers: [SettingsService]
 })
 export class ProductReportsComponent implements OnInit {
   categoriesList: Array<Category>;
@@ -17,6 +21,7 @@ export class ProductReportsComponent implements OnInit {
   productLogs: Array<Log>;
   chartList: Array<Report>;
   toDay: number;
+  printers: Array<Printer>;
 
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
@@ -29,7 +34,7 @@ export class ProductReportsComponent implements OnInit {
   DetailData: Array<any>;
   DetailLoaded: boolean;
 
-  constructor(private mainService: MainService) {
+  constructor(private mainService: MainService, private settingsService: SettingsService, private printerService: PrinterService) {
     this.DetailLoaded = false;
     this.DetailData = [];
   }
@@ -37,6 +42,9 @@ export class ProductReportsComponent implements OnInit {
   ngOnInit() {
     this.fillData(false);
     this.toDay = Date.now();
+    this.settingsService.getPrinters().subscribe(res => {
+      this.printers = res.value;
+    })
   }
 
   normalWeekOrder(array: Array<any>) {
@@ -48,7 +56,6 @@ export class ProductReportsComponent implements OnInit {
     }
     return array;
   }
-
 
   dailyCount(arr: Array<number>, price: number) {
     let newArray = [];
@@ -123,6 +130,24 @@ export class ProductReportsComponent implements OnInit {
       let products_ids = res.docs.map(obj => obj._id);
       this.productList = this.generalList.filter(obj => products_ids.includes(obj.connection_id));
     })
+  }
+
+  printReport() {
+    if (this.selectedCat) {
+      this.mainService.getAllBy('products', { cat_id: this.selectedCat }).then(res => {
+        res.docs.forEach(element => {
+          this.productList.find(obj => obj.connection_id == element._id).description = element.name;
+        });
+        this.printerService.printReport(this.printers[0], 'Ürünler', this.productList);
+      });
+    } else {
+      this.mainService.getAllBy('products', {}).then(res => {
+        res.docs.forEach(element => {
+          this.productList.find(obj => obj.connection_id == element._id).description = element.name;
+        });
+        this.printerService.printReport(this.printers[0], 'Ürünler', this.productList);
+      });
+    }
   }
 
   fillData(daily: boolean) {

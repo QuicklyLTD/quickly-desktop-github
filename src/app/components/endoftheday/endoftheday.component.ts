@@ -258,7 +258,7 @@ export class EndofthedayComponent implements OnInit {
     this.progress = 'Yerel Süreç Tamamlanıyor...';
     this.mainService.addData('endday', this.endDayReport).then(() => {
       this.electronService.backupData(this.backupData, this.endDayReport.timestamp);
-      this.printerService.printReport(this.printers[0], this.endDayReport);
+      this.printerService.printEndDay(this.printers[0], this.endDayReport);
       let dateData = { started: false, day: this.day, time: Date.now() };
       this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
         if (res.ok) {

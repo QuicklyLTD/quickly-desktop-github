@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
+import { MainService } from '../services/main.service';
 import * as escpos from 'escpos';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class PrinterService {
   quicklyLogo: string;
   storeInfo: any;
 
-  constructor(private electron: ElectronService, private messageService: MessageService, private settings: SettingsService) {
+  constructor(private electron: ElectronService, private mainService: MainService, private messageService: MessageService, private settings: SettingsService) {
     this.storeLogo = this.electron.appRealPath + '/data/customer.png';
     this.quicklyLogo = this.electron.appPath + '/assets/quickly.png';
     this.electron.ipcRenderer.on('error', (event, message) => {
@@ -97,8 +98,13 @@ export class PrinterService {
     this.electron.ipcRenderer.send('printPayment', device, payment, table, this.storeLogo);
   }
 
-  printReport(device, EndDayData) {
-    this.electron.ipcRenderer.send('printReport', device, EndDayData, this.quicklyLogo);
+  printEndDay(device, EndDayData) {
+    this.electron.ipcRenderer.send('printEndDay', device, EndDayData, this.quicklyLogo);
+  }
+
+  printReport(device, category, reports) {
+    console.log(reports);
+    this.electron.ipcRenderer.send('printReport', device, category, reports);
   }
 
   printCancel(device, product, reason, table, owner) {

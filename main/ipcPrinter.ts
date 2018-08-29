@@ -251,7 +251,48 @@ ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
   }
 });
 
-ipcMain.on('printReport', (event, device, data, logo) => {
+
+ipcMain.on('printReport', (event, device, category, reports) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    let date = new Date();
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer
+          .align('ct')
+          .size(3, 3)
+          .text('-----RAPOR!-----', '857')
+          .control('LF')
+          .size(2, 2)
+          .text(category, '857')
+          .control('LF')
+          .size(1, 1)
+          .align('lt')
+          .text(fitText('Ürün Adı', textPad('Adet', 'Tutar', 20, 0), 1), '857')
+          .text(line);
+        reports.forEach(report => {
+          printer.text(fitText(report.description, textPad(report.count + 'x', report.amount + ' TL', 20, 5), 1), '857')
+        });
+        printer
+          .size(1, 1)
+          .text(line)
+          .text(fitText('Tarih:', date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+          .control('LF')
+          .cut()
+          .beep(1, 6)
+          .beep(1, 3)
+          .close();
+      }
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+ipcMain.on('printEndDay', (event, device, data, logo) => {
   let deviceToPrint = findDevice(device);
   const printer = new escpos.Printer(deviceToPrint);
   let date = new Date();
@@ -337,6 +378,11 @@ function repeat(pattern, count) {
     count >>= 1, pattern += pattern;
   }
   return result + pattern;
+}
+
+function textPad(first, second, lineWidth, diffWidth) {
+  let textToReturn = first + repeat(' ', (lineWidth - first.length - second.length) - ((lineWidth - first.length - second.length) - diffWidth)) + repeat(' ', ((lineWidth - first.length - second.length) - diffWidth)) + second;
+  return textToReturn;
 }
 
 function fitText(header, text, number) {
