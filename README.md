@@ -1,4 +1,4 @@
-# QDesktop App Cross Platform Version 1.3.0
+# QDesktop App Cross Platform Version 1.3.1
 
 Uygulama Altyapısı
 
