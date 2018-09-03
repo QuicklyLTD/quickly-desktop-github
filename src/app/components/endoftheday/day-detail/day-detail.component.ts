@@ -17,21 +17,29 @@ export class DayDetailComponent implements OnInit {
   oldChecks: any;
   oldCashbox: any;
   oldReports: any;
+  selectedCat: string;
   currentSection: string;
   checksTable: Array<ClosedCheck>;
   cashboxTable: Array<Cashbox>;
   reportsTable: Array<Report>;
+  productsTable: Array<Report>;
+  usersTable: Array<Report>;
+  tablesTable: Array<Report>;
   checkDetail: ClosedCheck;
+  activityData: any;
   cashDetail: Cashbox;
   syncStatus: boolean;
   pieOptions: any = { responsive: false };
   pieData: Array<any>;
   pieLabels: Array<any>;
   pieColors: Array<any>;
+  detailTitle: string;
+  detailDay: number;
   constructor(private mainService: MainService, private electronService: ElectronService) {
   }
 
   ngOnInit() {
+    this.detailTitle = 'Genel Detaylar & Grafik';
     this.pieColors = [];
     this.pieData = [];
     this.pieLabels = [];
@@ -45,24 +53,45 @@ export class DayDetailComponent implements OnInit {
       this.currentSection = section;
       switch (section) {
         case 'Checks':
+          this.detailTitle = 'Kapatılan Hesap Detayları';
           if (filter == 'All') {
-            this.checksTable = this.oldChecks.docs.sort((a,b) => a.timestamp - b.timestamp);
+            this.checksTable = this.oldChecks.docs.sort((a, b) => a.timestamp - b.timestamp);
           } else if (filter == 'İptal') {
-            this.checksTable = this.oldChecks.docs.filter(obj => obj.type == 3).sort((a,b) => a.timestamp - b.timestamp);
+            this.checksTable = this.oldChecks.docs.filter(obj => obj.type == 3).sort((a, b) => a.timestamp - b.timestamp);
           } else {
-            this.checksTable = this.oldChecks.docs.filter(obj => obj.type !== 3).sort((a,b) => a.timestamp - b.timestamp);
-            this.checksTable = this.oldChecks.docs.filter(obj => obj.payment_method == filter).sort((a,b) => a.timestamp - b.timestamp);
+            this.checksTable = this.oldChecks.docs.filter(obj => obj.type !== 3).sort((a, b) => a.timestamp - b.timestamp);
+            this.checksTable = this.oldChecks.docs.filter(obj => obj.payment_method == filter).sort((a, b) => a.timestamp - b.timestamp);
           }
           break;
         case 'Cashbox':
-          if (filter == 'Gelir') {
-            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type == 'Gelir').sort((a,b) => a.timestamp - b.timestamp);
-          } else {
-            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type == 'Gider').sort((a,b) => a.timestamp - b.timestamp);
+          this.detailTitle = 'Kasa Gelir-Gider Detayları';
+          if (filter == 'All') {
+            this.cashboxTable = this.oldCashbox.docs;
+          }
+          else if (filter == 'Gelir') {
+            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type == 'Gelir').sort((a, b) => a.timestamp - b.timestamp);
+          } else if (filter == 'Gider') {
+            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type == 'Gider').sort((a, b) => a.timestamp - b.timestamp);
           }
           break;
-        case 'Reports':
-
+        case 'Products':
+          this.detailTitle = 'Güne Ait Ürün Satış Detayları';
+          this.productsTable = this.oldReports.docs.filter(obj => obj.type == 'Product').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          break;
+        case 'Users':
+          this.detailTitle = 'Güne Ait Kullanıcı Satış Detayları';
+          this.usersTable = this.oldReports.docs.filter(obj => obj.type == 'User').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          break;
+        case 'Tables':
+          this.detailTitle = 'Güne Ait Masa Satış Detayları';
+          this.tablesTable = this.oldReports.docs.filter(obj => obj.type == 'Table').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          break;
+        case 'Logs':
+          this.detailTitle = 'Güne Ait Sistem Kayıtları';
+          break;
+        case 'Activity':
+          this.detailTitle = 'Güne Ait Aktivite Grafiği';
+          this.activityData = this.oldReports.docs.find(obj => obj.type == 'Activity');
           break;
 
         default:
@@ -87,6 +116,7 @@ export class DayDetailComponent implements OnInit {
     this.pieColors = [{ backgroundColor: ['#5cb85c', '#f0ad4e', '#5bc0de', '#d9534f'] }];
     this.pieLabels.push('Nakit', 'Kart', 'Kupon', 'İkram');
     this.pieData.push(this.detailData.cash_total, this.detailData.card_total, this.detailData.coupon_total, this.detailData.free_total);
+    this.detailDay = new Date(this.detailData.timestamp).getDay();
     this.electronService.readBackupData(this.detailData.data_file).then((result: Array<BackupData>) => {
       this.oldBackupData = result;
       this.oldChecks = this.oldBackupData[0];
