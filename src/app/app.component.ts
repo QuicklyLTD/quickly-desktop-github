@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
   }
 
   loadAppBackup() {
-    let db_names = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings' && obj !== 'reports');
+    let db_names = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings');
     console.log(db_names);
     db_names.forEach((db, index) => {
       this.mainService.destroyDB(db).then(res => {
