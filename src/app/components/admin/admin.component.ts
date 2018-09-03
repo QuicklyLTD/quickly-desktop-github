@@ -80,6 +80,8 @@ export class AdminComponent implements OnInit {
       let reports = res.docs.filter(obj => obj.type !== 'Activity');
       reports.forEach((element, index) => {
         this.mainService.changeData('reports', element._id, (doc) => {
+          doc.amount = 0;
+          doc.count = 0;
           doc.weekly = [0, 0, 0, 0, 0, 0, 0];
           doc.weekly_count = [0, 0, 0, 0, 0, 0, 0];
           return doc;
