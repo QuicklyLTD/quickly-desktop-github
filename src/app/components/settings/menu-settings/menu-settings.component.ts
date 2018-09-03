@@ -208,7 +208,7 @@ export class MenuSettingsComponent implements OnInit {
     let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.subcat_id, this.productSpecs, form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('products', schema).then((response) => {
-        this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
+        this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], schema.name, Date.now())).then(res => {
           this.logService.createLog(logType.PRODUCT_CREATED, res.id, `${form.name} adlı Ürün Oluşturuldu`)
         });
         if (this.productRecipe.length > 0) {
