@@ -71,8 +71,8 @@ export class StockSettingsComponent implements OnInit {
 
   addQuantity(value) {
     const old_quantity = this.selectedStock.left_total / this.selectedStock.total;
-    const new_quantity = (old_quantity + parseInt(value));
-    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * parseInt(value)), first_quantity: new_quantity, warning_limit: (this.selectedStock.total * new_quantity) * 25 / 100 };
+    const new_quantity = (old_quantity + parseFloat(value));
+    let after = { quantity: new_quantity, left_total: this.selectedStock.left_total + (this.selectedStock.total * parseFloat(value)), first_quantity: new_quantity, warning_limit: (this.selectedStock.total * new_quantity) * 25 / 100 };
     this.stockForm.setValue(Object.assign(this.selectedStock, after));
     $('#quantityModal').modal('hide');
     $('#stock').modal('show');
