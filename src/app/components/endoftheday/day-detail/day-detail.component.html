@@ -309,12 +309,29 @@
               </table>
             </section>
             <section id="activity" *ngIf="currentSection == 'Activity'">
-
+              <canvas *ngIf="currentSection == 'Activity'" baseChart style="height: 590px; width:76vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels"
+              [options]="ChartOptions" [legend]="activityLegend" chartType="line"></canvas>
             </section>
             <section id="logs" *ngIf="currentSection == 'Logs'">
-
+              <table class="table table-bordered table-hover table-striped">
+                <thead class="thead-inverse">
+                  <tr>
+                    <th width="5%">#</th>
+                    <th width="65%">Açıklama</th>
+                    <th width="20%">Kullanıcı</th>
+                    <th width="10%">Saat</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let log of logsTable; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{log.description}}</td>
+                    <td>{{log.user}}</td>
+                    <td>{{log.timestamp | date:'HH:mm'}}</td>
+                  </tr>
+                </tbody>
+              </table>
             </section>
-
           </div>
         </div>
       </div>

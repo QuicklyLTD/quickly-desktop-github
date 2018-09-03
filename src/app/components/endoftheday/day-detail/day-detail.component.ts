@@ -5,6 +5,7 @@ import { BackupData, EndDay } from '../../../mocks/endoftheday.mock';
 import { Report } from '../../../mocks/report.mock';
 import { ElectronService } from '../../../providers/electron.service';
 import { MainService } from '../../../services/main.service';
+import { Log, logType } from '../../../mocks/log.mock';
 
 @Component({
   selector: 'app-day-detail',
@@ -17,6 +18,7 @@ export class DayDetailComponent implements OnInit {
   oldChecks: any;
   oldCashbox: any;
   oldReports: any;
+  oldLogs: any;
   selectedCat: string;
   currentSection: string;
   checksTable: Array<ClosedCheck>;
@@ -25,8 +27,10 @@ export class DayDetailComponent implements OnInit {
   productsTable: Array<Report>;
   usersTable: Array<Report>;
   tablesTable: Array<Report>;
+  logsTable: Array<Log>;
   checkDetail: ClosedCheck;
   activityData: any;
+  activityLabels: any;
   cashDetail: Cashbox;
   syncStatus: boolean;
   pieOptions: any = { responsive: false };
@@ -88,10 +92,13 @@ export class DayDetailComponent implements OnInit {
           break;
         case 'Logs':
           this.detailTitle = 'Güne Ait Sistem Kayıtları';
+          this.logsTable = this.oldLogs.docs.sort((a, b) => b.timestamp - a.timestamp);
           break;
         case 'Activity':
           this.detailTitle = 'Güne Ait Aktivite Grafiği';
-          this.activityData = this.oldReports.docs.find(obj => obj.type == 'Activity');
+          let sellingActivity = this.oldReports.docs.find(obj => obj.type == 'Activity');
+          this.activityData = [{ data: sellingActivity.activity, label: 'Gelir Endeksi' }, { data: sellingActivity.activity_count, label: 'Doluluk Oranı ( % )' }];
+          this.activityLabels = sellingActivity.activity_time;
           break;
 
         default:
@@ -119,9 +126,11 @@ export class DayDetailComponent implements OnInit {
     this.detailDay = new Date(this.detailData.timestamp).getDay();
     this.electronService.readBackupData(this.detailData.data_file).then((result: Array<BackupData>) => {
       this.oldBackupData = result;
+      console.log(this.oldBackupData);
       this.oldChecks = this.oldBackupData[0];
       this.oldCashbox = this.oldBackupData[1];
       this.oldReports = this.oldBackupData[2];
+      this.oldLogs = this.oldBackupData[3];
       this.syncStatus = true;
     }).catch(err => {
       console.log(err);
