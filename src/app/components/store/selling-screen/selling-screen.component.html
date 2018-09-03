@@ -8,7 +8,9 @@
               <div class="col-lg-8">
                 <span *ngIf="check?.type == 1">Masa:</span>
                 <b>{{check?.table_id | general:'tables' | async}}</b>
-                <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-muted">( {{check.note}} )</span>
+                <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-muted">( {{check.note}}
+                  )
+                </span>
               </div>
               <div class="col-lg-4 pr-1">
                 <div class="input-group input-group-sm">
@@ -28,7 +30,8 @@
                   class="btn btn-danger btn-block btn-sm">Masa Değiştir</button>
               </div>
               <div class="col-lg-6 pr-1 pl-1">
-                <button data-toggle="modal" data-target="#checkNote" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">Hesaba Not Ekle</button>
+                <button data-toggle="modal" data-target="#checkNote" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">Hesaba
+                  Not Ekle</button>
               </div>
             </div>
           </div>
@@ -207,6 +210,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="button" (click)="makeGift()" class="btn btn-danger btn-lg">İkram</button>
           <button type="submit" class="btn btn-primary btn-lg">Not Ekle</button>
         </div>
       </form>
@@ -327,8 +331,12 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button *ngIf="onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün Taşı</button>
-        <button *ngIf="!onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa Değiştir</button>
+        <button *ngIf="onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün
+          Taşı
+        </button>
+        <button *ngIf="!onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa
+          Değiştir
+        </button>
       </div>
     </div>
   </div>

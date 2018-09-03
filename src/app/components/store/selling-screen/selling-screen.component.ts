@@ -429,11 +429,19 @@ export class SellingScreenComponent implements OnInit {
       if (note == '' || note == null || note == ' ') {
         this.message.sendMessage('Not Alanı Boş Bırakılamaz');
       } else {
-        let shit = this.check.products[this.selectedIndex];
         this.check.products[this.selectedIndex].note = note;
         form.reset();
         $('#noteModal').modal('hide');
       }
+    }
+  }
+
+  makeGift() {
+    if (this.selectedProduct != undefined) {
+      this.check.products[this.selectedIndex].name += ' (İkram)';
+      this.check.total_price -= this.check.products[this.selectedIndex].price;
+      this.check.products[this.selectedIndex].price = 0;
+      $('#noteModal').modal('hide');
     }
   }
 
