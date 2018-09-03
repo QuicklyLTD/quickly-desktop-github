@@ -196,7 +196,7 @@ export class EndofthedayComponent implements OnInit {
     this.mainService.getAllBy('reports', {}).then(res => {
       this.progress = 'Raporlar Yedekleniyor...';
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
-      const reportsBackup = new BackupData('reports', this.reports);
+      const reportsBackup = new BackupData('reports', res.docs);
       this.backupData.push(reportsBackup);
       const activities = res.docs.filter(obj => obj.type == 'Activity');
       const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
