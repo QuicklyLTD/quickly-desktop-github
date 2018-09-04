@@ -296,6 +296,7 @@
                   <tr>
                     <th width="8%">#</th>
                     <th width="40%">Masa</th>
+                    <th width="20%">Yüzde</th>
                     <th width="20%">Tutar</th>
                     <th width="12%">Adet</th>
                     <th width="20%">Saat</th>
@@ -305,6 +306,7 @@
                   <tr *ngFor="let table of tablesTable; let i=index">
                     <td>{{i+1}}</td>
                     <td>{{table.connection_id | general:'tables' | async}}</td>
+                    <td><strong>% {{(table.weekly[detailDay]/detailData.total_income) * 100 | number: '1.0-2'}}</strong></td>
                     <td>{{table.weekly[detailDay]}} TL</td>
                     <td>{{table.weekly_count[detailDay]}} Adet</td>
                     <td>{{table.update_time | date:'HH:mm'}}</td>

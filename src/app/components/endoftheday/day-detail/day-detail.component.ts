@@ -129,7 +129,6 @@ export class DayDetailComponent implements OnInit {
     this.detailDay = new Date(this.detailData.timestamp).getDay();
     this.electronService.readBackupData(this.detailData.data_file).then((result: Array<BackupData>) => {
       this.oldBackupData = result;
-      console.log(this.oldBackupData);
       this.oldChecks = this.oldBackupData[0];
       this.oldCashbox = this.oldBackupData[1];
       this.oldReports = this.oldBackupData[2];
