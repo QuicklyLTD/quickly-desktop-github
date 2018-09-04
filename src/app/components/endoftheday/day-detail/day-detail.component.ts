@@ -81,14 +81,17 @@ export class DayDetailComponent implements OnInit {
         case 'Products':
           this.detailTitle = 'Güne Ait Ürün Satış Detayları';
           this.productsTable = this.oldReports.docs.filter(obj => obj.type == 'Product').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          this.productsTable = this.productsTable.filter(obj => obj.weekly[this.detailDay] !== 0);
           break;
         case 'Users':
           this.detailTitle = 'Güne Ait Kullanıcı Satış Detayları';
           this.usersTable = this.oldReports.docs.filter(obj => obj.type == 'User').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          this.usersTable = this.usersTable.filter(obj => obj.weekly[this.detailDay] !== 0);
           break;
         case 'Tables':
           this.detailTitle = 'Güne Ait Masa Satış Detayları';
           this.tablesTable = this.oldReports.docs.filter(obj => obj.type == 'Table').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          this.tablesTable = this.tablesTable.filter(obj => obj.weekly[this.detailDay] !== 0);
           break;
         case 'Logs':
           this.detailTitle = 'Güne Ait Sistem Kayıtları';
