@@ -159,3 +159,13 @@ nav{
     border-top: 2px solid #eceeef;
     overflow: hidden;
   }
+
+table {
+    table-layout: fixed;
+}
+td{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+}
