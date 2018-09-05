@@ -57,8 +57,8 @@ export class EndofthedayComponent implements OnInit {
       this.isStarted = res.value.started;
       this.day = res.value.day;
       this.dateToReport = res.value.time;
+      this.endDayReport = new EndDay(this.day, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
     })
-    this.endDayReport = new EndDay(Date.now(), this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
     this.settingsService.AppSettings.subscribe(res => this.lastDay = res.value.last_day);
     this.settingsService.RestaurantInfo.subscribe(res => this.restaurantID = res.value.id);
     this.settingsService.ServerSettings.subscribe(res => {
@@ -356,9 +356,9 @@ export class EndofthedayComponent implements OnInit {
         console.log(err);
         $('#endDayModal').modal('hide');
         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
-        setTimeout(() => {
-          this.electronService.relaunchProgram();
-        }, 5000);
+        // setTimeout(() => {
+        //   this.electronService.relaunchProgram();
+        // }, 5000);
         // const serverSelectedRevs = res.json();
         // this.electronService.fileSystem.readFile(this.electronService.appRealPath + '/data/db.dat', 'utf-8', (err, data) => {
         //   if (!err) {
