@@ -10,32 +10,32 @@
             type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-pie-chart fa-2x mr-2" aria-hidden="true"></i> Genel Detaylar
           </button>
-          <button (click)="filterOldData('Checks','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Checks'}" type="button"
-            class="list-group-item list-group-item-action">
+          <button (click)="filterOldData('Checks','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Checks'}"
+            type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-sticky-note fa-2x mr-2" aria-hidden="true"></i> Hesap Detayları
           </button>
-          <button (click)="filterOldData('Cashbox','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Cashbox'}" type="button"
-            class="list-group-item list-group-item-action">
+          <button (click)="filterOldData('Cashbox','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Cashbox'}"
+            type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-money fa-2x mr-2" aria-hidden="true"></i> Kasa Detayları
           </button>
           <button (click)="filterOldData('Products','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Products'}"
             type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-glass fa-2x mr-2" aria-hidden="true"></i> Ürün Raporları
           </button>
-          <button (click)="filterOldData('Users','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Users'}" type="button"
-            class="list-group-item list-group-item-action">
+          <button (click)="filterOldData('Users','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Users'}"
+            type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-user fa-2x mr-2" aria-hidden="true"></i> Kullanıcı Raporları
           </button>
-          <button (click)="filterOldData('Tables','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Tables'}" type="button"
-            class="list-group-item list-group-item-action">
+          <button (click)="filterOldData('Tables','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Tables'}"
+            type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-square fa-2x mr-2" aria-hidden="true"></i> Masa Raporları
           </button>
           <button (click)="filterOldData('Activity','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Activity'}"
             type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-line-chart fa-2x mr-2" aria-hidden="true"></i> Aktivite Grafiği
           </button>
-          <button (click)="filterOldData('Logs','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Logs'}" type="button"
-            class="list-group-item list-group-item-action">
+          <button (click)="filterOldData('Logs','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Logs'}"
+            type="button" class="list-group-item list-group-item-action">
             <i class="fa fa-bell fa-2x mr-2" aria-hidden="true"></i> Sistem Kayıtları
           </button>
         </div>
@@ -185,8 +185,8 @@
                   </strong>
                 </div>
                 <div class="col-xl-7 col-lg-6 pt-4 pl-0">
-                  <canvas baseChart style="height:525px; width:95%;  margin:auto;" [data]="pieData" [colors]="pieColors" [labels]="pieLabels"
-                    [legend]="true" chartType="pie" [options]="pieOptions"></canvas>
+                  <canvas baseChart style="height:525px; width:95%;  margin:auto;" [data]="pieData" [colors]="pieColors"
+                    [labels]="pieLabels" [legend]="true" chartType="pie" [options]="pieOptions"></canvas>
                 </div>
               </div>
             </section>
@@ -315,8 +315,9 @@
               </table>
             </section>
             <section id="activity" *ngIf="currentSection == 'Activity'">
-              <canvas *ngIf="currentSection == 'Activity'" baseChart style="height: 590px; width:76vw; margin:auto;" [datasets]="activityData"
-                [labels]="activityLabels" [options]="ChartOptions" [legend]="activityLegend" chartType="line"></canvas>
+              <canvas *ngIf="currentSection == 'Activity'" baseChart style="height: 590px; width:76vw; margin:auto;"
+                [datasets]="activityData" [labels]="activityLabels" [options]="ChartOptions" [legend]="activityLegend"
+                chartType="line"></canvas>
             </section>
             <section id="logs" *ngIf="currentSection == 'Logs'">
               <table class="table table-bordered table-hover table-striped">
@@ -345,7 +346,6 @@
   </div>
 </div>
 
-
 <div class="modal fade" id="checkDetail" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
@@ -367,51 +367,47 @@
           <div class="card-block flow p-0">
             <table *ngIf="checkDetail?.payment_method != 'Parçalı'" class="table table-striped table-sm table-bordered mb-0">
               <thead class="thead-inverse">
-                <th>#</th>
-                <th>Ürün</th>
-                <th>Garson</th>
-                <th>Saat</th>
-                <th>Fiyat</th>
+                <th width="5%">#</th>
+                <th width="49%">Ürün</th>
+                <th width="17%">Garson</th>
+                <th width="14%">Saat</th>
+                <th width="14%">Fiyat</th>
               </thead>
               <tbody>
                 <tr *ngFor="let item of checkDetail?.products; let i = index;" [ngClass]="{'table-danger': item.status == 3}">
-                  <td width="5%">{{i+1}}</td>
-                  <td width="49%">{{item.name}}
+                  <td>{{i+1}}</td>
+                  <td>{{item.name}}
                     <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                   </td>
-                  <td width="17%">{{item.owner}}</td>
-                  <td width="14%">{{item.timestamp |date:'HH:mm'}}</td>
-                  <td width="14%">{{item.price | number:'1.0-2'}} TL</td>
+                  <td>{{item.owner}}</td>
+                  <td>{{item.timestamp |date:'HH:mm'}}</td>
+                  <td>{{item.price | number:'1.0-2'}} TL</td>
                 </tr>
               </tbody>
             </table>
             <section *ngIf="checkDetail?.payment_method == 'Parçalı'">
               <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm table-bordered table-striped mb-0">
                 <thead class="thead-inverse">
-                  <th>#</th>
-                  <th>{{item.owner}}</th>
-                  <th>{{item.method}}</th>
-                  <th>{{item.timestamp | date:'HH:mm'}}</th>
-                  <th>{{item.amount + item.discount}} TL</th>
+                  <th width="5%">#</th>
+                  <th width="47%">{{item.owner}}</th>
+                  <th width="15%">{{item.method}}</th>
+                  <th width="15%">{{item.timestamp | date:'HH:mm'}}</th>
+                  <th width="17%">{{item.amount + item.discount}} TL</th>
                 </thead>
                 <tbody>
                   <tr *ngIf="item.discount > 0" class="table-info">
-                    <td width="4%">
-                      <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                    </td>
-                    <td width="48%">İndirim Tutarı</td>
-                    <td width="15%"></td>
-                    <td width="15%"></td>
+                    <td width="5%"><i class="fa fa-arrow-down" aria-hidden="true"></i></td>
+                    <td width="46%" colspan="3">İndirim Tutarı</td>
                     <td width="17%">{{item.discount}} TL</td>
                   </tr>
                   <tr *ngFor="let product of item.payed_products; let i = index;" [ngClass]="{'table-danger': product.status == 3}">
-                    <td width="4%">{{i+1}}</td>
-                    <td width="48%">{{product.name}}
+                    <td>{{i+1}}</td>
+                    <td>{{product.name}}
                       <small *ngIf="product.note !== '' && product.note !== undefined" class="text-muted">({{product.note}})</small>
                     </td>
-                    <td width="15%">{{product.owner}}</td>
-                    <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
-                    <td width="17%">{{product.price | number:'1.0-2'}} TL</td>
+                    <td>{{product.owner}}</td>
+                    <td>{{product.timestamp |date:'HH:mm'}}</td>
+                    <td>{{product.price | number:'1.0-2'}} TL</td>
                   </tr>
                 </tbody>
               </table>
@@ -495,7 +491,8 @@
                     </td>
                     <td>Toplam:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card | number:'1.0-2'
+                      <span class="pull-right">{{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card |
+                        number:'1.0-2'
                         }} TL</span>
                     </td>
                   </tr>
