@@ -335,11 +335,19 @@ export class SellingScreenComponent implements OnInit {
     if (this.askForCheckPrint) {
       this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
         if (isOK) {
-          this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+          if (this.check.type == 1) {
+            this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+          } else {
+            this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
+          }
         }
       });
     } else {
-      this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+      if (this.check.type == 1) {
+        this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+      } else {
+        this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
+      }
     }
     this.message.sendMessage(`Hesap ${this.check.total_price} TL tutarında ödeme alınarak kapatıldı`);
   }
