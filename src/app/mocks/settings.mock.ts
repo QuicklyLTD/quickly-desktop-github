@@ -42,3 +42,10 @@ export class PaymentMethod {
         public status: number
     ) { }
 }
+export class DayInfo {
+    constructor(
+        public day: number,
+        public started: boolean,
+        public time: number,
+    ) { }
+}
