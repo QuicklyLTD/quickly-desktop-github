@@ -4,7 +4,6 @@ import { ClosedCheck } from '../../../mocks/check.mock';
 import { BackupData, EndDay } from '../../../mocks/endoftheday.mock';
 import { Report } from '../../../mocks/report.mock';
 import { ElectronService } from '../../../providers/electron.service';
-import { MainService } from '../../../services/main.service';
 import { Log, logType } from '../../../mocks/log.mock';
 
 @Component({
@@ -39,7 +38,7 @@ export class DayDetailComponent implements OnInit {
   pieColors: Array<any>;
   detailTitle: string;
   detailDay: number;
-  constructor(private mainService: MainService, private electronService: ElectronService) {
+  constructor(private electronService: ElectronService) {
   }
 
   ngOnInit() {

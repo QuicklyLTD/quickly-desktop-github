@@ -57,7 +57,7 @@ export class EndofthedayComponent implements OnInit {
       this.isStarted = res.value.started;
       this.day = res.value.day;
       this.dateToReport = res.value.time;
-      this.endDayReport = new EndDay(this.day, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+      this.endDayReport = new EndDay(this.dateToReport, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
     })
     this.settingsService.AppSettings.subscribe(res => this.lastDay = res.value.last_day);
     this.settingsService.RestaurantInfo.subscribe(res => this.restaurantID = res.value.id);
@@ -232,7 +232,7 @@ export class EndofthedayComponent implements OnInit {
             return doc;
           });
         });
-        localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
+        // localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
       }
     });
   }
@@ -253,11 +253,11 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepFinal() {
-    this.endDayReport.timestamp = Date.now();
-    this.endDayReport.data_file = this.endDayReport.timestamp + '.qdat';
+    let finalDate = Date.now();
+    this.endDayReport.data_file = finalDate + '.qdat';
     this.progress = 'Yerel Süreç Tamamlanıyor...';
     this.mainService.addData('endday', this.endDayReport).then(() => {
-      this.electronService.backupData(this.backupData, this.endDayReport.timestamp);
+      this.electronService.backupData(this.backupData, finalDate);
       this.printerService.printEndDay(this.printers[0], this.endDayReport);
       let dateData = { started: false, day: this.day, time: Date.now() };
       this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
@@ -318,7 +318,7 @@ export class EndofthedayComponent implements OnInit {
       this.httpService.post(`v1/management/restaurants/${this.restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
         if (res.ok) {
           this.progress = 'Uzak Sunucu İsteği Onaylandı!';
-          let databasesArray = Object.keys(this.mainService.LocalDB)
+          let databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings')
           this.mainService.destroyDB(databasesArray).then(res => {
             if (res.ok) {
               setTimeout(() => {
@@ -330,23 +330,26 @@ export class EndofthedayComponent implements OnInit {
                     })
                     .on('complete', (info) => {
                       this.progress = 'Gün Sonu Tamamlanıyor..';
-                      this.mainService.syncToLocal().then(res => {
-                        if (res) {
-                          delete this.serverSet._rev;
-                          this.mainService.putDoc('settings', this.serverSet).then(res => {
-                            if (res.ok) {
-                              $('#endDayModal').modal('hide');
-                              this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
-                              setTimeout(() => {
-                                this.electronService.relaunchProgram();
-                              }, 5000);
-                            }
-                          })
-                        }
-                      })
-                    }).catch(err => {
-                      console.log(err);
+                      $('#endDayModal').modal('hide');
+                      this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+                      setTimeout(() => {
+                        this.electronService.relaunchProgram();
+                      }, 5000);
                     });
+                  // this.mainService.syncToLocal().then(res => {
+                  //   if (res) {
+                  //     delete this.serverSet._rev;
+                  //     this.mainService.putDoc('settings', this.serverSet).then(res => {
+                  //       if (res.ok) {
+                  //         $('#endDayModal').modal('hide');
+                  //         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+                  //         setTimeout(() => {
+                  //           this.electronService.relaunchProgram();
+                  //         }, 5000);
+                  //       }
+                  //     })
+                  //   }
+                  // })
                 }, 3000)
               }, 2000)
             }
