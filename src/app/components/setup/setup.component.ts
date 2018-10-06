@@ -51,6 +51,7 @@ export class SetupComponent implements OnInit {
   getConfigrations(connectionForm: NgForm) {
     let Form = connectionForm.value;
     let serverSettings = new Settings('ServerSettings', { type: 1, status: 1, ip_address: Form.address, ip_port: parseInt(Form.port), key: Form.key }, 'Sunucu Ayarları', Date.now());
+    localStorage.setItem('AppType', 'Secondary');
     this.electron.openDevTools();
     this.mainService.replicateDB(serverSettings.value)
       .on('active', () => {
@@ -112,6 +113,7 @@ export class SetupComponent implements OnInit {
     let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor', last_day: 0 }, 'Uygulama Ayarları', Date.now());
     let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.app_id }, 'Sunucu Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
+    localStorage.setItem('AppType', 'Primary');
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', authInfo);
     this.mainService.addData('settings', appSettings);
