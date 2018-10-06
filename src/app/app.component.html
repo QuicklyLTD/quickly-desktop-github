@@ -51,8 +51,20 @@
   </section>
   <section id="mainHolder" class="container-fluid">
     <div class="row">
-      <div id="routerHolder" class="col-lg-12">
+      <div [hidden]="onSync" id="routerHolder" class="col-lg-12">
         <router-outlet></router-outlet>
+      </div>
+      <div [hidden]="!onSync" id="syncHolder" class="col-lg-12">
+        <p class="text-center  mt-5 pt-5" [ngClass]="!hasError ? 'text-quickly': 'text-danger animated fadeIn'">
+          <i class="fa fa-5x" [ngClass]="!hasError ? 'fa-refresh fa-spin': 'fa-times'" style="font-size:50vh"
+            aria-hidden="true"></i>
+        </p>
+        <h1 *ngIf="!hasError" class="text-quickly text-center text-bold mt-5" style="font-weight:bolder">
+          Veriler Senkroinize Ediliyor
+        </h1>
+        <h1 *ngIf="hasError" class="text-danger text-center text-bold mt-5" style="font-weight:bolder">
+          Ana Sunucuya Bağlanılamadı
+        </h1>
       </div>
     </div>
   </section>
