@@ -7,6 +7,7 @@ import { AuthService } from './services/auth.service';
 import { MainService } from './services/main.service';
 import { SettingsService } from './services/settings.service';
 import { ConflictService } from './services/conflict.service';
+import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 
 @Component({
   selector: 'app-root',
@@ -18,67 +19,179 @@ import { ConflictService } from './services/conflict.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.3.1';
-  date: number;
+  version = '1.3.2';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
   onSync: boolean;
+  hasError: boolean;
+  date: number;
+
+  //// App Settings ////
+
+  activationStatus: boolean;
+  serverSettings: ServerInfo;
+  dayStatus: DayInfo;
+
 
   constructor(private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService) {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
-    this.onSync = false;
+    this.onSync = true;
+    this.hasError = false;
   }
 
   ngOnInit() {
     if (this.electronService.isElectron()) {
       this.settingsService.setLocalStorage();
-      // this.loadAppBackup();
-      this.startApp();
+      this.initAppSettings();
+      this.initConnectivityAndTime();
     }
+  }
+
+  initAppSettings() {
+    this.mainService.getAllBy('settings', {}).then(res => {
+      if (res.docs.length > 0) {
+        let settings: Array<Settings> = res.docs;
+        try {
+          this.activationStatus = settings.find(obj => obj.key == 'ActivationStatus').value;
+          this.dayStatus = settings.find(obj => obj.key == 'DateSettings').value;
+          this.serverSettings = settings.find(obj => obj.key == 'ServerSettings').value;
+        } catch (error) {
+          console.log('Settings Error Documents Not Available');
+          this.electronService.openDevTools();
+        }
+      }
+      this.initAppProcess();
+    });
+  }
+
+  initConnectivityAndTime() {
     setInterval(() => {
       this.date = Date.now();
       this.connectionStatus = this.aplicationService.connectionStatus();
     }, 5000);
   }
 
-  loadAppBackup() {
-    let db_names = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings');
-    console.log(db_names);
-    db_names.forEach((db, index) => {
-      this.mainService.destroyDB(db).then(res => {
-        if (res.ok) {
-          if (index == db_names.length - 1) {
-            this.mainService.initDatabases();
-            setTimeout(() => {
-              this.electronService.fileSystem.readFile(this.electronService.appRealPath + '/data/db.dat', (err, data) => {
-                if (!err) {
-                  const realData = JSON.parse(data.toString('utf-8'));
-                  this.mainService.putAll('allData', realData).then(() => {
-                    db_names.forEach(element => {
-                      let db_data = realData.filter(obj => obj.db_name == element);
-                      db_data.map(obj => {
-                        delete obj['db_name'];
-                        delete obj['db_seq'];
-                      })
-                      if (db_data.length > 0) {
-                        this.mainService.putAll(element, db_data).then(res => {
-                          console.log(element, db_data);
-                        });
-                      }
+  initAppProcess() {
+    switch (this.activationStatus) {
+      case true:
+        this.setupFinished = true;
+        if (this.serverSettings !== undefined) {
+          if (this.serverSettings.status == 1) {
+            ////// Birincil Ekran ///////
+            if (this.serverSettings.type == 0) {
+              this.electronService.ipcRenderer.send('appServer', this.serverSettings.key, this.serverSettings.ip_port);
+              this.mainService.syncToServer();
+              this.conflictService.conflictListener();
+              this.mainService.loadAppData().then((isLoaded: boolean) => {
+                if (isLoaded) {
+                  this.onSync = false;
+                  this.updateActivityReport();
+                  this.router.navigate(['']);
+                }
+              }).catch(err => {
+                console.log(err);
+              });
+            }
+            if (this.serverSettings.type == 1) {
+              ////// İkincil Ekran //////
+              this.mainService.replicateDB(this.serverSettings).on('complete', () => {
+                this.mainService.loadAppData().then((isLoaded: boolean) => {
+                  if (isLoaded) {
+                    this.onSync = false;
+                    this.router.navigate(['']);
+                    const signalListener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
+                      this.onSync = true;
+                      signalListener.cancel();
+                      this.mainService.syncToRemote().cancel();
+                      let databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings');
+                      this.mainService.destroyDB(databasesArray).then(res => {
+                        if (res.ok) {
+                          setTimeout(() => {
+                            this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program kapatılacak.', 'success');
+                            this.electronService.shellCommand('shutdown now');
+                          }, 5000);
+                        }
+                      });
                     });
-                  });
-                } else {
-                  console.log('Dosya Yok')
+                  }
+                })
+              }).catch(err => {
+                console.log(err);
+                this.hasError = true;
+                setTimeout(() => {
+                  this.electronService.relaunchProgram();
+                }, 10000);
+              });
+              this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', (res) => {
+                if (!this.onSync) {
+                  setTimeout(() => {
+                    this.electronService.reloadProgram();
+                  }, 5000);
                 }
               });
-            }, 5000)
+            }
+          } else {
+            if (this.serverSettings.type == 0) {
+              this.onSync = false;
+              this.mainService.loadAppData().then((isLoaded: boolean) => {
+                if (isLoaded) {
+                  this.onSync = false;
+                  this.router.navigate(['']);
+                }
+              }).catch(err => {
+                console.log(err);
+              });
+              this.updateActivityReport();
+            }
           }
+          this.mainService.syncToRemote();
+          if (new Date().getDay() !== this.dayStatus.day) {
+            if (this.dayStatus.started) {
+              this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
+            } else {
+              this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
+            }
+          }
+        } else {
+          let serverDocument;
+          let AppType = localStorage.getItem('AppType');
+          this.mainService.getAllBy('allData', { key: 'ServerSettings' }).then(res => {
+            switch (AppType) {
+              case 'Primary':
+                serverDocument = res.docs.find(obj => obj.value.type == 0);
+                delete serverDocument._rev;
+                this.mainService.putDoc('settings', serverDocument).then(res => {
+                  this.electronService.reloadProgram();
+                });
+                break;
+              case 'Secondary':
+                serverDocument = res.docs.find(obj => obj.value.type == 1);
+                delete serverDocument._rev;
+                this.mainService.putDoc('settings', serverDocument).then(res => {
+                  this.electronService.reloadProgram();
+                });
+              default:
+                break;
+            }
+          })
+          // this.mainService.syncToLocal('settings').then(res => {
+          //   console.log(res);
+          // })
         }
-      })
-    });
+        break;
+      case false:
+        this.setupFinished = false;
+        this.onSync = false;
+        this.router.navigate(['/activation']);
+        break;
+      default:
+        this.onSync = false;
+        this.router.navigate(['/setup']);
+        break;
+    }
   }
 
   startApp() {
