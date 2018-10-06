@@ -12,7 +12,6 @@ export class MainService {
   LocalDB: Object;
   RemoteDB: PouchDB.Database | any;
   ServerDB: PouchDB.Database | any;
-  MemoryDB: PouchDB.Database | any;
 
   authInfo: AuthInfo;
   serverInfo: ServerInfo;
@@ -26,7 +25,7 @@ export class MainService {
     PouchDB.plugin(PouchDBResolve);
     PouchDB.plugin(PouchDBInMemory);
 
-    const db_opts = { revs_limit: 1, auto_compaction: true };
+    const db_opts = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
 
     this.LocalDB = {
       users: new PouchDB('local_users', db_opts),
@@ -48,12 +47,10 @@ export class MainService {
       stocks_cat: new PouchDB('local_stocks_cat', db_opts),
       endday: new PouchDB('local_endday', db_opts),
       reports: new PouchDB('local_reports', db_opts),
-      settings: new PouchDB('local_settings', db_opts),
       logs: new PouchDB('local_logs', db_opts),
+      settings: new PouchDB('local_settings', { revs_limit: 1, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
-
-    // this.MemoryDB = new PouchDB('inMemory', { adapter: 'memory' });
 
     this.getAllBy('settings', { key: 'AuthInfo' }).then(res => {
       if (res.docs.length > 0) {
@@ -94,13 +91,16 @@ export class MainService {
   }
 
   addData(db, schema) {
-    this.LocalDB[db].post(schema).catch(err => {
+    return this.LocalDB[db].post(schema).then(res => {
+      let doc = Object.assign(schema, { db_name: db, db_seq: 0 });
+      delete doc._rev;
+      delete doc._rev_tree;
+      return this.LocalDB['allData'].put(doc).catch(err => {
+        console.log('addData-All', err);
+      });
+    }).catch(err => {
       console.log('addData-Local', err);
     });;
-    delete schema._rev;
-    return this.LocalDB['allData'].put(Object.assign({ db_name: db, db_seq: 0 }, schema)).catch(err => {
-      console.log('addData-All', err);
-    });
   }
 
   changeData(db, id, schema: any) {
@@ -345,7 +345,10 @@ export class MainService {
   }
 
   syncToServer() {
-    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true, heartbeat: 2500 })
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true, heartbeat: 2500 , back_off_function: (delay) => {
+      delay = 1000;
+      return delay;
+    } })
       .on('change', (sync) => { this.handleChanges(sync) })
     // .on('active', () => { console.log('Server Active') })
     // .on('paused', (err) => { console.log('Server Paused', err) })
