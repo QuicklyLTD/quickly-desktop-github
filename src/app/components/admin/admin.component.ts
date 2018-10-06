@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
 import * as fs from 'fs';
+import { ServerInfo, Settings } from '../../mocks/settings.mock';
 
 @Component({
   selector: 'app-admin',
@@ -46,7 +47,13 @@ export class AdminComponent implements OnInit {
 
   editDocument(document) {
     let newDocument = JSON.parse(document);
-    this.mainService.updateData(this.selectedDB, newDocument._id, newDocument).then(res => {
+    let db_name;
+    if (this.selectedDB == 'allData') {
+      db_name = document.db_name;
+    } else {
+      db_name = this.selectedDB;
+    }
+    this.mainService.updateData(db_name, newDocument._id, newDocument).then(res => {
       $('#docModal').modal('hide');
       console.log('Döküman Güncellendi');
       this.editArea.nativeElement.value == '';
@@ -151,19 +158,23 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
-    this.mainService.getAllBy('endday', {}).then(res => {
-      let endday = res.docs;
-      endday.forEach(element => {
-        this.mainService.changeData('endday', element._id, (doc) => {
-          let time = doc.time;
-          delete doc.time;
-          doc.timestamp = time;
-          return doc;
-        }).then(res => {
-          console.log(res);
-        });
-      });
-    })
+    // this.mainService.getAllBy('endday', {}).then(res => {
+    //   let endday = res.docs;
+    //   endday.forEach(element => {
+    //     this.mainService.changeData('endday', element._id, (doc) => {
+    //       let time = doc.time;
+    //       delete doc.time;
+    //       doc.timestamp = time;
+    //       return doc;
+    //     }).then(res => {
+    //       console.log(res);
+    //     });
+    //   });
+    // })
+    
+    // let value = new ServerInfo(0, 1, '192.168.1.1', 3000, 'kosmos2018');
+
+    // this.mainService.addData('settings', new Settings('ServerSettings', value, 'Sunucu Ayarları', Date.now()));
 
     // this.mainService.syncToRemote().cancel();
     // this.mainService.syncToServer().cancel();
