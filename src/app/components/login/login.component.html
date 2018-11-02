@@ -1,12 +1,12 @@
-<div class="row">
+<div class="row animated fadeIn">
     <div id="login-holder" class="container text-center">
         <div id="pincodeHolder">
             <div *ngIf="message" class="alert alert-danger">
                 <h3>{{ message }}</h3>
             </div>
             <div *ngIf="!message" class="input-group">
-                <input  class="form-control text-center" disabled maxlength="4" type="password" [(ngModel)]="pinInput">
-                <div class="input-group-btn">
+                <input  class="form-control text-center" readonly maxlength="4" type="password" [(ngModel)]="pinInput">
+                <div class="input-group-append">
                     <button class="btn btn-large btn-danger" (click)="clearDigits()"> <i class="fa fa-long-arrow-left fa-2x" aria-hidden="true"></i> </button>
                 </div>
             </div>
