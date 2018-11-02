@@ -13,13 +13,13 @@
           </div>
         </div>
       </div>
-      <div class="card-block p-0" [ngClass]="{'flow': selectedEndDay == undefined}">
+      <div class="card-body p-0" [ngClass]="{'flow': selectedEndDay == undefined}">
         <app-day-detail *ngIf="selectedEndDay !== undefined" [data]="selectedEndDay"></app-day-detail>
         <table *ngIf="selectedEndDay == undefined" class="table table-striped table-bordered table-hover">
-          <thead class="thead-inverse">
+          <thead class="thead-dark">
             <tr>
-              <th width="5%">#</th>
-              <th width="35%">
+              <th width="6%">#</th>
+              <th width="34%">
                 <i class="fa fa-clock-o" aria-hidden="true"></i> Tarih
               </th>
               <th width="20%" *ngIf="permissions?.end">

@@ -293,6 +293,8 @@ export class EndofthedayComponent implements OnInit {
           this.refreshToken();
         }
       })
+    }).catch(err => {
+      console.log(err);
     })
   }
 
@@ -331,7 +333,7 @@ export class EndofthedayComponent implements OnInit {
                     .on('complete', (info) => {
                       this.progress = 'Gün Sonu Tamamlanıyor..';
                       $('#endDayModal').modal('hide');
-                      this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+                      this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program Yeniden Başlatılacak', 'success');
                       setTimeout(() => {
                         this.electronService.relaunchProgram();
                       }, 5000);
@@ -358,7 +360,7 @@ export class EndofthedayComponent implements OnInit {
       }, err => {
         console.log(err);
         $('#endDayModal').modal('hide');
-        this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+        this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program Yeniden Başlatılacak', 'success');
         // setTimeout(() => {
         //   this.electronService.relaunchProgram();
         // }, 5000);
