@@ -78,6 +78,8 @@ export class KeyboardComponent implements OnInit {
           this.onNumb = true;
           break;
         default:
+          this.keytype = this.keyboard;
+          this.onNumb = false;
           break;
       }
     });

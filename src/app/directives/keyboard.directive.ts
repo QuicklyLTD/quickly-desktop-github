@@ -1,19 +1,21 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 import { KeyboardService } from '../providers/keyboard.service';
 
 @Directive({
-  selector: 'input:not([type="checkbox"]):not([id="keyboardElement"]):not([readonly])'
+  selector: 'input:not([type="checkbox"]):not([id="keyboardElement"]):not([readonly]),textarea:not([readonly])'
 })
 export class KeyboardDirective {
   onAir: boolean;
 
-  constructor(private element: ElementRef, private keyboardService: KeyboardService) {
+  constructor(private element: ElementRef, private keyboardService: KeyboardService, private renderer: Renderer2) {
     this.onAir = false;
   }
 
   @HostListener('click') onClick() {
     this.keyboardService.triggerKeyboard('Open', this.element);
-   // this.keyboardService.syncInputs(this.element);
+    // let inputElement = this.element.nativeElement;
+    // this.renderer.setStyle(inputElement, 'height', '100px');
+    // this.keyboardService.syncInputs(this.element);
   }
   @HostListener('input') onInput() {
     this.element.nativeElement.focus();
