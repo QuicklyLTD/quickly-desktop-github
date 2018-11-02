@@ -74,7 +74,6 @@ const routes: Routes = [
   {
     path: 'setup',
     component: SetupComponent
-    // canActivate: [SetupFinished]
   },
 ];
 @NgModule({

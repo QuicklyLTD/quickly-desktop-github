@@ -19,7 +19,7 @@ import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.3.2';
+  version = '1.5.0';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -305,7 +305,7 @@ export class AppComponent implements OnInit {
           });
         });
       });
-    }, 300000)
+    }, 360000)
   }
 
   resetTimer() {

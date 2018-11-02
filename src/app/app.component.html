@@ -1,14 +1,12 @@
 <section id="appHolder" (click)="resetTimer()">
+  <app-message></app-message>
   <section id="navBar">
-    <nav class="navbar navbar-toggleable-md quickly-color navbar-inverse">
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand navbar-dark quickly-color">
+      <a class="navbar-brand" href="#">Quickly</a>
+      <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
+        aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a *ngIf="setupFinished" routerLink="" class="navbar-brand">
-        {{title}}
-      </a>
-      <a *ngIf="!setupFinished" class="navbar-brand text-white">Quickly v{{version}}</a>
       <div *ngIf="setupFinished" class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
@@ -55,19 +53,18 @@
         <router-outlet></router-outlet>
       </div>
       <div [hidden]="!onSync" id="syncHolder" class="col-lg-12">
-        <p class="text-center  mt-5 pt-5" [ngClass]="!hasError ? 'text-quickly': 'text-danger animated fadeIn'">
+        <p class="text-center  mt-5 pt-5" [ngClass]="!hasError ? 'text-primary': 'text-danger animated fadeIn'">
           <i class="fa fa-5x" [ngClass]="!hasError ? 'fa-refresh fa-spin': 'fa-times'" style="font-size:50vh"
             aria-hidden="true"></i>
         </p>
-        <h1 *ngIf="!hasError" class="text-quickly text-center text-bold mt-5" style="font-weight:bolder">
+        <h1 *ngIf="!hasError" class="text-primary text-center font-weight-bold mt-5" style="font-weight:bolder">
           Veriler Senkroinize Ediliyor
         </h1>
-        <h1 *ngIf="hasError" class="text-danger text-center text-bold mt-5" style="font-weight:bolder">
+        <h1 *ngIf="hasError" class="text-danger text-center font-weight-bold mt-5" style="font-weight:bolder">
           Ana Sunucuya Bağlanılamadı
         </h1>
       </div>
     </div>
   </section>
-  <app-message></app-message>
   <app-keyboard></app-keyboard>
 </section>
