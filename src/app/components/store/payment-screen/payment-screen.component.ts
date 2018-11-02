@@ -201,7 +201,7 @@ export class PaymentScreenComponent implements OnInit {
     if (this.check.type == 1) {
       this.router.navigate(['/store']);
     } else {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/store']);
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {

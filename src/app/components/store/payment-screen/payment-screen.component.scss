@@ -5,18 +5,14 @@
     padding-bottom: 20px;
     padding-right: 0px;
     padding-left: 0px;
-    font-size: 3vh;
+    font-size: 1.35rem;
     font-weight: bold;
 }
 .cashButton{
-    height: 94.3px;
+    height: 114.5px;
     margin-bottom: 3.8px;
-    padding-top:20px;
-    padding-bottom: 20px;
-    padding-right: 0px;
-    padding-left: 0px;
-    color: #000;
-    font-size: 5.3vh;
+    padding-left: 7px;
+    font-size: 4vh;
     font-weight: bold;
 }
 .check-flow{
@@ -59,10 +55,6 @@
 #productHolder{
     overflow-y: scroll;
     background-color: #ebebeb;
-}
-.col-card{
-    padding-left: 5px;
-    padding-right: 5px;
 }
 .proCard{
     height: 112.4px;
@@ -126,7 +118,8 @@
     -webkit-text-stroke: #ebebeb 1px;
 }
 .numpad{
-    font-weight: bold;
+    font-weight: 900;
+    font-size: 21px;
 }
 .btn-discount{
     padding: 20px;
