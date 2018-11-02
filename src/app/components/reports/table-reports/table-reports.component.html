@@ -23,7 +23,9 @@
           </div>
           <div class="col-lg-4 pr-2 pl-0">
             <div class="input-group">
-              <div class="input-group-addon normal">Filtre</div>
+              <div class="input-group-prepend normal">
+                <div class="input-group-text">Filtre</div>
+              </div>
               <select class="form-control" (change)="changeFilter($event.target.value)">
                 <option>Tutar</option>
                 <option>Hesap Adedi</option>
@@ -32,9 +34,9 @@
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
-        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels"
-          [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+      <div class="card-body tab-height p-0">
+        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData"
+          [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
@@ -48,9 +50,11 @@
           <div class="col-lg-8">
             <h5 class="mt-2">Masa Gelir Listesi</h5>
           </div>
-          <div class="col-lg-4 r-2 pl-0">
+          <div class="col-lg-4 pr-2 pl-0">
             <div class="input-group">
-              <div class="input-group-addon normal">Filtre</div>
+              <div class="input-group-prepend normal">
+                <div class="input-group-text">Filtre</div>
+              </div>
               <select class="form-control" (change)="changeListFilter($event.target.value)">
                 <option>Genel</option>
                 <option>Haftalık</option>
@@ -60,16 +64,17 @@
           </div>
         </div>
       </div>
-      <div class="card-block p-0 tab-height">
+      <div class="card-body p-0 tab-height">
         <div class="row">
           <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Bölümler
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
-                  <button type="button" (click)="fillData();" [ngClass]="{'list-group-item-warning' : selectedCat == undefined}" class="list-group-item list-group-item-action list-eq">
+                  <button type="button" (click)="fillData();" [ngClass]="{'list-group-item-warning' : selectedCat == undefined}"
+                    class="list-group-item list-group-item-action list-eq">
                     Bütün Bölümler
                   </button>
                   <button *ngFor="let cat of floorsList" type="button" [ngClass]="{'list-group-item-warning' : selectedCat == cat._id}"
@@ -85,12 +90,12 @@
               <div class="card-header">
                 Masalar
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <table class="table table-bordered table-striped table-hover">
-                  <thead class="thead-inverse">
+                  <thead class="thead-dark">
                     <tr>
-                      <th width="5%">#</th>
-                      <th width="30%">Masa</th>
+                      <th width="6%">#</th>
+                      <th width="29%">Masa</th>
                       <th width="20%">Hesap Sayısı</th>
                       <th width="20%">Toplam Gelir</th>
                       <th width="25%">Son Güncellenme</th>
@@ -121,13 +126,13 @@
       <div class="card-header">
         <h5 class="mt-2">Bildirimler</h5>
       </div>
-      <div class="card-block tab-height p-0 flow">
+      <div class="card-body tab-height p-0 flow">
         <table class="table table-striped table-bordered">
-          <thead class="thead-inverse">
+          <thead class="thead-dark">
             <tr>
               <th width="10%">Kullanıcı</th>
               <th>Açıklama</th>
-              <th width="20%" colspan="2">Tarih</th>
+              <th width="25%" colspan="2">Tarih</th>
             </tr>
           </thead>
           <tbody>
@@ -157,8 +162,8 @@
         </button>
       </div>
       <div class="modal-body p-0">
-        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:790px; margin:auto;" [datasets]="DetailData" [labels]="ChartLabels"
-          [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:790px; margin:auto;" [datasets]="DetailData"
+          [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>

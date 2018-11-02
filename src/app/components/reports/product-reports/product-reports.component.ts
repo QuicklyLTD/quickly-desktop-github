@@ -25,7 +25,31 @@ export class ProductReportsComponent implements OnInit {
 
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
-  ChartOptions: any = { responsive: false };
+  ChartOptions: any = {
+    responsive: false,
+    legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
+    scales: {
+      xAxes: [{
+        ticks: {
+          beginAtZero: true,
+          fontColor: 'rgba(255,255,255)'
+        },
+        gridLines: {
+          color: 'rgba(255,255,255)',
+          lineWidth: 0.4
+        }
+      }],
+      yAxes: [{
+        ticks: {
+          fontColor: 'rgba(255,255,255)'
+        },
+        gridLines: {
+          color: 'rgba(255,255,255)',
+          lineWidth: 0.4
+        }
+      }]
+    },
+  };
   ChartLegend: boolean = true;
   ChartType: string = 'bar';
   ChartLoaded: boolean;

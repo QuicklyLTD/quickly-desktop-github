@@ -23,12 +23,12 @@
       <div class="card-header">
         <h5 class="mt-2">Normal Satış</h5>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">Filtreleme</div>
-              <div class="card-block p-0">
+              <div class="card-body p-0">
                 <div class="list-group">
                   <button type="button" (click)="fillData()" class="list-group-item list-group-item-action list-eq">Bütün
                     Masalar</button>
@@ -43,15 +43,17 @@
           </div>
           <div class="col-lg-9 pl-0">
             <div class="card tab-inside-height">
-              <div class="card-header">
+              <div class="card-header pb-2 pt-2">
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-6 pt-1">
                     Masalar
                   </div>
                   <div class="col-lg-6 pr-2">
                     <div class="input-group input-group-sm">
-                      <div class="input-group-addon normal">
-                        <i class="fa fa-search" aria-hidden="true"></i>
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text">
+                          <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>
                       </div>
                       <input #tableName type="text" placeholder="Masa Adı Giriniz.." (click)="fillData(); tableName.value = '';"
                         (keyup)="filterTables(tableName.value)" class="form-control form-contol-sm">
@@ -59,9 +61,9 @@
                   </div>
                 </div>
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <table class="table table-bordered table-striped table-hover">
-                  <thead class="thead-inverse">
+                  <thead class="thead-dark">
                     <tr>
                       <th width="7%">#</th>
                       <th width="33%">Masa</th>
@@ -109,12 +111,12 @@
       <div class="card-header">
         <h5 class="mt-2">Hızlı Satış</h5>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">Filtreleme</div>
-              <div class="card-block p-0">
+              <div class="card-body p-0">
                 <div class="list-group">
                   <button type="button" (click)="fillData()" class="list-group-item list-group-item-action list-eq">Bütün
                     Hesaplar</button>
@@ -129,15 +131,17 @@
           </div>
           <div class="col-lg-9 pl-0">
             <div class="card tab-inside-height">
-              <div class="card-header">
+              <div class="card-header pt-2 pb-2">
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-6 pt-1">
                     Hesaplar
                   </div>
                   <div class="col-lg-6 pr-2">
                     <div class="input-group input-group-sm">
-                      <div class="input-group-addon normal">
-                        <i class="fa fa-search" aria-hidden="true"></i>
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text">
+                          <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>
                       </div>
                       <input #ownerName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="fillData(); ownerName.value = '';"
                         (keyup)="filterChecks(ownerName.value)" class="form-control form-contol-sm">
@@ -145,9 +149,9 @@
                   </div>
                 </div>
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <table class="table table-bordered table-striped table-hover">
-                  <thead class="thead-inverse">
+                  <thead class="thead-dark">
                     <tr>
                       <th width="7%">#</th>
                       <th width="33%">Hesap Türü</th>
@@ -195,14 +199,14 @@
       <div class="card-header">
         <h5 class="mt-2">İptal Edilen Hesaplar</h5>
       </div>
-      <div class="card-block p-0 tab-height flow">
+      <div class="card-body p-0 tab-height flow">
         <div class="row">
           <div class="col-lg-12">
             <table class="table table-bordered table-striped table-hover">
               <thead>
-                <tr class="thead-inverse">
-                  <th width="5%">#</th>
-                  <th width="15%">Masa</th>
+                <tr class="thead-dark">
+                  <th width="6%">#</th>
+                  <th width="14%">Masa</th>
                   <th width="25%">Açıklama</th>
                   <th width="10%">Tür</th>
                   <th width="10%">Tutar</th>
@@ -237,13 +241,13 @@
       <div class="card-header">
         <h5 class="mt-2">Bildirimler</h5>
       </div>
-      <div class="card-block tab-height p-0 flow">
+      <div class="card-body tab-height p-0 flow">
         <table class="table table-striped table-bordered">
-          <thead class="thead-inverse">
+          <thead class="thead-dark">
             <tr>
               <th width="10%">Kullanıcı</th>
               <th>Açıklama</th>
-              <th width="20%" colspan="2">Tarih</th>
+              <th width="25%" colspan="2">Tarih</th>
             </tr>
           </thead>
           <tbody>
@@ -281,9 +285,9 @@
             </b>
             <span class="pull-right text-muted"> Hesap Türü : {{checkDetail?.payment_method}}</span>
           </div>
-          <div class="card-block flow p-0">
+          <div class="card-body flow p-0">
             <table *ngIf="checkDetail?.payment_method != 'Parçalı'" class="table table-striped table-bordered table-sm mb-0">
-              <thead class="thead-inverse">
+              <thead class="thead-dark">
                 <th width="6%">#</th>
                 <th width="44%">Ürün</th>
                 <th width="17%">Garson</th>
@@ -304,7 +308,7 @@
             </table>
             <section *ngIf="checkDetail?.payment_method == 'Parçalı'">
               <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm table-bordered table-striped mb-0">
-                <thead class="thead-inverse">
+                <thead class="thead-dark">
                   <th width="6%">#</th>
                   <th width="45%">{{item.owner}}</th>
                   <th width="15%">{{item.method}}</th>
@@ -375,8 +379,10 @@
       </div>
       <div class="modal-body">
         <div class="input-group">
-          <div class="input-group-addon">
-            İptal Nedeni
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              İptal Nedeni
+            </div>
           </div>
           <input #cancelNote type="text" class="form-control form-control-lg" placeholder="Açıklama Giriniz">
         </div>
@@ -403,14 +409,22 @@
         <div *ngIf="!checkDetail?.payment_flow" class="modal-body">
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Hesap Tutarı</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Hesap Tutarı
+                </div>
+              </div>
               <input type="number" class="form-control form-control-lg" name="total_price" [ngModel]="checkDetail.total_price">
-              <div class="input-group-addon normal">TL</div>
+              <div class="input-group-append">
+                <div class="input-group-text">TL</div>
+              </div>
             </div>
           </div>
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Hesap Tipi</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Hesap Tipi</div>
+              </div>
               <select name="payment_method" class="form-control form-control-lg" [ngModel]="checkDetail.payment_method">
                 <option>Nakit</option>
                 <option>Kart</option>
@@ -453,14 +467,24 @@
         <div class="modal-body">
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Ödeme Tutarı</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Ödeme Tutarı
+                </div>
+              </div>
               <input type="number" class="form-control form-control-lg" name="amount" [ngModel]="selectedPayment?.amount">
-              <div class="input-group-addon normal">TL</div>
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  TL
+                </div>
+              </div>
             </div>
           </div>
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Ödeme Tipi</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Ödeme Tipi</div>
+              </div>
               <select name="method" class="form-control form-control-lg" [ngModel]="selectedPayment?.method">
                 <option>Nakit</option>
                 <option>Kart</option>
