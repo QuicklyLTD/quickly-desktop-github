@@ -30,15 +30,42 @@ export class DayDetailComponent implements OnInit {
   checkDetail: ClosedCheck;
   activityData: any;
   activityLabels: any;
+  activityOptions: any;
   cashDetail: Cashbox;
   syncStatus: boolean;
-  pieOptions: any = { responsive: false };
   pieData: Array<any>;
   pieLabels: Array<any>;
+  pieOptions: any;
   pieColors: Array<any>;
   detailTitle: string;
   detailDay: number;
   constructor(private electronService: ElectronService) {
+    this.pieOptions = { responsive: false, legend: { labels: { fontColor: 'rgb(255, 255, 255)' } } };
+    this.activityOptions = {
+      responsive: false,
+      legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
+      scales: {
+        xAxes: [{
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'rgba(255,255,255)'
+          },
+          gridLines: {
+            color: 'rgba(255,255,255)',
+            lineWidth: 0.4
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            fontColor: 'rgba(255,255,255)'
+          },
+          gridLines: {
+            color: 'rgba(255,255,255)',
+            lineWidth: 0.4
+          }
+        }]
+      },
+    };
   }
 
   ngOnInit() {
