@@ -1,27 +1,20 @@
-<div class="row animated fadeIn">
-  <div class="col-lg-4">
-    <a routerLink="/store">
-      <div class="card card-inverse card-danger mb-3 mainCard store">
-        <div class="card-block">
-          <p>Satış</p>
-        </div>
-      </div>
-    </a>
-  </div>
-  <div class="col-lg-4" *ngFor="let menu of menus">
+<div class="row pr-2 pl-2 animated fadeIn">
+  <div class="col-lg-4 pr-2 pl-2" *ngFor="let menu of menus; let i = index;">
     <a routerLink="/{{menu.link}}">
-      <div class="card card-inverse card-{{menu.color}} mb-3 mainCard {{menu.link}}">
-        <div class="card-block">
+      <div class="card text-white bg-{{menu.color}} mb-3 mainCard {{menu.link}}">
+        <div class="card-body">
           <p>{{menu.name}}</p>
         </div>
       </div>
     </a>
   </div>
-  <div class="col-lg-4">
-    <div class="card card-inverse mb-3 mainCard exit" (click)="closeProgram()" style="background-color: #333; border-color: #333;">
-      <div class="card-block">
-        <p>Çıkış</p>
+  <div class="col-lg-4 pr-2 pl-2">
+    <a href="#">
+      <div class="card text-white mb-3 mainCard exit" (click)="closeProgram()" style="background-color: #333; border-color: #333;">
+        <div class="card-body">
+          <p>Çıkış</p>
+        </div>
       </div>
-    </div>
+    </a>
   </div>
 </div>

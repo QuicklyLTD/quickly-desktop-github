@@ -1,19 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MainService } from '../../services/main.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  title: string;
+
+export class HomeComponent implements OnInit {
   menus: Array<any>;
 
-  constructor(private mainService: MainService, private router: Router) {
-    this.title = 'Panel';
+  constructor(private router: Router) {
     this.menus = [
+      { name: 'Satış', color: 'danger', icon: 'fa-glass', link: 'store' },
       { name: 'Kasa', color: 'success', icon: 'fa-money', link: 'cashbox' },
       { name: 'Gün Sonu', color: 'warning', icon: 'fa-clock-o', link: 'endoftheday' },
       { name: 'Raporlar', color: 'info', icon: 'fa-pie-chart', link: 'reports' },
@@ -31,9 +30,4 @@ export class HomeComponent implements OnInit, OnDestroy {
     localStorage.removeItem('userAuth');
     this.router.navigate(['/']);
   }
-
-  ngOnDestroy() {
-
-  }
-
 }

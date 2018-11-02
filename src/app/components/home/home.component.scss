@@ -2,7 +2,7 @@
     min-height:43vh;
     padding: 2vh;
     overflow: hidden;
-    box-shadow: 1px 1px 3px rgba(60, 58, 58, 0.48);
+    box-shadow: 1px 1px 3px rgba(60, 58, 58, 0.60);
     p{  
         position: relative;
         left:-5px;
@@ -38,4 +38,11 @@
 }
 .mainCard.exit:before{
     content: "\f08b";
+}
+a{
+    color:rgb(212, 212, 212); 
+}
+a:hover{
+    color: #ebebeb;
+    text-decoration: none;
 }
