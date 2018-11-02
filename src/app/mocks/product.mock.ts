@@ -40,6 +40,8 @@ export class Product {
         public name: string,
         public price: number,
         public status: number,
+        public tax_value: number,
+        public barcode: number,
         public subcat_id?: string,
         public specifies?: Array<ProductSpecs>,
         public _id?: string,
