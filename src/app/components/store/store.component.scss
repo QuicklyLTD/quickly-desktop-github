@@ -1,37 +1,11 @@
 #floorHolder{
-    .card-block{
+    .card-body{
         padding: 1.13rem;
     }
     h2{
         font-size: 1.5vw;
         font-weight: bolder;
     }
-}
-.tableCard{
-    height: 13.5vh;
-    h1{
-        font-size: 2.45vw;
-    }
-    p{
-        margin: 0;
-    }
-    .long-name{
-        font-size: 1.7vw;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-transform: capitalize;
-    }
-    .card-text{
-        bottom: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-.col-card{
-    padding-right: 5px;
-    padding-left:5px;
 }
 .normal{
     width: auto !important;

@@ -8,8 +8,8 @@
           </div>
           <div class="col-lg-4 pr-2">
             <div class="input-group input-group-sm">
-              <div class="input-group-addon normal">
-                <i class="fa fa-search" aria-hidden="true"></i>
+              <div class="input-group-prepend normal">
+                <div class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></div>
               </div>
               <input #tableName type="text" placeholder="Masa Adı Giriniz.." (click)="tableViews = tables" (keyup)="filterTables(tableName.value)"
                 class="form-control form-contol-sm">
@@ -17,12 +17,13 @@
           </div>
         </div>
       </div>
-      <div class="card-block pt-0 flow">
+      <div class="card-body pt-0 flow">
         <div class="row">
           <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
-            <div [ngClass]="{'bg-success': table.status == 2, 'bg-danger text-white': table.status == 3 }" class="card card-warning tableCard">
-              <div class="card-block p-3">
-                <h1 [ngClass]="{'long-name mb-4': table.name.length >= 7}" class="card-title mb-3">{{table.name}}</h1>
+            <div [ngClass]="{'bg-success': table.status == 2, 'bg-warning text-dark':table.status == 1, 'bg-danger text-white': table.status == 3 }"
+              class="card tableCard">
+              <div class="card-body p-3">
+                <h1 [ngClass]="{'long-name mb-4': table.name.length >= 7}" class="card-title mb-2">{{table.name}}</h1>
                 <p>
                   <i class="fa fa-user"></i> {{table.capacity}}
                   <span *ngIf="table.status == 2" class="pull-right">
@@ -38,9 +39,9 @@
         </div>
         <div class="row">
           <div *ngFor="let check of checks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
-            <div class="card card-info tableCard">
-              <div class="card-block p-3">
-                <h1 class="card-title long-name mb-1">Hızlı Hesap</h1>
+            <div class="card bg-info tableCard">
+              <div class="card-body p-3">
+                <h1 class="card-title long-name mb-0">Hızlı Hesap</h1>
                 <p class="card-text">
                   <i class="fa fa-user" aria-hidden="true"></i> {{check.owner}}
                   <br>
@@ -54,18 +55,18 @@
     </div>
   </div>
   <div id="floorHolder" class="col-lg-2">
-    <div class="card mb-2" [routerLink]="['/selling-screen','Fast', 'New']" class="card mb-2 card-info card-inverse">
-      <div class="card-block">
-        <h2><i class="fa fa-sticky-note" aria-hidden="true"></i> Hızlı Satış</h2>
+    <div class="card mb-2" [routerLink]="['/selling-screen','Fast', 'New']" class="card mb-2 bg-info text-white">
+      <div class="card-body">
+        <h2><i class="fa fa-sticky-note" aria-hidden="true"></i> Hızlı Hesap</h2>
       </div>
     </div>
-    <div class="card mb-2" (click)="getTablesBy('All')" [ngClass]="{'card-danger card-inverse':selected == ''}">
-      <div class="card-block">
+    <div class="card mb-2" (click)="getTablesBy('All')" [ngClass]="{'bg-danger text-white':selected == ''}">
+      <div class="card-body">
         <h2>Tüm Masalar</h2>
       </div>
     </div>
-    <div *ngFor="let floor of floors" (click)="getTablesBy(floor._id)" class="card mb-2" [ngClass]="{'card-danger card-inverse':selected == floor._id}">
-      <div class="card-block">
+    <div *ngFor="let floor of floors" (click)="getTablesBy(floor._id)" class="card mb-2" [ngClass]="{'bg-danger text-white':selected == floor._id}">
+      <div class="card-body">
         <h2>{{floor.name}}</h2>
       </div>
     </div>
