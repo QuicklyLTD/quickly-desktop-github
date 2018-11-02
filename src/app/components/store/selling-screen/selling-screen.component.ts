@@ -189,7 +189,7 @@ export class SellingScreenComponent implements OnInit {
     const newProduct = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, newAmount, newNote, 1, this.owner, Date.now());
     this.check.total_price = this.check.total_price + newProduct.price;
     let countFor = newAmount / this.productWithSpecs.price;
-    if (this.productUnit.nativeElement.innerHTML == 'Adet') {
+    if (this.productUnit.nativeElement.innerHTML === 'Adet') {
       for (let index = 0; index < countFor; index++) {
         let repeatingProducts = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, this.productWithSpecs.price, '', 1, this.owner, Date.now());
         this.check.products.push(repeatingProducts);
@@ -944,7 +944,7 @@ export class SellingScreenComponent implements OnInit {
     this.mainService.getAllBy('tables', {}).then(res => {
       this.tables = res.docs;
       this.table = this.tables.filter(obj => obj._id == this.id)[0];
-      this.tables = this.tables.filter(obj => obj._id !== this.id).sort((a, b) => a.name.localeCompare(b.name));
+      this.tables = this.tables.filter(obj => obj._id !== this.id).filter(obj => obj.status !== 3).sort((a, b) => a.name.localeCompare(b.name));
       if (this.selectedFloor) {
         this.tablesView = this.tables.filter(obj => obj.floor_id == this.selectedFloor);
       } else {

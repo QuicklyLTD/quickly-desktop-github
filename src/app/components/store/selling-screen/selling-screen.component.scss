@@ -62,11 +62,7 @@
 }
 #productHolder{
     overflow-y: scroll;
-    background-color: #ebebeb;
-}
-.col-card{
-    padding-left: 5px;
-    padding-right: 5px;
+    // background-color: #ebebeb;
 }
 .normal{
     width: auto !important;
@@ -84,4 +80,7 @@
 }
 .payed-things{
     min-height: 200px;
+}
+.numpad{
+    font-size: 22px;
 }
