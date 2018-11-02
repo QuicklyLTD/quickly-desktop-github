@@ -28,17 +28,18 @@
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Kategoriler
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let cat of categories" class="btn-group btn-group-justify">
-                    <button (click)="getStockCatDetail(cat)" [ngClass]="{'list-group-item-warning' : selectedCat == cat}" type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
+                    <button (click)="getStockCatDetail(cat)" [ngClass]="{'list-group-item-warning' : selectedCat == cat}"
+                      type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
                   </div>
                 </div>
               </div>
@@ -50,23 +51,27 @@
                 <div class="card-header">
                   Ayrıntılar
                 </div>
-                <div class="card-block p-2 flow">
+                <div class="card-body p-2 flow">
                   <h1 *ngIf="selectedCat == undefined" class="text-center mt-5">Listeden Kategori Seçiniz</h1>
                   <section [hidden]="selectedCat == undefined">
                     <input type="hidden" name="_id" ngModel>
                     <input type="hidden" name="_rev" ngModel>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Kategori Adı
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Kategori Adı
+                          </div>
                         </div>
                         <input type="text" name="name" class="form-control form-control-lg" ngModel>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Açıklama
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Açıklama
+                          </div>
                         </div>
                         <input type="text" name="description" class="form-control form-control-lg" ngModel>
                       </div>
@@ -103,53 +108,56 @@
             <h5 class="mt-2">Stoklar</h5>
           </div>
           <div class="col-lg-4 pr-2 pl-0">
-            <button [disabled]="categories == undefined || categories.length == 0" class="btn btn-danger btn-md btn-block" (click)="setDefault()"
-              data-toggle="modal" data-target="#stock">
+            <button [disabled]="categories == undefined || categories.length == 0" class="btn btn-danger btn-md btn-block"
+              (click)="setDefault()" data-toggle="modal" data-target="#stock">
               <i class="fa fa-plus"></i> Stok Ekle
             </button>
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
-          <div class="col-xl-4 col-lg-3 pr-0">
+          <div class="col-xl-3 col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Kategoriler
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
-                  <button (click)="fillData()" type="button" class="list-group-item list-group-item-action">Bütün Stoklar</button>
+                  <button (click)="fillData()" type="button" class="list-group-item list-group-item-action">Bütün
+                    Stoklar</button>
                   <button *ngFor="let cat of categories" (click)="getStocks(cat._id)" type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-xl-8 col-lg-9 pl-0">
+          <div class="col-xl-9 col-lg-9 pl-0">
             <div class="card tab-inside-height">
-              <div class="card-header">
+              <div class="card-header pt-2 pb-2">
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-6 pt-1 pr-0">
                     Stoklar
                   </div>
-                  <div class="col-lg-6 pr-2">
+                  <div class="col-lg-6 pl-0 pr-2">
                     <div class="input-group input-group-sm">
-                      <div class="input-group-addon normal">
-                        <i class="fa fa-search" aria-hidden="true"></i>
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text">
+                          <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>
                       </div>
-                      <input #stockName type="text" placeholder="Stock Adı Giriniz.." (focus)="fillData()" (click)="stockName.value = '';" (keydown)="filterStocks(stockName.value)"
-                        class="form-control form-contol-sm">
+                      <input #stockName type="text" placeholder="Stok Adı Giriniz.." (focus)="fillData()" (click)="stockName.value = '';"
+                        (keydown)="filterStocks(stockName.value)" class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="card-block flow p-0">
+              <div class="card-body flow p-0">
                 <section>
-                  <table class="table table-bordered table-striped table-hover">
-                    <thead class="thead-inverse">
+                  <table class="table table-bordered table-dark table-striped table-hover">
+                    <thead class="thead-dark">
                       <tr>
-                        <th width="5%">#</th>
-                        <th width="30%">Stok</th>
+                        <th width="6%">#</th>
+                        <th width="29%">Stok</th>
                         <th colspan="2" width="30%">Son Giriş</th>
                         <th colspan="3" width="35%">Kalan Miktar</th>
                       </tr>
@@ -187,7 +195,7 @@
       <div class="card-header">
         <h5 class="mt-2">Stok Ayarları</h5>
       </div>
-      <div class="card-block tab-height flow">
+      <div class="card-body tab-height flow">
 
       </div>
       <div class="card-footer">
@@ -209,15 +217,19 @@
       <form #stockCatForm="ngForm" (ngSubmit)="addCategory(stockCatForm)">
         <div class="modal-body">
           <div *ngIf="onUpdate">
-            <input name="_id" type="hidden" ngModel/>
-            <input name="_rev" type="hidden" ngModel/>
+            <input name="_id" type="hidden" ngModel />
+            <input name="_rev" type="hidden" ngModel />
           </div>
           <div class="input-group">
-            <div class="input-group-addon">Kategori Adı</div>
+            <div class="input-group-prepend">
+              <div class="input-group-text">Kategori Adı</div>
+            </div>
             <input type="text" name="name" class="form-control form-control-lg" ngModel>
           </div>
           <div class="input-group">
-            <div class="input-group-addon">Açıklama</div>
+            <div class="input-group-prepend">
+              <div class="input-group-text">Açıklama</div>
+            </div>
             <input type="text" name="description" class="form-control form-control-lg" ngModel>
           </div>
         </div>
@@ -231,7 +243,7 @@
 </div>
 
 <div class="modal fade" id="stock" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-xl" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modelTitleId">Stok</h4>
@@ -242,40 +254,14 @@
       <form #stockForm="ngForm" (ngSubmit)="addStock(stockForm)">
         <div class="modal-body">
           <div *ngIf="onUpdate">
-            <input name="_id" type="hidden" ngModel/>
-            <input name="_rev" type="hidden" ngModel/>
-            <input name="first_quantity" type="hidden" ngModel/>
-            <input name="warning_limit" type="hidden" ngModel/>
+            <input name="_id" type="hidden" ngModel />
+            <input name="_rev" type="hidden" ngModel />
+            <input name="first_quantity" type="hidden" ngModel />
+            <input name="warning_limit" type="hidden" ngModel />
           </div>
           <div class="row">
-            <div class="col-lg-5 pr-1">
-              <div class="input-group">
-                <div class="input-group-addon">Stok Adı</div>
-                <input type="text" name="name" class="form-control form-control-lg" ngModel>
-              </div>
-              <div class="input-group">
-                <div class="input-group-addon">Kategori</div>
-                <select name="cat_id" class="form-control form-control-lg" ngModel>
-                  <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <div class="input-group-addon">Miktar</div>
-                <input type="number" name="total" class="form-control form-control-lg" ngModel>
-              </div>
-              <div class="input-group">
-                <div class="input-group-addon">Birim</div>
-                <select #unitName name="unit" class="form-control form-control-lg" ngModel>
-                  <option *ngFor="let unit of units" value="{{unit}}">{{unit}}</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <div class="input-group-addon">Açıklama</div>
-                <textarea name="description" rows="8" class="form-control form-control-lg" ngModel></textarea>
-              </div>
-            </div>
-            <div class="col-lg-7 pl-1">
-              <blockquote *ngIf="onUpdate && selectedStock" class="blockquote mb-0 pr-1 pl-1">
+            <div class="col-lg-12">
+              <div *ngIf="onUpdate && selectedStock" class="bodyquote mb-0 pr-1 pl-1">
                 <p class="mb-2">
                   <strong [ngClass]="{'text-danger': selectedStock.left_total <= 0}">{{selectedStock.name}}</strong>
                   <small>({{selectedStock.cat_id | general:'stocks_cat' | async}})</small>
@@ -286,22 +272,73 @@
                     [attr.aria-valuenow]="selectedStock.left_total" aria-valuemin="0" [attr.aria-valuemax]="selectedStock.total"></div>
                 </div>
                 <small class="mt-2">
-                  <span *ngIf="selectedStock.left_total > 0"> Kalan : {{selectedStock.left_total | number:'1.0-2'}} {{selectedStock.unit}}</span>
+                  <span *ngIf="selectedStock.left_total > 0"> Kalan : {{selectedStock.left_total | number:'1.0-2'}}
+                    {{selectedStock.unit}}</span>
                   <span *ngIf="selectedStock.left_total <= 0" class="text-danger">Tükendi!</span>
-                  <span class="pull-right text-muted mt-1">Stok Durumu: {{(selectedStock.left_total/(selectedStock.total*selectedStock.first_quantity))*100 | number:
+                  <span class="pull-right text-muted mt-1">Stok Durumu:
+                    {{(selectedStock.left_total/(selectedStock.total*selectedStock.first_quantity))*100 | number:
                     '1.0-2'}}%
                   </span>
                 </small>
-              </blockquote>
-              <div class="input-group">
-                <div class="input-group-addon">Adet</div>
-                <input [readonly]='onUpdate' type="number" name="quantity" class="form-control form-control-lg" ngModel>
               </div>
-              <div *ngIf="onUpdate" class="input-group">
-                <div class="input-group-addon">Kalan</div>
+              <div *ngIf="onUpdate" class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Kalan</div>
+                </div>
                 <input type="number" readonly name="left_total" class="form-control form-control-lg" ngModel>
                 <input type="hidden" name="timestamp" ngModel>
-                <div class="input-group-addon">{{unitName.value}}</div>
+                <div class="input-group-append">
+                  <div class="input-group-text">{{unitName.value}}</div>
+                </div>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text"> Stok Adı</div>
+                </div>
+                <input type="text" name="name" class="form-control form-control-lg" ngModel>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Kategori</div>
+                </div>
+                <select name="cat_id" class="form-control form-control-lg" ngModel>
+                  <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Adet</div>
+                </div>
+                <input [readonly]='onUpdate' type="number" name="quantity" class="form-control form-control-lg" ngModel>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Miktar</div>
+                </div>
+                <input type="number" name="total" class="form-control form-control-lg" ngModel>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Birim</div>
+                </div>
+                <select #unitName name="unit" class="form-control form-control-lg" ngModel>
+                  <option *ngFor="let unit of units" value="{{unit}}">{{unit}}</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Uyarı Limiti</div>
+                </div>
+                <input type="number" name="warning_value" class="form-control form-control-lg" ngModel>
+                <div class="input-group-append">
+                  <div class="input-group-text">%</div>
+                </div>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Açıklama</div>
+                </div>
+                <textarea name="description" rows="1" class="form-control form-control-lg" ngModel></textarea>
               </div>
             </div>
           </div>
@@ -310,7 +347,8 @@
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
           <button *ngIf="onUpdate" type="button" (click)="removeStock(selectedStock._id)" class="btn btn-danger btn-lg">
             <i class="fa fa-times"></i> Stok Sil</button>
-          <button *ngIf="onUpdate" type="button" data-toggle="modal" data-dismiss="modal" data-target="#quantityModal" class="btn btn-success btn-lg">
+          <button *ngIf="onUpdate" type="button" data-toggle="modal" data-dismiss="modal" data-target="#quantityModal"
+            class="btn btn-success btn-lg">
             <i class="fa fa-plus"></i> Adet Ekle</button>
           <button type="submit" class="btn btn-primary btn-lg">
             <i class="fa fa-check"></i> Kaydet</button>
@@ -332,7 +370,9 @@
       <div class="modal-body">
         <div class="input-group">
           <input #quantityInput type="number" class="form-control form-control-lg" placeholder="Lütfen Stok Adedi Giriniz">
-          <div class="input-group-addon">Adet</div>
+          <div class="input-group-append">
+            <div class="input-group-text">Adet</div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">

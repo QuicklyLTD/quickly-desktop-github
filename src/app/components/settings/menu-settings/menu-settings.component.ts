@@ -195,7 +195,7 @@ export class MenuSettingsComponent implements OnInit {
 
   addProduct(productForm: NgForm) {
     let form = productForm.value;
-    if (!form.name || !form.cat_id || !form.price) {
+    if (!form.name || !form.cat_id || !form.price || !form.tax_value) {
       this.messageService.sendMessage('Gerekli Alanları Doldurmalısınız');
       return false;
     }
@@ -205,7 +205,7 @@ export class MenuSettingsComponent implements OnInit {
         return false;
       }
     }
-    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.subcat_id, this.productSpecs, form._id, form._rev);
+    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.tax_value, form.barcode, form.subcat_id, this.productSpecs, form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('products', schema).then((response) => {
         this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], schema.name, Date.now())).then(res => {

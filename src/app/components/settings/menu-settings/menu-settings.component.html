@@ -28,17 +28,18 @@
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Kategoriler
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let cat of categories" class="btn-group btn-group-justify">
-                    <button (click)="getCategory(cat)" [ngClass]="{'list-group-item-warning' : selectedCat == cat}" type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
+                    <button (click)="getCategory(cat)" [ngClass]="{'list-group-item-warning' : selectedCat == cat}"
+                      type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
                   </div>
                 </div>
               </div>
@@ -50,7 +51,7 @@
                 <div class="card-header">
                   Ayrıntılar
                 </div>
-                <div class="card-block p-2 flow">
+                <div class="card-body p-2 flow">
                   <h1 *ngIf="selectedCat == undefined" class="text-center mt-5">Listeden Kategori Seçiniz</h1>
                   <div [hidden]="selectedCat == undefined">
                     <input type="hidden" name="_id" ngModel>
@@ -58,15 +59,19 @@
                     <input type="hidden" name="order" ngModel>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Kategori Adı
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Kategori Adı
+                          </div>
                         </div>
                         <input type="text" name="name" class="form-control form-control-lg" ngModel>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">Durum</div>
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">Durum</div>
+                        </div>
                         <select name="status" class="form-control form-control-lg" ngModel>
                           <option value="1">Herkese Açık</option>
                           <option value="2">Özel Kategori</option>
@@ -75,37 +80,46 @@
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Açıklama
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Açıklama
+                          </div>
                         </div>
                         <input type="text" name="description" class="form-control form-control-lg" ngModel>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Yazıcı
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Yazıcı
+                          </div>
                         </div>
-                        <select [disabled]="printers?.length == 0" name="printer" class="form-control form-control-lg" ngModel>
+                        <select [disabled]="printers?.length == 0" name="printer" class="form-control form-control-lg"
+                          ngModel>
                           <option *ngFor="let item of printers">{{item.name}}</option>
                         </select>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Etiketler
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Etiketler
+                          </div>
                         </div>
-                        <input type="text" name="tags" class="form-control form-control-lg" ngModel/>
+                        <input type="text" name="tags" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Alt Kategoriler
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            Alt Kategoriler
+                          </div>
                         </div>
                         <div class="img-thumbnail pl-2 subCatInput">
-                          <span *ngFor="let sub of subCats" (click)="updateSubCategory(sub);" class="badge badge-warning mr-1 subCat">{{sub.name}}</span>
+                          <span *ngFor="let sub of subCats" (click)="updateSubCategory(sub);" class="badge badge-warning text-dark mr-1 subCat">{{sub.name}}</span>
                         </div>
                       </div>
                     </div>
@@ -148,23 +162,24 @@
             <h5 class="mt-2">Ürün Ayarları</h5>
           </div>
           <div class="col-lg-4 pr-2 pl-0">
-            <button [disabled]="categories == undefined || categories.length == 0" class="btn btn-danger btn-md btn-block" (click)="setDefault()"
-              data-toggle="modal" data-target="#productModal">
+            <button [disabled]="categories == undefined || categories.length == 0" class="btn btn-danger btn-md btn-block"
+              (click)="setDefault()" data-toggle="modal" data-target="#productModal">
               <i class="fa fa-plus"></i> Ürün Ekle
             </button>
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Kategoriler
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
-                  <button (click)="getProductsByCategory(null)" type="button" class="list-group-item list-group-item-action">Bütün Ürünler</button>
+                  <button (click)="getProductsByCategory(null)" type="button" class="list-group-item list-group-item-action">Bütün
+                    Ürünler</button>
                   <button *ngFor="let cat of categories" (click)="getProductsByCategory(cat._id)" type="button" class="list-group-item list-group-item-action">{{cat.name}}</button>
                 </div>
               </div>
@@ -172,18 +187,20 @@
           </div>
           <div class="col-lg-8 pl-0">
             <div class="card tab-inside-height">
-              <div class="card-header">
+              <div class="card-header pt-2 pb-2">
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-6 pt-1">
                     Ürünler
                   </div>
-                  <div class="col-lg-6 pr-2">
+                  <div class="col-lg-6 pl-0 pr-2">
                     <div class="input-group input-group-sm">
-                      <div class="input-group-addon normal">
-                        <i class="fa fa-search" aria-hidden="true"></i>
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text">
+                          <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>
                       </div>
-                      <input #productName type="text" placeholder="Ürün Adı Giriniz.." (focus)="getProductsByCategory(null)" (click)="productName.value = '';"
-                        (keydown)="filterProducts(productName.value)" class="form-control form-contol-sm">
+                      <input #productName type="text" placeholder="Ürün Adı Giriniz.." (focus)="getProductsByCategory(null)"
+                        (click)="productName.value = '';" (keydown)="filterProducts(productName.value)" class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
@@ -197,17 +214,28 @@
                   </div>
                 </div>
               </div>
-              <div id="productHolder" class="card-block flow">
-                <div *ngIf="products !== undefined && products.length > 0" class="row">
-                  <div *ngFor="let product of products" class="col-lg-4 col-card">
-                    <div class="card mb-2 proCard">
-                      <div (click)="updateProduct(product._id)" class="card-block">
-                        <h2 class="card-title">{{product.name}}</h2>
-                        <p class="card-text text-danger">
-                          <i class="fa fa-money"></i> {{product.price}} TL</p>
-                      </div>
-                    </div>
-                  </div>
+              <div id="productHolder" class="card-body p-0 flow">
+                <div *ngIf="products !== undefined && products.length > 0">
+                  <table class="table table-dark table-bordered table-hover table-striped mb-0">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th width="7%">#</th>
+                        <th width="43%">Ürün Adı</th>
+                        <th width="17%">Fiyatı</th>
+                        <th width="13%">Kdv</th>
+                        <th width="20%">Kategori</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let product of products; let i = index;" (click)="updateProduct(product._id)">
+                        <td>{{i+1}}</td>
+                        <td>{{product.name}}</td>
+                        <td class="font-weight-bold">{{product.price}} TL</td>
+                        <td>{{product.tax_value}} %</td>
+                        <td>{{product.cat_id | general:'categories':'name' | async}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 <div *ngIf="products == undefined || products.length == 0" class="row mt-5">
                   <div class="col-lg-12 mt-5">
@@ -229,7 +257,7 @@
       <div class="card-header">
         <h5 class="mt-2">Tarife Ayarları</h5>
       </div>
-      <div class="card-block tab-height flow">
+      <div class="card-body tab-height flow">
 
       </div>
       <div class="card-footer">
@@ -250,36 +278,46 @@
       </div>
       <form #categoryForm="ngForm" (ngSubmit)="addCategory(categoryForm)">
         <div *ngIf="onUpdate">
-          <input name="_id" type="hidden" ngModel/>
-          <input name="_rev" type="hidden" ngModel/>
-          <input name="status" type="hidden" ngModel/>
+          <input name="_id" type="hidden" ngModel />
+          <input name="_rev" type="hidden" ngModel />
+          <input name="status" type="hidden" ngModel />
         </div>
         <div class="modal-body">
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Kategori Adı</div>
-              <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Kategori Adı</div>
+              </div>
+              <input type="text" name="name" class="form-control form-control-lg" ngModel />
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Durum</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Durum</div>
+              </div>
               <select name="status" class="form-control form-control-lg" ngModel>
                 <option value="1">Herkese Açık</option>
                 <option value="2">Özel Kategori</option>
               </select>
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Açıklama</div>
-              <input type="text" name="description" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Açıklama</div>
+              </div>
+              <input type="text" name="description" class="form-control form-control-lg" ngModel />
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Yazıcı</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Yazıcı</div>
+              </div>
               <select [disabled]="printers?.length == 0" name="printer" class="form-control form-control-lg" ngModel>
                 <option *ngFor="let item of printers">{{item.name}}</option>
               </select>
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Etiketler</div>
-              <input type="text" name="tags" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Etiketler</div>
+              </div>
+              <input type="text" name="tags" class="form-control form-control-lg" ngModel />
             </div>
           </div>
         </div>
@@ -302,21 +340,25 @@
         </button>
       </div>
       <form #subCatForm="ngForm" (ngSubmit)="addSubCategory(subCatForm)">
-        <input type="hidden" name="_id" ngModel/>
-        <input type="hidden" name="_rev" ngModel/>
-        <input type="hidden" name="status" ngModel/>
-        <input type="hidden" name="cat_id" ngModel/>
+        <input type="hidden" name="_id" ngModel />
+        <input type="hidden" name="_rev" ngModel />
+        <input type="hidden" name="status" ngModel />
+        <input type="hidden" name="cat_id" ngModel />
         <div class="modal-body">
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">
-                Alt Kategori Adı
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Alt Kategori Adı
+                </div>
               </div>
               <input type="text" class="form-control form-control-lg" name="name" ngModel>
             </div>
             <div class="input-group">
-              <div class="input-group-addon">
-                Açıklama
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Açıklama
+                </div>
               </div>
               <input type="text" class="form-control form-control-lg" name="description" ngModel>
             </div>
@@ -324,7 +366,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-          <button *ngIf="onUpdate" (click)="removeSubCategory(selectedSubCat._id)" type="button" class="btn btn-warning btn-lg" data-dismiss="modal">Alt Kategoriyi Sil</button>
+          <button *ngIf="onUpdate" (click)="removeSubCategory(selectedSubCat._id)" type="button" class="btn btn-warning btn-lg"
+            data-dismiss="modal">Alt Kategoriyi Sil</button>
           <button type="submit" class="btn btn-danger btn-lg">
             <span *ngIf="onUpdate">Değişiklikleri</span> Kaydet</button>
         </div>
@@ -344,34 +387,44 @@
       </div>
       <form #productForm="ngForm" (ngSubmit)="addProduct(productForm)">
         <div *ngIf="onUpdate">
-          <input name="_id" type="hidden" ngModel/>
-          <input name="_rev" type="hidden" ngModel/>
-          <input name="status" type="hidden" ngModel/>
-          <input name="note" type="hidden" ngModel/>
-          <input name="specifies" type="hidden" ngModel/>
+          <input name="_id" type="hidden" ngModel />
+          <input name="_rev" type="hidden" ngModel />
+          <input name="status" type="hidden" ngModel />
+          <input name="note" type="hidden" ngModel />
+          <input name="specifies" type="hidden" ngModel />
         </div>
         <div class="modal-body">
           <div class="row">
             <div class="col-lg-5 pr-2">
               <div class="form-group mb-0">
                 <div class="input-group">
-                  <div class="input-group-addon">Ürün Adı</div>
-                  <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Ürün Adı</div>
+                  </div>
+                  <input type="text" name="name" class="form-control form-control-lg" ngModel />
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">Kategori</div>
-                  <select (change)="getSubCategories($event.target.value)" name="cat_id" class="form-control form-control-lg" ngModel>
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Kategori</div>
+                  </div>
+                  <select (change)="getSubCategories($event.target.value)" name="cat_id" class="form-control form-control-lg"
+                    ngModel>
                     <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
                   </select>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">Alt Kategori</div>
-                  <select [disabled]="subCats.length == 0 || subCats == undefined" name="subcat_id" class="form-control form-control-lg" ngModel>
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Alt Kategori</div>
+                  </div>
+                  <select [disabled]="subCats.length == 0 || subCats == undefined" name="subcat_id" class="form-control form-control-lg"
+                    ngModel>
                     <option *ngFor="let cat of subCats" value="{{cat._id}}">{{cat.name}}</option>
                   </select>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">Ürün Tipi</div>
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Ürün Tipi</div>
+                  </div>
                   <select #productTypeSelect (change)="setProductType($event.target.value)" name="type" class="form-control form-control-lg"
                     ngModel>
                     <option value="1">Otomatik Stok</option>
@@ -379,14 +432,34 @@
                   </select>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">
-                    {{ (productType == 2) ? 'Birim' : ''}} Fiyat</div>
-                  <input type="number" name="price" class="form-control form-control-lg" ngModel/>
-                  <div class="input-group-addon normal">TL</div>
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">{{ (productType == 2) ? 'Birim' : ''}} Fiyat</div>
+                  </div>
+                  <input type="number" name="price" class="form-control form-control-lg" ngModel />
+                  <div class="input-group-append">
+                    <div class="input-group-text">TL</div>
+                  </div>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">Ürün Hakkında</div>
-                  <textarea name="description" rows="8" class="form-control form-control-lg" ngModel></textarea>
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Kdv</div>
+                  </div>
+                  <input type="number" name="tax_value" class="form-control form-control-lg" ngModel />
+                  <div class="input-group-append">
+                    <div class="input-group-text">%</div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Barkod</div>
+                  </div>
+                  <input type="number" name="barcode" class="form-control form-control-lg" ngModel />
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Ürün Hakkında</div>
+                  </div>
+                  <textarea name="description" rows="6" class="form-control form-control-lg" ngModel></textarea>
                 </div>
               </div>
             </div>
@@ -406,8 +479,9 @@
                     </div>
                     <div class="input-group">
                       <input [disabled]="stocks?.length == 0 || productType == 2 && productRecipe.length > 0 || productType == 2 && oldRecipes.length > 0"
-                        type="number" placeholder="0 {{stockUnit}}" name="amount" class="form-control form-control-lg" ngModel/>
-                      <span class="input-group-btn">
+                        type="number" placeholder="0 {{stockUnit}}" name="amount" class="form-control form-control-lg"
+                        ngModel />
+                      <span class="input-group-append">
                         <button [disabled]="stocks?.length == 0 || productType == 2 && productRecipe.length > 0 || productType == 2 && oldRecipes.length > 0"
                           class="btn btn-success" type="submit">Ekle</button>
                       </span>
@@ -415,10 +489,10 @@
                   </form>
                 </div>
                 <div class="card-header">Ürün İçeriği</div>
-                <div class="card-block p-0 flow" style="height:277px;">
+                <div class="card-body p-0 flow" style="height:277px;">
                   <div *ngIf="hasRecipe">
-                    <table class="table table-bordered table-striped">
-                      <thead>
+                    <table class="table table-bordered table-hover table-dark table-striped">
+                      <thead class="thead-dark">
                         <tr>
                           <th width="85%">İçerik</th>
                           <th width="15%">Sil</th>
@@ -453,23 +527,23 @@
                 <div class="card-header p-0">
                   <form #speciesForm="ngForm" (ngSubmit)="addSpecies(speciesForm)">
                     <input type="text" [disabled]="productType == 2" name="spec_name" placeholder="Durum Notu..." class="form-control form-control-lg"
-                      ngModel/>
+                      ngModel />
                     <div class="input-group">
-                      <input type="number" [disabled]="productType == 2" name="spec_price" placeholder="Durum Fiyatı.." class="form-control form-control-lg"
-                        ngModel/>
-                      <div class="input-group-btn">
+                      <input type="number" [disabled]="productType == 2" name="spec_price" placeholder="Durum Fiyatı.."
+                        class="form-control form-control-lg" ngModel />
+                      <div class="input-group-append">
                         <button type="submit" [disabled]="productType == 2" class="btn btn-success">Ekle</button>
                       </div>
                     </div>
                   </form>
                 </div>
                 <div class="card-header">Ürün Durumları</div>
-                <div class="card-block p-0 flow" style="height:277px;">
-                  <table *ngIf="productSpecs.length > 0" class="table table-bordered table-striped">
-                    <thead>
+                <div class="card-body p-0 flow" style="height:277px;">
+                  <table *ngIf="productSpecs.length > 0" class="table table-hover table-bordered table-dark table-striped">
+                    <thead class="thead-dark">
                       <tr>
-                        <th>Durum</th>
-                        <th width="5%">Sil</th>
+                        <th width="85%">Durum</th>
+                        <th width="15%">Sil</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -490,7 +564,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-          <button *ngIf="onUpdate" type="button" (click)="removeProduct()" class="btn btn-danger btn-lg" data-dismiss="modal">Ürünü Sil</button>
+          <button *ngIf="onUpdate" type="button" (click)="removeProduct()" class="btn btn-danger btn-lg" data-dismiss="modal">Ürünü
+            Sil</button>
           <button type="button" type="submit" class="btn btn-primary btn-lg">Kaydet</button>
         </div>
       </form>

@@ -28,17 +28,18 @@
           </div>
         </div>
       </div>
-      <div class="card-block p-0 tab-height">
+      <div class="card-body p-0 tab-height">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Gruplar
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let item of groups" class="btn-group btn-group-justify">
-                    <button (click)="getGroup(item._id)" [ngClass]="{'list-group-item-warning' : selectedGroup == item._id}" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                    <button (click)="getGroup(item._id)" [ngClass]="{'list-group-item-warning' : selectedGroup == item._id}"
+                      type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
                   </div>
                 </div>
               </div>
@@ -50,23 +51,27 @@
                 <div class="card-header">
                   Ayrıntılar
                 </div>
-                <div class="card-block p-2 flow">
+                <div class="card-body p-2 flow">
                   <h1 *ngIf="selectedGroup == undefined" class="text-center mt-5">Listeden Grup Seçiniz</h1>
                   <div [hidden]="selectedGroup == undefined">
-                    <input type="hidden" name="_id" ngModel/>
-                    <input type="hidden" name="_rev" ngModel/>
-                    <input type="hidden" name="status" ngModel/>
-                    <input type="hidden" name="timestamp" ngModel/>
+                    <input type="hidden" name="_id" ngModel />
+                    <input type="hidden" name="_rev" ngModel />
+                    <input type="hidden" name="status" ngModel />
+                    <input type="hidden" name="timestamp" ngModel />
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">Grup Adı</div>
-                        <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">Grup Adı</div>
+                        </div>
+                        <input type="text" name="name" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">Grup Açıklaması</div>
-                        <input type="text" name="description" class="form-control form-control-lg" ngModel/>
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">Grup Açıklaması</div>
+                        </div>
+                        <input type="text" name="description" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <h5 class="mt-4">Erişim Hakları</h5>
@@ -83,19 +88,19 @@
                       <tbody>
                         <tr class="text-center">
                           <td>
-                            <input type="checkbox" name="store" class="form-control" ngModel/>
+                            <input type="checkbox" name="store" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="cashbox" class="form-control" ngModel/>
+                            <input type="checkbox" name="cashbox" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="endoftheday" class="form-control" ngModel/>
+                            <input type="checkbox" name="endoftheday" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="reports" class="form-control" ngModel/>
+                            <input type="checkbox" name="reports" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="settings" class="form-control" ngModel/>
+                            <input type="checkbox" name="settings" class="form-control" ngModel />
                           </td>
                         </tr>
                       </tbody>
@@ -114,19 +119,19 @@
                       <tbody>
                         <tr class="text-center">
                           <td>
-                            <input type="checkbox" name="cancelCheck" class="form-control" ngModel/>
+                            <input type="checkbox" name="cancelCheck" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="cancelProduct" class="form-control" ngModel/>
+                            <input type="checkbox" name="cancelProduct" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="payment" class="form-control" ngModel/>
+                            <input type="checkbox" name="payment" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="discount" class="form-control" ngModel/>
+                            <input type="checkbox" name="discount" class="form-control" ngModel />
                           </td>
                           <td>
-                            <input type="checkbox" name="end" class="form-control" ngModel/>
+                            <input type="checkbox" name="end" class="form-control" ngModel />
                           </td>
                         </tr>
                       </tbody>
@@ -169,16 +174,17 @@
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Gruplar
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
-                  <button (click)="getUsersByGroup(null)" type="button" class="list-group-item list-group-item-action">Bütün Kullanıcılar</button>
+                  <button (click)="getUsersByGroup(null)" type="button" class="list-group-item list-group-item-action">Bütün
+                    Kullanıcılar</button>
                   <button *ngFor="let item of groups" (click)="getUsersByGroup(item._id)" type="button" class="list-group-item list-group-item-action">
                     {{item.name}}
                   </button>
@@ -188,25 +194,27 @@
           </div>
           <div class="col-lg-8 pl-0">
             <div class="card tab-inside-height">
-              <div class="card-header">
+              <div class="card-header pt-2 pb-2">
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-6 pt-1">
                     Kullanıcılar
                   </div>
-                  <div class="col-lg-6 pr-2">
+                  <div class="col-lg-6 pr-2 pl-0">
                     <div class="input-group input-group-sm">
-                      <div class="input-group-addon normal">
-                        <i class="fa fa-search" aria-hidden="true"></i>
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text">
+                          <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>
                       </div>
-                      <input #userName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="userName.value = '';" (keydown)="filterUsers(userName.value)"
-                        class="form-control form-contol-sm">
+                      <input #userName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="userName.value = '';"
+                        (keydown)="filterUsers(userName.value)" class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="card-block flow p-0">
+              <div class="card-body flow p-0">
                 <table class="table table-striped table-hover table-bordered">
-                  <thead class="thead-inverse">
+                  <thead class="thead-dark">
                     <tr>
                       <th width="7%">
                         <i class="fa fa-user"></i>
@@ -245,7 +253,7 @@
       <div class="card-header">
         <h5 class="mt-2">Kullanıcı İzinleri</h5>
       </div>
-      <div class="card-block tab-height flow">
+      <div class="card-body tab-height flow">
 
       </div>
       <div class="card-footer">
@@ -266,20 +274,28 @@
       </div>
       <form #groupForm="ngForm" (ngSubmit)="addGroup(groupForm)">
         <div *ngIf="onUpdate">
-          <input type="hidden" name="_id" ngModel/>
-          <input type="hidden" name="_rev" ngModel/>
-          <input type="hidden" name="status" ngModel/>
-          <input type="hidden" name="timestamp" ngModel/>
+          <input type="hidden" name="_id" ngModel />
+          <input type="hidden" name="_rev" ngModel />
+          <input type="hidden" name="status" ngModel />
+          <input type="hidden" name="timestamp" ngModel />
         </div>
         <div class="modal-body">
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Grup Adı</div>
-              <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Grup Adı
+                </div>
+              </div>
+              <input type="text" name="name" class="form-control form-control-lg" ngModel />
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Grup Açıklaması</div>
-              <input type="text" name="description" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Grup Açıklaması
+                </div>
+              </div>
+              <input type="text" name="description" class="form-control form-control-lg" ngModel />
             </div>
           </div>
           <h5 class="mt-3">Bölüm Erişim Hakları</h5>
@@ -296,19 +312,19 @@
             <tbody>
               <tr class="text-center">
                 <td>
-                  <input type="checkbox" name="store" class="form-control" ngModel/>
+                  <input type="checkbox" name="store" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="cashbox" class="form-control" ngModel/>
+                  <input type="checkbox" name="cashbox" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="endoftheday" class="form-control" ngModel/>
+                  <input type="checkbox" name="endoftheday" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="reports" class="form-control" ngModel/>
+                  <input type="checkbox" name="reports" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="settings" class="form-control" ngModel/>
+                  <input type="checkbox" name="settings" class="form-control" ngModel />
                 </td>
               </tr>
             </tbody>
@@ -327,19 +343,19 @@
             <tbody>
               <tr class="text-center">
                 <td>
-                  <input type="checkbox" name="cancelCheck" class="form-control" ngModel/>
+                  <input type="checkbox" name="cancelCheck" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="cancelProduct" class="form-control" ngModel/>
+                  <input type="checkbox" name="cancelProduct" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="payment" class="form-control" ngModel/>
+                  <input type="checkbox" name="payment" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="discount" class="form-control" ngModel/>
+                  <input type="checkbox" name="discount" class="form-control" ngModel />
                 </td>
                 <td>
-                  <input type="checkbox" name="end" class="form-control" ngModel/>
+                  <input type="checkbox" name="end" class="form-control" ngModel />
                 </td>
               </tr>
             </tbody>
@@ -373,24 +389,33 @@
           </div>
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Kullanıcı Adı</div>
-              <input type="text" name="name" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Kullanıcı Adı</div>
+              </div>
+              <input type="text" name="name" class="form-control form-control-lg" ngModel />
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Görevi</div>
+              <div class="input-group-prepend">
+                <div class="input-group-text">Görevi</div>
+              </div>
               <select #role name="role_id" class="form-control form-control-lg" ngModel>
                 <option *ngFor="let item of groups" value="{{item._id}}">{{item.name}}</option>
               </select>
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Parola</div>
-              <input type="password" maxlength="4" name="pincode" class="form-control form-control-lg" ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Parola
+                </div>
+              </div>
+              <input type="password" maxlength="4" name="pincode" class="form-control form-control-lg" ngModel />
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-          <button *ngIf="onUpdate" type="button" class="btn btn-danger btn-lg" (click)="removeUser(selectedUser)"> Kullanıcıyı Sil</button>
+          <button *ngIf="onUpdate" type="button" class="btn btn-danger btn-lg" (click)="removeUser(selectedUser)">
+            Kullanıcıyı Sil</button>
           <button type="submit" class="btn btn-primary btn-lg">Kaydet</button>
         </div>
       </form>

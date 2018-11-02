@@ -89,7 +89,7 @@ export class StockSettingsComponent implements OnInit {
     }
     if (form._id == undefined) {
       let left_total = form.total * form.quantity;
-      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * 25 / 100, Date.now());
+      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * form.warning_value / 100, form.warning_value, Date.now());
       this.mainService.addData('stocks', schema).then((res) => {
         this.logService.createLog(logType.STOCK_CREATED, res.id, `${form.name} adlı Stok oluşturuldu.`);
         this.fillData();
@@ -97,6 +97,7 @@ export class StockSettingsComponent implements OnInit {
         this.messageService.sendMessage('Stok oluşturuldu');
       });
     } else {
+      form.warning_limit = (form.total * form.quantity) * form.warning_value / 100;
       this.mainService.updateData('stocks', form._id, form).then(() => {
         this.fillData();
         stockForm.reset();

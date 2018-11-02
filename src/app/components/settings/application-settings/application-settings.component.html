@@ -26,14 +26,14 @@
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Ayarlar
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
                   <button (click)="getSettingsDetail('AppSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AppSettings'}"
                     type="button" class="list-group-item list-group-item-action">
@@ -56,22 +56,22 @@
               <form #settingsForm="ngForm" (ngSubmit)="saveSettings(settingsForm)">
                 <div class="card tab-inside-height">
                   <div class="card-header">Uygulama Ayarları</div>
-                  <div class="card-block flow p-2">
+                  <div class="card-body flow p-2">
                     <div class="form-group mb-2">
                       <div class="input-group text-center">
-                        <div class="input-group-addon">
-                          Zaman Aşımı
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Zaman Aşımı</div>
                         </div>
                         <input name="timeout" type="number" class="form-control form-control-lg" ngModel/>
-                        <div class="input-group-addon normal">
-                          Saniye
+                        <div class="input-group-append">
+                          <div class="input-group-text">Saniye</div>
                         </div>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Ekran Klavyesi
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">Ekran Klavyesi</div>
                         </div>
                         <select name="keyboard" class="form-control form-control-lg" id="" ngModel>
                           <option>Açık</option>
@@ -81,8 +81,8 @@
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Hızlı Satış
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"> Parakende Satış</div>
                         </div>
                         <select name="takeaway" class="form-control form-control-lg" id="" ngModel>
                           <option>Açık</option>
@@ -92,8 +92,8 @@
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Sipariş Fişi İçin
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">Sipariş Fişi İçin</div>
                         </div>
                         <select name="ask_print_order" class="form-control form-control-lg" ngModel>
                           <option>Sor</option>
@@ -103,8 +103,8 @@
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Hesap Fişi İçin
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Hesap Fişi İçin</div>
                         </div>
                         <select name="ask_print_check" class="form-control form-control-lg" ngModel>
                           <option>Sor</option>
@@ -114,8 +114,8 @@
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Son Gün
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Son Gün</div>
                         </div>
                         <select name="last_day" class="form-control form-control-lg" ngModel>
                           <option value="1">Pazartesi</option>
@@ -140,11 +140,11 @@
               <form #serverSettingsForm="ngForm" (ngSubmit)="saveServerSettings(serverSettingsForm)">
                 <div class="card tab-inside-height">
                   <div class="card-header">Sunucu Ayarları</div>
-                  <div class="card-block p-2 flow">
+                  <div class="card-body p-2 flow">
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Sunucu Modu
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Sunucu Modu</div>
                         </div>
                         <select name="type" class="form-control form-control-lg" ngModel>
                           <option value="0">Birincil</option>
@@ -154,8 +154,8 @@
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Sunucu Durumu
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Sunucu Durumu</div>
                         </div>
                         <select name="status" class="form-control form-control-lg" ngModel>
                           <option value="0">Kapalı</option>
@@ -165,27 +165,27 @@
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Sunucu Adresi
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Sunucu Adresi</div>
                         </div>
                         <input type="text" name="ip_address" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Sunucu Portu
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Sunucu Portu</div>
                         </div>
                         <input type="text" name="ip_port" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Sunucu Anahtarı
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Sunucu Anahtarı</div>
                         </div>
                         <textarea rows="3" name="key" class="form-control form-control-lg" ngModel></textarea>
-                        <div class="input-group-btn">
+                        <div class="input-group-append">
                           <button type="button" (click)="generateKey(serverSettingsForm)" class="btn btn-primary">
                             <i class="fa fa-key"></i>
                             <br> Anahtar Üret</button>
@@ -214,61 +214,61 @@
                   <div class="card-header">
                     Hesap Ayarları
                   </div>
-                  <div class="card-block flow p-2">
+                  <div class="card-body flow p-2">
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          İşletme Logo
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">İşletme Logo</div>
                         </div>
-                        <div style="width: 78%;" class="img-thumbnail">
-                          <img src="{{appLogo}}" style="height:133px;" class="img-responsive mx-auto d-block" alt="">
+                        <div class="img-thumbnail subCatInput">
+                          <img src="{{appLogo}}" style="height:133px;" class="img-responsive mx-auto d-body" alt="">
                         </div>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          İşletme Adı
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">İşletme Adı</div>
                         </div>
                         <input name="name" type="text" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          İşletme No
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">İşletme No</div>
                         </div>
                         <input name="id" type="string" class="form-control form-control-lg" readonly ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Telefon
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Telefon</div>
                         </div>
                         <input name="phone_number" type="text" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Şehir
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Şehir</div>
                         </div>
                         <input name="city" type="text" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Bölge
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Bölge</div>
                         </div>
                         <input name="state" type="text" class="form-control form-control-lg" ngModel/>
                       </div>
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Adres
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Adres</div>
                         </div>
                         <textarea name="address" rows="2" class="form-control form-control-lg" ngModel></textarea>
                       </div>
@@ -304,14 +304,14 @@
           </div>
         </div>
       </div>
-      <div class="card-block tab-height p-0">
+      <div class="card-body tab-height p-0">
         <div class="row">
           <div class="col-lg-4 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Yazıcılar
               </div>
-              <div class="card-block p-0 flow">
+              <div class="card-body p-0 flow">
                 <div class="list-group">
                   <button *ngFor="let item of printers" (click)="getPrinterDetail(item)" type="button" class="list-group-item list-group-item-action">
                     {{item.name}} ({{item.type}} Yazıcı)
@@ -326,44 +326,44 @@
                 <div class="card-header">
                   Detaylar
                 </div>
-                <div class="card-block flow p-2">
+                <div class="card-body flow p-2">
                   <section [hidden]="choosenPrinter == undefined" id="detailForm">
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Yazıcı Adı
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Yazıcı Adı</div>
                         </div>
                         <input type="text" name="name" class="form-control form-control-lg" ngModel>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Açıklama
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Açıklama</div>
                         </div>
                         <textarea name="note" rows="3" class="form-control form-control-lg" ngModel></textarea>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Tip
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Tip</div>
                         </div>
                         <input type="text" readonly name="type" class="form-control form-control-lg" ngModel>
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Adres
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Adres</div>
                         </div>
                         <input type="text" readonly name="device_port" class="form-control form-control-lg" ngModel>
                       </div>
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
-                        <div class="input-group-addon">
-                          Tür
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Tür</div>
                         </div>
                         <input type="text" disabled class="form-control form-control-lg" value="Adisyon / Fiş Yazıcı">
                       </div>
@@ -406,7 +406,7 @@
       <div class="card-header">
         <h5 class="mt-2">Sunucu Durumu</h5>
       </div>
-      <div class="card-block tab-height flow">
+      <div class="card-body tab-height flow">
 
       </div>
       <div class="card-footer">
@@ -489,25 +489,31 @@
               </div>
             </section>
             <section *ngIf="selectedPrinter !== undefined" id="printerFormHolder">
-              <h4 class="text-bold mb-3">{{printerProcess}} Yazıcı
+              <h4 class="font-weight-bold mb-3">{{printerProcess}} Yazıcı
                 <span *ngIf="printerProcess == 'USB'" class="pull-right text-muted">Bulunduğu Port: {{selectedPrinter.portNumbers[0]}}</span>
               </h4>
               <div class="form-group">
                 <div class="input-group">
-                  <div class="input-group-addon">
-                    Yazıcı Adı
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      Yazıcı Adı
+                    </div>
                   </div>
                   <input type="text" name="name" class="form-control form-control-lg" ngModel>
                 </div>
                 <div class="input-group">
-                  <div class="input-group-addon">
-                    Açıklama
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      Açıklama
+                    </div>
                   </div>
                   <input type="text" name="note" class="form-control form-control-lg" ngModel>
                 </div>
                 <div *ngIf="printerProcess == 'LAN'" class="input-group">
-                  <div class="input-group-addon">
-                    IP Adresi
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      IP Adresi
+                    </div>
                   </div>
                   <input type="text" name="port_number" class="form-control form-control-lg" ngModel>
                 </div>
