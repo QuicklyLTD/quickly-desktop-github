@@ -3,30 +3,26 @@
     <div class="card full-height">
       <div class="card-header">Kasa Durumu</div>
       <div class="card-header p-0">
-        <table class="table table-bordered table-hover mb-0">
-          <thead class="thead-inverse">
+        <table class="table table-hover mb-0">
+          <thead class="thead-dark">
             <tr class="table-info">
-              <td width="5%">
+              <td width="6%">
                 <i class="fa fa-diamond"></i>
               </td>
-              <td width="44.5%">
+              <td width="94%">
                 <b>Faliyet Gelirleri</b>
-              </td>
-              <td colspan="5">
-                <b>
-                  <span class="pull-right">Toplam: {{sellingIncomes  | number:'1.0-2' }} TL</span>
-                </b>
+                <span class="pull-right">Toplam: {{sellingIncomes  | number:'1.0-2' }} TL</span>
               </td>
             </tr>
           </thead>
         </table>
       </div>
-      <div class="card-block p-0 flow">
+      <div class="card-body p-0 flow">
         <table class="table table-bordered table-hover">
-          <thead class="thead-inverse">
+          <thead class="thead-dark">
             <tr>
-              <th width="5%">#</th>
-              <th width="45%"><i class="fa fa-sticky-note" aria-hidden="true"></i> Açıklama</th>
+              <th width="6%">#</th>
+              <th width="44%"><i class="fa fa-sticky-note" aria-hidden="true"></i> Açıklama</th>
               <th width="15%"><i class="fa fa-user" aria-hidden="true"></i> Kullanıcı</th>
               <th width="15%"><i class="fa fa-clock-o" aria-hidden="true"></i> Saat</th>
               <th width="20%"><i class="fa fa-money" aria-hidden="true"></i> Tutar</th>
@@ -86,42 +82,42 @@
           <input id="type" type="hidden" name="type"  ngModel>
           <div class="form-group mb-2">
             <div class="input-group">
-              <div class="input-group-addon">
-                Açıklama
+              <div class="input-group-prepend">
+                <div class="input-group-text">Açıklama</div> 
               </div>
               <input type="text" name="description" class="form-control form-control-lg" ngModel>
             </div>
           </div>
           <div class="form-group mb-2">
             <div class="input-group">
-              <div class="input-group-addon">
-                Nakit
+              <div class="input-group-prepend">
+                  <div class="input-group-text">Nakit</div>
               </div>
               <input type="number" min="0" name="cash" class="form-control form-control-lg" ngModel>
-              <div class="input-group-addon">
-                TL
+              <div class="input-group-append">
+                  <div class="input-group-text">TL</div>
               </div>
             </div>
           </div>
           <div class="form-group mb-2">
             <div class="input-group">
-              <div class="input-group-addon">
-                Kart
+              <div class="input-group-prepend">
+                  <div class="input-group-text">Kart</div>
               </div>
               <input type="number" min="0" name="card" class="form-control form-control-lg" ngModel>
-              <div class="input-group-addon">
-                TL
+              <div class="input-group-append">
+                  <div class="input-group-text">TL</div>
               </div>
             </div>
           </div>
           <div class="form-group mb-2">
             <div class="input-group">
-              <div class="input-group-addon">
-                Kupon
+              <div class="input-group-prepend">
+                <div class="input-group-text">Kupon</div>
               </div>
               <input type="number" min="0" name="coupon" class="form-control form-control-lg" ngModel>
-              <div class="input-group-addon">
-                TL
+              <div class="input-group-append">
+                  <div class="input-group-text">TL</div>
               </div>
             </div>
           </div>
