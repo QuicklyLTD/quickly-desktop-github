@@ -5,10 +5,10 @@
       <div class="col-xl-2 col-lg-3 pr-1">
         <div class="card inside-height">
           <div class="card-header">Veritabanı</div>
-          <div class="card-body flow">
-            <div class="list-group">
-              <button *ngFor="let db of databases" type="button" [ngClass]="{'list-group-item-warning': selectedDB == db}" (click)="showDatabase(db)"
-                class="list-group-item list-group-item-action list-eq">{{db}}</button>
+          <div class="card-body p-0 flow">
+            <div class="btn-group-vertical btn-block btn-group-lg">
+              <button *ngFor="let db of databases" type="button" [ngClass]="{'btn-danger bg-danger text-white': selectedDB == db}" (click)="showDatabase(db)"
+                class="btn btn-secondary dark-bg">{{db}}</button>
             </div>
           </div>
         </div>
@@ -16,7 +16,7 @@
       <div class="col-xl-8 col-lg-6 pl-0 pr-1">
         <div class="card inside-height">
           <div class="card-header">Dökümanlar</div>
-          <div class="card-block p-0 flow">
+          <div class="card-body p-0 flow">
             <table class="table table-hover table-striped">
               <tbody>
                 <tr *ngFor="let item of documents" (click)="showDocument(item)">
@@ -29,7 +29,7 @@
             <div class="input-group">
               <input #filterKey type="text" placeholder="Key" class="form-control form-control-sm">
               <input #filterValue type="text" placeholder="Value" class="form-control form-control-sm">
-              <span class="input-group-btn">
+              <span class="input-group-append">
                 <button class="btn btn-secondary" (click)="getByFilter(filterKey.value,filterValue.value)" type="button">Sorgula</button>
               </span>
             </div>
@@ -41,7 +41,7 @@
           <div class="card-header">
             İşlemler
           </div>
-          <div class="card-block p-0">
+          <div class="card-body p-0">
           </div>
           <div class="card-footer p-1">
             <button [disabled]="selectedDB == undefined" (click)="resolveDB()" class="btn btn-quickly btn-md btn-block">Veritabanı Düzelt</button>
@@ -83,7 +83,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <textarea #editArea rows="25" class="form-control">{{selectedDoc | json }}</textarea>
+        <textarea #editArea rows="18" class="form-control">{{selectedDoc | json }}</textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>

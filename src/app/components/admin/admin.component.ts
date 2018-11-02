@@ -158,6 +158,31 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
+    this.mainService.getAllBy('products', {}).then(res => {
+      let products = res.docs;
+      products.forEach(element => {
+        this.mainService.changeData('products', element._id, (doc) => {
+          doc.tax_value = 8;
+          doc.barcode = 0;
+          return doc;
+        }).then(res => {
+          console.log(res);
+        });
+      });
+    })
+
+    this.mainService.getAllBy('stocks', {}).then(res => {
+      let stocks = res.docs;
+      stocks.forEach(element => {
+        this.mainService.changeData('stocks', element._id, (doc) => {
+          doc.warning_value = 25;
+          return doc;
+        }).then(res => {
+          console.log(res);
+        });
+      });
+    })
+
     // this.mainService.getAllBy('endday', {}).then(res => {
     //   let endday = res.docs;
     //   endday.forEach(element => {
@@ -171,7 +196,7 @@ export class AdminComponent implements OnInit {
     //     });
     //   });
     // })
-    
+
     // let value = new ServerInfo(0, 1, '192.168.1.1', 3000, 'kosmos2018');
 
     // this.mainService.addData('settings', new Settings('ServerSettings', value, 'Sunucu Ayarları', Date.now()));
