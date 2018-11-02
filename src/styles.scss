@@ -1,5 +1,7 @@
 @import '../node_modules/animate.css/animate.min.css';
-@import '../node_modules/bootstrap/scss/bootstrap';
+// @import '../node_modules/bootstrap/scss/bootstrap';
+// @import url('https://bootswatch.com/4/superhero/bootstrap.min.css');
+@import url('./assets/themes/dark.scss');
 $fa-font-path: "../node_modules/font-awesome/fonts/";
 @import '../node_modules/font-awesome/scss/font-awesome';
 @font-face {
@@ -7,7 +9,7 @@ $fa-font-path: "../node_modules/font-awesome/fonts/";
     src: url('assets/quickly.ttf') format('truetype');
 }
 .quickly-color{
-    background-color: #312783 !important;
+    // background-color: #312783 !important;
 }
 .text-quickly{
     color: #312783 !important;
@@ -28,7 +30,7 @@ html, body {
    font-family: Quickly !important;
 }
 app-root {
-   display: block;
+   display: body;
    position: relative;
    height: 100%;
    width: 100%;
@@ -48,11 +50,22 @@ nav{
 .inside-height{
     height: 79vh;
 }
-.input-group-addon{
-    width: 150px;
+.input-group-prepend{
+    .input-group-text{
+        width: 150px;
+    }
 }
-.input-group-addon.normal{
-    width: auto !important;
+
+.input-group-append{
+    .input-group-text{
+        min-width: 50px;
+    }
+}
+
+.input-group-prepend.normal{
+    .input-group-text{
+        width: auto !important;
+    }
 }
 .list-group-item{
     white-space: nowrap;
@@ -60,21 +73,86 @@ nav{
     text-overflow: ellipsis;
     text-transform: capitalize;
 }
-.proCard{
-    height: 7.5vw;
-    box-shadow: 1px 1px 3px rgba(60, 58, 58, 0.48);
-    .card-block{
-        padding: 1rem;
+.dark-bg{
+    background-color: #2b3e50;
+}
+.form-control{
+    background-color: rgb(230, 230, 230);
+}
+.img-thumbnail {
+    padding: 0.25rem;
+    background-color: #e6e6e6;
+    border: 1px solid #dee2e6;
+    border-radius: 0;
+    max-width: 100%;
+    height: auto;
+}
+input[readonly]{
+    color:white !important;
+}
+input[disabled]{
+    color:white !important;
+}
+
+.input-group{
+    box-shadow: 1px 1px 4px rgb(22, 31, 40);
+}
+
+.btn{
+    box-shadow: 1px 1px 4px rgba(60, 58, 58, 0.48);
+}
+
+.form-control{
+    background-clip: initial;
+}
+
+.tableCard{
+    box-shadow: 1px 1px 4px rgb(43, 62, 80);
+    height: 13.5vh;
+    h1{
+        font-weight: 600;
+        font-size: 2.45vw;
     }
-    h2{
+    h4{
+        font-weight: 600;
+    }
+    p{
+        margin: 0;
+    }
+    .long-name{
         font-size: 1.7vw;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
+    .card-text{
+        bottom: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.proCard{
+    background-color: #2b3e50;
+    color: #f0ad4e;
+    height: 7.5vw;
+    box-shadow: 1px 1px 4px rgba(60, 58, 58, 0.48);
+    .card-body{
+        padding: 1rem;
+    }
+    h2{
+        font-size: 1.7vw;
+        font-weight: 900;
+        white-space: pre-wrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: capitalize;
+    }
     :hover{
-        background-color: #ebcccc;
+        background-color: #000;
+        box-shadow: none;
     }
     .long-name{
         font-size:1.2vw;
@@ -89,12 +167,12 @@ nav{
         text-overflow: ellipsis;
     }
 }
-.nav-tabs{
-    .nav-link.active{
-        background-color: #f7f7f9;
-        border-bottom-color: #f7f7f9;
-    }
-}
+// .nav-tabs{
+//     .nav-link.active{
+//         background-color: #f7f7f9;
+//         border-bottom-color: #f7f7f9;
+//     }
+// }
 .ntb{
     border-top: 0px !important;
 }
@@ -118,9 +196,31 @@ nav{
         font-size: 1.2vw;
     }
 }
+.col-card{
+    padding-right: 5px !important;
+    padding-left:5px !important;
+}
+.bodyquote{
+    padding: 10px;
+    background-color: #2b3e50;
+    box-shadow: 1px 1px 4px rgb(22, 31, 40);
+}
 
 .modal-xl{
     max-width: 1000px;
+}
+
+input[type="checkbox"]{
+    height: 45px;
+    width: 45px;
+    margin: auto;
+}
+
+.btn-lg, .btn-group-lg>.btn {
+    padding: 0.55rem 1rem;
+    font-size: 1.171875rem;
+    line-height: 1.5;
+    border-radius: 0;
 }
 
 @media screen and (min-width: 900px) {
@@ -130,8 +230,8 @@ nav{
         }
     }
     .subCatInput{
-        width:70%;
-        height:51px;
+        width:70.8%;
+        min-height:51px;
     }
 }
 
@@ -142,23 +242,24 @@ nav{
         }
     }
     .subCatInput{
-        width:79%;
-        height:51px;
+        width:78.7%;
+        min-height:51px;
     }
 }
+
+.swal-modal{
+    border-radius: 0px;
+}
+
 .swal-text {
-    font-size: 23px;
+    font-size: 30px;
     color:black;
-    background-color: #FEFAE3;
-    padding: 15px;
-    border: 1px solid #F0E1A1;
-    display: block;
-    margin: 22px;
     text-align: center;
 }
 
 .swal-footer {
-    margin-top: 32px;
+    margin-top: 30px;
+    padding: 10px !important;
     border-top: 2px solid #eceeef;
     overflow: hidden;
   }
@@ -166,9 +267,39 @@ nav{
 table {
     table-layout: fixed;
 }
+.table{
+    font-size: 1rem;
+}
 td , th{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-transform: capitalize;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link{
+    background-color: #5b6977;
+    border-color: #43505e;
+    border-bottom-color: #5b6977;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #5b6977; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
 }
