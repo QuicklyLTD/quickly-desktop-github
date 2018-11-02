@@ -2,21 +2,22 @@
   <div class="card-header">
     İlk Kurulum
   </div>
-  <div class="card-block p-0">
+  <div class="card-body p-0">
     <div class="row justify-content-md-center">
-      <div class="col-lg-8 text-center" style="height:230px">
-        <img src="../../../assets/quickly.png" class="mt-4" style="width: 350px; margin-left:auto; margin-right:auto;" alt="">
+      <div class="col-lg-8 text-center" style="height:220px">
+        <img src="../../../assets/logo.svg" class="mt-4" style="width: 350px; margin-left:auto; margin-right:auto;"
+          alt="">
       </div>
     </div>
     <div class="row justify-content-md-center">
-      <div *ngIf="setupStep == 0" class="col-lg-6 col-xl-6 animated fadeIn">
-        <blockquote class="blockquote mt-3">
-          <p class="mb-0">Program Kurulumu</p>
-          <footer class="blockquote-footer">Programın Çalışma Türünü Seçiniz.</footer>
-        </blockquote>
+      <div *ngIf="setupStep == 0" class="col-lg-10 col-xl-10 animated fadeIn">
+        <div class="alert alert-success text-center" role="alert">
+          <h5 class="alert-heading font-weight-bold">Program Kurulumu</h5>
+          <p>Programın Çalışma Türünü Seçiniz.</p>
+        </div>
         <div class="row justify-content-md-center mt-3">
           <div class="col-lg-6">
-            <button (click)="setupStep = 1" class="btn btn-secondary btn-lg btn-block p-4">
+            <button (click)="setupStep = 1" class="btn btn-outline-primary btn-lg btn-block p-4">
               <i class="fa fa-server fa-5x"></i>
               <br> Birincil
               <br>
@@ -24,7 +25,7 @@
             </button>
           </div>
           <div class="col-lg-6">
-            <button (click)="setupStep = 4;" class="btn btn-secondary btn-lg btn-block work-type p-4">
+            <button (click)="setupStep = 4;" class="btn btn-outline-primary btn-lg btn-block work-type p-4">
               <i class="fa fa-desktop fa-5x"></i>
               <br> İkincil
               <br>
@@ -33,23 +34,29 @@
           </div>
         </div>
       </div>
-      <div *ngIf="setupStep == 1" class="col-lg-6 col-xl-6 animated fadeIn">
-        <blockquote class="blockquote mt-3">
-          <p class="mb-0">İşletme Kullanıcı Bilgileri</p>
-          <footer class="blockquote-footer">Quickly Hesabı Kullanıcı Adı ve Şifrenizi giriniz</footer>
-        </blockquote>
+      <div *ngIf="setupStep == 1" class="col-lg-10 col-xl-10 animated fadeIn">
+        <div class="alert alert-success text-center" role="alert">
+          <h5 class="alert-heading font-weight-bold">İşletme Hesabı Bilgileri</h5>
+          <p>Quickly Hesabı Kullanıcı Adı ve Şifrenizi giriniz</p>
+        </div>
         <form #loginForm="ngForm" class="mt-3" (ngSubmit)="makeLogin(loginForm)">
           <div class="input-group">
-            <div class="input-group-addon">
-              Kullanıcı Adı
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                Kullanıcı Adı
+              </div>
             </div>
-            <input name="username" type="text" placeholder="Kullanıcı Adı Giriniz.." class="form-control form-control-lg" ngModel/>
+            <input name="username" type="text" placeholder="Kullanıcı Adı Giriniz.." class="form-control form-control-lg"
+              ngModel />
           </div>
           <div class="input-group">
-            <div class="input-group-addon">
-              Şifre
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                Şifre
+              </div>
             </div>
-            <input name="password" type="password" placeholder="Şifre Giriniz.." class="form-control form-control-lg" ngModel/>
+            <input name="password" type="password" placeholder="Şifre Giriniz.." class="form-control form-control-lg"
+              ngModel />
           </div>
           <div class="mt-3">
             <button type="submit" class="btn btn-danger btn-lg pull-right">Bilgileri Kaydet</button>
@@ -59,10 +66,10 @@
       <div *ngIf="setupStep == 2" class="col-lg-12 animated fadeIn">
         <div class="row justify-content-md-center">
           <div class="col-xl-8 col-lg-10">
-            <blockquote class="blockquote mt-3">
+            <div class="bodyquote mt-3">
               <p class="mb-0">İşletme Kurulum Bilgileri</p>
-              <footer class="blockquote-footer">Programı Kurmak İstediğiniz İşletmeyi Seçiniz. </footer>
-            </blockquote>
+              <footer class="bodyquote-footer">Programı Kurmak İstediğiniz İşletmeyi Seçiniz. </footer>
+            </div>
           </div>
         </div>
         <div class="row justify-content-md-center">
@@ -71,7 +78,7 @@
               <div class="card-header">
                 <strong>{{store.name}}</strong>
               </div>
-              <div class="card-block p-1">
+              <div class="card-body p-1">
                 <div class="row">
                   <div class="col-lg-3 pr-2">
                     <img class="card-img-top" width="100" height="100" src="{{store.logo}}" alt="">
@@ -89,47 +96,58 @@
         </div>
       </div>
       <div *ngIf="setupStep == 3" class="col-lg-6 col-xl-5 animated fadeIn">
-        <blockquote class="blockquote mt-3">
+        <div class="bodyquote mt-3">
           <p class="mb-0">Yönetici Bilgileri</p>
-          <footer class="blockquote-footer">Lütfen bir Yönetici Adı ve Şifresi giriniz.</footer>
-        </blockquote>
+          <footer class="bodyquote-footer">Lütfen bir Yönetici Adı ve Şifresi giriniz.</footer>
+        </div>
         <form #setupForm="ngForm" class="mt-3" (ngSubmit)="makeAdmin(setupForm)">
           <div class="input-group">
-            <div class="input-group-addon">
-              Yönetici Adı
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                Yönetici Adı
+              </div>
             </div>
-            <input name="admin_name" placeholder="Yönetici Adı Giriniz.." type="text" class="form-control form-control-lg" ngModel/>
+            <input name="admin_name" placeholder="Yönetici Adı Giriniz.." type="text" class="form-control form-control-lg"
+              ngModel />
           </div>
           <div class="input-group">
-            <div class="input-group-addon">
-              Yönetici Parolası
+            <div class="input-group-prepend">
+              <div class="input-group-tex">
+                Yönetici Parolası
+              </div>
             </div>
-            <input name="admin_pass" type="password" placeholder="Şifre Giriniz.. ( 4 Haneli Sayı )" maxlength="4" class="form-control form-control-lg"
-              ngModel/>
+            <input name="admin_pass" type="password" placeholder="Şifre Giriniz.. ( 4 Haneli Sayı )" maxlength="4"
+              class="form-control form-control-lg" ngModel />
           </div>
           <div class="mt-3">
             <button type="submit" class="btn btn-danger btn-lg pull-right">Bilgileri Kaydet</button>
           </div>
         </form>
       </div>
-      <div *ngIf="setupStep == 4" class="col-lg-6 col-xl-5 animated fadeIn">
-        <blockquote class="blockquote mt-3">
-          <p class="mb-0">Ana Makinaya Bağlanın</p>
-          <footer class="blockquote-footer">Ana Makinanın Çalıştığı Adresi ve Anahtarı Giriniz..</footer>
-        </blockquote>
+      <div *ngIf="setupStep == 4" class="col-lg-10 col-xl-10 animated fadeIn">
+        <div class="alert alert-success text-center" role="alert">
+          <h5 class="alert-heading font-weight-bold">Ana Makinaya Bağlanın</h5>
+          <p>Ana Makinanın Çalıştığı Adresi ve Anahtarı Giriniz..</p>
+        </div>
         <form #connectionForm="ngForm" class="mt-3" (ngSubmit)="getConfigrations(connectionForm)">
           <div class="form-group">
             <div class="input-group">
-              <div class="input-group-addon">Makina Adresi</div>
-              <input type="text" name="address" class="form-control form-control-lg" placeholder="IP adresini giriniz." ngModel/>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Makina Adresi
+                </div>
+              </div>
+              <input type="text" name="address" class="form-control form-control-lg" placeholder="IP adresini giriniz."
+                ngModel />
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Makina Portu</div>
-              <input type="text" name="port" class="form-control form-control-lg" placeholder="Port giriniz." ngModel/>
+              <div class="input-group-prepend"><div class="input-group-text">Makina Portu</div></div>
+              <input type="text" name="port" class="form-control form-control-lg" placeholder="Port giriniz." ngModel />
             </div>
             <div class="input-group">
-              <div class="input-group-addon">Anahtar</div>
-              <input type="text" name="key" class="form-control form-control-lg" placeholder="Ana Makina anahtarını giriniz." ngModel/>
+              <div class="input-group-prepend"><div class="input-group-text">Anahtar</div></div>
+              <input type="text" name="key" class="form-control form-control-lg" placeholder="Ana Makina anahtarını giriniz."
+                ngModel />
             </div>
           </div>
           <div class="mt-3">
