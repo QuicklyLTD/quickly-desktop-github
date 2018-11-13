@@ -29,8 +29,8 @@ ipcMain.on('printTest', (event, device) => {
           .control('LF')
           .text('Quickly', '857')
           .control('LF')
-          .cut()
           .beep(3, 2)
+          .cut()
           .close();
       }
     });
@@ -67,8 +67,8 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
         printer
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
           .control('LF')
-          .cut()
           .beep(3, 2)
+          .cut()
           .close();
       }
     });
@@ -108,9 +108,9 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               if (check.products[prop].status !== 3) {
                 let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
-                if (check.products[prop].note !== '') {
-                  printer.text('      Not: ' + check.products[prop].note, '857');
-                }
+                // if (check.products[prop].note !== '') {
+                //   printer.text('      Not: ' + check.products[prop].note, '857');
+                // }
               }
             }
             printer
@@ -133,9 +133,9 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               if (check.payed_products[prop].status !== 3) {
                 let text = fitText((check.payed_products[prop].count >= 10 ? check.payed_products[prop].count : ' ' + check.payed_products[prop].count) + ' x  ' + check.payed_products[prop].name, check.payed_products[prop].price + ' TL' + '   ' + (check.payed_products[prop].total_price.toString().length > 3 ? check.payed_products[prop].total_price : (check.payed_products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.payed_products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
-                if (check.payed_products[prop].note !== '') {
-                  printer.text('      Not: ' + check.payed_products[prop].note, '857');
-                }
+                // if (check.payed_products[prop].note !== '') {
+                //   printer.text('      Not: ' + check.payed_products[prop].note, '857');
+                // }
               }
             }
             printer
@@ -155,8 +155,8 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
-            .beep(3, 2)
             .cut()
+            .beep(3, 2)
             .close();
         }
       });
@@ -214,6 +214,7 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
 });
 
 ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
+  reason = reason.replace('ş', 's').replace('ğ', 'g');
   let deviceToPrint = findDevice(device);
   if (deviceToPrint) {
     const printer = new escpos.Printer(deviceToPrint);
