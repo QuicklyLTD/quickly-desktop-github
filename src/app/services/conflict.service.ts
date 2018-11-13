@@ -83,12 +83,19 @@ export class ConflictService {
         console.log('Have OlderDoc Out Of Reports!', a, b);
         if (a.timestamp > b.timestamp) this.diffRecreate(a, b);
         if (b.timestamp > a.timestamp) this.diffRecreate(b, a);
-        if (b.timestamp == a.timestamp) console.log('33333');
+        if (b.timestamp == a.timestamp) this.diffRevision(a, b);
       }
     } else {
       console.log('No OlderDoc', a);
       this.diffRecreate(a, b);
     }
+  }
+
+  diffRevision(a, b) {
+    let aRev = a._rev.split('-')[0];
+    let bRev = b._rev.split('-')[0];
+    if (aRev > bRev) this.diffRecreate(a, b);
+    if (bRev > aRev) this.diffRecreate(b, a);
   }
 
   diffRecreate(first, second) {
