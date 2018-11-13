@@ -46,13 +46,13 @@
     <div class="card full-height">
       <div class="card-body">
         <div *ngIf="selected == undefined" class="container text-center">
-          <img src="{{logo}}" class="logo" alt=""> 
-          <div class="jumbotron">
+          <div class="jumbotron mb-0">
             <h1 class="display-3">Quickly</h1>
             <p class="lead">Yeni Nesil Otomasyon</p>
             <hr class="my-4">
             <p>{{storeInfo?.name}}</p>
           </div>
+          <img src="{{logo}}" class="logo" alt="">
         </div>
         <app-user-settings *ngIf="selected == 1"></app-user-settings>
         <app-menu-settings *ngIf="selected == 2"></app-menu-settings>
