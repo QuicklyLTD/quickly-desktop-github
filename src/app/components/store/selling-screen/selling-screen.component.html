@@ -72,6 +72,7 @@
                             <p class="card-text text-danger">
                               <i class="fa fa-money"></i>
                               <b> {{product.price}} TL</b>
+                              <small class="float-right mt-1 text-white">{{product.cat_id | general:'categories':'name' | async}}</small>
                             </p>
                           </div>
                         </div>
@@ -92,7 +93,7 @@
             <div class="card inside-height">
               <div class="card-body check-flow p-2 dark-bg">
                 <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
-                  <div [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning':selectedIndex == i}"
+                  <div [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning text-dark':selectedIndex == i}"
                     style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
                     <div class="product-name">
                       <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
@@ -101,10 +102,10 @@
                     </div>
                     <div class="product-price">{{item.price | number:'1.0-2' }} TL</div>
                   </div>
-                  <div *ngIf="selectedIndex == i && item.status !== 1">
+                  <div *ngIf="selectedIndex == i && item.status !== 1" class="animated slideInDown">
                     <small>
                       <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
-                      <span class="pull-right">
+                      <span class="pull-right mt-1">
                         <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
                     </small>
                   </div>
