@@ -117,7 +117,7 @@ export class MainService {
       this.LocalDB['allData'].upsert(id, function (doc) {
         return Object.assign(doc, schema);
       }).catch(err => {
-        console.log('updateData-All', err);
+        console.log('updateData-Local', err);
       });
       return this.LocalDB[db].put(Object.assign(doc, schema)).catch(err => {
         console.log('updateData-All', err);
