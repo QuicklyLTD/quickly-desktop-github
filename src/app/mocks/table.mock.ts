@@ -32,3 +32,10 @@ export class FloorSpecs {
         public events: boolean,
     ) { }
 }
+
+export enum TableStatus{
+    PASSIVE,
+    ACTIVE,
+    OCCUPIED,
+    WILL_READY
+}

@@ -82,3 +82,16 @@ export class Ingredient {
         public amount: number
     ) { }
 }
+
+export enum ProductType {
+    PASSIVE,
+    AUTOMATIC,
+    MANUEL
+}
+
+export enum ProductStatus{
+    PASSIVE,
+    ACTIVE,
+    LOCKED,
+    CANCELED
+}

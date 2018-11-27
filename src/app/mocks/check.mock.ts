@@ -10,8 +10,8 @@ export class Check {
         public timestamp: number,
         public type: number,
         public payment_flow?: Array<PaymentStatus>,
-        public _id?:string,
-        public _rev?:string
+        public _id?: string,
+        public _rev?: string
     ) { }
 }
 export class ClosedCheck {
@@ -27,9 +27,9 @@ export class ClosedCheck {
         public type: number,
         public payment_method: string,
         public payment_flow?: Array<PaymentStatus>,
-        public description?:string,
-        public _id?:string,
-        public _rev?:string,
+        public description?: string,
+        public _id?: string,
+        public _rev?: string,
     ) { }
 }
 export class PaymentStatus {
@@ -45,7 +45,7 @@ export class PaymentStatus {
 export class CheckProduct {
     constructor(
         public id: string,
-        public cat_id:string,
+        public cat_id: string,
         public name: string,
         public price: number,
         public note: string,
@@ -53,4 +53,19 @@ export class CheckProduct {
         public owner: string,
         public timestamp: number
     ) { }
+}
+
+export enum CheckType {
+    PASSIVE,
+    NORMAL,
+    FAST,
+    CANCELED,
+    PROCESSING
+}
+
+export enum CheckStatus {
+    PASSIVE,
+    READY,
+    OCCUPIED,
+    PROCESSING,
 }

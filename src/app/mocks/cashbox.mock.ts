@@ -7,7 +7,13 @@ export class Cashbox {
     public card: number,
     public coupon: number,
     public user: string,
-    public _id?:string,
-    public _rev?:string
+    public _id?: string,
+    public _rev?: string
   ) { }
+}
+
+export enum CashboxType {
+    PASSIVE,
+    INCOME,
+    OUTCOME
 }
