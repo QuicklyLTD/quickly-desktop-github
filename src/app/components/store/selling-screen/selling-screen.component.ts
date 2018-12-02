@@ -170,7 +170,7 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.productFilterInput.nativeElement.value = '';
       this.countProductsData(product._id, product.price);
-      let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now());
+      let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now(), product.tax_value, product.barcode);
       this.check.total_price = this.check.total_price + product.price;
       this.check.products.push(newProduct);
       this.newOrders.push(newProduct);
@@ -186,12 +186,12 @@ export class SellingScreenComponent implements OnInit {
   numpadToCheck() {
     let newAmount = (this.numpad * this.productWithSpecs.price) / this.productStock.amount;
     let newNote = `${this.numpad} ${this.productUnit.nativeElement.innerHTML}`;
-    const newProduct = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, newAmount, newNote, 1, this.owner, Date.now());
+    const newProduct = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, newAmount, newNote, 1, this.owner, Date.now(), this.productWithSpecs.tax_value, this.productWithSpecs.barcode);
     this.check.total_price = this.check.total_price + newProduct.price;
     let countFor = newAmount / this.productWithSpecs.price;
     if (this.productUnit.nativeElement.innerHTML === 'Adet') {
       for (let index = 0; index < countFor; index++) {
-        let repeatingProducts = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, this.productWithSpecs.price, '', 1, this.owner, Date.now());
+        let repeatingProducts = new CheckProduct(this.productWithSpecs._id, this.productWithSpecs.cat_id, this.productWithSpecs.name, this.productWithSpecs.price, '', 1, this.owner, Date.now(), this.productWithSpecs.tax_value, this.productWithSpecs.barcode);
         this.check.products.push(repeatingProducts);
         this.newOrders.push(repeatingProducts);
       }

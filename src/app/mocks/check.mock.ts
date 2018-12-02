@@ -51,7 +51,9 @@ export class CheckProduct {
         public note: string,
         public status: number,
         public owner: string,
-        public timestamp: number
+        public timestamp: number,
+        public tax_value: number,
+        public barcode: number,
     ) { }
 }
 
