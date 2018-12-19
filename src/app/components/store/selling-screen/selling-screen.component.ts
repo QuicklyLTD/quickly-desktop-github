@@ -62,6 +62,7 @@ export class SellingScreenComponent implements OnInit {
   day: number;
   paymentMethods: Array<PaymentMethod>;
   changes: any;
+  discounts: Array<number>;
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
@@ -69,6 +70,7 @@ export class SellingScreenComponent implements OnInit {
     this.owner = this.settingsService.getUser('name');
     this.ownerRole = this.settingsService.getUser('type');
     this.ownerId = this.settingsService.getUser('id');
+    this.discounts = [10, 15, 20, 25, 50];
     this.paymentMethods = [
       new PaymentMethod('Nakit', 'Nakit Ödeme', '#5cb85c', 'fa-money', 1, 1),
       new PaymentMethod('Kart', 'Kredi veya Banka Kartı', '#f0ad4e', 'fa-credit-card', 2, 1),
@@ -115,6 +117,9 @@ export class SellingScreenComponent implements OnInit {
           this.mainService.getData('checks', change.id).then(res => {
             this.check = res;
             this.id = res.table_id;
+            if (this.check.status == CheckStatus.PROCESSING) {
+              this.router.navigate(['/store']);
+            }
           })
         } else {
           this.router.navigate(['/store']);
@@ -299,19 +304,30 @@ export class SellingScreenComponent implements OnInit {
   }
 
   closeCheck(method: string) {
+    let total_discounts = 0;
+    let general_discount = 0;
     if (this.check.payment_flow) {
       let lastAmount = 0;
       let lastProducts = this.check.products.filter(obj => obj.status == 2);
       lastProducts.forEach(product => {
         lastAmount += product.price;
       })
-      let lastPayment = new PaymentStatus(this.owner, method, lastAmount, 0, Date.now(), lastProducts);
+      if (this.check.discountPercent) {
+        general_discount = (this.check.total_price * this.check.discountPercent) / 100;
+      }
+      let lastPayment = new PaymentStatus(this.owner, method, lastAmount - general_discount, general_discount, Date.now(), lastProducts);
       this.check.payment_flow.push(lastPayment);
       this.check.products = [];
       method = 'Parçalı';
+      total_discounts = this.check.payment_flow.map(obj => obj.discount).reduce((a, b) => a + b);
+    } else {
+      if (this.check.discountPercent) {
+        general_discount = (this.check.total_price * this.check.discountPercent) / 100;
+        total_discounts += general_discount;
+      }
     }
     $('#closeCheck').modal('hide');
-    let checkWillClose = new ClosedCheck(this.check.table_id, this.check.total_price + this.check.discount, 0, this.check.owner, this.check.note, this.check.status, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow);
+    let checkWillClose = new ClosedCheck(this.check.table_id, (this.check.total_price + this.check.discount) - general_discount, total_discounts, this.check.owner, this.check.note, this.check.status, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow);
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.updateSellingReport(method);
     });
@@ -332,35 +348,39 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner} tarafından ${this.table.name} Masası ${this.check.total_price} TL '${method}' ödeme alınarak kapatıldı.`)
     }
-    if (this.askForCheckPrint) {
-      this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
-        if (isOK) {
-          if (this.check.type == CheckType.NORMAL) {
-            this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
-          } else {
-            this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
-          }
-        }
-      });
-    } else {
-      if (this.check.type == CheckType.NORMAL) {
-        this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
-      } else {
-        this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
-      }
-    }
+    // if (this.askForCheckPrint) {
+    //   this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
+    //     if (isOK) {
+    //       if (this.check.type == CheckType.NORMAL) {
+    //         this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+    //       } else {
+    //         this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
+    //       }
+    //     }
+    //   });
+    // } else {
+    //   if (this.check.type == CheckType.NORMAL) {
+    //     this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+    //   } else {
+    //     this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
+    //   }
+    // }
     this.message.sendMessage(`Hesap ${this.check.total_price} TL tutarında ödeme alınarak kapatıldı`);
   }
 
   updateSellingReport(method: string) {
+    let general_discount = 0;
+    if (this.check.discountPercent) {
+      general_discount = (this.check.total_price * this.check.discountPercent) / 100;
+    }
     if (method !== 'Parçalı') {
       this.mainService.getAllBy('reports', { connection_id: method }).then(res => {
         if (res.docs.length > 0) {
           let doc = res.docs[0];
           doc.count++;
           doc.weekly_count[this.day]++;
-          doc.amount += this.check.total_price + this.check.discount;
-          doc.weekly[this.day] += this.check.total_price + this.check.discount;
+          doc.amount += (this.check.total_price + this.check.discount) - general_discount;
+          doc.weekly[this.day] += (this.check.total_price + this.check.discount) - general_discount;
           doc.update_time = Date.now();
           this.mainService.updateData('reports', doc._id, doc);
         }
@@ -376,7 +396,7 @@ export class SellingScreenComponent implements OnInit {
           reportWillChange.weekly[this.day] += obj.amount;
           reportWillChange.update_time = Date.now();
           if (this.check.payment_flow.length == index + 1) {
-            sellingReports.forEach((report, dd) => {
+            sellingReports.forEach((report) => {
               if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
                 this.mainService.updateData('reports', report._id, report);
               }
@@ -700,24 +720,47 @@ export class SellingScreenComponent implements OnInit {
   }
 
   printCheck() {
+    // this.check.products = this.check.products.filter(obj => obj.status == 2);
+    // this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
+    // if (this.table.status !== TableStatus.WILL_READY) {
+    //   this.printerService.printCheck(this.printers[0], this.table.name, this.check);
+    //   if (this.check.status !== CheckStatus.PASSIVE) {
+    //     if (this.check.type == CheckType.NORMAL) {
+    //       this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
+    //         this.router.navigate(['store']);
+    //       });
+    //       this.message.sendMessage('Hesap Yazdırıldı..');
+    //     }
+    //   }
+    // } else {
+    //   this.message.sendConfirm('Adisyon Tekrar Yazdırılsın mı?').then(isOk => {
+    //     if (isOk) {
+    //       this.printerService.printCheck(this.printers[0], this.table.name, this.check);
+    //     }
+    //   });
+    // }
     this.check.products = this.check.products.filter(obj => obj.status == 2);
     this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
-    if (this.table.status !== TableStatus.WILL_READY) {
-      this.printerService.printCheck(this.printers[0], this.table.name, this.check);
-      if (this.check.status !== CheckStatus.PASSIVE) {
-        if (this.check.type == CheckType.NORMAL) {
-          this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
-            this.router.navigate(['store']);
-          });;
-          this.message.sendMessage('Hesap Yazdırıldı..');
+    if (this.check.type == CheckType.NORMAL) {
+      if (this.table.status !== TableStatus.WILL_READY) {
+        this.printerService.printCheck(this.printers[0], this.table.name, this.check);
+        if (this.check.status !== CheckStatus.PASSIVE) {
+          if (this.check.type == CheckType.NORMAL) {
+            this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
+              this.router.navigate(['store']);
+            });
+            this.message.sendMessage('Hesap Yazdırıldı..');
+          }
         }
+      } else {
+        this.message.sendConfirm('Adisyon Tekrar Yazdırılsın mı?').then(isOk => {
+          if (isOk) {
+            this.printerService.printCheck(this.printers[0], this.table.name, this.check);
+          }
+        });
       }
     } else {
-      this.message.sendConfirm('Adisyon Tekrar Yazdırılsın mı?').then(isOk => {
-        if (isOk) {
-          this.printerService.printCheck(this.printers[0], this.table.name, this.check);
-        }
-      });
+      this.printerService.printCheck(this.printers[0], this.check.table_id, this.check);
     }
   }
 
@@ -904,6 +947,19 @@ export class SellingScreenComponent implements OnInit {
           });
         }
       })
+    }
+  }
+
+  setDiscount(value) {
+    this.check.discountPercent = value;
+    $('#checkDiscount').modal('hide');
+    if (this.check.type == CheckType.NORMAL) {
+      if (this.check.status !== CheckStatus.PASSIVE) {
+        this.mainService.changeData('checks', this.check._id, (doc) => {
+          doc.discountPercent = value;
+          return doc;
+        });
+      }
     }
   }
 

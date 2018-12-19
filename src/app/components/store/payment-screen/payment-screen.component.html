@@ -111,30 +111,6 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0 d-lg-none d-xl-block">
-            <!-- <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(200)"
-              class="btn btn-block cashButton ikiyuzTL">
-              200
-            </button>
-            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(100)"
-              class="btn btn-block cashButton yuzTL">
-              100
-            </button>
-            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(50)" class="btn btn-block cashButton elliTL">
-              50
-            </button>
-            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(20)" class="btn btn-block cashButton yirmiTL">
-              20
-            </button>
-            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(10)" class="btn btn-block cashButton onTL">
-              10
-            </button>
-            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(5)" class="btn btn-block cashButton besTL">
-              5
-            </button> -->
-            <!-- <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(200)"
-              class="btn btn-block cashButton btn btn-outline-warning">
-              200
-            </button> -->
             <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(100)"
               class="btn btn-block cashButton btn-outline-info">
               100
@@ -220,7 +196,8 @@
                       <i class="fa fa-chevron-down" aria-hidden="true"></i>
                     </span>
                   </button>
-                  <button disabled type="button" data-toggle="modal" data-target="#otherOptions" class="btn btn-info btn-lg mt-0">İşlemler
+                  <button [disabled]="check?.products.length !== 0 || productsWillPay.length == 0 || !permissions.discount"
+                    type="button" data-toggle="modal" data-target="#otherOptions" class="btn btn-info btn-lg mt-0">İşlemler
                   </button>
                 </div>
               </div>
@@ -296,19 +273,28 @@
 
 
 <div class="modal fade" id="otherOptions" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Hesap İşlemleri</h4>
+        <h4 class="modal-title">Alacaklı Kapat</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-
+        <div class="form-group">
+          <input #customerInput type="text" placeholder="Müşteri Adı" class="form-control form-control-lg">
+        </div>
+        <div class="form-group mb-0">
+          <input #creditNote type="text" placeholder="Cari Hesap Notu" class="form-control form-control-lg">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button class="btn btn-primary btn-lg" [disabled]="creditNote.value == '' || creditNote.value == ' ' || customerInput.value == '' || customerInput.value == ' '"
+          (click)="createCredit(customerInput.value,creditNote.value)" type="button">
+          <i class="fa fa-arrow-down" aria-hidden="true"></i> Alacaklı Kapat
+        </button>
       </div>
     </div>
   </div>

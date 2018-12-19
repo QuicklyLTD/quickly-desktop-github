@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus } from '../../../mocks/check.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType } from '../../../mocks/check.mock';
 import { Printer } from '../../../mocks/settings.mock';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
@@ -45,6 +45,8 @@ export class PaymentScreenComponent implements OnInit {
   day: number;
   changes: any;
   @ViewChild('discountInput') discountInput: ElementRef;
+  @ViewChild('customerInput') customerInput: ElementRef;
+  @ViewChild('creditNote') creditNote: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private settingsService: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
     this.route.params.subscribe(params => {
@@ -189,20 +191,15 @@ export class PaymentScreenComponent implements OnInit {
       total_discounts = this.discountAmount;
       checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), this.check.type, method);
     }
-    if (this.askForPrint) {
-      this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
-        if (isOK) {
-          this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
-        }
-      });
-    } else {
-      this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
-    }
-    if (this.check.type == 1) {
-      this.router.navigate(['/store']);
-    } else {
-      this.router.navigate(['/store']);
-    }
+    // if (this.askForPrint) {
+    //   this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
+    //     if (isOK) {
+    //       this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+    //     }
+    //   });
+    // } else {
+    //   this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+    // }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
         this.mainService.removeData('checks', this.check._id).then(res => {
@@ -214,8 +211,34 @@ export class PaymentScreenComponent implements OnInit {
         });
         this.updateSellingReport(method);
         if (this.check.type == 1) {
-          this.updateTableReport(this.check);
+          this.updateTableReport(this.check, method);
         }
+        this.router.navigate(['/store']);
+      }
+    });
+  }
+
+  createCredit(customer: string, creditNote: string) {
+    if (this.check.payment_flow !== undefined) {
+      let paymentMethod;
+      (this.check.payment_flow.length > 1) ? paymentMethod = 'Parçalı' : paymentMethod = this.check.payment_flow[0].method;
+      let checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, 0, this.userName, '', this.check.status, this.check.products, Date.now(), this.check.type, paymentMethod, this.check.payment_flow, '');
+      this.updateSellingReport(paymentMethod);
+      this.updateTableReport(this.check, paymentMethod);
+      this.mainService.addData('closed_checks', checkWillClose);
+    }
+    let newCredit = new Check(customer, this.priceWillPay, CheckStatus.PASSIVE, this.userName, creditNote, 0, this.productsWillPay, Date.now(), CheckType.PASSIVE);
+    this.mainService.addData('credits', newCredit).then(res => {
+      if (res.ok) {
+        if (this.check.type == 1) {
+          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        }
+        this.mainService.removeData('checks', this.check._id).then(res => {
+          if (res.ok) {
+            $('#otherOptions').modal('hide');
+            this.router.navigate(['/store']);
+          }
+        })
       }
     });
   }
@@ -366,7 +389,7 @@ export class PaymentScreenComponent implements OnInit {
           reportWillChange.weekly[this.day] += obj.amount;
           reportWillChange.update_time = Date.now();
           if (this.check.payment_flow.length == index + 1) {
-            sellingReports.forEach((report, dd) => {
+            sellingReports.forEach((report) => {
               if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
                 this.mainService.updateData('reports', report._id, report);
               }
@@ -377,14 +400,24 @@ export class PaymentScreenComponent implements OnInit {
     }
   }
 
-  updateTableReport(check: Check) {
+  updateTableReport(check: Check, method: string) {
     this.mainService.getAllBy('reports', { connection_id: check.table_id }).then(res => {
       let report = res.docs[0];
-      report.count++;
-      report.amount += this.currentAmount;
-      report.update_time = Date.now();
-      report.weekly[this.day] += this.currentAmount;
-      report.weekly_count[this.day]++;
+      if (method !== 'Parçalı') {
+        report.count++;
+        report.amount += this.currentAmount;
+        report.update_time = Date.now();
+        report.weekly[this.day] += this.currentAmount;
+        report.weekly_count[this.day]++;
+      } else {
+        report.count++;
+        report.weekly_count[this.day]++;
+        report.update_time = Date.now();
+        this.check.payment_flow.forEach((obj, index) => {
+          report.amount += obj.amount;
+          report.weekly[this.day] += obj.amount;
+        });
+      }
       this.mainService.updateData('reports', report._id, report);
     });
   }
@@ -402,6 +435,9 @@ export class PaymentScreenComponent implements OnInit {
         this.check_id = this.id;
         this.check_type = 'Fast';
         this.table = (this.check.note == '' ? 'Hızlı Satış' : this.check.note);
+      }
+      if (this.check.discountPercent) {
+        this.setDiscount(this.check.discountPercent);
       }
       this.canceledProducts = this.check.products.filter(obj => obj.status == 3);
       this.check.products = this.check.products.filter(obj => obj.status == 2);

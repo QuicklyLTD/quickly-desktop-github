@@ -10,6 +10,7 @@ export class Check {
         public timestamp: number,
         public type: number,
         public payment_flow?: Array<PaymentStatus>,
+        public discountPercent?: number,
         public _id?: string,
         public _rev?: string
     ) { }
