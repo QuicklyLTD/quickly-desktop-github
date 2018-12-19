@@ -629,24 +629,26 @@ export class SellingScreenComponent implements OnInit {
   }
 
   updateUserReport() {
-    let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
-    if (this.check.type == CheckType.NORMAL) {
-      this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} masasına ${pricesTotal} TL tutarında sipariş girdi.`);
-    } else {
-      this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' Hızlı Satış - ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
-    }
-    this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
-      let doc = res.docs[0]
-      doc.amount += pricesTotal;
-      doc.count++;
-      doc.weekly[this.day] += pricesTotal;
-      doc.weekly_count[this.day]++;
-      if (doc.weekly_count[this.day] == 100) {
-        this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
+    if (this.newOrders.length > 0) {
+      let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
+      if (this.check.type == CheckType.NORMAL) {
+        this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' ${this.table.name} masasına ${pricesTotal} TL tutarında sipariş girdi.`);
+      } else {
+        this.logService.createLog(logType.ORDER_CREATED, this.check._id, `'${this.owner}' Hızlı Satış - ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
       }
-      doc.update_time = Date.now();
-      this.mainService.updateData('reports', doc._id, doc).then();
-    });
+      this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(res => {
+        let doc = res.docs[0]
+        doc.amount += pricesTotal;
+        doc.count++;
+        doc.weekly[this.day] += pricesTotal;
+        doc.weekly_count[this.day]++;
+        if (doc.weekly_count[this.day] == 100) {
+          this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
+        }
+        doc.update_time = Date.now();
+        this.mainService.updateData('reports', doc._id, doc).then();
+      });
+    }
   }
 
   updateProductReport(data) {
@@ -720,28 +722,9 @@ export class SellingScreenComponent implements OnInit {
   }
 
   printCheck() {
-    // this.check.products = this.check.products.filter(obj => obj.status == 2);
-    // this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
-    // if (this.table.status !== TableStatus.WILL_READY) {
-    //   this.printerService.printCheck(this.printers[0], this.table.name, this.check);
-    //   if (this.check.status !== CheckStatus.PASSIVE) {
-    //     if (this.check.type == CheckType.NORMAL) {
-    //       this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
-    //         this.router.navigate(['store']);
-    //       });
-    //       this.message.sendMessage('Hesap Yazdırıldı..');
-    //     }
-    //   }
-    // } else {
-    //   this.message.sendConfirm('Adisyon Tekrar Yazdırılsın mı?').then(isOk => {
-    //     if (isOk) {
-    //       this.printerService.printCheck(this.printers[0], this.table.name, this.check);
-    //     }
-    //   });
-    // }
-    this.check.products = this.check.products.filter(obj => obj.status == 2);
-    this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
     if (this.check.type == CheckType.NORMAL) {
+      this.check.products = this.check.products.filter(obj => obj.status == 2);
+      this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
       if (this.table.status !== TableStatus.WILL_READY) {
         this.printerService.printCheck(this.printers[0], this.table.name, this.check);
         if (this.check.status !== CheckStatus.PASSIVE) {
@@ -759,7 +742,8 @@ export class SellingScreenComponent implements OnInit {
           }
         });
       }
-    } else {
+    } else if (this.check.type == CheckType.FAST) {
+      this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
       this.printerService.printCheck(this.printers[0], this.check.table_id, this.check);
     }
   }
