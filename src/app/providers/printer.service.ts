@@ -39,17 +39,17 @@ export class PrinterService {
   }
 
   printCheck(device, table, check) {
-    let ordersArray = [];
+    let productsArray = [];
     let payedArray = [];
     check.products.forEach(element => {
-      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
+      let contains = productsArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
       if (contains) {
-        let index = ordersArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
-        ordersArray[index].total_price += element.price;
-        ordersArray[index].count++;
+        let index = productsArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        productsArray[index].total_price += element.price;
+        productsArray[index].count++;
       } else {
         let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
-        ordersArray.push(schema);
+        productsArray.push(schema);
       }
     });
     if (check.payment_flow) {
@@ -75,25 +75,25 @@ export class PrinterService {
       });
     }
     let newCheck = Object.assign({}, check);
-    newCheck.products = ordersArray;
+    newCheck.products = productsArray;
     newCheck.payed_products = payedArray;
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, '');
   }
 
   printPayment(device, table, payment) {
-    let ordersArray = [];
+    let productsArray = [];
     payment.payed_products.forEach(element => {
-      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
+      let contains = productsArray.some(obj => obj.name == element.name && obj.note == element.note);
       if (contains) {
-        let index = ordersArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
-        ordersArray[index].total_price += element.price;
-        ordersArray[index].count++;
+        let index = productsArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        productsArray[index].total_price += element.price;
+        productsArray[index].count++;
       } else {
         let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
-        ordersArray.push(schema);
+        productsArray.push(schema);
       }
     });
-    payment.payed_products = ordersArray;
+    payment.payed_products = productsArray;
     this.electron.ipcRenderer.send('printPayment', device, payment, table, this.storeLogo);
   }
 

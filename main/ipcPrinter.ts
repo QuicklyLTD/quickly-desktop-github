@@ -108,9 +108,6 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               if (check.products[prop].status !== 3) {
                 let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
-                // if (check.products[prop].note !== '') {
-                //   printer.text('      Not: ' + check.products[prop].note, '857');
-                // }
               }
             }
             printer
@@ -120,38 +117,44 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               .control('LF');
           }
           if (check.payment_flow) {
-            if (check.type == 1) {
-              printer
-                .text(fitText('Önceden Ödenen Ürünler Toplam:', check.discount + ' TL', 1), '857');
-            }
             printer
+              .size(2, 2)
+              .text('Ödenen Ürünler', '857')
               .control('LF')
               .align('lt')
+              .size(1, 1)
               .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
               .text(line);
             for (let prop in check.payed_products) {
               if (check.payed_products[prop].status !== 3) {
                 let text = fitText((check.payed_products[prop].count >= 10 ? check.payed_products[prop].count : ' ' + check.payed_products[prop].count) + ' x  ' + check.payed_products[prop].name, check.payed_products[prop].price + ' TL' + '   ' + (check.payed_products[prop].total_price.toString().length > 3 ? check.payed_products[prop].total_price : (check.payed_products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.payed_products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
-                // if (check.payed_products[prop].note !== '') {
-                //   printer.text('      Not: ' + check.payed_products[prop].note, '857');
-                // }
               }
             }
             printer
               .text(line);
-            if (check.products.length == 0) {
+            if (check.type == 1) {
               printer
-                .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
-                .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+                .text(fitText('Önceden Ödenen Ürünler Toplam:', check.discount + ' TL', 1), '857')
                 .control('LF');
             }
           }
           printer
             .align('ct')
-            .size(2, 2)
-            .control('LF')
-            .text('Toplam:  ' + check.total_price + ' TL')
+            .size(1, 1);
+          if (check.discountPercent !== undefined) {
+            printer
+              .text(fitText('Hesap Toplam:', check.total_price + ' TL', 1), '857')
+              .text(fitText(check.discountPercent + '% İndirim Tutarı:', (check.total_price * check.discountPercent) / 100 + ' TL', 1), '857')
+              .size(2, 2)
+              .control('LF')
+              .text(fitText('Son Toplam:', (check.total_price - (check.total_price * check.discountPercent) / 100) + ' TL', 2), '857');
+          } else {
+            printer
+              .size(2, 2)
+              .text('Toplam:  ' + check.total_price + ' TL');
+          }
+          printer
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
@@ -386,9 +389,9 @@ function textPad(first, second, lineWidth, diffWidth) {
   return textToReturn;
 }
 
-function fitText(header, text, number) {
-  header = header.replace('ş', 's').replace('ğ', 'g');
-  let space = 48 / number;
+function fitText(header, text, size) {
+  header = header.replace('ş', 's').replace('ğ', 'g').replace('İ', 'I');
+  let space = 48 / size;
   let middleSpace = repeat(' ', space - text.toString().length - header.toString().length);
   let fixed = header + middleSpace + text;
   return fixed;
