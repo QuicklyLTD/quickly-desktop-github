@@ -126,12 +126,12 @@ export class MainService {
   }
 
   removeData(db: string, id: string) {
-    return this.LocalDB[db].get(id).then((doc) => {
-      this.LocalDB['allData'].get(id).then((doc) => {
-        this.LocalDB['allData'].remove(doc).catch(err => {
-          console.log('removeData-All', err);
-        });
+    this.LocalDB['allData'].get(id).then((doc) => {
+      this.LocalDB['allData'].remove(doc).catch(err => {
+        console.log('removeData-All', err);
       });
+    });
+    return this.LocalDB[db].get(id).then((doc) => {
       return this.LocalDB[db].remove(doc).catch(err => {
         console.log('removeData-Local', err);
       });
@@ -345,10 +345,12 @@ export class MainService {
   }
 
   syncToServer() {
-    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, { live: true, retry: true, heartbeat: 2500 , back_off_function: (delay) => {
-      delay = 1000;
-      return delay;
-    } })
+    return PouchDB.sync(this.LocalDB['allData'], this.ServerDB, {
+      live: true, retry: true, heartbeat: 2500, back_off_function: (delay) => {
+        delay = 1000;
+        return delay;
+      }
+    })
       .on('change', (sync) => { this.handleChanges(sync) })
     // .on('active', () => { console.log('Server Active') })
     // .on('paused', (err) => { console.log('Server Paused', err) })
