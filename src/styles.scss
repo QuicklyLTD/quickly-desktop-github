@@ -237,8 +237,12 @@ input[type="checkbox"]{
         }
     }
     .subCatInput{
-        width:70.8%;
+        width:70.5%;
         min-height:51px;
+        img{
+            display: block;
+            height: 80px;
+        }
     }
 }
 
@@ -249,8 +253,11 @@ input[type="checkbox"]{
         }
     }
     .subCatInput{
-        width:78.7%;
+        width:78.6%;
         min-height:51px;
+        img{
+            display: block;
+        }
     }
 }
 
@@ -293,7 +300,7 @@ td , th{
 
 /* width */
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 10px;
 }
 
 /* Track */
