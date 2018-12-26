@@ -1,6 +1,6 @@
 <div class="row">
   <div id="settings-holder" class="col-lg-2">
-    <div class="card">
+    <!-- <div class="card">
       <div class="card-body text-center" [ngClass]="{'bg-danger text-white':selected == 1}" (click)="selected = 1">
         <h3 class="card-title">
           <i class="fa fa-users"></i>
@@ -32,13 +32,86 @@
         <p class="card-text">Stok Ayarları</p>
       </div>
     </div>
-
     <div class="card mt-3" [ngClass]="{'bg-danger text-white':selected == 3}" (click)="selected = 3">
       <div class="card-body text-center">
         <h3 class="card-title">
           <i class="fa fa-cogs"></i>
         </h3>
         <p class="card-text">Program Ayarları</p>
+      </div>
+    </div> -->
+
+
+    <div class="card">
+      <div class="card-body" [ngClass]="{'bg-danger text-white':selected == 1}" (click)="selected = 1">
+        <h2>
+          <i class="fa fa-users"></i>
+          <span>Kullanıcılar</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 2}" (click)="selected = 2">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-glass"></i>
+          <span>Ürünler</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 3}" (click)="selected = 3">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-cutlery"></i>
+          <span>Masalar</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 4}" (click)="selected = 4">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-truck"></i>
+          <span>Stoklar</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 5}" (click)="selected = 5">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-sticky-note"></i>
+          <span>Reçeteler</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 6}" (click)="selected = 6">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-book"></i>
+          <span>Müşteriler</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 7}" (click)="selected = 7">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-print"></i>
+          <span>Yazıcılar</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 8}" (click)="selected = 8">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-server"></i>
+          <span>Sunucular</span>
+        </h2>
+      </div>
+    </div>
+    <div class="card" [ngClass]="{'bg-danger text-white':selected == 9}" (click)="selected = 9">
+      <div class="card-body">
+        <h2>
+          <i class="fa fa-cogs"></i>
+          <span>Ayarlar</span>
+        </h2>
       </div>
     </div>
   </div>
@@ -56,9 +129,15 @@
         </div>
         <app-user-settings *ngIf="selected == 1"></app-user-settings>
         <app-menu-settings *ngIf="selected == 2"></app-menu-settings>
-        <app-application-settings *ngIf="selected == 3"></app-application-settings>
-        <app-restaurant-settings *ngIf="selected == 4"></app-restaurant-settings>
+        <app-restaurant-settings *ngIf="selected == 3"></app-restaurant-settings>
+        <app-stock-settings *ngIf="selected == 4"></app-stock-settings>
+        <!-- 
         <app-stock-settings *ngIf="selected == 5"></app-stock-settings>
+        <app-stock-settings *ngIf="selected == 6"></app-stock-settings>
+        <app-stock-settings *ngIf="selected == 7"></app-stock-settings>
+        <app-stock-settings *ngIf="selected == 8"></app-stock-settings> 
+        -->
+        <app-application-settings *ngIf="selected == 9"></app-application-settings>
       </div>
     </div>
   </div>

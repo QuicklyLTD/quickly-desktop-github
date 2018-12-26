@@ -41,11 +41,11 @@
           <div *ngFor="let check of checks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
             <div class="card bg-info tableCard">
               <div class="card-body p-3">
-                <h1 class="card-title long-name mb-0">Hızlı Hesap</h1>
+                <h1 class="card-title long-name mb-0">{{check.note}}</h1>
                 <p class="card-text">
                   <i class="fa fa-user" aria-hidden="true"></i> {{check.owner}}
                   <br>
-                  <i class="fa fa-sticky-note"></i> {{check.note}}
+                  <i class="fa fa-clock-o"></i> {{check.timestamp | date:'HH:mm'}}
                 </p>
               </div>
             </div>
@@ -55,7 +55,7 @@
     </div>
   </div>
   <div id="floorHolder" class="col-lg-2">
-    <div class="card mb-2" [routerLink]="['/selling-screen','Fast', 'New']" class="card mb-2 bg-info text-white">
+    <div class="card" [routerLink]="['/selling-screen','Fast', 'New']" class="mb-2 bg-info text-white">
       <div class="card-body">
         <h2><i class="fa fa-sticky-note" aria-hidden="true"></i> Hızlı Hesap</h2>
       </div>

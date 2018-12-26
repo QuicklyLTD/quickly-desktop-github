@@ -58,7 +58,7 @@ export class ReportsComponent implements OnInit {
       legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
       elements: {
         line: {
-          tension: 0,
+          tension: 0.5,
         }
       },
       scales: {

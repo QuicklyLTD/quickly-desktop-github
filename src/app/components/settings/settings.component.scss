@@ -1,3 +1,45 @@
 .logo{
     width: 300px;
 }
+
+
+
+@media screen and (min-width: 900px) {
+    #settings-holder{
+        .card{
+            height: 70px;
+            margin-bottom: 6px;
+        }
+        .card-body{
+            padding: 23px 5px 20px 10px;
+        }
+        h2{
+            font-size: 17px;
+            margin-bottom: 0;
+            i{
+                width: 14%;
+                text-align: center;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    #settings-holder{
+        .card{
+            height: 70px;
+            margin-bottom: 6px;
+        }
+        .card-body{
+            padding: 22px 5px 20px 10px;
+        }
+        h2{
+            font-size: 22px;
+            margin-bottom: 0;
+            i{
+                width: 13%;
+                text-align: center;
+            }
+        }
+    }
+}
