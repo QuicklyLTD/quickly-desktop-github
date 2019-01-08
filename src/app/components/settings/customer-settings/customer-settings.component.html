@@ -1,0 +1,219 @@
+<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#customers" role="tab">
+      <i class="fa fa-user-circle" aria-hidden="true"></i> Müşteriler</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#accounts" role="tab">
+      <i class="fa fa-address-card" aria-hidden="true"></i> Hesaplar</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#credits" role="tab">
+      <i class="fa fa-envelope-open" aria-hidden="true"></i> Krediler</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#cards" role="tab">
+      <i class="fa fa-credit-card" aria-hidden="true"></i> Kartlar</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- <div class="tab-pane active" id="groups" role="tabpanel">
+        <div class="card ntb">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-lg-8">
+                <h5 class="mt-2">Kullanıcı Grupları</h5>
+              </div>
+              <div class="col-lg-4 pr-2 pl-0">
+                <button class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#groupModal">
+                  <i class="fa fa-plus"></i> Kullanıcı Grubu Ekle
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0 tab-height">
+            <div class="row">
+              <div class="col-lg-3 pr-0">
+                <div class="card tab-inside-height">
+                  <div class="card-header">
+                    Gruplar
+                  </div>
+                  <div class="card-body p-0 flow">
+                    <div class="list-group">
+                      <div *ngFor="let item of groups" class="btn-group btn-group-justify">
+                        <button (click)="getGroup(item._id)" [ngClass]="{'list-group-item-warning' : selectedGroup == item._id}"
+                          type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-9 pl-0">
+                <form #groupDetailForm="ngForm" (ngSubmit)="updateGroup(groupDetailForm)">
+                  <div class="card tab-inside-height">
+                    <div class="card-header">
+                      Ayrıntılar
+                    </div>
+                    <div class="card-body p-2 flow">
+                      <h1 *ngIf="selectedGroup == undefined" class="text-center mt-5">Listeden Grup Seçiniz</h1>
+                      <div [hidden]="selectedGroup == undefined">
+                        <input type="hidden" name="_id" ngModel />
+                        <input type="hidden" name="_rev" ngModel />
+                        <input type="hidden" name="status" ngModel />
+                        <input type="hidden" name="timestamp" ngModel />
+                        <div class="form-group mb-2">
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                              <div class="input-group-text">Grup Adı</div>
+                            </div>
+                            <input type="text" name="name" class="form-control form-control-lg" ngModel />
+                          </div>
+                        </div>
+                        <div class="form-group mb-2">
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                              <div class="input-group-text">Grup Açıklaması</div>
+                            </div>
+                            <input type="text" name="description" class="form-control form-control-lg" ngModel />
+                          </div>
+                        </div>
+                        <h5 class="mt-4">Erişim Hakları</h5>
+                        <table class="table table-bordered text-center mb-0">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Satış</th>
+                              <th class="text-center">Kasa</th>
+                              <th class="text-center">Gün Sonu</th>
+                              <th class="text-center">Raporlar</th>
+                              <th class="text-center">Ayarlar</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class="text-center">
+                              <td>
+                                <input type="checkbox" name="store" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="cashbox" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="endoftheday" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="reports" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="settings" class="form-control" ngModel />
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <h5 class="mt-3">Grup İzinleri</h5>
+                        <table class="table table-bordered text-center">
+                          <thead>
+                            <tr>
+                              <th width="20%" class="text-center">Hesap İptal</th>
+                              <th width="20%" class="text-center">Ürün İptal</th>
+                              <th width="20%" class="text-center">Ödeme</th>
+                              <th width="20%" class="text-center">İndirim</th>
+                              <th width="20%" class="text-center">Gün Sonu</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class="text-center">
+                              <td>
+                                <input type="checkbox" name="cancelCheck" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="cancelProduct" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="payment" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="discount" class="form-control" ngModel />
+                              </td>
+                              <td>
+                                <input type="checkbox" name="end" class="form-control" ngModel />
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="card-footer" [hidden]="selectedGroup == undefined">
+                      <div class="row">
+                        <div class="col pr-1">
+                          <button type="button" (click)="removeGroup(selectedGroup)" class="btn btn-danger btn-md btn-block">
+                            <i class="fa fa-times" aria-hidden="true"></i> Grubu Sil</button>
+                        </div>
+                        <div class="col pl-1">
+                          <button type="submit" class="btn btn-success btn-md btn-block">
+                            <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+          </div>
+        </div>
+      </div> -->
+  <div class="tab-pane active" id="customers" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Müşteriler</h5>
+      </div>
+      <div class="card-body tab-height flow">
+
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="accounts" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Müşteri Hesapları</h5>
+      </div>
+      <div class="card-body tab-height flow">
+
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="credits" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Müşteri Kredileri</h5>
+      </div>
+      <div class="card-body tab-height flow">
+
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="cards" role="tabpanel">
+    <div class="card ntb">
+      <div class="card-header">
+        <h5 class="mt-2">Müşteri Kartları</h5>
+      </div>
+      <div class="card-body tab-height flow">
+
+      </div>
+      <div class="card-footer">
+        <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+</div>
