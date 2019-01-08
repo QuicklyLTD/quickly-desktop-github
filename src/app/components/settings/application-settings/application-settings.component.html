@@ -1,16 +1,20 @@
 <ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#general" role="tab">
-      <i class="fa fa-cog" aria-hidden="true"></i> Genel Ayarlar</a>
+      <i class="fa fa-cog" aria-hidden="true"></i> Program</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#printer" role="tab">
-      <i class="fa fa-print" aria-hidden="true"></i> Yazıcı Ayarları</a>
+      <i class="fa fa-print" aria-hidden="true"></i> Yazıcılar</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#server" role="tab">
-      <i class="fa fa-server" aria-hidden="true"></i> Sunucu Durumu</a>
+    <a class="nav-link" data-toggle="tab" href="#store" role="tab">
+      <i class="fa fa-briefcase" aria-hidden="true"></i> İşletme</a>
   </li>
+  <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#account" role="tab">
+        <i class="fa fa-asterisk" aria-hidden="true"></i> Hesap</a>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -28,7 +32,7 @@
       </div>
       <div class="card-body tab-height p-0">
         <div class="row">
-          <div class="col-lg-4 pr-0">
+          <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Ayarlar
@@ -51,7 +55,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-8 pl-0">
+          <div class="col-lg-9 pl-0">
             <section [hidden]="currentSection !== 'AppSettings'">
               <form #settingsForm="ngForm" (ngSubmit)="saveSettings(settingsForm)">
                 <div class="card tab-inside-height">
@@ -306,7 +310,7 @@
       </div>
       <div class="card-body tab-height p-0">
         <div class="row">
-          <div class="col-lg-4 pr-0">
+          <div class="col-lg-3 pr-0">
             <div class="card tab-inside-height">
               <div class="card-header">
                 Yazıcılar
@@ -320,7 +324,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-8 pl-0">
+          <div class="col-lg-9 pl-0">
             <form #printerDetailForm="ngForm" (ngSubmit)="updatePrinter(printerDetailForm)">
               <div class="card tab-inside-height">
                 <div class="card-header">

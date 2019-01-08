@@ -61,7 +61,7 @@
     <div class="card" [ngClass]="{'bg-danger text-white':selected == 3}" (click)="selected = 3">
       <div class="card-body">
         <h2>
-          <i class="fa fa-cutlery"></i>
+          <i class="fa fa-square"></i>
           <span>Masalar</span>
         </h2>
       </div>
@@ -77,7 +77,7 @@
     <div class="card" [ngClass]="{'bg-danger text-white':selected == 5}" (click)="selected = 5">
       <div class="card-body">
         <h2>
-          <i class="fa fa-sticky-note"></i>
+          <i class="fa fa-file"></i>
           <span>Reçeteler</span>
         </h2>
       </div>
@@ -85,7 +85,7 @@
     <div class="card" [ngClass]="{'bg-danger text-white':selected == 6}" (click)="selected = 6">
       <div class="card-body">
         <h2>
-          <i class="fa fa-book"></i>
+          <i class="fa fa-address-card"></i>
           <span>Müşteriler</span>
         </h2>
       </div>
@@ -131,9 +131,9 @@
         <app-menu-settings *ngIf="selected == 2"></app-menu-settings>
         <app-restaurant-settings *ngIf="selected == 3"></app-restaurant-settings>
         <app-stock-settings *ngIf="selected == 4"></app-stock-settings>
+        <app-recipe-settings *ngIf="selected == 5"></app-recipe-settings>
+        <app-customer-settings *ngIf="selected == 6"></app-customer-settings>
         <!-- 
-        <app-stock-settings *ngIf="selected == 5"></app-stock-settings>
-        <app-stock-settings *ngIf="selected == 6"></app-stock-settings>
         <app-stock-settings *ngIf="selected == 7"></app-stock-settings>
         <app-stock-settings *ngIf="selected == 8"></app-stock-settings> 
         -->
