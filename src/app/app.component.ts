@@ -19,7 +19,7 @@ import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.5.2';
+  version = '1.5.9';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;

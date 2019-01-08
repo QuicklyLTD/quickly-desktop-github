@@ -59,6 +59,9 @@ import { MessageComponent } from './components/helpers/message/message.component
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
 import { ButtonDirective } from './directives/button.directive';
+import { PrinterSettingsComponent } from './components/settings/printer-settings/printer-settings.component';
+import { RecipeSettingsComponent } from './components/settings/recipe-settings/recipe-settings.component';
+import { CustomerSettingsComponent } from './components/settings/customer-settings/customer-settings.component';
 
 //// Error Handler Sentry
 // import * as Raven from 'raven-js';
@@ -101,6 +104,9 @@ import { ButtonDirective } from './directives/button.directive';
     DayDetailComponent,
     ActivationComponent,
     ButtonDirective,
+    PrinterSettingsComponent,
+    RecipeSettingsComponent,
+    CustomerSettingsComponent,
   ],
   imports: [
     BrowserModule,
