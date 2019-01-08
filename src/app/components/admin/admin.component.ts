@@ -3,6 +3,7 @@ import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
 import * as fs from 'fs';
 import { ServerInfo, Settings } from '../../mocks/settings.mock';
+import { Product } from 'app/mocks/product.mock';
 
 @Component({
   selector: 'app-admin',
@@ -16,6 +17,7 @@ export class AdminComponent implements OnInit {
   selectedDoc: object;
   selectedDB: string;
   storeReports: Array<any>;
+  onCreate:boolean;
   @ViewChild('editArea') editArea: ElementRef;
 
   constructor(private mainService: MainService, private httpService: HttpService) {
@@ -56,9 +58,23 @@ export class AdminComponent implements OnInit {
     this.mainService.updateData(db_name, newDocument._id, newDocument).then(res => {
       $('#docModal').modal('hide');
       console.log('Döküman Güncellendi');
-      this.editArea.nativeElement.value == '';
+      this.editArea.nativeElement.value = '';
       this.selectedDoc = undefined;
       this.showDatabase(this.selectedDB);
+    });
+  }
+
+
+  createDocument(document) {
+    let newDocument = JSON.parse(document);
+    this.mainService.addData(this.selectedDB, newDocument).then(res => {
+      if(res.ok){
+        $('#docModal').modal('hide');
+        console.log('Döküman Güncellendi');
+        this.editArea.nativeElement.value = '';
+        this.selectedDoc = undefined;
+        this.showDatabase(this.selectedDB);
+      }
     });
   }
 
@@ -158,30 +174,56 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
-    this.mainService.getAllBy('products', {}).then(res => {
-      let products = res.docs;
-      products.forEach(element => {
-        this.mainService.changeData('products', element._id, (doc) => {
-          doc.tax_value = 8;
-          doc.barcode = 0;
-          return doc;
-        }).then(res => {
-          console.log(res);
-        });
-      });
-    })
+    localStorage.setItem('CheckNo', "1");
+    // let specifies = [
+    //   {
+    //     spec_name: "Sek",
+    //     spec_price: 70
+    //   },
+    //   {
+    //     spec_name: "Soda",
+    //     spec_price: 70
+    //   },
+    //   {
+    //     spec_name: "Kola",
+    //     spec_price: 70
+    //   },
+    //   {
+    //     spec_name: "Redbull",
+    //     spec_price: 75
+    //   }
+    // ];
+    // this.mainService.getAllBy('products', {cat_id :"ebb230e3-c297-4822-8c2b-6b11b0f9ca68"}).then(res => {
+    //   let products = res.docs;
+    //   products.forEach(element => {
+    //     this.mainService.changeData('products', element._id, (doc: Product) => {
+    //       doc.specifies = specifies;
+    //       doc.specifies.map(obj => {
+    //         if(obj.spec_name == 'Redbull'){
+    //           obj.spec_price = doc.price + 5;
+    //         }else{
+    //           obj.spec_price = doc.price;
+    //         }
+    //       });
+    //       console.log(doc);
+    //       return doc;
+    //     }).then(res => {
+    //       console.log(res);
+    //     });
+    //   });
+    // })
 
-    this.mainService.getAllBy('stocks', {}).then(res => {
-      let stocks = res.docs;
-      stocks.forEach(element => {
-        this.mainService.changeData('stocks', element._id, (doc) => {
-          doc.warning_value = 25;
-          return doc;
-        }).then(res => {
-          console.log(res);
-        });
-      });
-    })
+    // this.mainService.getAllBy('stocks', {}).then(res => {
+    //   let stocks = res.docs;
+    //   stocks.forEach(element => {
+    //     this.mainService.changeData('stocks', element._id, (doc) => {
+    //       doc.warning_value = 25;
+    //       return doc;
+    //     }).then(res => {
+    //       console.log(res);
+    //     });
+    //   });
+    // })
 
     // this.mainService.getAllBy('endday', {}).then(res => {
     //   let endday = res.docs;

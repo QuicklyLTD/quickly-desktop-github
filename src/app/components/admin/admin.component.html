@@ -7,15 +7,19 @@
           <div class="card-header">Veritabanı</div>
           <div class="card-body p-0 flow">
             <div class="btn-group-vertical btn-block btn-group-lg">
-              <button *ngFor="let db of databases" type="button" [ngClass]="{'btn-danger bg-danger text-white': selectedDB == db}" (click)="showDatabase(db)"
-                class="btn btn-secondary dark-bg">{{db}}</button>
+              <button *ngFor="let db of databases" type="button" [ngClass]="{'btn-danger bg-danger text-white': selectedDB == db}"
+                (click)="showDatabase(db)" class="btn btn-secondary dark-bg">{{db}}</button>
             </div>
           </div>
         </div>
       </div>
       <div class="col-xl-8 col-lg-6 pl-0 pr-1">
         <div class="card inside-height">
-          <div class="card-header">Dökümanlar</div>
+          <div class="card-header">Dökümanlar
+            <span class="float-right">
+              <button [disabled]="selectedDB == undefined" data-toggle="modal" data-target="#docModal" (click)="onCreate = true" class="btn btn-sm btn-warning"> + Ekle</button>
+            </span>
+          </div>
           <div class="card-body p-0 flow">
             <table class="table table-hover table-striped">
               <tbody>
@@ -44,19 +48,23 @@
           <div class="card-body p-0">
           </div>
           <div class="card-footer p-1">
-            <button [disabled]="selectedDB == undefined" (click)="resolveDB()" class="btn btn-quickly btn-md btn-block">Veritabanı Düzelt</button>
+            <button [disabled]="selectedDB == undefined" (click)="resolveDB()" class="btn btn-quickly btn-md btn-block">Veritabanı
+              Düzelt</button>
           </div>
           <div class="card-footer p-1">
-            <button [disabled]="selectedDB == undefined" (click)="clearDB()" class="btn btn-secondary btn-md btn-block">Veritabanı Boşalt</button>
+            <button [disabled]="selectedDB == undefined" (click)="clearDB()" class="btn btn-secondary btn-md btn-block">Veritabanı
+              Boşalt</button>
           </div>
           <div class="card-footer p-1">
-            <button [disabled]="selectedDB == undefined" (click)="compactDB()" class="btn btn-default btn-md btn-block">Veritabanı Sıkıştır</button>
+            <button [disabled]="selectedDB == undefined" (click)="compactDB()" class="btn btn-default btn-md btn-block">Veritabanı
+              Sıkıştır</button>
           </div>
           <div class="card-footer p-1">
             <button (click)="resetReports()" class="btn btn-danger btn-md btn-block">Raporları Sıfırla</button>
           </div>
           <div class="card-footer p-1">
-            <button (click)="syncData()" [disabled]="selectedDB == undefined || selectedDB == 'allData'" class="btn btn-warning btn-md btn-block">Senkorinize Et</button>
+            <button (click)="syncData()" [disabled]="selectedDB == undefined || selectedDB == 'allData'" class="btn btn-warning btn-md btn-block">Senkorinize
+              Et</button>
           </div>
           <div class="card-footer p-1">
             <button type="button" (click)="refreshToken()" class="btn btn-success btn-block btn-md">Erişimi Güncelle</button>
@@ -87,8 +95,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button type="button" (click)="removeDocument(selectedDoc?._id)" class="btn btn-danger btn-lg">Sil</button>
-        <button type="button" (click)="editDocument(editArea.value)" class="btn btn-success btn-lg">Kaydet</button>
+        <button *ngIf="!onCreate" type="button" (click)="removeDocument(selectedDoc?._id)" class="btn btn-danger btn-lg">Sil</button>
+        <button *ngIf="!onCreate" type="button" (click)="editDocument(editArea.value)" class="btn btn-success btn-lg">Kaydet</button>
+        <button *ngIf="onCreate" type="button" (click)="createDocument(editArea.value)" class="btn btn-success btn-lg">Oluştur</button>
       </div>
     </div>
   </div>
