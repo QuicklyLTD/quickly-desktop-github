@@ -43,6 +43,11 @@ export class DayDetailComponent implements OnInit {
     this.pieOptions = { responsive: false, legend: { labels: { fontColor: 'rgb(255, 255, 255)' } } };
     this.activityOptions = {
       responsive: false,
+      elements: {
+        line: {
+          tension: 0.5,
+        }
+      },
       legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
       scales: {
         xAxes: [{
