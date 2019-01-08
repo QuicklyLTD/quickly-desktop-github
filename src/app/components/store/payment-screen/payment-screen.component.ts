@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType } from '../../../mocks/check.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check.mock';
 import { Printer } from '../../../mocks/settings.mock';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
@@ -227,7 +227,7 @@ export class PaymentScreenComponent implements OnInit {
       this.updateTableReport(this.check, paymentMethod);
       this.mainService.addData('closed_checks', checkWillClose);
     }
-    let newCredit = new Check(customer, this.priceWillPay, CheckStatus.PASSIVE, this.userName, creditNote, 0, this.productsWillPay, Date.now(), CheckType.PASSIVE);
+    let newCredit = new Check(customer, this.priceWillPay, CheckStatus.PASSIVE, this.userName, creditNote, 0, this.productsWillPay, Date.now(), CheckType.PASSIVE, CheckNo());
     this.mainService.addData('credits', newCredit).then(res => {
       if (res.ok) {
         if (this.check.type == 1) {
