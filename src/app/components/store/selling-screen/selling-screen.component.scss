@@ -20,7 +20,7 @@
         position: absolute;
         bottom: 10px;
         right: 20px;
-        font-size: 15px;
+        font-size: 20px;
     }
 }
 .payment-flow{
@@ -55,4 +55,22 @@
 }
 .numpad{
     font-size: 22px;
+}
+.table-name{
+    font-size: 20px;
+    display: inline;
+}
+
+.proCard{
+    p.card-text{
+        .price{
+            float: left;
+            width: 50%
+        }
+        .category{
+            text-align: right;
+            float: right;
+            width: 50%
+        }
+    }
 }

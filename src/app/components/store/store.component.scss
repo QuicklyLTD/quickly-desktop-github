@@ -1,12 +1,28 @@
 #floorHolder{
+    .card{
+        height: 68.1px;
+    }
     .card-body{
-        padding: 1.076rem;
+        padding: 0.75rem;
     }
     h2{
-        font-size: 1.5vw;
+        font-size: 1.7vw;
         font-weight: bolder;
     }
 }
 .normal{
     width: auto !important;
+}
+.nav-link.active{
+        background-color: #4e5d6c;
+        border-color: #43505e;
+        border-bottom-color: #4e5d6c;
+}
+.check-card{
+    height: 288px;
+    margin-bottom: 5px;
+    .card-body{
+        height: 200px;
+        overflow: hidden;
+    }
 }
