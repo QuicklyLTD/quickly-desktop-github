@@ -9,6 +9,7 @@ export class Check {
         public products: Array<CheckProduct>,
         public timestamp: number,
         public type: number,
+        public check_no: number,
         public payment_flow?: Array<PaymentStatus>,
         public discountPercent?: number,
         public _id?: string,
@@ -71,4 +72,12 @@ export enum CheckStatus {
     READY,
     OCCUPIED,
     PROCESSING,
+}
+
+export function CheckNo(){
+    // let currentID = parseInt(localStorage.getItem('CheckNo'));
+    // let CheckNo = currentID+1;
+    // localStorage.setItem('CheckNo', CheckNo.toString());
+    let CheckNo = Math.floor(Math.random() * Math.floor(500));
+    return CheckNo;
 }
