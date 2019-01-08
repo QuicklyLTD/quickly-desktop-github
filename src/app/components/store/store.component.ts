@@ -11,19 +11,22 @@ export class StoreComponent implements OnInit {
   floors: Array<any>;
   tables: Array<any>;
   tableViews: Array<any>;
+  fastChecks: Array<any>;
   checks: Array<any>;
   selected: string;
   changes: any;
+  section: any;
 
   constructor(private mainService: MainService) {
     this.fillData();
+    this.section = 'Masalar';
   }
 
   ngOnInit() {
     this.changes = this.mainService.LocalDB['tables'].changes({ since: 'now', live: true }).on('change', (change) => {
       this.mainService.getAllBy('tables', {}).then((result) => {
         this.tables = result.docs;
-        this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
+        this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name, 'tr', { numeric: true, sensitivity: 'base' }));
         this.tableViews = this.tables;
         if (localStorage.getItem('selectedFloor')) {
           let selectedID = JSON.parse(localStorage['selectedFloor']);
@@ -35,6 +38,10 @@ export class StoreComponent implements OnInit {
 
   ngOnDestroy() {
     this.changes.cancel();
+  }
+
+  changeSection(section) {
+    this.section = section;
   }
 
   getTablesBy(id: string) {
@@ -60,8 +67,9 @@ export class StoreComponent implements OnInit {
       this.floors = result.docs;
       this.floors = this.floors.sort((a, b) => a.timestamp - b.timestamp);
     });
-    this.mainService.getAllBy('checks', { type: 2 }).then(res => {
+    this.mainService.getAllBy('checks', {}).then(res => {
       this.checks = res.docs;
+      this.fastChecks = this.checks.filter(obj => obj.type == 2);
     })
     this.mainService.getAllBy('tables', {}).then((result) => {
       this.tables = result.docs;
