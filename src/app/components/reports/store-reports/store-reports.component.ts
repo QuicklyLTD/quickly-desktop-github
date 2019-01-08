@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Check, ClosedCheck, PaymentStatus } from '../../../mocks/check.mock';
+import { Check, ClosedCheck, PaymentStatus, CheckType, CheckStatus, CheckNo } from '../../../mocks/check.mock';
 import { Log } from '../../../mocks/log.mock';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
@@ -106,9 +106,9 @@ export class StoreReportsComponent implements OnInit {
       check.payment_flow.forEach(element => {
         discount += element.amount;
       });
-      checkWillReOpen = new Check('Hızlı Satış', 0, discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), 2, check.payment_flow);
+      checkWillReOpen = new Check('Hızlı Satış', 0, discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), CheckType.FAST, CheckNo(), check.payment_flow);
     } else {
-      checkWillReOpen = new Check('Hızlı Satış', check.total_price, check.discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), 2, check.payment_flow);
+      checkWillReOpen = new Check('Hızlı Satış', check.total_price, check.discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), CheckType.FAST, CheckNo(), check.payment_flow);
     }
     this.mainService.addData('checks', checkWillReOpen).then(res => {
       this.mainService.removeData('closed_checks', check._id).then(res => {

@@ -35,7 +35,8 @@
               <small class="mt-2">
                 <span *ngIf="stock.left_total > 0"> Kalan : {{stock.left_total | number:'1.0-2'}} {{stock.unit}}</span>
                 <span *ngIf="stock.left_total <= 0" class="text-danger">Tükendi!</span>
-                <span class="pull-right text-muted mt-1">Stok Durumu: {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-2'}}%</span>
+                <span class="pull-right text-muted mt-1">Stok Durumu:
+                  {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-2'}}%</span>
               </small>
             </div>
           </div>
@@ -68,7 +69,7 @@
             <tr *ngFor="let stock of allStocks; let i = index;">
               <td>{{i+1}}</td>
               <td>{{stock.name}}</td>
-              <td>{{stock.first_quantity}}x</td>
+              <td>{{stock.first_quantity | number: '1.0-2'}}x</td>
               <td>{{stock.total*stock.first_quantity | number:'1.0-2'}} </td>
               <td>{{stock.unit}}</td>
               <td class="table-info">{{stock.total*stock.first_quantity - stock.left_total | number:'1.0-2' }}</td>
