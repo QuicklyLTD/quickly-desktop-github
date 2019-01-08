@@ -1,13 +1,15 @@
 <div class="row">
   <div class="col-xl-12">
     <div class="card full-height">
-      <div class="card-header">
+      <div class="card-header border-bottom-0">
         <div class="row">
           <div class="col-xl-8 col-lg-7">
             <div class="row">
               <div class="col-lg-8">
-                <span *ngIf="check?.type == 1">Masa:</span>
-                <b>{{check?.table_id | general:'tables' | async}}</b>
+                <div class="table-name">
+                  <span *ngIf="check?.type == 1">Masa:</span>
+                  <b>{{check?.table_id | general:'tables' | async}}</b>
+                </div>
                 <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-muted">(
                   {{check.note}}
                   )
@@ -71,10 +73,13 @@
                           <div class="card-body">
                             <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
                             <p class="card-text text-danger">
-                              <i class="fa fa-money"></i>
-                              <b> {{product.price}} TL</b>
-                              <small class="float-right mt-1 text-white">{{product.cat_id | general:'categories':'name'
-                                | async}}</small>
+                              <span class="price">
+                                <i class="fa fa-money"></i>
+                                <b> {{product.price}} TL</b>
+                              </span>
+                              <small class="category mt-1 text-white">
+                                {{product.cat_id | general:'categories':'name'| async}}
+                              </small>
                             </p>
                           </div>
                         </div>
@@ -100,7 +105,7 @@
                     <div class="product-name">
                       <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
                       {{item.name}}
-                      <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
+                      <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
                     </div>
                     <div class="product-price">{{item.price | number:'1.0-2' }} TL</div>
                   </div>
@@ -146,7 +151,7 @@
               <div class="card-footer p-2">
                 <p class="text-primary mb-0">
                   <strong>Hesap Toplamı:
-                    <span class="pull-right">{{check.total_price | number:'1.0-2'}} TL</span>
+                    <span class="pull-right">{{check.total_price + check.discount | number:'1.0-2'}} TL</span>
                   </strong>
                 </p>
                 <p *ngIf="check.discount > 0" class="text-muted mb-0"> Ödenen Miktar:
@@ -159,8 +164,13 @@
                 </p>
                 <p *ngIf="check.discount > 0 || check.discountPercent !== undefined" class="mb-0">
                   <strong>Kalan Toplam:
-                    <span class="pull-right">{{check.total_price - (check.total_price * (check.discountPercent ?
-                      check.discountPercent : 0 ))/100 | number:'1.0-2'}} TL</span>
+                    <span class="pull-right">
+                      {{check.total_price - (check.total_price *(check.discountPercent ? check.discountPercent : 0 ))/100 | number:'1.0-2'}} TL</span>
+                  </strong>
+                </p>
+                <p class="text-warning mb-0">
+                  <strong>Adisyon No:
+                    <span class="pull-right">{{check.check_no}}</span>
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block mt-2" data-toggle="buttons">
@@ -220,6 +230,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button type="button" (click)="dontGive()" class="btn btn-warning btn-lg">Verme</button>
           <button type="button" (click)="makeGift()" class="btn btn-danger btn-lg">İkram</button>
           <button type="submit" class="btn btn-primary btn-lg">Not Ekle</button>
         </div>
@@ -242,7 +253,7 @@
         <div class="row">
           <div *ngFor="let spec of productSpecs" class="col pr-2 pl-2 mb-2">
             <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="changeSpecs(spec)">{{spec.spec_name}}
-              <small class="spec-price">{{spec.spec_price}} TL</small>
+              <b class="spec-price">{{spec.spec_price}} TL</b>
             </button>
           </div>
         </div>
@@ -452,7 +463,8 @@
             </button>
           </div>
           <div class="col pr-2 pl-2">
-            <button data-toggle="modal" data-dismiss="modal" data-target="#checkDiscount" class="btn btn-secondary text-danger border-danger btn-block btn-lg sellButton">
+            <button [disabled]="!permissions.discount" data-toggle="modal" data-dismiss="modal" data-target="#checkDiscount"
+              class="btn btn-secondary text-danger border-danger btn-block btn-lg sellButton">
               <i class="fa fa-arrow-down"></i>
               <p class="mt-1 mb-1">
                 <b>İndirim Yap</b>

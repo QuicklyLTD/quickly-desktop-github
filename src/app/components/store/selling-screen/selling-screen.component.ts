@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType } from '../../../mocks/check.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check.mock';
 import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../mocks/product.mock';
 import { PaymentMethod, Printer } from '../../../mocks/settings.mock';
 import { Floor, Table, TableStatus } from '../../../mocks/table.mock';
@@ -82,13 +82,13 @@ export class SellingScreenComponent implements OnInit {
       this.id = params['id'];
       this.type = params['type'];
       if (this.type == 'Normal') {
-        this.check = new Check(this.id, 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.NORMAL);
+        this.check = new Check(this.id, 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.NORMAL, CheckNo());
         this.getCheck({ table_id: this.id });
       } else {
         if (this.id == 'New') {
-          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST);
+          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
         } else {
-          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST);
+          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
           this.getCheck({ _id: this.id });
         }
       }
@@ -186,6 +186,9 @@ export class SellingScreenComponent implements OnInit {
         $('#specsModal').modal('show');
       }
     }
+    setTimeout(() => {
+      $('.check-flow').scrollTop(999999);
+    }, 200)
   }
 
   numpadToCheck() {
@@ -473,6 +476,13 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
+  dontGive() {
+    if (this.selectedProduct != undefined) {
+      this.check.products[this.selectedIndex].note = 'Verme';
+      $('#noteModal').modal('hide');
+    }
+  }
+
   addCheckNote(form: NgForm) {
     let note = form.value.description;
     if (note == '' || note == null || note == ' ') {
@@ -708,7 +718,7 @@ export class SellingScreenComponent implements OnInit {
           if (index == orders.length - 1) {
             let table_name;
             if (this.check.type == CheckType.FAST) {
-              table_name = 'Hızlı Satış';
+              table_name = this.check.note;
             } else {
               table_name = this.table.name;
             }
@@ -744,7 +754,7 @@ export class SellingScreenComponent implements OnInit {
       }
     } else if (this.check.type == CheckType.FAST) {
       this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
-      this.printerService.printCheck(this.printers[0], this.check.table_id, this.check);
+      this.printerService.printCheck(this.printers[0], this.check.note, this.check);
     }
   }
 
@@ -766,7 +776,7 @@ export class SellingScreenComponent implements OnInit {
     if (this.selectedTable.status == TableStatus.ACTIVE) {
       this.message.sendConfirm(`${this.selectedProduct.name}, ${this.selectedTable.name} Masasına Aktarılacak ve Yeni Hesap Açılacak.`).then(isOk => {
         if (isOk) {
-          let newCheck = new Check(this.selectedTable._id, this.selectedProduct.price, 0, this.owner, '', 1, [this.selectedProduct], Date.now(), 1);
+          let newCheck = new Check(this.selectedTable._id, this.selectedProduct.price, 0, this.owner, '', 1, [this.selectedProduct], Date.now(), CheckType.NORMAL, CheckNo());
           this.mainService.addData('checks', newCheck).then(res => {
             if (res.ok) {
               this.check.products.splice(this.selectedIndex, 1);
