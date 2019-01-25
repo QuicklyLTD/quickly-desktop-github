@@ -262,6 +262,7 @@
             <input name="_rev" type="hidden" ngModel />
             <input name="first_quantity" type="hidden" ngModel />
             <input name="warning_limit" type="hidden" ngModel />
+            <input type="hidden" name="quantity" class="form-control form-control-lg" ngModel>
           </div>
           <div class="row">
             <div class="col-lg-12">
@@ -309,12 +310,20 @@
                   <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
                 </select>
               </div>
-              <div class="input-group">
+              <div *ngIf="!onUpdate" class="input-group">
                 <div class="input-group-prepend">
                   <div class="input-group-text">Adet</div>
                 </div>
-                <input [readonly]='onUpdate' type="number" name="quantity" class="form-control form-control-lg" ngModel>
+                <input type="number" name="quantity" class="form-control form-control-lg" ngModel>
               </div>
+
+              <!-- <div class="input-group">
+                <div *ngIf="!onUpdate" class="input-group-prepend">
+                  <div class="input-group-text">Adet</div>
+                </div>
+                <input type="number" name="quantity" class="form-control form-control-lg" [readonly]='onUpdate' ngModel>
+              </div> -->
+
               <div class="input-group">
                 <div class="input-group-prepend">
                   <div class="input-group-text">Miktar</div>
