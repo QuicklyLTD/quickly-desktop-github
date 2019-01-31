@@ -21,6 +21,14 @@
 .check-card{
     height: 288px;
     margin-bottom: 5px;
+    .card-header{
+        span.float-left{
+            width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
     .card-body{
         height: 200px;
         overflow: hidden;
