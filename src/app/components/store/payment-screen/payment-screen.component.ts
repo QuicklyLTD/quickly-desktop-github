@@ -191,15 +191,15 @@ export class PaymentScreenComponent implements OnInit {
       total_discounts = this.discountAmount;
       checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), this.check.type, method);
     }
-    // if (this.askForPrint) {
-    //   this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
-    //     if (isOK) {
-    //       this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
-    //     }
-    //   });
-    // } else {
-    //   this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
-    // }
+    if (this.askForPrint) {
+      this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
+        if (isOK) {
+          this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+        }
+      });
+    } else {
+      this.printerService.printCheck(this.printers[0], this.table, checkWillClose);
+    }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
         this.mainService.removeData('checks', this.check._id).then(res => {

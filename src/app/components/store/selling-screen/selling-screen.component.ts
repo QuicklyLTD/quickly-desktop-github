@@ -351,23 +351,23 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner} tarafından ${this.table.name} Masası ${this.check.total_price} TL '${method}' ödeme alınarak kapatıldı.`)
     }
-    // if (this.askForCheckPrint) {
-    //   this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
-    //     if (isOK) {
-    //       if (this.check.type == CheckType.NORMAL) {
-    //         this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
-    //       } else {
-    //         this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
-    //       }
-    //     }
-    //   });
-    // } else {
-    //   if (this.check.type == CheckType.NORMAL) {
-    //     this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
-    //   } else {
-    //     this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
-    //   }
-    // }
+    if (this.askForCheckPrint) {
+      this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
+        if (isOK) {
+          if (this.check.type == CheckType.NORMAL) {
+            this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+          } else {
+            this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
+          }
+        }
+      });
+    } else {
+      if (this.check.type == CheckType.NORMAL) {
+        this.printerService.printCheck(this.printers[0], this.table.name, checkWillClose);
+      } else {
+        this.printerService.printCheck(this.printers[0], this.check.table_id, checkWillClose);
+      }
+    }
     this.message.sendMessage(`Hesap ${this.check.total_price} TL tutarında ödeme alınarak kapatıldı`);
   }
 
