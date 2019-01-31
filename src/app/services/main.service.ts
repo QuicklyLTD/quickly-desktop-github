@@ -274,7 +274,7 @@ export class MainService {
   loadAppData() {
     return new Promise((resolve, reject) => {
       this.getAllBy('allData', {}).then(res => {
-        const docs = res.docs;
+        let docs = res.docs;
         if (docs.length > 0) {
           docs.forEach((element, index) => {
             let db = element.db_name;

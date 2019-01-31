@@ -92,7 +92,25 @@ export class AppComponent implements OnInit {
                   this.router.navigate(['']);
                 }
               }).catch(err => {
-                console.log(err);
+                this.electronService.fileSystem
+                  .readFile('./data/db.dat', (err, data) => {
+                    const rdata = JSON.parse(data.toString('utf-8'));
+                    this.mainService.destroyDB('allData').then(res => {
+                      if (res.ok) {
+                        this.mainService.initDatabases();
+                        setTimeout(() => {
+                          this.mainService.putAll('allData', rdata).then(res => {
+                            console.log(res);
+                            this.electronService.reloadProgram();
+                          }).catch(err => {
+                            this.electronService.reloadProgram();
+                          })
+                        }, 2500)
+                      }
+                    }).catch(err => {
+                      console.error(err);
+                    });
+                  })
               });
             }
             if (this.serverSettings.type == 1) {
