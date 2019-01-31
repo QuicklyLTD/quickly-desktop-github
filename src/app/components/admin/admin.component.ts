@@ -17,7 +17,7 @@ export class AdminComponent implements OnInit {
   selectedDoc: object;
   selectedDB: string;
   storeReports: Array<any>;
-  onCreate:boolean;
+  onCreate: boolean;
   @ViewChild('editArea') editArea: ElementRef;
 
   constructor(private mainService: MainService, private httpService: HttpService) {
@@ -42,7 +42,7 @@ export class AdminComponent implements OnInit {
   }
 
   showDocument(doc) {
-    this.editArea.nativeElement.value == '';
+    // this.editArea.nativeElement.value == '';
     this.selectedDoc = doc;
     $('#docModal').modal('show');
   }
@@ -68,7 +68,7 @@ export class AdminComponent implements OnInit {
   createDocument(document) {
     let newDocument = JSON.parse(document);
     this.mainService.addData(this.selectedDB, newDocument).then(res => {
-      if(res.ok){
+      if (res.ok) {
         $('#docModal').modal('hide');
         console.log('Döküman Güncellendi');
         this.editArea.nativeElement.value = '';
@@ -174,7 +174,7 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
-    localStorage.setItem('CheckNo', "1");
+    // localStorage.setItem('CheckNo', "1");
     // let specifies = [
     //   {
     //     spec_name: "Sek",
@@ -232,6 +232,20 @@ export class AdminComponent implements OnInit {
     //       let time = doc.time;
     //       delete doc.time;
     //       doc.timestamp = time;
+    //       return doc;
+    //     }).then(res => {
+    //       console.log(res);
+    //     });
+    //   });
+    // })
+
+    // this.mainService.getAllBy('reports', { type: 'Product' }).then(res => {
+    //   let reports = res.docs;
+    //   console.log(res);
+    //   reports.forEach(element => {
+    //     this.mainService.changeData('reports', element._id, (doc) => {
+    //       doc.weekly[0] = 0;
+    //       doc.weekly_count[0] = 0;
     //       return doc;
     //     }).then(res => {
     //       console.log(res);
