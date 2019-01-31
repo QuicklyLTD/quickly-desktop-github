@@ -9,9 +9,11 @@ import { MainService } from '../../../services/main.service';
   styleUrls: ['./stock-reports.component.scss']
 })
 export class StockReportsComponent implements OnInit {
+  stocksView: Array<Stock>;
   allStocks: Array<Stock>;
   allCats: Array<StockCategory>;
   stockLogs: Array<Log>;
+  selectedCat: string;
 
   constructor(private mainService: MainService) { }
 
@@ -19,10 +21,17 @@ export class StockReportsComponent implements OnInit {
     this.fillData();
   }
 
+  getStocksByCategory(cat_id) {
+    this.stocksView = this.allStocks.filter(obj => obj.cat_id == cat_id);
+    this.selectedCat = cat_id;
+  }
+
   fillData() {
+    this.selectedCat = undefined;
     this.mainService.getAllBy('stocks', {}).then(result => {
       this.allStocks = result.docs;
       this.allStocks = this.allStocks.sort((b, a) => (b.left_total / (b.total * b.first_quantity)) * 100 - (a.left_total / (a.total * a.first_quantity)) * 100);
+      this.stocksView = this.allStocks.sort((b, a) => (b.left_total / (b.total * b.first_quantity)) * 100 - (a.left_total / (a.total * a.first_quantity)) * 100);
     });
     this.mainService.getAllBy('stocks_cat', {}).then(result => {
       this.allCats = result.docs;

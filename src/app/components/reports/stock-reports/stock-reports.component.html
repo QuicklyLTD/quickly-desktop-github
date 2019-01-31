@@ -19,25 +19,50 @@
       <div class="card-header">
         <h5 class="mt-2">Stok Durumu</h5>
       </div>
-      <div class="card-body tab-height p-0 flow">
+      <div class="card-body tab-height p-0">
         <div class="row">
-          <div *ngFor="let stock of allStocks" class="col-lg-6 stocksCard">
-            <div class="bodyquote">
-              <p class="mb-2">
-                <strong [ngClass]="{'text-danger': stock.left_total <= 0}">{{stock.name}}</strong>
-                <small>({{stock.cat_id | general:'stocks_cat' | async}})</small>
-              </p>
-              <div class="progress">
-                <div [ngClass]="{'bg-danger':stock.warning_limit >= stock.left_total}" class="progress-bar bg-warning progress-bar-striped"
-                  role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.first_quantity) | percent:'1.0-1'}"
-                  [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
+          <div class="col-lg-3 pr-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">Kategoriler</div>
+              <div class="card-body p-0 flow">
+                <button type="button" (click)="fillData();" [ngClass]="{'list-group-item-warning' : selectedCat == undefined}"
+                  class="list-group-item list-group-item-action list-eq">
+                  Bütün Stoklar
+                </button>
+                <button *ngFor="let cat of allCats" type="button" [ngClass]="{'list-group-item-warning' : selectedCat == cat._id}"
+                  (click)="getStocksByCategory(cat._id)" class="list-group-item list-group-item-action list-eq">
+                  {{cat.name}}
+                </button>
               </div>
-              <small class="mt-2">
-                <span *ngIf="stock.left_total > 0"> Kalan : {{stock.left_total | number:'1.0-2'}} {{stock.unit}}</span>
-                <span *ngIf="stock.left_total <= 0" class="text-danger">Tükendi!</span>
-                <span class="pull-right text-muted mt-1">Stok Durumu:
-                  {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-2'}}%</span>
-              </small>
+            </div>
+          </div>
+          <div class="col-lg-9 pl-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">Stoklar</div>
+              <div class="card-body p-0 flow">
+                <div class="row">
+                  <div *ngFor="let stock of stocksView" class="col-lg-6 stocksCard">
+                    <div class="bodyquote">
+                      <p class="mb-2">
+                        <strong [ngClass]="{'text-danger': stock.left_total <= 0}">{{stock.name}}</strong>
+                        <small>({{stock.cat_id | general:'stocks_cat' | async}})</small>
+                      </p>
+                      <div class="progress">
+                        <div [ngClass]="{'bg-danger':stock.warning_limit >= stock.left_total}" class="progress-bar bg-warning progress-bar-striped"
+                          role="progressbar" style="height: 20px;" [ngStyle]="{width:stock.left_total/(stock.total*stock.first_quantity) | percent:'1.0-1'}"
+                          [attr.aria-valuenow]="stock.left_total" aria-valuemin="0" [attr.aria-valuemax]="stock.total"></div>
+                      </div>
+                      <small class="mt-2">
+                        <span *ngIf="stock.left_total > 0"> Kalan : {{stock.left_total | number:'1.0-2'}}
+                          {{stock.unit}}</span>
+                        <span *ngIf="stock.left_total <= 0" class="text-danger">Tükendi!</span>
+                        <span class="pull-right text-muted mt-1">Stok Durumu:
+                          {{(stock.left_total/(stock.total*stock.first_quantity))*100 | number: '1.0-2'}}%</span>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
