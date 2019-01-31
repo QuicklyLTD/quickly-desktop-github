@@ -77,7 +77,7 @@
                                 <i class="fa fa-money"></i>
                                 <b> {{product.price}} TL</b>
                               </span>
-                              <small class="category mt-1 text-white">
+                              <small *ngIf="selectedCat !== undefined" class="category mt-1 text-white">
                                 {{product.cat_id | general:'categories':'name'| async}}
                               </small>
                             </p>
