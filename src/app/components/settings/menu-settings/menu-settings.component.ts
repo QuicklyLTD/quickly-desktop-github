@@ -350,7 +350,7 @@ export class MenuSettingsComponent implements OnInit {
     }
     let item = new Ingredient(form.stock_id, form.amount);
     this.mainService.getData('stocks', form.stock_id).then(result => {
-      if (form.amount < result.left_total) {
+      // if (form.amount < result.left_total) {
         if (this.productRecipe.find(item => item.stock_id == form.stock_id)) {
           this.messageService.sendMessage('İçerik daha önce tanımlanmış!');
         } else if (this.oldRecipes.find(item => item.id == form.stock_id)) {
@@ -360,9 +360,9 @@ export class MenuSettingsComponent implements OnInit {
           this.recipesTable.push({ id: form.stock_id, name: this.stockName, amount: form.amount, unit: this.stockUnit });
           this.hasRecipe = true;
         }
-      } else {
-        this.messageService.sendMessage('Elinizdeki kalan stok miktarından fazla giremezsiniz.')
-      }
+      // } else {
+      //   this.messageService.sendMessage('Elinizdeki kalan stok miktarından fazla giremezsiniz.')
+      // }
       recipesForm.reset();
     });
   }

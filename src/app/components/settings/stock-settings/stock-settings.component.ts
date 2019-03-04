@@ -54,7 +54,7 @@ export class StockSettingsComponent implements OnInit {
           this.logService.createLog(logType.STOCK_DELETED, res.id, `${this.selectedStock.name} adlı Stok silindi.`);
           this.fillData();
           $('#stock').modal('hide');
-          this.messageService.sendMessage('Kategori İsmi Belirtmelisiniz!');
+          this.messageService.sendMessage('Stok Silindi!');
         });
       }
     })
