@@ -1,23 +1,46 @@
-/* Layout */
 #appHolder {
-   height: 100vh;
-//    background-color: #ebebeb;
-//    background-image: url(../assets/pattern.png);
+    height: 100vh; // background-color: #ebebeb;
+    // background-image: url(../assets/pattern.png);
 }
+
+nav {
+    height: 56px !important;
+    -webkit-app-region: drag;
+    a,
+    form,
+    ::after,
+    ::before {
+        -webkit-app-region: no-drag;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
+    }
+}
+
 #mainHolder {
-   position: relative;
-   bottom: 0;
+    position: relative;
+    bottom: 0;
 }
+
+#mainHolder *,
+#mainHolder *::after,
+#mainHolder *::before {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-app-region: no-drag;
+    cursor: default;
+}
+
 #sidebarHolder {
-   position: fixed;
-   bottom: 0;
-   right: 0;
-   z-index: 1000;
-   padding: 20px;
-   overflow-x: hidden;
-   overflow-y: auto;
-   background-color: grey;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: grey;
 }
+
 #routerHolder {
-   margin-top: 20px;
+    margin-top: 20px;
 }
