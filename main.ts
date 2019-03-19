@@ -20,6 +20,8 @@ function createWindow() {
     y: 0,
     width: 1366,
     height: 768
+    // frame: false,
+    // resizable: false,
   });
   win.setMenu(null);
   win.setFullScreen(true);
