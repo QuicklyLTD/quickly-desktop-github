@@ -361,7 +361,7 @@ export class MenuSettingsComponent implements OnInit {
           this.hasRecipe = true;
         }
       // } else {
-      //   this.messageService.sendMessage('Elinizdeki kalan stok miktarından fazla giremezsiniz.')
+      //   this.messageService.sendMessage('Elinizdeki  kalan stok miktarından fazla giremezsiniz.')
       // }
       recipesForm.reset();
     });

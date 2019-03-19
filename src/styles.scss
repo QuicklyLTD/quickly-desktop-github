@@ -1,16 +1,10 @@
 @import '../node_modules/animate.css/animate.min.css';
-// @import '../node_modules/bootstrap/scss/bootstrap';
-// @import url('https://bootswatch.com/4/superhero/bootstrap.min.css');
 @import url('./assets/themes/dark.scss');
 $fa-font-path: "../node_modules/font-awesome/fonts/";
 @import '../node_modules/font-awesome/scss/font-awesome';
 @font-face {
     font-family: 'Quickly';
     src: url('assets/quickly.ttf') format('truetype');
-}
-
-.quickly-color {
-    // background-color: #312783 !important;
 }
 
 .text-quickly {
