@@ -369,7 +369,10 @@
                         <div class="input-group-prepend">
                             <div class="input-group-text">Tür</div>
                         </div>
-                        <input type="text" disabled class="form-control form-control-lg" value="Adisyon / Fiş Yazıcı">
+                        <select name="mission" class="form-control form-control-lg" ngModel>
+                          <option value="Adisyon">Hesap Yazıcısı</option>
+                          <option value="Sipariş">Sipariş Yazıcısı</option>
+                        </select>
                       </div>
                     </div>
                   </section>
@@ -520,6 +523,17 @@
                     </div>
                   </div>
                   <input type="text" name="port_number" class="form-control form-control-lg" ngModel>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      Tür
+                    </div>
+                  </div>
+                  <select name="mission" class="form-control form-control-lg" ngModel>
+                    <option value="Adisyon">Hesap Yazıcısı</option>
+                    <option value="Sipariş">Sipariş Yazıcısı</option>
+                  </select>
                 </div>
               </div>
             </section>

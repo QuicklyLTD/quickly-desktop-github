@@ -19,7 +19,7 @@ import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.5.9';
+  version = '1.6.0';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -56,11 +56,19 @@ export class AppComponent implements OnInit {
         let settings: Array<Settings> = res.docs;
         try {
           this.activationStatus = settings.find(obj => obj.key == 'ActivationStatus').value;
-          this.dayStatus = settings.find(obj => obj.key == 'DateSettings').value;
+        } catch (error) {
+          this.messageService.sendAlert('Aktivasyon Hatası', 'Aktivasyon Anahtarı Bulunamadı!', 'error');
+        }
+        try {
           this.serverSettings = settings.find(obj => obj.key == 'ServerSettings').value;
         } catch (error) {
-          console.log('Settings Error Documents Not Available');
-          this.electronService.openDevTools();
+          this.messageService.sendAlert('Bağlantı Hatası', 'Sunucu Bağlantı Anahtarı Bulunamadı!', 'error');
+          this.findServerSettings();
+        }
+        try {
+          this.dayStatus = settings.find(obj => obj.key == 'DateSettings').value;
+        } catch (error) {
+          this.messageService.sendAlert('Gün Dökümanı Hatası', 'Tarih Eşleştirmesi Başarısız', 'error');
         }
       }
       this.initAppProcess();
@@ -92,63 +100,37 @@ export class AppComponent implements OnInit {
                   this.router.navigate(['']);
                 }
               }).catch(err => {
-                this.electronService.fileSystem
-                  .readFile('./data/db.dat', (err, data) => {
-                    const rdata = JSON.parse(data.toString('utf-8'));
-                    this.mainService.destroyDB('allData').then(res => {
-                      if (res.ok) {
-                        this.mainService.initDatabases();
-                        setTimeout(() => {
-                          this.mainService.putAll('allData', rdata).then(res => {
-                            console.log(res);
-                            this.electronService.reloadProgram();
-                          }).catch(err => {
-                            this.electronService.reloadProgram();
-                          })
-                        }, 2500)
-                      }
-                    }).catch(err => {
-                      console.error(err);
-                    });
-                  })
+                this.electronService.fileSystem.readFile('./data/db.dat', (err, data) => {
+                  const rdata = JSON.parse(data.toString('utf-8'));
+                  this.mainService.destroyDB('allData').then(res => {
+                    if (res.ok) {
+                      this.mainService.initDatabases();
+                      setTimeout(() => {
+                        this.mainService.putAll('allData', rdata).then(res => {
+                          console.log(res);
+                          this.electronService.reloadProgram();
+                        }).catch(err => {
+                          this.electronService.reloadProgram();
+                        })
+                      }, 2500)
+                    }
+                  }).catch(err => {
+                    console.error(err);
+                  });
+                })
               });
             }
             if (this.serverSettings.type == 1) {
               ////// İkincil Ekran //////
+              console.log('Server Replicating Started!')
               this.mainService.replicateDB(this.serverSettings).on('complete', () => {
-                this.mainService.loadAppData().then((isLoaded: boolean) => {
-                  if (isLoaded) {
-                    this.onSync = false;
-                    this.router.navigate(['']);
-                    const signalListener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
-                      this.onSync = true;
-                      signalListener.cancel();
-                      this.mainService.syncToRemote().cancel();
-                      let databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings');
-                      this.mainService.destroyDB(databasesArray).then(res => {
-                        if (res.ok) {
-                          setTimeout(() => {
-                            this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program kapatılacak.', 'success');
-                            this.electronService.shellCommand('shutdown now');
-                          }, 5000);
-                        }
-                      });
-                    });
-                  }
-                })
+                setTimeout(() => this.appDataInitializer(), 2000)
               }).catch(err => {
-                console.log(err);
+                console.warn('Server Replicating Error:', err);
                 this.hasError = true;
                 setTimeout(() => {
                   this.electronService.relaunchProgram();
                 }, 10000);
-              });
-              this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', (res) => {
-                if (!this.onSync) {
-                  setTimeout(() => {
-                    this.electronService.reloadProgram();
-                  }, 5000);
-                }
               });
             }
           } else {
@@ -174,30 +156,7 @@ export class AppComponent implements OnInit {
             }
           }
         } else {
-          let serverDocument;
-          let AppType = localStorage.getItem('AppType');
-          this.mainService.getAllBy('allData', { key: 'ServerSettings' }).then(res => {
-            switch (AppType) {
-              case 'Primary':
-                serverDocument = res.docs.find(obj => obj.value.type == 0);
-                delete serverDocument._rev;
-                this.mainService.putDoc('settings', serverDocument).then(res => {
-                  this.electronService.reloadProgram();
-                });
-                break;
-              case 'Secondary':
-                serverDocument = res.docs.find(obj => obj.value.type == 1);
-                delete serverDocument._rev;
-                this.mainService.putDoc('settings', serverDocument).then(res => {
-                  this.electronService.reloadProgram();
-                });
-              default:
-                break;
-            }
-          })
-          // this.mainService.syncToLocal('settings').then(res => {
-          //   console.log(res);
-          // })
+          this.findServerSettings();
         }
         break;
       case false:
@@ -212,90 +171,70 @@ export class AppComponent implements OnInit {
     }
   }
 
-  startApp() {
-    this.settingsService.ActivationStatus.subscribe(res => {
-      if (res) {
-        this.setupFinished = true;
-        if (this.setupFinished) {
-          if (res.value) {
-            this.settingsService.DateSettings.subscribe(res => {
-              if (new Date().getDay() !== res.value.day) {
-                if (res.value.started) {
-                  this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
-                } else {
-                  this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
-                }
-              }
-            });
-            this.settingsService.ServerSettings.subscribe(res => {
-              let settings: any = res;
-              let configrations = res.value;
-              if (configrations.type == 0) {
-                this.updateActivityReport();
-              }
-              if (configrations.status == 1) {
-                if (configrations.type == 0) {
-                  this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
-                  this.mainService.syncToServer();
-                  this.conflictService.conflictListener();
-                } else if (configrations.type == 1) {
-                  let listener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
-                    this.onSync = true;
-                    listener.cancel();
-                    this.mainService.syncToRemote().cancel();
-                    this.router.navigate(['/endoftheday_no_guard']).then(() => {
-                      $('#endDayModal').modal('show');
-                      setTimeout(() => {
-                        let databasesArray = Object.keys(this.mainService.LocalDB);
-                        this.mainService.destroyDB(databasesArray).then(res => {
-                          if (res.ok) {
-                            setTimeout(() => {
-                              this.mainService.initDatabases();
-                              setTimeout(() => {
-                                this.mainService.replicateDB(configrations).on('complete', () => {
-                                  this.mainService.syncToLocal().then(res => {
-                                    if (res) {
-                                      delete settings._rev;
-                                      this.mainService.putDoc('settings', settings).then(res => {
-                                        if (res.ok) {
-                                          $('#endDayModal').modal('hide');
-                                          this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
-                                          setTimeout(() => {
-                                            this.electronService.shellCommand('shutdown now');
-                                          }, 5000);
-                                        }
-                                      })
-                                    }
-                                  })
-                                });
-                              }, 60000);
-                            }, 5000)
-                          }
-                        });
-                      }, 10000);
-                    });
-                  });
-                  this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', (res) => {
-                    if (!this.onSync) {
-                      clearInterval(this.conflictService.conflictListener());
-                      setTimeout(() => {
-                        this.electronService.reloadProgram();
-                      }, 5000);
-                    }
-                  });
-                }
-              }
-              this.mainService.syncToRemote();
-            });
-          } else {
-            this.setupFinished = false;
-            this.router.navigate(['/activation']);
-          }
+  appDataInitializer() {
+    this.mainService.loadAppData().then((isLoaded: boolean) => {
+      if (isLoaded) {
+        this.onSync = false;
+        this.router.navigate(['']);
+        this.settingsListener();
+        setTimeout(() => this.endDayListener(), 5000)
+      }
+    }).catch(err => {
+      console.warn('LoadApp Data Error:', err);
+    })
+  }
+
+  endDayListener() {
+    console.log('Endday Listener Process Started');
+    const signalListener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', (changes) => {
+      this.mainService.syncToRemote().cancel();
+      console.log('Endday Processing...');
+      this.onSync = true;
+      signalListener.cancel();
+      this.mainService.destroyDB('allData').then(res => {
+        if (res.ok) {
+          this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program kapatılacak.', 'success');
+          setTimeout(() => {
+            this.electronService.shellCommand('shutdown now');
+          }, 5000);
         }
-      } else {
-        this.router.navigate(['/setup']);
+      });
+    });
+  }
+
+  settingsListener() {
+    console.log('Settings Listener Process Started');
+    return this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', (res) => {
+      if (!this.onSync) {
+        setTimeout(() => {
+          this.electronService.reloadProgram();
+        }, 5000);
       }
     });
+  }
+
+  findServerSettings(){
+    let serverDocument;
+    let AppType = localStorage.getItem('AppType');
+    this.mainService.getAllBy('allData', { key: 'ServerSettings' }).then(res => {
+      switch (AppType) {
+        case 'Primary':
+          serverDocument = res.docs.find(obj => obj.value.type == 0);
+          delete serverDocument._rev;
+          this.mainService.putDoc('settings', serverDocument).then(res => {
+            this.electronService.reloadProgram();
+          });
+          break;
+        case 'Secondary':
+          serverDocument = res.docs.find(obj => obj.value.type == 1);
+          delete serverDocument._rev;
+          this.mainService.putDoc('settings', serverDocument).then(res => {
+            this.electronService.reloadProgram();
+          });
+        default:
+          break;
+      }
+    })
   }
 
   updateActivityReport() {
@@ -331,15 +270,104 @@ export class AppComponent implements OnInit {
   }
 
   exitProgram() {
-    let isOK = confirm('Programdan Çıkmak Üzeresiniz..');
-    if (isOK) {
-      this.authService.logout();
-      this.electronService.exitProgram();
-    }
+    this.messageService.sendConfirm('Program Kapatılacak!').then(isOK => {
+      if (isOK) {
+        this.authService.logout();
+        this.electronService.exitProgram();
+      }
+    })
   }
 
   changeWindow() {
     this.electronService.fullScreen(this.windowStatus);
     this.windowStatus = !this.windowStatus;
   }
+
+
+
+  // startApp() {
+  //   this.settingsService.ActivationStatus.subscribe(res => {
+  //     if (res) {
+  //       this.setupFinished = true;
+  //       if (this.setupFinished) {
+  //         if (res.value) {
+  //           this.settingsService.DateSettings.subscribe(res => {
+  //             if (new Date().getDay() !== res.value.day) {
+  //               if (res.value.started) {
+  //                 this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
+  //               } else {
+  //                 this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
+  //               }
+  //             }
+  //           });
+  //           this.settingsService.ServerSettings.subscribe(res => {
+  //             let settings: any = res;
+  //             let configrations = res.value;
+  //             if (configrations.type == 0) {
+  //               this.updateActivityReport();
+  //             }
+  //             if (configrations.status == 1) {
+  //               if (configrations.type == 0) {
+  //                 this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
+  //                 this.mainService.syncToServer();
+  //                 this.conflictService.conflictListener();
+  //               } else if (configrations.type == 1) {
+  //                 let listener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
+  //                   this.onSync = true;
+  //                   listener.cancel();
+  //                   this.mainService.syncToRemote().cancel();
+  //                   this.router.navigate(['/endoftheday_no_guard']).then(() => {
+  //                     $('#endDayModal').modal('show');
+  //                     setTimeout(() => {
+  //                       let databasesArray = Object.keys(this.mainService.LocalDB);
+  //                       this.mainService.destroyDB(databasesArray).then(res => {
+  //                         if (res.ok) {
+  //                           setTimeout(() => {
+  //                             this.mainService.initDatabases();
+  //                             setTimeout(() => {
+  //                               this.mainService.replicateDB(configrations).on('complete', () => {
+  //                                 this.mainService.syncToLocal().then(res => {
+  //                                   if (res) {
+  //                                     delete settings._rev;
+  //                                     this.mainService.putDoc('settings', settings).then(res => {
+  //                                       if (res.ok) {
+  //                                         $('#endDayModal').modal('hide');
+  //                                         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
+  //                                         setTimeout(() => {
+  //                                           this.electronService.shellCommand('shutdown now');
+  //                                         }, 5000);
+  //                                       }
+  //                                     })
+  //                                   }
+  //                                 })
+  //                               });
+  //                             }, 60000);
+  //                           }, 5000)
+  //                         }
+  //                       });
+  //                     }, 10000);
+  //                   });
+  //                 });
+  //                 this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', (res) => {
+  //                   if (!this.onSync) {
+  //                     clearInterval(this.conflictService.conflictListener());
+  //                     setTimeout(() => {
+  //                       this.electronService.reloadProgram();
+  //                     }, 5000);
+  //                   }
+  //                 });
+  //               }
+  //             }
+  //             this.mainService.syncToRemote();
+  //           });
+  //         } else {
+  //           this.setupFinished = false;
+  //           this.router.navigate(['/activation']);
+  //         }
+  //       }
+  //     } else {
+  //       this.router.navigate(['/setup']);
+  //     }
+  //   });
+  // }
 }

@@ -128,6 +128,7 @@ export class ElectronService {
   }
 
   fullScreen(status: boolean) {
+    this.appWindow.setResizable(true);
     this.appWindow.setFullScreen(status);
   }
 

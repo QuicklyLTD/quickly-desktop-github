@@ -30,6 +30,7 @@ export class Printer {
         public type: string,
         public note: string,
         public device_port: number,
+        public mission: string,
     ) { }
 }
 export class PaymentMethod {

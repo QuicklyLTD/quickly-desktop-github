@@ -87,7 +87,7 @@
                         <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
                         <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
                       </p>
-                      <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3">
+                      <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3" style="text-transform: capitalize;">
                         <small>{{product.name}}
                           <span class="pull-right">{{product.price | number:'1.0-2'}} TL</span>
                         </small>

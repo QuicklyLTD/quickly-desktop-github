@@ -80,7 +80,7 @@
                       </td>
                       <td>{{check.total_price + check.discount | number:'1.0-2'}} TL
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
-                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
+                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount |  number:'1.0-2'}} TL
                         </small>
                       </td>
                       <td>{{check.timestamp | date:"HH:mm" }}</td>

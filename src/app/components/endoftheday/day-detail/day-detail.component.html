@@ -211,7 +211,7 @@
                     <td>{{item.owner}}</td>
                     <td>{{item.total_price | number:'1.0-2'}} TL
                       <small *ngIf="item.discount !== 0" class="text-danger pull-right">
-                        <i class="fa fa-arrow-down" aria-hidden="true"></i> {{item.discount}} TL</small>
+                        <i class="fa fa-arrow-down" aria-hidden="true"></i> {{item.discount | number:'1.0-2'}} TL</small>
                     </td>
                     <td>{{item.payment_method}}</td>
                     <td>{{item.timestamp | date:'HH:mm'}}</td>

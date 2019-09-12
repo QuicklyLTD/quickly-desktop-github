@@ -49,6 +49,7 @@ export class ApplicationSettingsComponent implements OnInit {
       this.restInfo = res.value
       this.restMap = res.value.geolocation;
       this.appLogo = this.restInfo.logo;
+      if (this.restInfo.last_seen) delete this.restInfo.last_seen;
       this.restaurantForm.setValue(this.restInfo);
     });
     this.settings.ServerSettings.subscribe(res => {
@@ -112,7 +113,7 @@ export class ApplicationSettingsComponent implements OnInit {
           return false;
         }
       }
-      let printer = new Printer(form.name, this.printerProcess, form.note, address);
+      let printer = new Printer(form.name, this.printerProcess, form.note, address, form.mission);
       let printersData = this.printers.filter(obj => obj.name == form.name);
       if (printersData.length == 0) {
         this.settings.addPrinter(printer);

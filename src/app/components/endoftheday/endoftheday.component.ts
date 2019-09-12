@@ -84,6 +84,7 @@ export class EndofthedayComponent implements OnInit {
     } else {
       clearInterval(this.conflictService.conflictListener());
       let dateData = { started: true, day: new Date().getDay(), time: Date.now() };
+
       this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
         res.docs.forEach(element => {
           this.mainService.changeData('reports', element._id, (doc) => {
@@ -94,7 +95,9 @@ export class EndofthedayComponent implements OnInit {
           });
         });
       });
+
       this.messageService.sendMessage('Gün Başlatıldı. Program Yeniden Başlatılıyor..');
+      
       if (this.day == 1) {
         this.mainService.getAllBy('reports', {}).then(res => {
           let reports = res.docs.filter(obj => obj.type !== 'Activity');
@@ -107,6 +110,7 @@ export class EndofthedayComponent implements OnInit {
           });
         });
       }
+
       this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
         if (res.ok) {
           this.isStarted = true;
@@ -116,6 +120,7 @@ export class EndofthedayComponent implements OnInit {
           }, 5000)
         }
       })
+      
     }
   }
 

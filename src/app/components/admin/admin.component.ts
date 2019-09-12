@@ -1,9 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
+import { Report } from '../../mocks/report.mock';
+
 import * as fs from 'fs';
 import { ServerInfo, Settings } from '../../mocks/settings.mock';
-import { Product } from 'app/mocks/product.mock';
+import { Product } from '../../mocks/product.mock';
+import { Table } from '../../mocks/table.mock';
 
 @Component({
   selector: 'app-admin',
@@ -174,6 +177,31 @@ export class AdminComponent implements OnInit {
   }
 
   updateProgram() {
+
+    // this.mainService.getAllBy('floors',{}).then(res => {
+    //   console.log(res);
+    // })
+    // let tablesArr = [];
+    // this.mainService.getAllBy('tables', {}).then(res => {
+    //   for (let index = 0; index < res.docs.length; index++) {
+    //     let connection_id = res.docs[index]._id;
+    //     let reports = new Report('Table', connection_id, 0, 0, 0, [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], '', Date.now());
+    //     this.mainService.addData('reports', reports).then(res => {
+    //       console.log(res);
+    //     })
+
+    //   }
+    // })
+
+    // for (let index = 1; index < 16; index++) {
+    //     let table = new Table(`S${index}`,'05800961-4aaa-4add-baa8-9f8fbfb3f2fb',4,'',1,Date.now(),[]);
+    //     this.mainService.addData('tables',table).then(res => {
+    //       console.log(res);
+    //     }); 
+    // }
+
+
+
     // localStorage.setItem('CheckNo', "1");
     // let specifies = [
     //   {

@@ -48,7 +48,7 @@ export class MainService {
       endday: new PouchDB('local_endday', db_opts),
       reports: new PouchDB('local_reports', db_opts),
       logs: new PouchDB('local_logs', db_opts),
-      settings: new PouchDB('local_settings', { revs_limit: 1, auto_compaction: true }),
+      settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
 
@@ -195,7 +195,7 @@ export class MainService {
   }
 
   initDatabases() {
-    const db_opts = { revs_limit: 1, auto_compaction: true };
+    const db_opts = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
     this.LocalDB = {
       users: new PouchDB('local_users', db_opts),
       users_group: new PouchDB('local_users_group', db_opts),
@@ -216,8 +216,8 @@ export class MainService {
       stocks_cat: new PouchDB('local_stocks_cat', db_opts),
       endday: new PouchDB('local_endday', db_opts),
       reports: new PouchDB('local_reports', db_opts),
-      settings: new PouchDB('local_settings', db_opts),
       logs: new PouchDB('local_logs', db_opts),
+      settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
   }
@@ -263,7 +263,9 @@ export class MainService {
             if (db !== 'allData') {
               this.LocalDB[db].get(element._id).then((doc) => {
                 if (doc) return this.LocalDB[db].remove(doc);
-              }).catch(err => { });
+              }).catch(err => {
+                console.log(db);
+              });
             }
           }
         }
@@ -277,7 +279,7 @@ export class MainService {
         let docs = res.docs;
         if (docs.length > 0) {
           docs.forEach((element, index) => {
-            let db = element.db_name;
+            const db = element.db_name;
             if (db !== undefined) {
               if (db !== 'settings') {
                 delete element.db_name;
@@ -288,7 +290,7 @@ export class MainService {
                     resolve(true);
                   }
                 }).catch(err => {
-                  console.log(db, element)
+                  console.log(err)
                 });
               }
             }

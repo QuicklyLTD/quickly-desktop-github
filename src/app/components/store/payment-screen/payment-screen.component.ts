@@ -303,7 +303,6 @@ export class PaymentScreenComponent implements OnInit {
   setChange() {
     if (this.discount) {
       this.discountAmount = ((this.priceWillPay * this.discount) / 100);
-      this.discountAmount = Math.round(this.discountAmount);
     }
     this.currentAmount = this.priceWillPay - this.discountAmount;
     this.changePrice = this.payedPrice - this.priceWillPay;

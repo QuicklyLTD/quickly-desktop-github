@@ -187,7 +187,7 @@ export class SellingScreenComponent implements OnInit {
       }
     }
     setTimeout(() => {
-      $('.check-flow').scrollTop(999999);
+      $('#check-products').scrollTop(999999);
     }, 200)
   }
 
@@ -731,12 +731,13 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
-  printCheck() {
+  printCheck(selectedPrinter) {
+    $('#printersModal').modal('hide');
     if (this.check.type == CheckType.NORMAL) {
       this.check.products = this.check.products.filter(obj => obj.status == 2);
       this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
       if (this.table.status !== TableStatus.WILL_READY) {
-        this.printerService.printCheck(this.printers[0], this.table.name, this.check);
+        this.printerService.printCheck(selectedPrinter, this.table.name, this.check);
         if (this.check.status !== CheckStatus.PASSIVE) {
           if (this.check.type == CheckType.NORMAL) {
             this.mainService.updateData('tables', this.id, { status: 3 }).then(res => {
@@ -748,13 +749,13 @@ export class SellingScreenComponent implements OnInit {
       } else {
         this.message.sendConfirm('Adisyon Tekrar Yazdırılsın mı?').then(isOk => {
           if (isOk) {
-            this.printerService.printCheck(this.printers[0], this.table.name, this.check);
+            this.printerService.printCheck(selectedPrinter, this.table.name, this.check);
           }
         });
       }
     } else if (this.check.type == CheckType.FAST) {
       this.check.total_price = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
-      this.printerService.printCheck(this.printers[0], this.check.note, this.check);
+      this.printerService.printCheck(selectedPrinter, this.check.note, this.check);
     }
   }
 

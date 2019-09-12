@@ -391,7 +391,7 @@ function textPad(first, second, lineWidth, diffWidth) {
 
 function fitText(header, text, size) {
   header = header.replace('ş', 's').replace('ğ', 'g').replace('İ', 'I');
-  let space = 48 / size;
+  let space = line.length / size;
   let middleSpace = repeat(' ', space - text.toString().length - header.toString().length);
   let fixed = header + middleSpace + text;
   return fixed;
