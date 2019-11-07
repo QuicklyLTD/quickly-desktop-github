@@ -11,7 +11,7 @@
           </div>
           <div class="col-xl-2 col-lg-3 pr-1">
             <button type="button" [routerLink]="['/selling-screen',check_type, check_id]" class="btn btn-danger btn-sm btn-block">
-              <i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</button>
+              <i class="fa fa-backward" aria-hidden="true"></i> <strong>Geri Dön</strong></button>
           </div>
         </div>
       </div>
@@ -42,8 +42,8 @@
                         <span class="float-right">{{check?.total_price | number:'1.0-2'}} TL</span>
                       </strong>
                     </p>
-                    <button (click)="sendAllProducts()" [disabled]="check?.products.length == 0" class="btn btn-lg btn-danger btn-block text-left">Hepsini
-                      Öde
+                    <button (click)="sendAllProducts()" [disabled]="check?.products.length == 0" class="btn btn-lg btn-danger btn-block text-left">
+                      <strong>Hepsini Öde</strong>
                       <span class="float-right">
                         <i class="fa fa-arrow-right" aria-hidden="true"></i>
                       </span>
@@ -71,13 +71,12 @@
                     <p *ngIf="check?.discount > 0" class="pr-1 pl-1 mt-2">
                       <strong>
                         Önceden Ödenen Miktar:
-                        <span class="pull-right">{{check?.discount}} TL</span>
+                        <span class="pull-right">{{check?.discount | number:'1.0-2' }} TL</span>
                       </strong>
                     </p>
                     <button (click)="togglePayed()" class="btn btn-lg btn-secondary btn-block text-left">{{payedTitle}}
                       <span class="float-right">
-                        <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa hidden-lg-down"
-                          aria-hidden="true"></i>
+                        <i [ngClass]="(payedShow) ? 'fa-caret-down':'fa-caret-up'" class="fa hidden-lg-down" aria-hidden="true"></i>
                       </span>
                     </button>
                   </div>
@@ -85,9 +84,9 @@
                     <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
                       <p class="mb-0">{{payment.method}}
                         <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
-                        <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
+                        <span class="pull-right">{{payment.amount + payment.discount | number:'1.0-2'}} TL</span>
                       </p>
-                      <p *ngFor="let product of payment.payed_products" class="m-0 text-muted pl-3" style="text-transform: capitalize;">
+                      <p *ngFor="let product of payment.payed_products" class="m-0 text-warning pl-3" style="text-transform: capitalize;">
                         <small>{{product.name}}
                           <span class="pull-right">{{product.price | number:'1.0-2'}} TL</span>
                         </small>
@@ -95,12 +94,12 @@
                       <p *ngIf="payment.discount > 0" class="text-danger m-0">
                         <small>
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
-                          <span class="pull-right">{{payment.discount}} TL</span>
+                          <span class="pull-right">{{payment.discount | number:'1.0-2'}} TL</span>
                         </small>
                       </p>
                       <p class="m-0 font-weight-bold">
                         <small>
-                          <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
+                          <i class="fa fa-arrow-right" aria-hidden="true"></i> Alınan Ödeme
                           <span class="pull-right">{{payment.amount | number:'1.0-2'}} TL</span>
                         </small>
                       </p>
@@ -111,8 +110,7 @@
             </div>
           </div>
           <div class="col-lg-1 pl-1 pr-0 d-lg-none d-xl-block">
-            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(100)"
-              class="btn btn-block cashButton btn-outline-info">
+            <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(100)" class="btn btn-block cashButton btn-outline-info">
               100
             </button>
             <button [disabled]="priceWillPay == 0 || payedPrice > 0 && changePrice >= 0" (click)="getPayment(50)" class="btn btn-block cashButton btn-outline-primary">
@@ -157,28 +155,28 @@
                 </h4>
                 <h4 *ngIf="payedPrice > 0 && changePrice !== 0" class="mb-1">{{changeMessage}}:
                   <span class="text-warning pull-right">
-                    <b>{{(changePrice < 0 ? changePrice*-1 : changePrice) | number: '1.0-2' }} TL </b> </span> </h4> </div>
-                        <div class="card-footer p-1 pr-2 pl-2">
-                        <div class="input-group">
-                          <input type="text" class="form-control form-control-lg text-right" readonly [ngModel]="numpad"
-                            style="font-size: 2rem;">
-                          <div class="input-group-append">
-                            <div class="input-group-text">
-                              <i class="fa fa-turkish-lira" aria-hidden="true"></i>
-                            </div>
-                          </div>
-                          <span class="input-group-append">
-                            <button class="btn btn-secondary" (click)="cleanPad()" type="button">
-                              <i class="fa fa-arrow-left" aria-hidden="true"></i> Temizle
-                            </button>
-                          </span>
-                        </div>
+                    <b>{{(changePrice < 0 ? changePrice*-1 : changePrice) | number: '1.0-2' }} TL </b> </span> </h4>
+              </div>
+              <div class="card-footer p-1 pr-2 pl-2">
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg text-right" readonly [ngModel]="numpad" style="font-size: 2rem;">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <i class="fa fa-turkish-lira" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <span class="input-group-append">
+                    <button class="btn btn-secondary" (click)="cleanPad()" type="button">
+                      <i class="fa fa-arrow-left" aria-hidden="true"></i> Temizle
+                    </button>
+                  </span>
+                </div>
               </div>
               <div class="card-footer">
                 <div *ngFor="let keys of numboard;" class="row mb-1">
                   <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1">
-                    <button type="button" [ngClass]="{'btn-success': key == '✔' && numpad > 0}" [disabled]="key == '✔' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == ''"
-                      (click)="pushKey(key)" class="btn btn-primary btn-lg btn-block numpad">{{key}}</button>
+                    <button type="button" [ngClass]="{'btn-success': key == '✔' && numpad > 0}" [disabled]="key == '✔' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == ''" (click)="pushKey(key)"
+                      class="btn btn-primary btn-lg btn-block numpad">{{key}}</button>
                   </div>
                 </div>
               </div>
@@ -190,37 +188,31 @@
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block">
-                  <button [disabled]="productsWillPay.length == 0 || !permissions.discount" type="button" data-toggle="modal"
-                    data-target="#discount" class="btn btn-secondary btn-block btn-lg">İndirim Yap
+                  <button [disabled]="productsWillPay.length == 0 || !permissions.discount" type="button" data-toggle="modal" data-target="#discount" class="btn btn-secondary btn-block btn-lg"><strong>İndirim Yap</strong>
                     <span class="float-right">
                       <i class="fa fa-chevron-down" aria-hidden="true"></i>
                     </span>
                   </button>
-                  <button [disabled]="check?.products.length !== 0 || productsWillPay.length == 0 || !permissions.discount"
-                    type="button" data-toggle="modal" data-target="#otherOptions" class="btn btn-info btn-lg mt-0">İşlemler
+                  <button [disabled]="check?.products.length !== 0 || productsWillPay.length == 0 || !permissions.discount" type="button" data-toggle="modal" data-target="#otherOptions" class="btn btn-info btn-lg mt-0"><strong>İşlemler</strong>
                   </button>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-lg-1 pl-0 pr-0">
-            <button [disabled]="currentAmount == 0 ||  payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('Nakit')" class="btn btn-block sellButton btn-outline-success">
+            <button [disabled]="currentAmount == 0 ||  payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Nakit')" class="btn btn-block sellButton btn-outline-success">
               <i class="fa fa-money ml-1"></i>
               <br> Nakit
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('Kart')" class="btn btn-block sellButton btn-outline-warning">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')" class="btn btn-block sellButton btn-outline-warning">
               <i class="fa fa-credit-card ml-1"></i>
               <br> Kart
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('Kupon')" class="btn btn-block sellButton btn-outline-info">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')" class="btn btn-block sellButton btn-outline-info">
               <i class="fa fa-bookmark ml-1"></i>
               <br> Kupon
             </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0"
-              (click)="payProducts('İkram')" class="btn btn-block sellButton btn-outline-danger">
+            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')" class="btn btn-block sellButton btn-outline-danger">
               <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
               <br> İkram
             </button>
@@ -249,8 +241,7 @@
                 <div class="input-group-text">TL</div>
               </div>
               <span class="input-group-append">
-                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= currentAmount" (click)="setDiscount((discountInput.value*100)/priceWillPay)"
-                  type="button">
+                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= currentAmount" (click)="setDiscount((discountInput.value*100)/priceWillPay)" type="button">
                   <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Yap
                 </button>
               </span>
@@ -291,8 +282,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button class="btn btn-primary btn-lg" [disabled]="creditNote.value == '' || creditNote.value == ' ' || customerInput.value == '' || customerInput.value == ' '"
-          (click)="createCredit(customerInput.value,creditNote.value)" type="button">
+        <button class="btn btn-primary btn-lg" [disabled]="creditNote.value == '' || creditNote.value == ' ' || customerInput.value == '' || customerInput.value == ' '" (click)="createCredit(customerInput.value,creditNote.value)" type="button">
           <i class="fa fa-arrow-down" aria-hidden="true"></i> Alacaklı Kapat
         </button>
       </div>

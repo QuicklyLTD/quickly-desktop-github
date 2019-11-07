@@ -1,75 +1,95 @@
-.sellButton{
+.sellButton {
     font-family: Quickly;
     margin-bottom: 3.8px;
-    margin-top:0px;
-    padding-top:20px;
+    margin-top: 0px;
+    padding-top: 20px;
     padding-bottom: 20px;
     padding-right: 0px;
     padding-left: 0px;
     color: #000;
-    i{
+
+    i {
         font-size: 7.4vh;
     }
 }
-.btn-specs{
+
+.btn-specs {
     padding: 25px;
     float: left;
     font-weight: bolder;
     font-size: 30px;
-    .spec-price{
+
+    .spec-price {
         font-size: 20px;
         color: #8a5f25;
         margin-left: 5px;
     }
 }
-.payment-flow{
-    height:35vh;
+
+.payment-flow {
+    height: 35vh;
     overflow: hidden;
     overflow-y: scroll;
     overflow-x: hidden;
-    p{
+
+    p {
         font-weight: bolder;
     }
 }
-#productHolder{
+
+#productHolder {
     overflow-y: scroll;
     // background-color: #ebebeb;
 }
-.normal{
+
+.normal {
     width: auto !important;
 }
-.tFlow{
+
+.tFlow {
     height: 60vh;
     overflow-y: scroll;
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
-.modal-big{
+
+.modal-big {
     max-width: 1300px;
 }
-.payedLayer{
-    border-top: 1px solid black;
+
+.payedLayer {
+    border-top: 1px solid white;
 }
-.payed-things{
+
+.payed-things {
     min-height: 200px;
 }
-.numpad{
+
+.numpad {
     font-size: 22px;
 }
-.table-name{
+
+.table-name {
     font-size: 20px;
     display: inline;
 }
 
-.proCard{
-    p.card-text{
-        .price{
+.proCard {
+    p.card-text {
+        .price {
             float: left;
             width: 50%
         }
-        .category{
+
+        .category {
+            font-size: 10px;
             text-align: right;
             float: right;
             width: 50%
         }
     }
+}
+
+.catButton{
+    font-weight: bold;
+    font-size: 1.3vw;
 }

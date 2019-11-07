@@ -63,6 +63,8 @@ export class SellingScreenComponent implements OnInit {
   paymentMethods: Array<PaymentMethod>;
   changes: any;
   discounts: Array<number>;
+  selectedQuantity: number;
+  customers: any = { male: 0, female: 0 };
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
@@ -71,11 +73,18 @@ export class SellingScreenComponent implements OnInit {
     this.ownerRole = this.settingsService.getUser('type');
     this.ownerId = this.settingsService.getUser('id');
     this.discounts = [10, 15, 20, 25, 50];
+    this.selectedQuantity = 1;
     this.paymentMethods = [
       new PaymentMethod('Nakit', 'Nakit Ödeme', '#5cb85c', 'fa-money', 1, 1),
       new PaymentMethod('Kart', 'Kredi veya Banka Kartı', '#f0ad4e', 'fa-credit-card', 2, 1),
       new PaymentMethod('Kupon', 'İndirim Kuponu veya Yemek Çeki', '#5bc0de', 'fa-bookmark', 3, 1),
       new PaymentMethod('İkram', 'İkram Hesap', '#c9302c', 'fa-handshake-o', 4, 1)
+    ];
+    this.cancelReasons = [
+      'Zayi',
+      'Stokta Yok',
+      'Yanlış Sipariş',
+      'Müşteri İstemedi',
     ];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "◂"]];
     this.route.params.subscribe(params => {
@@ -105,12 +114,6 @@ export class SellingScreenComponent implements OnInit {
 
   ngOnInit() {
     this.fillData();
-    this.cancelReasons = [
-      'Zayi',
-      'Stokta Yok',
-      'Yanlış Sipariş',
-      'Müşteri İstemedi',
-    ];
     this.changes = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', (change) => {
       if (change.id == this.check_id) {
         if (!change.deleted) {
@@ -174,11 +177,13 @@ export class SellingScreenComponent implements OnInit {
       $('#productSpecs').modal('show');
     } else {
       this.productFilterInput.nativeElement.value = '';
-      this.countProductsData(product._id, product.price);
       let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now(), product.tax_value, product.barcode);
-      this.check.total_price = this.check.total_price + product.price;
-      this.check.products.push(newProduct);
-      this.newOrders.push(newProduct);
+      for (let index = 0; index < this.selectedQuantity; index++) {
+        this.countProductsData(product._id, product.price);
+        this.check.total_price = this.check.total_price + product.price;
+        this.check.products.push(newProduct);
+        this.newOrders.push(newProduct);
+      }
       if (product.specifies.length > 0) {
         this.selectedIndex = this.check.products.length - 1;
         this.selectedProduct = this.check.products[this.selectedIndex];
@@ -189,6 +194,7 @@ export class SellingScreenComponent implements OnInit {
     setTimeout(() => {
       $('#check-products').scrollTop(999999);
     }, 200)
+    this.selectedQuantity = 1;
   }
 
   numpadToCheck() {

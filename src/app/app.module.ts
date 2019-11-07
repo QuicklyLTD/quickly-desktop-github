@@ -53,6 +53,7 @@ import { ElectronService } from './providers/electron.service';
 import { TerminalService } from './providers/terminal.service';
 //////  Pipes
 import { GeneralPipe } from './pipes/general.pipe';
+import { TimeAgoPipe } from './pipes/timeago.pipe';
 //////  Helpers
 import { KeyboardComponent } from './components/helpers/keyboard/keyboard.component';
 import { MessageComponent } from './components/helpers/message/message.component';
@@ -99,6 +100,7 @@ import { CustomerSettingsComponent } from './components/settings/customer-settin
     StockReportsComponent,
     UserReportsComponent,
     GeneralPipe,
+    TimeAgoPipe,
     KeyboardDirective,
     AdminComponent,
     DayDetailComponent,

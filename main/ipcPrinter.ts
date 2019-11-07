@@ -2,6 +2,8 @@ import { ipcMain } from 'electron';
 import * as escpos from 'escpos';
 
 const line = '------------------------------------------------';
+// const line = '------------------------------------------';
+
 
 ipcMain.on('printTest', (event, device) => {
   let deviceToPrint = findDevice(device);
@@ -145,10 +147,10 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
           if (check.discountPercent !== undefined) {
             printer
               .text(fitText('Hesap Toplam:', check.total_price + ' TL', 1), '857')
-              .text(fitText(check.discountPercent + '% İndirim Tutarı:', (check.total_price * check.discountPercent) / 100 + ' TL', 1), '857')
+              .text(fitText(check.discountPercent + '% İndirim Tutarı:', ((check.total_price * check.discountPercent) / 100).toFixed(2) + ' TL', 1), '857')
               .size(2, 2)
               .control('LF')
-              .text(fitText('Son Toplam:', (check.total_price - (check.total_price * check.discountPercent) / 100) + ' TL', 2), '857');
+              .text(fitText('Son Toplam:', (check.total_price - (check.total_price * check.discountPercent) / 100).toFixed(2) + ' TL', 2), '857');
           } else {
             printer
               .size(2, 2)
@@ -200,7 +202,7 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .align('ct')
             .size(2, 2)
             .control('LF')
-            .text('Toplam:  ' + payment.amount + ' TL')
+            .text('Toplam:  ' + payment.amount.toFixed(2) + ' TL')
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
@@ -340,7 +342,7 @@ ipcMain.on('printEndDay', (event, device, data, logo) => {
               .text(fitText('Kasa Gelir Toplam:', data.incomes + ' TL', 1))
               .text(fitText('Kasa Gider Toplam:', data.outcomes + ' TL', 1))
               .text(line)
-              .text(fitText('Kasa Genel Toplam:', (data.incomes - data.outcomes) + ' TL', 1))
+              .text(fitText('Kasa Genel Toplam:', (data.incomes - data.outcomes).toFixed(2) + ' TL', 1))
               .text(line)
               .control('LF')
               .control('LF')
@@ -352,7 +354,7 @@ ipcMain.on('printEndDay', (event, device, data, logo) => {
               .size(2, 2)
               .control('LF')
               .align('ct')
-              .text((data.total_income - data.canceled_total) + (data.incomes - data.outcomes) + ' TL')
+              .text(((data.total_income - data.canceled_total) + (data.incomes - data.outcomes)).toFixed(2) + ' TL')
               .control('LF')
               .align('lt')
               .size(1, 1)

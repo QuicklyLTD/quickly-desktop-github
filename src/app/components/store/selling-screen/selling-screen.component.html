@@ -7,14 +7,17 @@
             <div class="row">
               <div class="col-lg-8">
                 <div class="table-name">
-                  <span *ngIf="check?.type == 1">Masa:</span>
+                  <!-- <span *ngIf="check?.type == 1">Masa:</span> -->
                   <b>{{check?.table_id | general:'tables' | async}}</b>
                 </div>
                 <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-muted">
                   ({{check.note}})
                 </span>
               </div>
-              <div class="col-lg-4 pr-1">
+              <!-- <div class="col-lg-2">
+                {{check?.timestamp | timeAgo}}
+              </div> -->
+              <div class="col-lg-4 pl-1 pr-1">
                 <div class="input-group input-group-sm">
                   <div class="input-group-prepend normal">
                     <div class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></div>
@@ -27,12 +30,14 @@
           <div class="col-xl-4 col-lg-5">
             <div class="row">
               <div class="col-lg-6 pr-1 pl-1">
-                <button data-toggle="modal" (click)="onProductChange = false" data-target="#splitTable" [disabled]="tablesView?.length == 0 || check.products.length == 0 || check.status == 0" class="btn btn-danger btn-block btn-sm">Masa
-                  Değiştir</button>
+                <button data-toggle="modal" (click)="onProductChange = false" data-target="#splitTable" [disabled]="tablesView?.length == 0 || check.products.length == 0 || check.status == 0" class="btn btn-danger btn-block btn-sm">
+                  <strong>Masa Değiştir</strong>
+                </button>
               </div>
               <div class="col-lg-6 pr-1 pl-1">
-                <button data-toggle="modal" data-target="#checkOptions" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">Hesap
-                  İşlemleri</button>
+                <button data-toggle="modal" data-target="#checkOptions" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">
+                  <strong>Hesap İşlemleri</strong>
+                </button>
               </div>
             </div>
           </div>
@@ -42,15 +47,15 @@
         <div class="row">
           <div class="col-xl-8 col-lg-7">
             <div class="row">
-              <div class="col-xl-3 col-lg-4 inside-height check-flow pl-0 pr-0">
+              <div class="col-xl-3 col-lg-3 inside-height check-flow pl-0 pr-0">
                 <div class="btn-group-vertical btn-block btn-group-lg">
-                  <button (click)="productsView = products; selectedCat = undefined; subCatsView = undefined;" [ngClass]="{'btn-danger bg-danger text-white':selectedCat == undefined}" class="btn btn-secondary dark-bg">Bütün
+                  <button (click)="productsView = products; selectedCat = undefined; subCatsView = undefined;" [ngClass]="{'btn-danger bg-danger text-white':selectedCat == undefined}" class="btn btn-secondary dark-bg catButton">Bütün
                     Ürünler
                   </button>
-                  <button *ngFor="let cat of categories" [ngClass]="{'btn-danger bg-danger text-white':selectedCat == cat._id}" (click)="getProductsBy(cat._id)" class="btn btn-secondary dark-bg">{{cat.name}}</button>
+                  <button *ngFor="let cat of categories" [ngClass]="{'btn-danger bg-danger text-white':selectedCat == cat._id}" (click)="getProductsBy(cat._id)" class="btn btn-secondary dark-bg catButton">{{cat.name}}</button>
                 </div>
               </div>
-              <div class="col-xl-9 col-lg-8  pr-0 pl-0">
+              <div class="col-xl-8 col-lg-8  pr-0 pl-0">
                 <div class="card inside-height">
                   <div *ngIf="subCatsView !== undefined && subCatsView.length > 0">
                     <div class="card-header pt-1 pb-1 pr-1 pl-1">
@@ -90,27 +95,64 @@
                   </div>
                 </div>
               </div>
+              <div class="col-lg-1 col-xl-1">
+                <div class="row">
+                  <div *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]" class="col pr-0 pl-1">
+                    <button (click)="selectedQuantity = item" class="btn btn-block {{ selectedQuantity == item ? 'btn-warning' : 'btn-outline-warning'}}" style="height: 60.6px; font-weight: bold; font-size:1.5vw;"><strong>{{item}}</strong></button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="col-xl-3 col-lg-4 pr-0 pl-1">
             <div class="card inside-height">
+              <div class="card-header pt-1 pb-1">
+                <div class="row">
+                  <div class="col-lg-6 pl-0 pr-1">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text"><i class="fa fa-male" aria-hidden="true"></i></div>
+                      </div>
+                      <input type="number" readonly value="{{customers.male}}" class="form-control form-contol-sm" style="font-weight: bolder;">
+                      <div class="input-group-append normal">
+                        <button (click)="customers.male = customers.male +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                      </div>
+                      <div class="input-group-append normal">
+                        <button [disabled]="customers.male == 0" (click)="customers.male = customers.male -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 pl-1 pr-2">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-prepend normal">
+                        <div class="input-group-text"><i class="fa fa-female" aria-hidden="true"></i></div>
+                      </div>
+                      <input type="number" readonly value="{{customers.female}}" class="form-control form-contol-sm" style="font-weight: bolder;">
+                      <div class="input-group-append normal">
+                        <button (click)="customers.female = customers.female +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                      </div>
+                      <div class="input-group-append normal">
+                        <button [disabled]="customers.female == 0" (click)="customers.female = customers.female -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div id="check-products" class="card-body check-flow p-2 dark-bg">
                 <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
-                  <div [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'bg-warning text-dark':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
+                  <div [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
                     <div class="product-name">
                       <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
                       {{item.name}}
                       <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
                     </div>
                     <div class="product-price">{{item.price | number:'1.0-2' }} TL</div>
-                  </div>
-                  <div *ngIf="selectedIndex == i && item.status !== 1">
-                    <small>
+                    <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
                       <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
-                      <span class="pull-right mt-1">
+                      <span class="pull-right">
                         <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
-                    </small>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -123,9 +165,9 @@
                 <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
                   <p class="mb-0">{{payment.method}}
                     <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
-                    <span class="pull-right">{{payment.amount + payment.discount}} TL</span>
+                    <span class="pull-right">{{payment.amount + payment.discount | number:'1.0-2'}} TL</span>
                   </p>
-                  <p *ngFor="let product of payment.payed_products" class="text-muted m-0 pl-3" style="text-transform: capitalize;">
+                  <p *ngFor="let product of payment.payed_products" class="text-warning m-0 pl-3" style="text-transform: capitalize;">
                     <small>{{product.name}}
                       <span class="pull-right">{{product.price | number:'1.0-2'}} TL</span>
                     </small>
@@ -133,12 +175,12 @@
                   <p *ngIf="payment.discount > 0" class="text-danger m-0">
                     <small>
                       <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Miktarı
-                      <span class="pull-right">{{payment.discount}} TL</span>
+                      <span class="pull-right">{{payment.discount | number:'1.0-2'}} TL</span>
                     </small>
                   </p>
                   <p class="m-0 font-weight-bold">
                     <small>
-                      <i class="fa fa-arrow-right" aria-hidden="true"></i> Cari Ödeme
+                      <i class="fa fa-arrow-right" aria-hidden="true"></i> Alınan Ödeme
                       <span class="pull-right">{{payment.amount | number:'1.0-2'}} TL</span>
                     </small>
                   </p>
@@ -151,7 +193,7 @@
                   </strong>
                 </p>
                 <p *ngIf="check.discount > 0" class="text-muted mb-0"> Ödenen Miktar:
-                  <span class="pull-right">{{check.discount}} TL</span>
+                  <span class="pull-right">{{check.discount | number:'1.0-2' }} TL</span>
                 </p>
                 <p *ngIf="check.discountPercent > 0" class="text-danger mb-0">
                   İndirim Tutarı:
@@ -170,8 +212,9 @@
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block mt-2" data-toggle="buttons">
-                  <button (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block">Ödeme Al</button>
-                  <button [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck">Kapat</button>
+                  <button (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
+                  <button [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal"
+                    data-target="#closeCheck"><strong>Kapat</strong></button>
                 </div>
               </div>
             </div>

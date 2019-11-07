@@ -7,13 +7,13 @@
             <!-- Masalar -->
             <ul class="nav nav-tabs nav-justify">
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Masalar'}" (click)="section = 'Masalar'">Masalar</a>
+                <a class="nav-link" [ngClass]="{'active': section == 'Masalar'}" (click)="section = 'Masalar'"><i class="fa fa-square" aria-hidden="true"></i> Masalar</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Hesaplar'}" (click)="section = 'Hesaplar'">Hesaplar</a>
+                <a class="nav-link" [ngClass]="{'active': section == 'Hesaplar'}" (click)="section = 'Hesaplar'"><i class="fa fa-sticky-note" aria-hidden="true"></i> Hesaplar</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link disabled">Kroki</a>
+                <a class="nav-link disabled"><i class="fa fa-map" aria-hidden="true"></i> Kroki</a>
               </li>
             </ul>
           </div>
@@ -37,7 +37,7 @@
                   <p>
                     <i class="fa fa-user"></i> {{table.capacity}}
                     <span *ngIf="table.status == 2" class="pull-right">
-                      <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | date:'HH:mm'}}
+                      <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | timeAgo }}
                     </span>
                     <span *ngIf="table.status == 3" class="pull-right">
                       <i class="fa fa-print" aria-hidden="true"></i>
@@ -65,15 +65,15 @@
         <section *ngIf="section == 'Hesaplar'" id="checks">
           <div class="row">
             <div *ngFor="let check of checks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-3 col-lg-4 mt-2 col-card check-card">
-              <div class="card text-dark" [ngClass]="check.type == 1 ? 'bg-warning' : 'bg-info'">
+              <div class="card text-dark" [ngClass]="check.type == 1 ? 'bg-white' : 'bg-info'">
                 <div class="card-header pr-2 pl-2">
                   <b>
-                    <span class="float-left">{{check.table_id | general:'tables' | async}} {{check.note}}</span>
+                    <span class="float-left">{{check.table_id | general:'tables' | async}} <small>{{check.note}}</small></span>
                     <span class="float-right">{{check.total_price}} TL</span>
                   </b>
                 </div>
                 <div class="card-body pr-2 pl-2 pt-1 check-flow">
-                  <div *ngFor="let product of check.products" class="check-product" style="border-bottom: 1px solid #5b6977;">
+                  <div *ngFor="let product of check.products" class="check-product">
                     <div class="product-name">
                       {{product.name}}
                     </div>

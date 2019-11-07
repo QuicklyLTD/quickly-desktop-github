@@ -20,15 +20,6 @@ nav {
     bottom: 0;
 }
 
-#mainHolder *,
-#mainHolder *::after,
-#mainHolder *::before {
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
-    -webkit-app-region: no-drag;
-    cursor: default;
-}
-
 #sidebarHolder {
     position: fixed;
     bottom: 0;

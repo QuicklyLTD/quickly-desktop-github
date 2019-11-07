@@ -290,7 +290,10 @@ export class MainService {
                     resolve(true);
                   }
                 }).catch(err => {
-                  console.log(err)
+                  console.log(err);
+                  if (docs.length == index + 1) {
+                    resolve(true);
+                  }
                 });
               }
             }

@@ -69,6 +69,7 @@ export class AppComponent implements OnInit {
           this.dayStatus = settings.find(obj => obj.key == 'DateSettings').value;
         } catch (error) {
           this.messageService.sendAlert('Gün Dökümanı Hatası', 'Tarih Eşleştirmesi Başarısız', 'error');
+          this.findAppSettings();
         }
       }
       this.initAppProcess();
@@ -213,7 +214,15 @@ export class AppComponent implements OnInit {
     });
   }
 
-  findServerSettings(){
+  findAppSettings() {
+    this.mainService.syncToLocal('settings').then(message => {
+      this.messageService.sendMessage('Ayarlar Güncelleniyor...');
+    }).catch(err => {
+      this.messageService.sendAlert('Hata!', 'Gün Dökümanı Bulunamadı!', 'error');
+    });
+  }
+
+  findServerSettings() {
     let serverDocument;
     let AppType = localStorage.getItem('AppType');
     this.mainService.getAllBy('allData', { key: 'ServerSettings' }).then(res => {

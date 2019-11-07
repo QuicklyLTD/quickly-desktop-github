@@ -2,6 +2,7 @@
 @import url('./assets/themes/dark.scss');
 $fa-font-path: "../node_modules/font-awesome/fonts/";
 @import '../node_modules/font-awesome/scss/font-awesome';
+
 @font-face {
     font-family: 'Quickly';
     src: url('assets/quickly.ttf') format('truetype');
@@ -9,6 +10,15 @@ $fa-font-path: "../node_modules/font-awesome/fonts/";
 
 .text-quickly {
     color: #312783 !important;
+}
+
+*,
+*::after,
+*::before {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-app-region: no-drag;
+    cursor: default;
 }
 
 html,
@@ -109,16 +119,20 @@ input[disabled] {
 .tableCard {
     box-shadow: 1px 1px 4px rgb(43, 62, 80);
     height: 13.5vh;
+
     h1 {
         font-weight: 600;
         font-size: 2.45vw;
     }
+
     h4 {
         font-weight: 600;
     }
+
     p {
         margin: 0;
     }
+
     .long-name {
         font-size: 1.7vw;
         white-space: nowrap;
@@ -126,6 +140,7 @@ input[disabled] {
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
+
     .card-text {
         bottom: 0;
         white-space: nowrap;
@@ -139,24 +154,29 @@ input[disabled] {
     color: #f0ad4e;
     height: 7.5vw;
     box-shadow: 1px 1px 4px rgba(60, 58, 58, 0.48);
+
     .card-body {
         padding: 1rem;
     }
+
     h2 {
-        font-size: 1.7vw;
+        font-size: 1.5vw;
         font-weight: 900;
         white-space: pre-wrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
+
     :hover {
         background-color: #000;
         box-shadow: none;
     }
+
     .long-name {
-        font-size: 1.2vw;
+        font-size: 1vw;
     }
+
     p {
         position: absolute;
         width: 85%;
@@ -242,9 +262,11 @@ input[type="checkbox"] {
             font-size: 2vw;
         }
     }
+
     .subCatInput {
         width: 74%;
         min-height: 51px;
+
         img {
             display: block;
             height: 80px;
@@ -258,9 +280,11 @@ input[type="checkbox"] {
             font-size: 3vh;
         }
     }
+
     .subCatInput {
         width: 81%;
         min-height: 51px;
+
         img {
             display: block;
         }
@@ -334,9 +358,13 @@ th {
 .check-flow {
     overflow-y: scroll;
     overflow-x: hidden;
+
     .check-product {
         font-weight: bolder;
-        border-bottom: 1px solid #87919b;
+        border-bottom: 0.5px dashed #87919b;
+        margin-bottom: 0.10rem;
+        font-size: 14px;
+
         .product-name {
             display: inline-block;
             width: 80% !important;
@@ -345,12 +373,14 @@ th {
             text-overflow: ellipsis;
             text-transform: capitalize;
         }
+
         .product-price {
             float: right;
             text-align: right;
             width: 20% !important;
         }
     }
+
     .btn {
         padding-left: 5px;
         padding-right: 5px;

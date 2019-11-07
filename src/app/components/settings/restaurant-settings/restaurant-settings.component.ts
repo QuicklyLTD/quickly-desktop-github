@@ -120,7 +120,7 @@ export class RestaurantSettingsComponent implements OnInit {
     let schema = new Table(form.name, form.floor_id, form.capacity, form.description, 1, Date.now(), [], form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('tables', schema).then((response) => {
-        this.mainService.addData('reports', new Report('Table', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], 'Rapor Oluşturuldu', Date.now())).then(res => {
+        this.mainService.addData('reports', new Report('Table', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], form.name, Date.now())).then(res => {
           this.logService.createLog(logType.TABLE_CREATED, res.id, `${form.name} adlı Masa oluşturuldu.`);
         });
         this.fillData();
