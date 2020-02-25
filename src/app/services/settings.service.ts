@@ -27,14 +27,25 @@ export class SettingsService {
 
     this.mainService.getAllBy('settings', {}).then((res) => {
       this.Settings = res.docs;
+
       this.AppSettings.next(this.Settings.find((setting) => setting.key == 'AppSettings'));
       this.AuthInfo.next(this.Settings.find((setting) => setting.key == 'AuthInfo'));
       this.ActivationStatus.next(this.Settings.find((setting) => setting.key == 'ActivationStatus'));
       this.AppInformation.next(this.Settings.find((setting) => setting.key == 'AppInformation'));
       this.RestaurantInfo.next(this.Settings.find((setting) => setting.key == 'RestaurantInfo'));
       this.Printers.next(this.Settings.find((setting) => setting.key == 'Printers'));
-      this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings'));
       this.DateSettings.next(this.Settings.find((setting) => setting.key == 'DateSettings'));
+
+      let appType = localStorage.getItem('AppType');
+      switch (appType) {
+        case 'Primary':
+          this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings' && setting.value.type == 0));
+          break;
+        case 'Secondary':
+          this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings' && setting.value.type == 1));
+        default:
+          break;
+      }
     });
   }
 

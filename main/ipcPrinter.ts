@@ -4,6 +4,8 @@ import * as escpos from 'escpos';
 const line = '------------------------------------------------';
 // const line = '------------------------------------------';
 
+// const line = '------------------------------------------';
+
 
 ipcMain.on('printTest', (event, device) => {
   let deviceToPrint = findDevice(device);

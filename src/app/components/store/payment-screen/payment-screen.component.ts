@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check.mock';
-import { Printer } from '../../../mocks/settings.mock';
+import { Printer, PaymentMethod } from '../../../mocks/settings.mock';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { LogService, logType } from '../../../services/log.service';
@@ -44,6 +44,7 @@ export class PaymentScreenComponent implements OnInit {
   permissions: Object;
   day: number;
   changes: any;
+  paymentMethods: Array<PaymentMethod>
   @ViewChild('discountInput') discountInput: ElementRef;
   @ViewChild('customerInput') customerInput: ElementRef;
   @ViewChild('creditNote') creditNote: ElementRef;
@@ -53,6 +54,12 @@ export class PaymentScreenComponent implements OnInit {
       this.id = params['id'];
       this.fillData();
     });
+    this.paymentMethods = [
+      new PaymentMethod('Nakit', 'Nakit Ödeme', '#5cb85c', 'fa-money', 1, 1),
+      new PaymentMethod('Kart', 'Kredi veya Banka Kartı', '#f0ad4e', 'fa-credit-card', 2, 1),
+      new PaymentMethod('Kupon', 'İndirim Kuponu veya Yemek Çeki', '#5bc0de', 'fa-bookmark', 3, 1),
+      new PaymentMethod('İkram', 'İkram Hesap', '#c9302c', 'fa-handshake-o', 4, 1)
+    ];
     this.permissions = JSON.parse(localStorage['userPermissions']);
     this.settingsService.DateSettings.subscribe(res => {
       this.day = res.value.day;
@@ -61,11 +68,11 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.discounts = [10, 15, 20, 25, 50];
+    this.discounts = [5, 10, 15, 20, 25, 50];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "✔"]];
     this.setDefault();
     this.payedShow = false;
-    this.payedTitle = 'Alınan Ödemeleri Göster';
+    this.payedTitle = 'Ödemeleri Göster';
     this.userId = this.settingsService.getUser('id');
     this.userName = this.settingsService.getUser('name');
     this.onClosing = false;
@@ -256,10 +263,10 @@ export class PaymentScreenComponent implements OnInit {
   togglePayed() {
     if (this.payedShow) {
       this.payedShow = false;
-      this.payedTitle = 'Alınan Ödemeleri Göster';
+      this.payedTitle = 'Ödemeleri Göster';
     } else {
       this.payedShow = true;
-      this.payedTitle = 'Alınan Ödemeleri Gizle';
+      this.payedTitle = 'Ödemeleri Gizle';
     }
   }
 
@@ -270,7 +277,7 @@ export class PaymentScreenComponent implements OnInit {
     this.priceWillPay += product.price;
     this.numpad = this.priceWillPay.toString();
     this.payedShow = false;
-    this.payedTitle = 'Alınan Ödemeleri Göster';
+    this.payedTitle = 'Ödemeleri Göster';
     this.setChange();
   }
 

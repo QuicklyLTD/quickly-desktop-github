@@ -55,8 +55,7 @@
                           <i class="fa fa-search" aria-hidden="true"></i>
                         </div>
                       </div>
-                      <input #tableName type="text" placeholder="Masa Adı Giriniz.." (click)="fillData(); tableName.value = '';"
-                        (keyup)="filterTables(tableName.value)" class="form-control form-contol-sm">
+                      <input #tableName type="text" placeholder="Masa Adı Giriniz.." (click)="fillData(); tableName.value = '';" (keyup)="filterTables(tableName.value)" class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
@@ -66,8 +65,8 @@
                   <thead class="thead-dark">
                     <tr>
                       <th width="7%">#</th>
-                      <th width="33%">Masa</th>
-                      <th width="20%">Tutar</th>
+                      <th width="30%">Masa</th>
+                      <th width="23%">Tutar</th>
                       <th width="13%">Saat</th>
                       <th width="17%">Ödeme</th>
                     </tr>
@@ -78,9 +77,11 @@
                       <td>{{check.table_id | general:'tables' | async}}
                         <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
-                      <td>{{check.total_price + check.discount | number:'1.0-2'}} TL
+                      <td>{{check.total_price + check.discount | price}}
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
-                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount |  number:'1.0-2'}} TL
+                          <strong>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount |  price}}
+                          </strong>
                         </small>
                       </td>
                       <td>{{check.timestamp | date:"HH:mm" }}</td>
@@ -94,7 +95,7 @@
               <div class="card-footer">
                 <strong>
                   Normal Hesap Toplamı:
-                  <span class="pull-right">{{NormalTotal | number:'1.0-2' }} TL</span>
+                  <span class="pull-right">{{NormalTotal | price }} </span>
                 </strong>
               </div>
             </div>
@@ -143,8 +144,7 @@
                           <i class="fa fa-search" aria-hidden="true"></i>
                         </div>
                       </div>
-                      <input #ownerName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="fillData(); ownerName.value = '';"
-                        (keyup)="filterChecks(ownerName.value)" class="form-control form-contol-sm">
+                      <input #ownerName type="text" placeholder="Kullanıcı Adı Giriniz.." (click)="fillData(); ownerName.value = '';" (keyup)="filterChecks(ownerName.value)" class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
@@ -166,9 +166,9 @@
                       <td>{{check.table_id}}
                         <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
-                      <td>{{check.total_price + check.discount | number:'1.0-2'}} TL
+                      <td>{{check.total_price + check.discount | price}}
                         <small *ngIf="check.discount > 0" class="pull-right text-danger">
-                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount}} TL
+                          <i class="fa fa-arrow-down" aria-hidden="true"></i> {{check.discount | price}}
                         </small>
                       </td>
                       <td>{{check.timestamp | date:"HH:mm" }}</td>
@@ -182,7 +182,7 @@
               <div class="card-footer">
                 <strong>
                   Hızlı Hesap Toplamı:
-                  <span class="pull-right">{{FastTotal | number:'1.0-2' }} TL</span>
+                  <span class="pull-right">{{FastTotal | price }} </span>
                 </strong>
               </div>
             </div>
@@ -222,7 +222,7 @@
                   </td>
                   <td>{{check.description}}</td>
                   <td>{{check.payment_method}}</td>
-                  <td>{{check.total_price | number:'1.0-2' }} TL</td>
+                  <td>{{check.total_price | price }} </td>
                   <td>{{check.timestamp | date:"HH:mm" }}</td>
                   <td>{{check.owner}}</td>
                 </tr>
@@ -271,7 +271,7 @@
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">Hesap Detayı
+        <h4 class="modal-tie" id="modelTieId">Hesap Detayı
         </h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -302,7 +302,7 @@
                   </td>
                   <td>{{item.owner}}</td>
                   <td>{{item.timestamp |date:'HH:mm'}}</td>
-                  <td>{{item.price | number:'1.0-2'}} TL</td>
+                  <td>{{item.price | price}} </td>
                 </tr>
               </tbody>
             </table>
@@ -313,13 +313,13 @@
                   <th width="45%">{{item.owner}}</th>
                   <th width="15%">{{item.method}}</th>
                   <th width="15%">{{item.timestamp | date:'HH:mm'}}</th>
-                  <th width="17%">{{item.amount + item.discount | number:'1.0-2'}} TL</th>
+                  <th width="17%">{{item.amount + item.discount | price}} </th>
                 </thead>
                 <tbody>
                   <tr *ngIf="item.discount > 0" class="table-info">
                     <td><i class="fa fa-arrow-down" aria-hidden="true"></i></td>
                     <td colspan="3">İndirim Tutarı</td>
-                    <td>{{item.discount}} TL</td>
+                    <td>{{item.discount | price }} </td>
                   </tr>
                   <tr *ngFor="let product of item.payed_products; let i = index;" [ngClass]="{'table-danger': product.status == 3}">
                     <td width="4%">{{i+1}}</td>
@@ -328,7 +328,7 @@
                     </td>
                     <td width="15%">{{product.owner}}</td>
                     <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
-                    <td width="17%">{{product.price | number:'1.0-2'}} TL</td>
+                    <td width="17%">{{product.price | price}} </td>
                   </tr>
                 </tbody>
               </table>
@@ -343,25 +343,23 @@
           <div *ngIf="checkDetail?.discount > 0" class="card-footer">
             <b>
               <i class="fa fa-arrow-down" aria-hidden="true"></i> Toplam İndirim Tutarı:
-              <span class="pull-right">{{checkDetail?.discount}} TL</span>
+              <span class="pull-right">{{checkDetail?.discount | price}} </span>
             </b>
           </div>
           <div class="card-footer">
             <b>
               <i class="fa fa-check" aria-hidden="true"></i> Ödenen Miktar:
-              <span class="pull-right">{{checkDetail?.total_price | number:'1.0-2'}} TL</span>
+              <span class="pull-right">{{checkDetail?.total_price | price}} </span>
             </b>
           </div>
         </div>
       </div>
       <div class="modal-footer pr-2 text-center">
-        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" data-toggle="modal" data-dismiss="modal"
-          data-target="#cancelDetail" class="btn btn-danger btn-lg">
+        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" data-toggle="modal" data-dismiss="modal" data-target="#cancelDetail" class="btn btn-danger btn-lg">
           <i class="fa fa-times" aria-hidden="true"></i> İptal Et</button>
         <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
           <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
-        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" type="button" class="btn btn-success btn-lg mr-1"
-          data-toggle="modal" data-dismiss="modal" data-target="#editCheck">
+        <button *ngIf="checkDetail?.type !== 3" [disabled]="!permissions.cancelCheck" type="button" class="btn btn-success btn-lg mr-1" data-toggle="modal" data-dismiss="modal" data-target="#editCheck">
           <i class="fa fa-edit" aria-hidden="true"></i> Hesap Düzelt</button>
       </div>
     </div>
@@ -372,7 +370,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">Hesap İptal Detayı</h4>
+        <h4 class="modal-tie" id="modelTieId">Hesap İptal Detayı</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -389,8 +387,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button [disabled]="cancelNote.value == '' || cancelNote.value == ' '" (click)="cancelCheck(checkDetail._id,cancelNote.value)"
-          class="btn btn-danger btn-lg">İptal Et</button>
+        <button [disabled]="cancelNote.value == '' || cancelNote.value == ' '" (click)="cancelCheck(checkDetail._id,cancelNote.value)" class="btn btn-danger btn-lg">İptal Et</button>
       </div>
     </div>
   </div>
@@ -400,7 +397,7 @@
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">Hesap Düzenle</h4>
+        <h4 class="modal-tie" id="modelTieId">Hesap Düzenle</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -416,7 +413,7 @@
               </div>
               <input type="number" class="form-control form-control-lg" name="total_price" [ngModel]="checkDetail.total_price">
               <div class="input-group-append">
-                <div class="input-group-text">TL</div>
+                <div class="input-group-text"></div>
               </div>
             </div>
           </div>
@@ -438,7 +435,7 @@
           <p>Düzenlemek istediğiniz ödemeyi seçin</p>
           <div *ngFor="let payment of checkDetail?.payment_flow; let i = index">
             <button type="button" class="btn btn-block btn-lg btn-secondary text-left mb-1" (click)="editPayment(i)">{{payment.method}}
-              <span class="pull-right">{{payment.amount | number:'1.0-2'}} TL</span>
+              <span class="pull-right">{{payment.amount | price}} </span>
             </button>
           </div>
         </div>
@@ -458,7 +455,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Ödeme Düzenle</h4>
+        <h4 class="modal-tie">Ödeme Düzenle</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -475,7 +472,7 @@
               <input type="number" class="form-control form-control-lg" name="amount" [ngModel]="selectedPayment?.amount">
               <div class="input-group-append">
                 <div class="input-group-text">
-                  TL
+
                 </div>
               </div>
             </div>

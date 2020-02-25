@@ -64,7 +64,16 @@ export class MainService {
 
     this.getAllBy('settings', { key: 'ServerSettings' }).then(res => {
       if (res.docs.length > 0) {
-        this.serverInfo = res.docs[0].value;
+        let appType = localStorage.getItem('AppType');
+        switch (appType) {
+          case 'Primary':
+            this.serverInfo = res.docs.find(obj => obj.key == 'ServerSettings' && obj.value.type == 0).value;
+            break;
+          case 'Secondary':
+            this.serverInfo = res.docs.find(obj => obj.key == 'ServerSettings' && obj.value.type == 1).value;
+          default:
+            break;
+        }
         if (this.serverInfo.type == 0) {
           if (this.serverInfo.status == 1) {
             this.ServerDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
@@ -247,7 +256,7 @@ export class MainService {
       changes.forEach((element) => {
         if (!element._deleted) {
           let db = element.db_name;
-          if (element.key !== 'ServerSettings') {
+          if (element.key !== 'ServerSettings' || element.key !== 'ActivationStatus') {
             delete element._rev;
             delete element._revisions;
             delete element.db_seq;
@@ -263,9 +272,7 @@ export class MainService {
             if (db !== 'allData') {
               this.LocalDB[db].get(element._id).then((doc) => {
                 if (doc) return this.LocalDB[db].remove(doc);
-              }).catch(err => {
-                console.log(db);
-              });
+              }).catch(err => { });
             }
           }
         }

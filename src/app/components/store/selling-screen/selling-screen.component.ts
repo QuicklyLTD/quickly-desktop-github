@@ -65,6 +65,7 @@ export class SellingScreenComponent implements OnInit {
   discounts: Array<number>;
   selectedQuantity: number;
   customers: any = { male: 0, female: 0 };
+  takeaway: boolean;
   @ViewChild('productName') productFilterInput: ElementRef
   @ViewChild('specsUnit') productUnit: ElementRef
 
@@ -72,7 +73,7 @@ export class SellingScreenComponent implements OnInit {
     this.owner = this.settingsService.getUser('name');
     this.ownerRole = this.settingsService.getUser('type');
     this.ownerId = this.settingsService.getUser('id');
-    this.discounts = [10, 15, 20, 25, 50];
+    this.discounts = [5,10, 15, 20, 25, 50];
     this.selectedQuantity = 1;
     this.paymentMethods = [
       new PaymentMethod('Nakit', 'Nakit Ödeme', '#5cb85c', 'fa-money', 1, 1),
@@ -104,7 +105,16 @@ export class SellingScreenComponent implements OnInit {
     });
     this.settingsService.DateSettings.subscribe(res => {
       this.day = res.value.day;
+
     });
+    this.settingsService.AppSettings.subscribe(res => {
+      let takeaway = res.value.takeaway;
+      if (takeaway == 'Kapalı') {
+        this.takeaway = false;
+      } else {
+        this.takeaway = true;
+      }
+    })
     this.permissions = JSON.parse(localStorage['userPermissions']);
     this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
     if (localStorage.getItem('selectedFloor')) {
@@ -350,7 +360,11 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.updateUserReport();
       this.updateProductReport(this.countData);
-      this.router.navigate(['']);
+      if(this.takeaway){
+        this.router.navigate(['']);
+      }else{
+        this.router.navigate(['/store']);
+      }
     }
     if (this.check.type == CheckType.FAST) {
       this.logService.createLog(logType.CHECK_CLOSED, this.ownerId, `${this.owner} tarafından ${this.check.table_id} Hesabı ${this.check.total_price} TL ${method} ödeme alınarak kapatıldı.`)
@@ -1012,11 +1026,13 @@ export class SellingScreenComponent implements OnInit {
       this.floors = res.docs;
     });
     this.settingsService.getAppSettings().subscribe((res: any) => {
+
       if (res.value.ask_print_order == 'Sor') {
         this.askForPrint = true;
       } else {
         this.askForPrint = false;
       }
+
       if (res.value.ask_print_check == 'Sor') {
         this.askForCheckPrint = true;
       } else {

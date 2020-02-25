@@ -215,7 +215,7 @@ export class MenuSettingsComponent implements OnInit {
           let schema = new Recipe(response.id, this.productRecipe);
           this.mainService.addData('recipes', schema);
         }
-        this.fillData();
+        // this.fillData();
         this.messageService.sendMessage('Ürün Oluşturuldu');
       });
     } else {
@@ -231,7 +231,7 @@ export class MenuSettingsComponent implements OnInit {
               this.mainService.updateData('recipes', this.recipeId, { recipe: this.productRecipe });
             }
           }
-          this.fillData();
+          // this.fillData();
           this.messageService.sendMessage('Ürün Düzenlendi');
         }
       });
@@ -297,7 +297,7 @@ export class MenuSettingsComponent implements OnInit {
             this.mainService.removeData('recipes', res.docs[0]._id);
         });
         this.messageService.sendMessage('Ürün Silindi!');
-        this.fillData();
+        // this.fillData();
       });
     }
   }

@@ -11,7 +11,7 @@
               </td>
               <td width="94%">
                 <b>Faliyet Gelirleri</b>
-                <span class="pull-right">Toplam:  {{sellingIncomes  | number:'1.0-2' }} TL</span>
+                <span class="pull-right">Toplam: {{sellingIncomes | price }}</span>
               </td>
             </tr>
           </thead>
@@ -36,7 +36,7 @@
               <td>{{cash.description}}</td>
               <td>{{cash.user}}</td>
               <td>{{cash.timestamp | date:'HH:mm'}}</td>
-              <td>{{cash.cash + cash.card + cash.coupon  | number:'1.0-2'}} TL</td>
+              <td>{{cash.cash + cash.card + cash.coupon  | price}}</td>
             </tr>
           </tbody>
         </table>
@@ -44,13 +44,13 @@
       <div class="card-footer">
         <div class="row">
           <div class="col-lg-4">
-            <h4 class="text-success">Gelir: {{incomes  | number:'1.0-2'}} TL</h4>
+            <h4 class="text-success">Gelir: {{incomes | price}}</h4>
           </div>
           <div class="col-lg-4 text-center">
-            <h4 class="text-danger">Gider: {{outcomes  | number:'1.0-2'}} TL</h4>
+            <h4 class="text-danger">Gider: {{outcomes | price}}</h4>
           </div>
           <div class="col-lg-4">
-            <h4 class="pull-right text-primary">Toplam: {{leftTotal  | number:'1.0-2'}} TL</h4>
+            <h4 class="pull-right text-primary">Toplam: {{leftTotal | price}}</h4>
           </div>
         </div>
       </div>
@@ -74,16 +74,16 @@
       <form #cashboxForm="ngForm" (ngSubmit)="addData(cashboxForm)">
         <div class="modal-body">
           <div *ngIf="onUpdate">
-            <input type="hidden" name="_id" ngModel/>
-            <input type="hidden" name="_rev" ngModel/>
+            <input type="hidden" name="_id" ngModel />
+            <input type="hidden" name="_rev" ngModel />
           </div>
           <input type="hidden" name="timestamp" class="form-control form-control-lg" ngModel>
           <input type="hidden" name="user" class="form-control form-control-lg" ngModel>
-          <input id="type" type="hidden" name="type"  ngModel>
+          <input id="type" type="hidden" name="type" ngModel>
           <div class="form-group mb-0">
             <div class="input-group">
               <div class="input-group-prepend">
-                <div class="input-group-text">Açıklama</div> 
+                <div class="input-group-text">Açıklama</div>
               </div>
               <input type="text" name="description" class="form-control form-control-lg" ngModel>
             </div>
@@ -91,22 +91,22 @@
           <div class="form-group mb-0">
             <div class="input-group">
               <div class="input-group-prepend">
-                  <div class="input-group-text">Nakit</div>
+                <div class="input-group-text">Nakit</div>
               </div>
               <input type="number" min="0" name="cash" class="form-control form-control-lg" ngModel>
               <div class="input-group-append">
-                  <div class="input-group-text">TL</div>
+                <div class="input-group-text">TL</div>
               </div>
             </div>
           </div>
           <div class="form-group mb-0">
             <div class="input-group">
               <div class="input-group-prepend">
-                  <div class="input-group-text">Kart</div>
+                <div class="input-group-text">Kart</div>
               </div>
               <input type="number" min="0" name="card" class="form-control form-control-lg" ngModel>
               <div class="input-group-append">
-                  <div class="input-group-text">TL</div>
+                <div class="input-group-text">TL</div>
               </div>
             </div>
           </div>
@@ -117,7 +117,7 @@
               </div>
               <input type="number" min="0" name="coupon" class="form-control form-control-lg" ngModel>
               <div class="input-group-append">
-                  <div class="input-group-text">TL</div>
+                <div class="input-group-text">TL</div>
               </div>
             </div>
           </div>

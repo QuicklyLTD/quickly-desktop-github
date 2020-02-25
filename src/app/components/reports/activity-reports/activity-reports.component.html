@@ -1,0 +1,94 @@
+  <ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" (click)="dailySalesActivity()" href="#sales" role="tab">
+        <i class="fa fa-turkish-lira" aria-hidden="true"></i> Gelir Endeksi</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" (click)="dailyCrowdActivity()" href="#crowd" role="tab">
+        <i class="fa fa-users" aria-hidden="true"></i> Doluluk</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link disabled" data-toggle="tab" href="#weekly" role="tab">
+        <i class="fa fa-exchange" aria-hidden="true"></i> Sirkülasyon</a>
+    </li>
+    <li class="nav-item disabled">
+      <a class="nav-link" data-toggle="tab" href="#monthly" role="tab">
+        <i class="fa fa-table" aria-hidden="true"></i> Aylık</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- <div class="tab-pane" id="weekly" role="tabpanel">
+      <div class="card ntb">
+        <div class="card-header">
+          <h5 class="mt-2">Haftalık Satış Raporu</h5>
+        </div>
+        <div class="card-body tab-height p-0">
+          <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:77vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [colors]="ChartColors" [chartType]="ChartType"></canvas>
+        </div>
+        <div class="card-footer">
+          <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="monthly" role="tabpanel">
+      <div class="card ntb">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-lg-9">
+              <h5 class="mt-2">Aylık Satış Raporu</h5>
+            </div>
+            <div class="col-lg-3 pr-2 pl-0">
+              <div class="input-group">
+                <div class="input-group-prepend normal">
+                  <div class="input-group-text">Yıl</div>
+                </div>
+                <select class="form-control" (change)="getMonthlyReport($event.target.value)">
+                  <option>2018</option>
+                  <option>2019</option>
+                  <option selected>2020</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body tab-height p-0">
+          <h1 *ngIf="monthlyData?.length == 0">Yıla Ait Veri Bulunamadı</h1>
+          <canvas *ngIf="monthlyLoaded" baseChart style="height: 468px; width:77vw; margin:auto;" [datasets]="monthlyData" [labels]="monthlyLabels" [options]="ChartOptions" [legend]="monthlyLegends" [colors]="ChartColors" [chartType]="ChartType"></canvas>
+        </div>
+        <div class="card-footer">
+          <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+        </div>
+      </div>
+    </div>  -->
+
+    <div class="tab-pane active" id="sales" role="tabpanel">
+      <div class="card ntb">
+        <div class="card-header">
+          <h5 class="mt-2">Günlük Gelir Endeksi Aktivitesi</h5>
+        </div>
+        <div class="card-body tab-height p-0">
+          <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:77vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels" [options]="SalesActivityOptions" [legend]="activityLegend" [colors]="SalesColor" chartType="line"></canvas>
+        </div>
+        <div class="card-footer">
+          <i class="fa fa-question-circle" aria-hidden="true"></i> Belirtilen Saatlerde Oturan Müşterilerin Ortalama Hesap Tutarı
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="crowd" role="tabpanel">
+      <div class="card ntb">
+        <div class="card-header">
+          <h5 class="mt-2">Günlük Doluluk Aktivitesi</h5>
+        </div>
+        <div class="card-body tab-height p-0">
+          <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:77vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels" [options]="CrowdActivityOptions" [legend]="activityLegend" [colors]="CrowdColor" chartType="line"></canvas>
+        </div>
+        <div class="card-footer">
+          <i class="fa fa-question-circle" aria-hidden="true"></i> Zaman Bazlı Mekan Doluluk Oranı
+        </div>
+      </div>
+    </div>
+  </div>

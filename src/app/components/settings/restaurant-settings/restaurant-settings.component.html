@@ -42,8 +42,7 @@
               <div class="card-body p-0 flow">
                 <div class="list-group">
                   <div *ngFor="let item of floors" class="btn-group btn-group-justify">
-                    <button (click)="getFloor(item)" [ngClass]="{'list-group-item-warning' : selectedFloor == item._id}"
-                      type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
+                    <button (click)="getFloor(item)" [ngClass]="{'list-group-item-warning' : selectedFloor == item._id}" type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
                   </div>
                 </div>
               </div>
@@ -160,8 +159,7 @@
             <h5 class="mt-2">Masa Ayarları</h5>
           </div>
           <div class="col-lg-4 pr-2 pl-0">
-            <button [disabled]="floors?.length == 0" class="btn btn-danger btn-md btn-block" (click)="setDefault()"
-              data-toggle="modal" data-target="#tableModal">
+            <button [disabled]="floors?.length == 0" class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#tableModal">
               <i class="fa fa-plus"></i> Masa Ekle
             </button>
           </div>
@@ -199,8 +197,7 @@
                           <i class="fa fa-search" aria-hidden="true"></i>
                         </div>
                       </div>
-                      <input #tableName type="text" placeholder="Masa Adı Giriniz.." (focus)="getTablesByFloor(null)"
-                        (click)="tableName.value = '';" (keydown)="filterTables(tableName.value)" class="form-control form-contol-sm">
+                      <input #tableName type="text" placeholder="Masa Adı Giriniz.." (focus)="getTablesByFloor(null)" (click)="tableName.value = '';" (keydown)="filterTables(tableName.value)" class="form-control form-contol-sm">
                     </div>
                   </div>
                 </div>
@@ -407,10 +404,11 @@
       </div>
       <form #tableForm="ngForm" (ngSubmit)="addTable(tableForm)">
         <div *ngIf="onUpdate">
-          <input type="hidden" name="_id" ngModel />
-          <input type="hidden" name="_rev" ngModel />
-          <input type="hidden" name="status" ngModel />
-          <input type="hidden" name="timestamp" ngModel />
+          <input type="hidden" name="_id" ngModel>
+          <input type="hidden" name="_rev" ngModel>
+          <input type="hidden" name="status" ngModel>
+          <input type="hidden" name="timestamp" ngModel>
+          <input type="hidden" name="position" ngModel>
         </div>
         <div class="modal-body">
           <div class="form-group">
@@ -436,7 +434,7 @@
             </div>
             <div class="input-group">
               <div class="input-group-prepend">
-                <div class="input-group-text">Masa Açıklaması</div>
+                <div class="input-group-text">Açıklama</div>
               </div>
               <input type="text" name="description" class="form-control form-control-lg" ngModel />
             </div>

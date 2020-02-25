@@ -1,9 +1,64 @@
-#settings-holder{
-    .card{
-        i{
-            font-size:3vw;
+// #settings-holder{
+//     .card{
+//         i{
+//             font-size:3vw;
+//         }
+//         height: 16vh;
+//         font-size: 1.2vw;
+//     }
+// }
+
+
+@media screen and (min-width: 900px) {
+    #settings-holder{
+        .card{
+            height: 70px;
+            margin-bottom: 6px;
         }
-        height: 16vh;
-        font-size: 1.2vw;
+        .card-body{
+            padding: 23px 5px 20px 10px;
+        }
+        h2{
+            font-size: 17px;
+            margin-bottom: 0;
+            font-weight: bold;
+            i{
+                width: 14%;
+                text-align: center;
+                margin-right: 3px;
+                margin-left: 2px;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    #settings-holder{
+        .card{
+            height: 70px;
+            margin-bottom: 6px;
+        }
+        .card-body{
+            padding: 22px 5px 20px 10px;
+        }
+        h2{
+            font-size: 22px;
+            margin-bottom: 0;
+            font-weight: bold;
+            i{
+                width: 13%;
+                text-align: center;
+                margin-right: 3px;
+                margin-left: 2px;
+            }
+        }
+    }
+}
+
+h5{
+    font-weight: bold !important;
+    i{
+        text-align: center;
+        width: 35px;
     }
 }

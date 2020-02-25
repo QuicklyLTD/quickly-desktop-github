@@ -1,11 +1,12 @@
 @import '../node_modules/animate.css/animate.min.css';
 @import url('./assets/themes/dark.scss');
+
 $fa-font-path: "../node_modules/font-awesome/fonts/";
 @import '../node_modules/font-awesome/scss/font-awesome';
 
 @font-face {
     font-family: 'Quickly';
-    src: url('assets/quickly.ttf') format('truetype');
+    src: url('assets/fonts/Quickly.ttf') format('truetype');
 }
 
 .text-quickly {
@@ -30,6 +31,24 @@ body {
     overflow-y: hidden;
     touch-action: manipulation;
     font-family: Quickly !important;
+    // background-image: url(http://www.astopia.eu/wp-content/uploads/2015/12/pieter_leon_vermeersch_2015_04_01_1280_pixels.jpg);
+    // background-repeat: no-repeat;
+    // background-attachment: fixed;
+    // background-size: cover;
+    // animation: hue 7s infinite;
+
+}
+
+@keyframes hue {
+
+    0%,
+    100% {
+        -webkit-filter: hue-rotate(0deg);
+    }
+
+    50% {
+        -webkit-filter: hue-rotate(180deg);
+    }
 }
 
 app-root {
@@ -57,6 +76,7 @@ app-root {
 .input-group-prepend {
     .input-group-text {
         width: 150px;
+        font-weight: bolder;
     }
 }
 
@@ -77,10 +97,16 @@ app-root {
     overflow: hidden;
     text-overflow: ellipsis;
     text-transform: capitalize;
+    font-weight: bolder;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    font-weight: bolder;
 }
 
 .dark-bg {
-    background-color: #2b3e50;
+    // background-color: #2b3e50;
+    background-color: #1B2731;
 }
 
 .form-control {
@@ -149,6 +175,16 @@ input[disabled] {
     }
 }
 
+.card-body {
+    .card-text {
+        font-weight: bolder;
+    }
+}
+
+.btn {
+    font-weight: bolder;
+}
+
 .proCard {
     background-color: #2b3e50;
     color: #f0ad4e;
@@ -189,12 +225,12 @@ input[disabled] {
     }
 }
 
-// .nav-tabs{
-//     .nav-link.active{
-//         background-color: #f7f7f9;
-//         border-bottom-color: #f7f7f9;
-//     }
-// }
+.nav-tabs {
+    .nav-link.active {
+        font-weight: bolder;
+    }
+}
+
 .btn-discount {
     padding: 20px;
     font-size: 5vh !important;
@@ -218,15 +254,18 @@ input[disabled] {
     overflow-x: hidden;
 }
 
-// #settings-holder{
-//     .card{
-//         i{
-//             font-size:3vw;
-//         }
-//         height: 16vh;
-//         font-size: 1.2vw;
-//     }
-// }
+.table-name {
+    font-weight: bolder;
+    font-size: xx-large;
+    position: absolute;
+    top: -7px;
+    left: 5px;
+
+    span {
+        vertical-align: middle;
+        font-size: large;
+    }
+}
 .col-card {
     padding-right: 5px !important;
     padding-left: 5px !important;
@@ -322,6 +361,7 @@ th {
     overflow: hidden;
     text-overflow: ellipsis;
     text-transform: capitalize;
+    font-weight: bolder;
 }
 
 .nav-tabs .nav-link.active,
@@ -331,25 +371,17 @@ th {
     border-bottom-color: #5b6977;
 }
 
-/* width */
-
 ::-webkit-scrollbar {
     width: 10px;
 }
-
-/* Track */
 
 ::-webkit-scrollbar-track {
     background: #5b6977;
 }
 
-/* Handle */
-
 ::-webkit-scrollbar-thumb {
     background: #888;
 }
-
-/* Handle on hover */
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
@@ -367,7 +399,7 @@ th {
 
         .product-name {
             display: inline-block;
-            width: 80% !important;
+            width: 70% !important;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -377,7 +409,7 @@ th {
         .product-price {
             float: right;
             text-align: right;
-            width: 20% !important;
+            width: 30% !important;
         }
     }
 
@@ -389,4 +421,135 @@ th {
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
+}
+
+
+.bg-orange {
+    background-color: #DF691A;
+}
+
+.bg-indigo {
+    background-color: #6610f2;
+}
+
+.bg-purple {
+    background-color: #6f42c1;
+}
+
+.bg-pink {
+    background-color: #e83e8c;
+}
+
+.bg-red {
+    background-color: #d9534f;
+}
+
+.bg-yellow {
+    background-color: #f0ad4e;
+}
+
+.bg-green {
+    background-color: #5cb85c;
+}
+
+.bg-teal {
+    background-color: #20c997;
+}
+
+.bg-cyan {
+    background-color: #5bc0de;
+}
+
+.bg-dark {
+    background-color: #1B2731;
+}
+
+.bg-oil {
+    background-color: #2B3E50;
+}
+
+.bg-dark-gray {
+    background-color: #4e5d6c;
+}
+
+.bg-gray {
+    background-color: #5b6977;
+}
+
+.bg-light-gray {
+    background-color: #EBEBEB;
+}
+
+.bg-white {
+    background-color: #FFFFFF;
+}
+
+
+
+.color-orange {
+    color: #DF691A;
+}
+
+.color-indigo {
+    color: #6610f2;
+}
+
+.color-purple {
+    color: #6f42c1;
+}
+
+.color-pink {
+    color: #e83e8c;
+}
+
+.color-red {
+    color: #d9534f;
+}
+
+.color-yellow {
+    color: #f0ad4e;
+}
+
+.color-green {
+    color: #5cb85c;
+}
+
+.color-teal {
+    color: #20c997;
+}
+
+.color-cyan {
+    color: #5bc0de;
+}
+
+.color-dark {
+    color: #1B2731;
+}
+
+.color-oil {
+    color: #2B3E50;
+}
+
+.bg-dark-gray {
+    color: #4e5d6c;
+}
+
+.color-gray {
+    color: #5b6977;
+}
+
+.color-light-gray {
+    color: #EBEBEB;
+}
+
+.color-white {
+    color: #FFFFFF;
+}
+
+.card-header{
+    font-weight: bold;
+}
+
+.close{
+    font-size: 2rem;
 }

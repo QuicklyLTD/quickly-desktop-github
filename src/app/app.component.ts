@@ -19,7 +19,7 @@ import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.6.0';
+  version = '1.6.5';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -55,12 +55,16 @@ export class AppComponent implements OnInit {
       if (res.docs.length > 0) {
         let settings: Array<Settings> = res.docs;
         try {
-          this.activationStatus = settings.find(obj => obj.key == 'ActivationStatus').value;
-        } catch (error) {
-          this.messageService.sendAlert('Aktivasyon Hatası', 'Aktivasyon Anahtarı Bulunamadı!', 'error');
-        }
-        try {
-          this.serverSettings = settings.find(obj => obj.key == 'ServerSettings').value;
+          let appType = localStorage.getItem('AppType');
+          switch (appType) {
+            case 'Primary':
+              this.serverSettings = settings.find(obj => obj.key == 'ServerSettings' && obj.value.type == 0).value;
+              break;
+            case 'Secondary':
+              this.serverSettings = settings.find(obj => obj.key == 'ServerSettings' && obj.value.type == 1).value;
+            default:
+              break;
+          }
         } catch (error) {
           this.messageService.sendAlert('Bağlantı Hatası', 'Sunucu Bağlantı Anahtarı Bulunamadı!', 'error');
           this.findServerSettings();
@@ -71,7 +75,14 @@ export class AppComponent implements OnInit {
           this.messageService.sendAlert('Gün Dökümanı Hatası', 'Tarih Eşleştirmesi Başarısız', 'error');
           this.findAppSettings();
         }
+        try {
+          this.activationStatus = settings.find(obj => obj.key == 'ActivationStatus').value;
+        } catch (error) {
+          this.messageService.sendAlert('Aktivasyon Hatası', 'Aktivasyon Anahtarı Bulunamadı!', 'error');
+          this.findAppSettings();
+        }
       }
+    }).then(() => {
       this.initAppProcess();
     });
   }
@@ -125,6 +136,7 @@ export class AppComponent implements OnInit {
               ////// İkincil Ekran //////
               console.log('Server Replicating Started!')
               this.mainService.replicateDB(this.serverSettings).on('complete', () => {
+                this.commandListener();
                 setTimeout(() => this.appDataInitializer(), 2000)
               }).catch(err => {
                 console.warn('Server Replicating Error:', err);
@@ -172,13 +184,19 @@ export class AppComponent implements OnInit {
     }
   }
 
+  commandListener() {
+    this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (changes) => {
+      console.log(changes);
+    });
+  }
+
   appDataInitializer() {
     this.mainService.loadAppData().then((isLoaded: boolean) => {
       if (isLoaded) {
         this.onSync = false;
         this.router.navigate(['']);
         this.settingsListener();
-        setTimeout(() => this.endDayListener(), 5000)
+        setTimeout(() => this.endDayListener(), 120000)
       }
     }).catch(err => {
       console.warn('LoadApp Data Error:', err);
@@ -197,6 +215,7 @@ export class AppComponent implements OnInit {
           this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program kapatılacak.', 'success');
           setTimeout(() => {
             this.electronService.shellCommand('shutdown now');
+            console.log('Endday Finished')
           }, 5000);
         }
       });
@@ -217,6 +236,7 @@ export class AppComponent implements OnInit {
   findAppSettings() {
     this.mainService.syncToLocal('settings').then(message => {
       this.messageService.sendMessage('Ayarlar Güncelleniyor...');
+      this.electronService.reloadProgram();
     }).catch(err => {
       this.messageService.sendAlert('Hata!', 'Gün Dökümanı Bulunamadı!', 'error');
     });
@@ -291,8 +311,6 @@ export class AppComponent implements OnInit {
     this.electronService.fullScreen(this.windowStatus);
     this.windowStatus = !this.windowStatus;
   }
-
-
 
   // startApp() {
   //   this.settingsService.ActivationStatus.subscribe(res => {

@@ -10,6 +10,7 @@
 /_users/*
 /pouch__all_dbs__/*
 /appServer
+/old_modules
 
 # dependencies
 /node_modules

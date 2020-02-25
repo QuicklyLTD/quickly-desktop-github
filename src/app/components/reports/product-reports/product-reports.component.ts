@@ -25,9 +25,27 @@ export class ProductReportsComponent implements OnInit {
 
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
+
   ChartOptions: any = {
     responsive: false,
-    legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
+    legend: {
+      labels: {
+        fontColor: 'rgb(255, 255, 255)',
+        fontStyle: 'bolder'
+      }
+    },
+    tooltips: {
+      callbacks: {
+        label: function (value) {
+          return ' ' + Number(value.yLabel).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+        }
+      }
+    },
+    elements: {
+      line: {
+        tension: 0.5,
+      }
+    },
     scales: {
       xAxes: [{
         ticks: {
@@ -41,7 +59,11 @@ export class ProductReportsComponent implements OnInit {
       }],
       yAxes: [{
         ticks: {
-          fontColor: 'rgba(255,255,255)'
+          fontColor: 'rgba(255,255,255)',
+          callback: function (value, index, values) {
+            return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+          }
+
         },
         gridLines: {
           color: 'rgba(255,255,255)',
@@ -109,7 +131,7 @@ export class ProductReportsComponent implements OnInit {
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
-      this.DetailData = [{ data: res.weekly, label: 'Satış Tutarı' }, { data: res.weekly_count, label: 'Satış Adedi' }];
+      this.DetailData = [{ data: res.weekly, label: 'Satış Tutarı' }];
       this.DetailLoaded = true;
       $('#reportDetail').modal('show');
     });

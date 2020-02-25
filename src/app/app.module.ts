@@ -18,18 +18,18 @@ import { EndofthedayComponent } from './components/endoftheday/endoftheday.compo
 import { StoreComponent } from './components/store/store.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { AdminComponent } from './components/admin/admin.component';
-//EndDay Child Components
+////// EndDay Child Components
 import { DayDetailComponent } from './components/endoftheday/day-detail/day-detail.component';
-//Store Child Components
+////// Store Child Components
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
-//Settings Child Components
+////// Settings Child Components
 import { UserSettingsComponent } from './components/settings/user-settings/user-settings.component';
 import { MenuSettingsComponent } from './components/settings/menu-settings/menu-settings.component';
 import { ApplicationSettingsComponent } from './components/settings/application-settings/application-settings.component';
 import { RestaurantSettingsComponent } from './components/settings/restaurant-settings/restaurant-settings.component';
 import { StockSettingsComponent } from './components/settings/stock-settings/stock-settings.component';
-//Reports Child Components
+////// Reports Child Components
 import { StoreReportsComponent } from './components/reports/store-reports/store-reports.component';
 import { ProductReportsComponent } from './components/reports/product-reports/product-reports.component';
 import { TableReportsComponent } from './components/reports/table-reports/table-reports.component';
@@ -63,6 +63,11 @@ import { ButtonDirective } from './directives/button.directive';
 import { PrinterSettingsComponent } from './components/settings/printer-settings/printer-settings.component';
 import { RecipeSettingsComponent } from './components/settings/recipe-settings/recipe-settings.component';
 import { CustomerSettingsComponent } from './components/settings/customer-settings/customer-settings.component';
+import { PricePipe } from './pipes/price.pipe';
+import { OrderComponent } from './components/helpers/order/order.component';
+import { ActivityReportsComponent } from './components/reports/activity-reports/activity-reports.component';
+import { CashboxReportsComponent } from './components/reports/cashbox-reports/cashbox-reports.component';
+import { NotificationsReportsComponent } from './components/reports/notifications-reports/notifications-reports.component';
 
 //// Error Handler Sentry
 // import * as Raven from 'raven-js';
@@ -101,6 +106,7 @@ import { CustomerSettingsComponent } from './components/settings/customer-settin
     UserReportsComponent,
     GeneralPipe,
     TimeAgoPipe,
+    PricePipe,
     KeyboardDirective,
     AdminComponent,
     DayDetailComponent,
@@ -109,6 +115,10 @@ import { CustomerSettingsComponent } from './components/settings/customer-settin
     PrinterSettingsComponent,
     RecipeSettingsComponent,
     CustomerSettingsComponent,
+    OrderComponent,
+    ActivityReportsComponent,
+    CashboxReportsComponent,
+    NotificationsReportsComponent,
   ],
   imports: [
     BrowserModule,

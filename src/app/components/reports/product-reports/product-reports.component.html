@@ -39,8 +39,7 @@
         </div>
       </div>
       <div class="card-body tab-height p-0">
-        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData"
-          [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+        <canvas *ngIf="ChartLoaded" baseChart style="height: 468px; width:76vw; margin:auto;" [datasets]="ChartData" [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
@@ -77,12 +76,10 @@
               </div>
               <div class="card-body p-0 flow">
                 <div class="list-group">
-                  <button type="button" (click)="fillData();" [ngClass]="{'list-group-item-warning' : selectedCat == undefined}"
-                    class="list-group-item list-group-item-action list-eq">
+                  <button type="button" (click)="fillData();" [ngClass]="{'list-group-item-warning' : selectedCat == undefined}" class="list-group-item list-group-item-action list-eq">
                     Bütün Ürünler
                   </button>
-                  <button *ngFor="let cat of categoriesList" type="button" [ngClass]="{'list-group-item-warning' : selectedCat == cat._id}"
-                    (click)="getReportsByCategory(cat._id)" class="list-group-item list-group-item-action list-eq">
+                  <button *ngFor="let cat of categoriesList" type="button" [ngClass]="{'list-group-item-warning' : selectedCat == cat._id}" (click)="getReportsByCategory(cat._id)" class="list-group-item list-group-item-action list-eq">
                     {{cat.name}}
                   </button>
                 </div>
@@ -101,23 +98,24 @@
               <div class="card-body p-0 flow">
                 <table class="table table-bordered table-striped table-hover">
                   <thead class="thead-dark">
-                    <tr>
-                      <th width="7%">
+                    <tr >
+                      <th class="text-center" width="10%">
                         <i class="fa fa-glass" aria-hidden="true"></i>
                       </th>
-                      <th width="32%">Ürün Adı</th>
-                      <th width="20%">Adet</th>
-                      <th width="17%">Getiri</th>
-                      <th width="24%">Tarih</th>
+                      <th class="text-center" width="50%">Ürün Adı</th>
+                      <th class="text-right" width="20%">Adet</th>
+                      <th class="text-right" width="20%">Getiri</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of productList; let i = index" (click)="getItemReport(item)">
-                      <td>{{i+1}}</td>
-                      <td>{{item.connection_id | general:'products' | async}}</td>
-                      <td>{{item.count}} Adet</td>
-                      <td>{{item.amount | number:'1.0-2'}} TL</td>
-                      <td>{{item.update_time | date:'dd/M/y'}}</td>
+                      <td class="text-center">{{i+1}}</td>
+                      <td style="text-transform:capitalize;">
+                        {{item.description}}
+                        <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.update_time | timeAgo }}</small>
+                      </td>
+                      <td class="text-right">{{item.count | number:'1.0-2'}} Adet</td>
+                      <td class="text-right">{{item.amount | price }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -172,8 +170,7 @@
         </button>
       </div>
       <div class="modal-body p-0">
-        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:790px; margin:auto;" [datasets]="DetailData"
-          [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
+        <canvas *ngIf="DetailLoaded" baseChart style="height: 350px; width:790px; margin:auto;" [datasets]="DetailData" [labels]="ChartLabels" [options]="ChartOptions" [legend]="ChartLegend" [chartType]="ChartType"></canvas>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>

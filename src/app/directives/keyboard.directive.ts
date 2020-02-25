@@ -11,11 +11,12 @@ export class KeyboardDirective {
     this.onAir = false;
   }
 
-  @HostListener('click') onClick() {
+  @HostListener('click') onClick(event) {
     this.keyboardService.triggerKeyboard('Open', this.element);
-    // let inputElement = this.element.nativeElement;
-    // this.renderer.setStyle(inputElement, 'height', '100px');
-    // this.keyboardService.syncInputs(this.element);
+    let inputElement = this.element.nativeElement;
+    
+    // console.log(inputElement.getBoundingClientRect()); 
+
   }
   @HostListener('input') onInput() {
     this.element.nativeElement.focus();

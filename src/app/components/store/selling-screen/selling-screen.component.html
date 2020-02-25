@@ -5,24 +5,25 @@
         <div class="row">
           <div class="col-xl-8 col-lg-7">
             <div class="row">
-              <div class="col-lg-8">
+              <div class="col-lg-6">
                 <div class="table-name">
                   <!-- <span *ngIf="check?.type == 1">Masa:</span> -->
                   <b>{{check?.table_id | general:'tables' | async}}</b>
+                  <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-warning">
+                    ({{check.note}})
+                  </span>
                 </div>
-                <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-muted">
-                  ({{check.note}})
-                </span>
               </div>
-              <!-- <div class="col-lg-2">
+              <div class="col-lg-2 humanIcon pr-2 pl-0 text-right">
+                <i class="fa fa-clock-o"></i>
                 {{check?.timestamp | timeAgo}}
-              </div> -->
+              </div>
               <div class="col-lg-4 pl-1 pr-1">
                 <div class="input-group input-group-sm">
                   <div class="input-group-prepend normal">
-                    <div class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></div>
+                    <div class="input-group-text humanIcon"><i class="fa fa-search" aria-hidden="true"></i></div>
                   </div>
-                  <input #productName type="text" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;" class="form-control form-contol-sm">
+                  <input #productName type="text" style="font-size: 17px;" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;" class="form-control form-contol-sm">
                 </div>
               </div>
             </div>
@@ -76,8 +77,7 @@
                             <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
                             <p class="card-text text-danger">
                               <span class="price">
-                                <i class="fa fa-money"></i>
-                                <b> {{product.price}} TL</b>
+                                <b> {{product.price | price }} </b>
                               </span>
                               <small *ngIf="selectedCat !== undefined" class="category mt-1 text-white">
                                 {{product.cat_id | general:'categories':'name'| async}}
@@ -112,23 +112,23 @@
                   <div class="col-lg-6 pl-0 pr-1">
                     <div class="input-group input-group-sm">
                       <div class="input-group-prepend normal">
-                        <div class="input-group-text"><i class="fa fa-male" aria-hidden="true"></i></div>
+                        <div class="input-group-text humanIcon"><i class="fa fa-male" aria-hidden="true"></i></div>
                       </div>
-                      <input type="number" readonly value="{{customers.male}}" class="form-control form-contol-sm" style="font-weight: bolder;">
+                      <input type="number" readonly value="{{customers.male}}" class="form-control form-contol-sm" style="font-weight: bolder; font-size: 20px;">
                       <div class="input-group-append normal">
                         <button (click)="customers.male = customers.male +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
                       </div>
                       <div class="input-group-append normal">
-                        <button [disabled]="customers.male == 0" (click)="customers.male = customers.male -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                        <button [disabled]="customers.  male == 0" (click)="customers.male = customers.male -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
                       </div>
                     </div>
                   </div>
                   <div class="col-lg-6 pl-1 pr-2">
                     <div class="input-group input-group-sm">
                       <div class="input-group-prepend normal">
-                        <div class="input-group-text"><i class="fa fa-female" aria-hidden="true"></i></div>
+                        <div class="input-group-text humanIcon"><i class="fa fa-female" aria-hidden="true"></i></div>
                       </div>
-                      <input type="number" readonly value="{{customers.female}}" class="form-control form-contol-sm" style="font-weight: bolder;">
+                      <input type="number" readonly value="{{customers.female}}" class="form-control form-contol-sm" style="font-weight: bolder; font-size: 20px;">
                       <div class="input-group-append normal">
                         <button (click)="customers.female = customers.female +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
                       </div>
@@ -147,7 +147,7 @@
                       {{item.name}}
                       <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
                     </div>
-                    <div class="product-price">{{item.price | number:'1.0-2' }} TL</div>
+                    <div class="product-price">{{item.price | price }} </div>
                     <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
                       <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
                       <span class="pull-right">
@@ -163,58 +163,64 @@
               </div>
               <div *ngIf="check.discount > 0 && payedShow" class="card-body check-flow p-2 payed-things">
                 <div *ngFor="let payment of check.payment_flow" class="mb-2 payedLayer">
-                  <p class="mb-0">{{payment.method}}
+                  <p class="mb-0">
+                    <strong>{{payment.method}}</strong>
                     <small>( {{payment.owner}} - {{payment.timestamp | date:'HH:mm'}} )</small>
-                    <span class="pull-right">{{payment.amount + payment.discount | number:'1.0-2'}} TL</span>
+                    <span class="pull-right">{{payment.amount + payment.discount | price}} </span>
                   </p>
                   <p *ngFor="let product of payment.payed_products" class="text-warning m-0 pl-3" style="text-transform: capitalize;">
-                    <small>{{product.name}}
-                      <span class="pull-right">{{product.price | number:'1.0-2'}} TL</span>
+                    <small>
+                      <strong>
+                        {{product.name}}
+                        <span class="pull-right">{{product.price | price}} </span>
+                      </strong>
                     </small>
                   </p>
                   <p *ngIf="payment.discount > 0" class="text-danger m-0">
                     <small>
                       <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Miktarı
-                      <span class="pull-right">{{payment.discount | number:'1.0-2'}} TL</span>
+                      <span class="pull-right">{{payment.discount | price}} </span>
                     </small>
                   </p>
                   <p class="m-0 font-weight-bold">
                     <small>
                       <i class="fa fa-arrow-right" aria-hidden="true"></i> Alınan Ödeme
-                      <span class="pull-right">{{payment.amount | number:'1.0-2'}} TL</span>
+                      <span class="pull-right">{{payment.amount | price}} </span>
                     </small>
                   </p>
                 </div>
               </div>
               <div class="card-footer p-2">
                 <p class="text-primary mb-0">
-                  <strong>Hesap Toplamı:
-                    <span class="pull-right">{{check.total_price + check.discount | number:'1.0-2'}} TL</span>
+                  <strong style="font-size: large;">Hesap Toplamı:
+                    <span class="pull-right">{{check.total_price + check.discount | price}} </span>
                   </strong>
                 </p>
-                <p *ngIf="check.discount > 0" class="text-muted mb-0"> Ödenen Miktar:
-                  <span class="pull-right">{{check.discount | number:'1.0-2' }} TL</span>
+                <p *ngIf="check.discount > 0" class="text-warning mb-0">
+                  <strong style="font-size: medium;">
+                    Ödenen Miktar:
+                    <span class="pull-right">{{check.discount | price }} </span>
+                  </strong>
                 </p>
                 <p *ngIf="check.discountPercent > 0" class="text-danger mb-0">
-                  İndirim Tutarı:
-                  <span class="pull-right">{{check.discountPercent | number:'1.0-2' }}% -
-                    {{(check.total_price * check.discountPercent)/100 | number:'1.0-2'}} TL</span>
+                  <strong>İndirim Tutarı:</strong>
+                  <span class="pull-right">{{ check.discountPercent.toFixed(2) }}% -
+                    {{(check.total_price * check.discountPercent)/100 | price}} </span>
                 </p>
                 <p *ngIf="check.discount > 0 || check.discountPercent !== undefined" class="mb-0">
-                  <strong>Kalan Toplam:
+                  <strong style="font-size: larger;">Kalan Toplam:
                     <span class="pull-right">
-                      {{check.total_price - (check.total_price *(check.discountPercent ? check.discountPercent : 0 ))/100 | number:'1.0-2'}} TL</span>
+                      {{check.total_price - (check.total_price *(check.discountPercent ? check.discountPercent : 0 ))/100 | price}} </span>
                   </strong>
                 </p>
-                <p class="text-warning mb-0">
+                <p class="text-muted mb-0">
                   <strong>Adisyon No:
-                    <span class="pull-right">{{check.check_no}}</span>
+                    <span class="pull-right">#{{check.check_no}}</span>
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block mt-2" data-toggle="buttons">
                   <button (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
-                  <button [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal"
-                    data-target="#closeCheck"><strong>Kapat</strong></button>
+                  <button [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
                 </div>
               </div>
             </div>
@@ -223,8 +229,7 @@
             <button (click)="sendCheck()" [oneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sellButton">
               <i class="fa fa-paper-plane fa-5x"></i>
             </button>
-            <button data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1" data-target="#noteModal"
-              class="btn btn-warning btn-block sellButton">
+            <button data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1" data-target="#noteModal" class="btn btn-warning btn-block sellButton">
               <i class="fa fa-sticky-note fa-5x"></i>
             </button>
             <button (click)="undoChanges()" [disabled]="newOrders.length == 0" class="btn btn-primary btn-block sellButton">
@@ -261,6 +266,7 @@
           <div class="form-group">
             <input type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
           </div>
+          <!-- <div *ngFor="let note of selectedProduct?.description.slice(',')">{{note}}</div>  -->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
@@ -286,8 +292,9 @@
       <div *ngIf="productSpecs?.length > 0" class="modal-body">
         <div class="row">
           <div *ngFor="let spec of productSpecs" class="col pr-2 pl-2 mb-2">
-            <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="changeSpecs(spec)">{{spec.spec_name | titlecase }}
-              <b class="spec-price">{{spec.spec_price}} TL</b>
+            <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="changeSpecs(spec)">
+              {{spec.spec_name}}
+              <b class="spec-price">{{spec.spec_price | price }} </b>
             </button>
           </div>
         </div>
@@ -381,8 +388,7 @@
           <div class="col-lg-10 tFlow pl-1 pr-1">
             <div class="row pr-3 pl-3">
               <div *ngFor="let item of tablesView" class="col-lg-2 pl-1 pr-1 mb-2">
-                <div [ngClass]="{'bg-success': item.status == 2 ,'bg-danger': item.status == 3, 'bg-warning text-dark' : item.status == 1 && item._id !== selectedTable?._id , 'bg-info': item._id == selectedTable?._id}" (click)="selectTable(item)"
-                  class="card tableCard">
+                <div [ngClass]="{'bg-success': item.status == 2 ,'bg-danger': item.status == 3, 'bg-warning text-dark' : item.status == 1 && item._id !== selectedTable?._id , 'bg-info': item._id == selectedTable?._id}" (click)="selectTable(item)" class="card tableCard">
                   <div class="card-body p-3">
                     <h4 class="card-title" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{item.name}}</h4>
                     <p class="card-text">
@@ -393,14 +399,14 @@
             </div>
           </div>
           <div class="col-lg-2 pl-2 pr-2 tFlow">
-            <div (click)="tablesView = tables; selectedFloor = undefined" [ngClass]="{'bg-danger text-white':selectedFloor == undefined}" class="card mb-2">
+            <div (click)="tablesView = tables; selectedFloor = undefined" [ngClass]="{'bg-danger text-white':selectedFloor == undefined}" class="card mb-2 dark-bg">
               <div class="card-body p-2 pt-3">
-                <h2 style="font-size:1.7vw">Tüm Masalar</h2>
+                <h2 style="font-size:1.7vw; font-weight:bold;">Tüm Masalar</h2>
               </div>
             </div>
-            <div *ngFor="let floor of floors" [ngClass]="{'bg-danger text-white':selectedFloor == floor._id}" (click)="filterTables(floor._id)" class="card mb-2">
+            <div *ngFor="let floor of floors" [ngClass]="{'bg-danger text-white':selectedFloor == floor._id}" (click)="filterTables(floor._id)" class="card mb-2 dark-bg">
               <div class="card-body p-2 pt-3">
-                <h2 style="font-size:1.7vw">{{floor.name}}</h2>
+                <h2 style="font-size:1.7vw; font-weight:bold;">{{floor.name}}</h2>
               </div>
             </div>
           </div>
@@ -442,16 +448,15 @@
           <div class="card-footer">
             <div *ngFor="let keys of numboard;" class="row mb-1">
               <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1 mb-1">
-                <button type="button" [disabled]="key == '◂' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == '' || key == '.' && isFirstTime || key == '.' && specsUnit.innerHTML == 'Adet'" (click)="pushKey(key)"
-                  class="btn dark-bg btn-outline-primary font-weight-bold btn-lg p-3 btn-block numpad">{{key}}</button>
+                <button type="button" [disabled]="key == '◂' && numpad == '' || key == '.' && numpad == '' || key == '0' && numpad == '' || key == '.' && isFirstTime || key == '.' && specsUnit.innerHTML == 'Adet'" (click)="pushKey(key)" class="btn dark-bg btn-outline-primary font-weight-bold btn-lg p-3 btn-block numpad">{{key}}</button>
               </div>
             </div>
           </div>
           <div class="card-footer">
             <b>
               <h2 class="mb-0">Tutar:
-                <span class="pull-right">{{(numpad*productWithSpecs?.price) / productStock?.amount | number: '1.0-2' }}
-                  TL</span>
+                <span class="pull-right">{{(numpad*productWithSpecs?.price) / productStock?.amount | price }}
+                </span>
               </h2>
             </b>
           </div>
@@ -532,7 +537,7 @@
 </div>
 
 <div class="modal fade" id="checkDiscount" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">İndirim Yap</h4>
@@ -546,7 +551,7 @@
             <div class="input-group">
               <input #discountInput type="number" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg">
               <div class="input-group-append normal">
-                <div class="input-group-text">TL</div>
+                <div class="input-group-text"><i class="fa fa-turkish-lira fa-2x" aria-hidden="true"></i></div>
               </div>
               <span class="input-group-append">
                 <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= check.total_price || discountInput.value <= 0" (click)="setDiscount((discountInput.value*100)/check.total_price)" type="button">
@@ -554,10 +559,21 @@
                 </button>
               </span>
             </div>
+            <!-- <div class="input-group">
+              <input #discountInput type="number" placeholder="0" class="form-control text-center form-control-lg">
+              <div class="input-group-append normal">
+                <div class="input-group-text"><i class="fa fa-percent fa-2x" aria-hidden="true"></i></div>
+              </div>
+              <span class="input-group-append">
+                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= check.total_price || discountInput.value <= 0" (click)="setDiscount((discountInput.value*100)/check.total_price)" type="button">
+                  <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Yap
+                </button>
+              </span>
+            </div> -->
           </div>
         </div>
         <div class="row mt-4 pr-2 pl-2">
-          <div *ngFor="let item of discounts;" class="col pr-1 pl-1">
+          <div *ngFor="let item of discounts;" class="col-lg-4 mb-2 pr-1 pl-1">
             <button type="button" (click)="setDiscount(item)" class="btn btn-primary btn-block btn-lg btn-discount">{{item}}
               %</button>
           </div>

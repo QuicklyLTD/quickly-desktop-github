@@ -6,37 +6,37 @@
       </div>
       <div class="card-body p-0">
         <div class="list-group">
-          <button (click)="currentSection = undefined; detailTitle = 'Genel Detaylar & Grafik';" [ngClass]="{'list-group-item-warning' : currentSection == undefined}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-pie-chart fa-2x mr-2" aria-hidden="true"></i> Genel Detaylar
+          <button (click)="currentSection = undefined; detailTitle = 'Genel Detaylar & Grafik';" [ngClass]="{'list-group-item-warning' : currentSection == undefined}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-pie-chart fa-2x" aria-hidden="true"></i>
+            <span>Genel Detaylar</span>
           </button>
-          <button (click)="filterOldData('Checks','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Checks'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-sticky-note fa-2x mr-2" aria-hidden="true"></i> Hesap Detayları
+          <button (click)="filterOldData('Checks','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Checks'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-sticky-note fa-2x" aria-hidden="true"></i> 
+            <span>Hesap Detayları</span>
           </button>
-          <button (click)="filterOldData('Cashbox','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Cashbox'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-money fa-2x mr-2" aria-hidden="true"></i> Kasa Detayları
+          <button (click)="filterOldData('Cashbox','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Cashbox'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-money fa-2x" aria-hidden="true"></i>
+            <span>Kasa Detayları</span>
           </button>
-          <button (click)="filterOldData('Products','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Products'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-glass fa-2x mr-2" aria-hidden="true"></i> Ürün Raporları
+          <button (click)="filterOldData('Products','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Products'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-glass fa-2x" aria-hidden="true"></i> 
+            <span>Ürün Raporları</span> 
           </button>
-          <button (click)="filterOldData('Users','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Users'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-user fa-2x mr-2" aria-hidden="true"></i> Kullanıcı Raporları
+          <button (click)="filterOldData('Users','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Users'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+            <span>Kullanıcı Raporları</span>
           </button>
-          <button (click)="filterOldData('Tables','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Tables'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-square fa-2x mr-2" aria-hidden="true"></i> Masa Raporları
+          <button (click)="filterOldData('Tables','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Tables'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-square fa-2x" aria-hidden="true"></i> 
+            <span>Masa Raporları</span> 
           </button>
-          <button (click)="filterOldData('Activity','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Activity'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-line-chart fa-2x mr-2" aria-hidden="true"></i> Aktivite Grafiği
+          <button (click)="filterOldData('Activity','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Activity'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-line-chart fa-2x" aria-hidden="true"></i>
+            <span>Aktivite Grafiği</span>
           </button>
-          <button (click)="filterOldData('Logs','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Logs'}"
-            type="button" class="list-group-item list-group-item-action">
-            <i class="fa fa-bell fa-2x mr-2" aria-hidden="true"></i> Sistem Kayıtları
+          <button (click)="filterOldData('Logs','All')" [ngClass]="{'list-group-item-warning' : currentSection == 'Logs'}" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-bell fa-2x" aria-hidden="true"></i>
+            <span>Sistem Kayıtları</span>
           </button>
         </div>
       </div>
@@ -101,7 +101,7 @@
                             <i class="fa fa-check" aria-hidden="true"></i>
                           </td>
                           <td width="57%">Genel Toplam:</td>
-                          <td width="30%">{{detailData.total_income | number:'1.0-2'}} TL</td>
+                          <td width="30%">{{detailData.total_income | price}}</td>
                         </tr>
                         <tr class="text-muted" (click)="filterOldData('Checks','All')">
                           <td>
@@ -115,49 +115,49 @@
                             <i class="fa fa-money" aria-hidden="true"></i>
                           </td>
                           <td width="60%">Nakit Hesap Toplamı:</td>
-                          <td>{{detailData.cash_total | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.cash_total | price}} </td>
                         </tr>
                         <tr class="text-warning" (click)="filterOldData('Checks','Kart')">
                           <td>
                             <i class="fa fa-credit-card" aria-hidden="true"></i>
                           </td>
                           <td>Kart Hesap Toplamı:</td>
-                          <td>{{detailData.card_total | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.card_total | price}} </td>
                         </tr>
                         <tr class="text-info" (click)="filterOldData('Checks','Kupon')">
                           <td>
                             <i class="fa fa-bookmark ml-1" aria-hidden="true"></i>
                           </td>
                           <td>Kupon Hesap Toplamı:</td>
-                          <td>{{detailData.coupon_total | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.coupon_total | price}} </td>
                         </tr>
                         <tr class="text-danger" (click)="filterOldData('Checks','İkram')">
                           <td>
                             <i class="fa fa-handshake-o" aria-hidden="true"></i>
                           </td>
                           <td>İkram Hesap Toplamı:</td>
-                          <td>{{detailData.free_total | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.free_total | price}} </td>
                         </tr>
                         <tr class="text-primary" (click)="filterOldData('Checks','İptal')">
                           <td>
                             <i class="fa fa-times-rectangle" aria-hidden="true"></i>
                           </td>
                           <td>İptal Hesap Toplamı:</td>
-                          <td>{{detailData.canceled_total | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.canceled_total | price}} </td>
                         </tr>
                         <tr (click)="filterOldData('Cashbox','Gelir')">
                           <td>
                             <i class="fa fa-arrow-down" aria-hidden="true"></i>
                           </td>
                           <td>Kasa Geliri Toplamı:</td>
-                          <td>{{detailData.incomes | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.incomes | price}} </td>
                         </tr>
                         <tr (click)="filterOldData('Cashbox','Gider')">
                           <td>
                             <i class="fa fa-arrow-up" aria-hidden="true"></i>
                           </td>
                           <td>Kasa Gideri Toplamı:</td>
-                          <td>{{detailData.outcomes | number:'1.0-2'}} TL</td>
+                          <td>{{detailData.outcomes | price}} </td>
                         </tr>
                         <tr>
                           <td>
@@ -185,8 +185,7 @@
                   </strong>
                 </div>
                 <div class="col-xl-7 col-lg-6 pt-4 pl-0">
-                  <canvas baseChart style="height:525px; width:95%;  margin:auto;" [data]="pieData" [colors]="pieColors"
-                    [labels]="pieLabels" [legend]="true" chartType="pie" [options]="pieOptions"></canvas>
+                  <canvas baseChart style="height:525px; width:95%;  margin:auto;" [data]="pieData" [colors]="pieColors" [labels]="pieLabels" [legend]="true" chartType="pie" [options]="pieOptions"></canvas>
                 </div>
               </div>
             </section>
@@ -209,9 +208,9 @@
                       <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                     </td>
                     <td>{{item.owner}}</td>
-                    <td>{{item.total_price | number:'1.0-2'}} TL
+                    <td>{{item.total_price | price}}
                       <small *ngIf="item.discount !== 0" class="text-danger pull-right">
-                        <i class="fa fa-arrow-down" aria-hidden="true"></i> {{item.discount | number:'1.0-2'}} TL</small>
+                        <i class="fa fa-arrow-down" aria-hidden="true"></i> <b>{{item.discount | price}}</b></small>
                     </td>
                     <td>{{item.payment_method}}</td>
                     <td>{{item.timestamp | date:'HH:mm'}}</td>
@@ -235,7 +234,7 @@
                     <td>{{i+1}}</td>
                     <td>{{cash.description}}</td>
                     <td>{{cash.user}}</td>
-                    <td>{{cash.cash + cash.card + cash.coupon | number:'1.0-2'}} TL</td>
+                    <td>{{cash.cash + cash.card + cash.coupon | price}} </td>
                     <td>{{cash.timestamp | date:'HH:mm'}}</td>
                   </tr>
                 </tbody>
@@ -257,8 +256,8 @@
                   <tr *ngFor="let product of productsTable; let i=index">
                     <td>{{i+1}}</td>
                     <td>{{product.connection_id | general:'products' | async}}</td>
-                    <td><strong>% {{(product.weekly[detailDay]/detailData.total_income) * 100 | number: '1.0-2'}}</strong></td>
-                    <td>{{product.weekly[detailDay]}} TL</td>
+                    <td><strong>% {{(product.weekly[detailDay]/detailData.total_income) * 100 | number:'1.0-2' }}</strong></td>
+                    <td>{{product.weekly[detailDay] | price }} </td>
                     <td>{{product.weekly_count[detailDay]}} Adet</td>
                     <td>{{product.update_time | date:'HH:mm'}}</td>
                   </tr>
@@ -281,8 +280,8 @@
                   <tr *ngFor="let user of usersTable; let i=index">
                     <td>{{i+1}}</td>
                     <td>{{user.connection_id | general:'users' | async}}</td>
-                    <td><strong>% {{(user.weekly[detailDay]/detailData.total_income) * 100 | number: '1.0-2'}}</strong></td>
-                    <td>{{user.weekly[detailDay]}} TL</td>
+                    <td><strong>% {{(user.weekly[detailDay]/detailData.total_income) * 100 | number:'1.0-2' }}</strong></td>
+                    <td>{{user.weekly[detailDay] | price }} </td>
                     <td>{{user.weekly_count[detailDay]}} Adet</td>
                     <td>{{user.update_time | date:'HH:mm'}}</td>
                   </tr>
@@ -306,8 +305,8 @@
                   <tr *ngFor="let table of tablesTable; let i=index">
                     <td>{{i+1}}</td>
                     <td>{{table.connection_id | general:'tables' | async}}</td>
-                    <td><strong>% {{(table.weekly[detailDay]/detailData.total_income) * 100 | number: '1.0-2'}}</strong></td>
-                    <td>{{table.weekly[detailDay]}} TL</td>
+                    <td><strong>% {{(table.weekly[detailDay]/detailData.total_income) * 100 | number:'1.0-2'}}</strong></td>
+                    <td>{{table.weekly[detailDay] | price }} </td>
                     <td>{{table.weekly_count[detailDay]}} Adet</td>
                     <td>{{table.update_time | date:'HH:mm'}}</td>
                   </tr>
@@ -315,9 +314,7 @@
               </table>
             </section>
             <section id="activity" *ngIf="currentSection == 'Activity'">
-              <canvas *ngIf="currentSection == 'Activity'" baseChart style="height: 590px; width:76vw; margin:auto;"
-                [datasets]="activityData" [labels]="activityLabels" [options]="activityOptions" [legend]="activityLegend"
-                chartType="line"></canvas>
+              <canvas *ngIf="currentSection == 'Activity'" baseChart style="height: 590px; width:76vw; margin:auto;" [datasets]="activityData" [labels]="activityLabels" [options]="activityOptions" [legend]="activityLegend" chartType="line"></canvas>
             </section>
             <section id="logs" *ngIf="currentSection == 'Logs'">
               <table class="table table-bordered table-hover table-striped">
@@ -381,7 +378,7 @@
                   </td>
                   <td>{{item.owner}}</td>
                   <td>{{item.timestamp |date:'HH:mm'}}</td>
-                  <td>{{item.price | number:'1.0-2'}} TL</td>
+                  <td>{{item.price | price}} </td>
                 </tr>
               </tbody>
             </table>
@@ -392,13 +389,13 @@
                   <th width="44%">{{item.owner}}</th>
                   <th width="15%">{{item.method}}</th>
                   <th width="15%">{{item.timestamp | date:'HH:mm'}}</th>
-                  <th width="17%">{{item.amount + item.discount}} TL</th>
+                  <th width="17%">{{item.amount + item.discount | price }} </th>
                 </thead>
                 <tbody>
                   <tr *ngIf="item.discount > 0" class="table-info">
                     <td width="5%"><i class="fa fa-arrow-down" aria-hidden="true"></i></td>
                     <td width="46%" colspan="3">İndirim Tutarı</td>
-                    <td width="17%">{{item.discount}} TL</td>
+                    <td width="17%">{{item.discount}} </td>
                   </tr>
                   <tr *ngFor="let product of item.payed_products; let i = index;" [ngClass]="{'table-danger': product.status == 3}">
                     <td>{{i+1}}</td>
@@ -407,7 +404,7 @@
                     </td>
                     <td>{{product.owner}}</td>
                     <td>{{product.timestamp |date:'HH:mm'}}</td>
-                    <td>{{product.price | number:'1.0-2'}} TL</td>
+                    <td>{{product.price | price}} </td>
                   </tr>
                 </tbody>
               </table>
@@ -422,13 +419,13 @@
           <div *ngIf="checkDetail?.discount > 0" class="card-footer">
             <b>
               <i class="fa fa-arrow-down" aria-hidden="true"></i> Toplam İndirim Tutarı:
-              <span class="pull-right">{{checkDetail?.discount}} TL</span>
+              <span class="pull-right">{{checkDetail?.discount | price }} </span>
             </b>
           </div>
           <div class="card-footer">
             <b>
               <i class="fa fa-check" aria-hidden="true"></i> Ödenen Miktar:
-              <span class="pull-right">{{checkDetail?.total_price | number:'1.0-2' }} TL</span>
+              <span class="pull-right">{{checkDetail?.total_price | price }} </span>
             </b>
           </div>
         </div>
@@ -464,7 +461,7 @@
                     </td>
                     <td>Nakit:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.cash | number:'1.0-2' }} TL</span>
+                      <span class="pull-right">{{cashDetail?.cash | price }} </span>
                     </td>
                   </tr>
                   <tr class="table-warning">
@@ -473,7 +470,7 @@
                     </td>
                     <td>Kart:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.card | number:'1.0-2' }} TL</span>
+                      <span class="pull-right">{{cashDetail?.card | price }} </span>
                     </td>
                   </tr>
                   <tr class="table-info">
@@ -482,7 +479,7 @@
                     </td>
                     <td>Kupon:</td>
                     <td width="20%">
-                      <span class="pull-right">{{cashDetail?.coupon | number:'1.0-2' }} TL</span>
+                      <span class="pull-right">{{cashDetail?.coupon | price }} </span>
                     </td>
                   </tr>
                   <tr>
@@ -492,8 +489,8 @@
                     <td>Toplam:</td>
                     <td width="20%">
                       <span class="pull-right">{{cashDetail?.coupon + cashDetail?.cash + cashDetail?.card |
-                        number:'1.0-2'
-                        }} TL</span>
+                        price
+                        }} </span>
                     </td>
                   </tr>
                 </tbody>

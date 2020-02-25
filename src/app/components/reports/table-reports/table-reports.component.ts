@@ -19,7 +19,24 @@ export class TableReportsComponent implements OnInit {
 
   ChartOptions: any = {
     responsive: false,
-    legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
+    legend: {
+      labels: {
+        fontColor: 'rgb(255, 255, 255)',
+        fontStyle: 'bolder'
+      }
+    },
+    tooltips: {
+      callbacks: {
+        label: function (value) {
+          return ' ' + Number(value.yLabel).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+        }
+      }
+    },
+    elements: {
+      line: {
+        tension: 0.5,
+      }
+    },
     scales: {
       xAxes: [{
         ticks: {
@@ -33,7 +50,11 @@ export class TableReportsComponent implements OnInit {
       }],
       yAxes: [{
         ticks: {
-          fontColor: 'rgba(255,255,255)'
+          fontColor: 'rgba(255,255,255)',
+          callback: function (value, index, values) {
+            return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+          }
+
         },
         gridLines: {
           color: 'rgba(255,255,255)',

@@ -93,6 +93,29 @@
               <div class="card-body p-0 flow">
                 <table class="table table-bordered table-striped table-hover">
                   <thead class="thead-dark">
+                    <tr >
+                      <th class="text-center" width="10%">
+                        <i class="fa fa-glass" aria-hidden="true"></i>
+                      </th>
+                      <th class="text-center" width="50%">Masa Adı</th>
+                      <th class="text-right" width="20%">Hesap Adedi</th>
+                      <th class="text-right" width="20%">Getiri</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of tablesList; let i = index" (click)="getItemReport(item)">
+                      <td class="text-center">{{i+1}}</td>
+                      <td style="text-transform:capitalize;">
+                        {{item.description}}
+                        <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.update_time | timeAgo }}</small>
+                      </td>
+                      <td class="text-right">{{item.count | number:'1.0-2'}} Adet</td>
+                      <td class="text-right">{{item.amount | price }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!-- <table class="table table-bordered table-striped table-hover">
+                  <thead class="thead-dark">
                     <tr>
                       <th width="6%">#</th>
                       <th width="29%">Masa</th>
@@ -104,13 +127,13 @@
                   <tbody>
                     <tr *ngFor="let item of tablesList; let i = index" (click)="getItemReport(item)">
                       <td>{{i+1}}</td>
-                      <td>{{item.connection_id | general: 'tables' | async}}</td>
+                      <td>{{item.description}}</td>
                       <td>{{item.count}} Adet</td>
                       <td>{{item.amount | number:'1.0-2'}} TL</td>
                       <td>{{item.update_time | date: 'd/M/y HH:mm'}}</td>
                     </tr>
                   </tbody>
-                </table>
+                </table> -->
               </div>
             </div>
           </div>

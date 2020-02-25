@@ -97,7 +97,7 @@ export class EndofthedayComponent implements OnInit {
       });
 
       this.messageService.sendMessage('Gün Başlatıldı. Program Yeniden Başlatılıyor..');
-      
+
       if (this.day == 1) {
         this.mainService.getAllBy('reports', {}).then(res => {
           let reports = res.docs.filter(obj => obj.type !== 'Activity');
@@ -120,7 +120,7 @@ export class EndofthedayComponent implements OnInit {
           }, 5000)
         }
       })
-      
+
     }
   }
 
@@ -403,7 +403,7 @@ export class EndofthedayComponent implements OnInit {
   fillData() {
     this.mainService.getAllBy('endday', {}).then((result) => {
       this.endDayData = result.docs;
-      this.endDayData = this.endDayData.sort((a, b) => b.timestamp - a.timestamp);
+      this.endDayData = this.endDayData.sort((a, b) => b.timestamp - a.timestamp).filter(obj => obj.total_income !== 0);
     });
   }
 }

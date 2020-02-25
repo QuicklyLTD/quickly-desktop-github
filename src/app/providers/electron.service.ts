@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import * as crypto from 'crypto';
+// import * as crypto from 'crypto';
 
 
 @Injectable()
@@ -38,12 +38,12 @@ export class ElectronService {
     return window && window.process && window.process.type;
   }
 
-  encryptData(secret: string, data: Buffer) {
-    return crypto.privateEncrypt(secret, data);
-  }
-  decryptData(secret: string, data: Buffer) {
-    return crypto.privateDecrypt(secret, data);
-  }
+  // encryptData(secret: string, data: Buffer) {
+  //   return crypto.privateEncrypt(secret, data);
+  // }
+  // decryptData(secret: string, data: Buffer) {
+  //   return crypto.privateDecrypt(secret, data);
+  // }
 
   getLocalIP() {
     const interfaces = os.networkInterfaces();

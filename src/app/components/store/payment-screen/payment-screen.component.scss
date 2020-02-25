@@ -1,20 +1,26 @@
-.sellButton{
+.sellButton {
     height: 145.8px;
     margin-bottom: 3.8px;
-    padding-top:20px;
+    padding-top: 20px;
     padding-bottom: 20px;
     padding-right: 0px;
     padding-left: 0px;
     font-size: 1.35rem;
     font-weight: bold;
+
+    i {
+        font-size: 3.5vw;
+    }
 }
-.cashButton{
+
+.cashButton {
     height: 114.5px;
     margin-bottom: 3.8px;
     padding-left: 7px;
-    font-size: 4vh;
+    font-size: 5vh;
     font-weight: bold;
 }
+
 // .check-flow{
 //     overflow-y: scroll;
 //     overflow-x: hidden; 
@@ -43,35 +49,42 @@
 //         text-transform: capitalize;
 //     }
 // }
-.payment-flow{
-    height:35vh;
+.payment-flow {
+    height: 35vh;
     overflow: hidden;
     overflow-y: scroll;
     overflow-x: hidden;
-    p{
+
+    p {
         font-weight: bolder;
     }
 }
-#productHolder{
+
+#productHolder {
     overflow-y: scroll;
     background-color: #ebebeb;
 }
-.proCard{
+
+.proCard {
     height: 112.4px;
-    h2{
+
+    h2 {
         font-size: 3vh;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-transform: capitalize;
     }
-    :hover{
+
+    :hover {
         background-color: #ebcccc;
     }
-    .long-name{
+
+    .long-name {
         font-size: 2.4vh;
     }
-    p{
+
+    p {
         position: absolute;
         bottom: 15px;
         white-space: nowrap;
@@ -79,55 +92,67 @@
         text-overflow: ellipsis;
     }
 }
-.normal{
+
+.normal {
     width: auto !important;
 }
-.tFlow{
+
+.tFlow {
     height: 60vh;
     overflow-y: scroll;
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
-.ikiyuzTL{
-    background-color:#d65f84;
-    color:#162c5b;
+
+.ikiyuzTL {
+    background-color: #d65f84;
+    color: #162c5b;
     -webkit-text-stroke: #ebebeb 1px;
 }
-.yuzTL{
-    background-color:#83a8d4;
-    color:#163d82;
+
+.yuzTL {
+    background-color: #83a8d4;
+    color: #163d82;
     -webkit-text-stroke: #ebebeb 1px;
 }
-.elliTL{
-    background-color:#f7d0a7;
-    color:#e04e3c;
+
+.elliTL {
+    background-color: #f7d0a7;
+    color: #e04e3c;
     -webkit-text-stroke: #ebebeb 1px;
 }
-.yirmiTL{
-    background-color:#bfcbab;
-    color:#3c5c1d;
+
+.yirmiTL {
+    background-color: #bfcbab;
+    color: #3c5c1d;
     -webkit-text-stroke: #ebebeb 1px;
 }
-.onTL{
-    background-color:#efa2b6;
-    color:#d84861;
+
+.onTL {
+    background-color: #efa2b6;
+    color: #d84861;
     -webkit-text-stroke: #ebebeb 1px;
 }
-.besTL{
-    background-color:#eed9c1;
-    color:#85453b;
+
+.besTL {
+    background-color: #eed9c1;
+    color: #85453b;
     -webkit-text-stroke: #ebebeb 1px;
 }
-.numpad{
+
+.numpad {
     font-weight: 900;
     font-size: 26px;
     padding: 5px;
 }
-.payedLayer{
+
+.payedLayer {
     border-top: 1px solid white;
 }
-.payed-things{
+
+.payed-things {
     min-height: 200px;
 }
-.will-pay{
-    font-size:2vw;
+
+.will-pay {
+    font-size: 2vw;
 }

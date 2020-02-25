@@ -1,47 +1,5 @@
 <div class="row">
   <div id="settings-holder" class="col-lg-2">
-    <!-- <div class="card">
-      <div class="card-body text-center" [ngClass]="{'bg-danger text-white':selected == 1}" (click)="selected = 1">
-        <h3 class="card-title">
-          <i class="fa fa-users"></i>
-        </h3>
-        <p class="card-text">Kullanıcı Ayarları</p>
-      </div>
-    </div>
-    <div class="card mt-3" [ngClass]="{'bg-danger text-white':selected == 2}" (click)="selected = 2">
-      <div class="card-body text-center">
-        <h3 class="card-title">
-          <i class="fa fa-book"></i>
-        </h3>
-        <p class="card-text">Menü ve Ürün Ayarları</p>
-      </div>
-    </div>
-    <div class="card mt-3" [ngClass]="{'bg-danger text-white':selected == 4}" (click)="selected = 4">
-      <div class="card-body text-center">
-        <h3 class="card-title">
-          <i class="fa fa-cutlery"></i>
-        </h3>
-        <p class="card-text">İşletme ve Masa Ayarları</p>
-      </div>
-    </div>
-    <div class="card mt-3" [ngClass]="{'bg-danger text-white':selected == 5}" (click)="selected = 5">
-      <div class="card-body text-center">
-        <h3 class="card-title">
-          <i class="fa fa-truck"></i>
-        </h3>
-        <p class="card-text">Stok Ayarları</p>
-      </div>
-    </div>
-    <div class="card mt-3" [ngClass]="{'bg-danger text-white':selected == 3}" (click)="selected = 3">
-      <div class="card-body text-center">
-        <h3 class="card-title">
-          <i class="fa fa-cogs"></i>
-        </h3>
-        <p class="card-text">Program Ayarları</p>
-      </div>
-    </div> -->
-
-
     <div class="card">
       <div class="card-body" [ngClass]="{'bg-danger text-white':selected == 1}" (click)="selected = 1">
         <h2>
@@ -119,13 +77,13 @@
     <div class="card full-height">
       <div class="card-body">
         <div *ngIf="selected == undefined" class="container text-center">
-          <div class="jumbotron mb-0">
-            <h1 class="display-3">Quickly</h1>
-            <p class="lead">Yeni Nesil Otomasyon</p>
+          <div class="jumbotron m-0 p-0">
+            <img src="../../../assets/logo.svg" height="200px" style="margin-top:15px; margin-bottom:15px;" alt="">
+            <p><strong>Quickly Yazılım Kurumsal Hizmetler İç ve Dış Tic. Ltd. Şti.</strong></p>
             <hr class="my-4">
-            <p>{{storeInfo?.name}}</p>
           </div>
           <img src="{{logo}}" class="logo" alt="">
+          <p>{{storeInfo?.name}}</p>
         </div>
         <app-user-settings *ngIf="selected == 1"></app-user-settings>
         <app-menu-settings *ngIf="selected == 2"></app-menu-settings>
@@ -133,10 +91,6 @@
         <app-stock-settings *ngIf="selected == 4"></app-stock-settings>
         <app-recipe-settings *ngIf="selected == 5"></app-recipe-settings>
         <app-customer-settings *ngIf="selected == 6"></app-customer-settings>
-        <!-- 
-        <app-stock-settings *ngIf="selected == 7"></app-stock-settings>
-        <app-stock-settings *ngIf="selected == 8"></app-stock-settings> 
-        -->
         <app-application-settings *ngIf="selected == 9"></app-application-settings>
       </div>
     </div>

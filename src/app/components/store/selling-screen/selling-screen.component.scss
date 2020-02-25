@@ -7,10 +7,15 @@
     padding-right: 0px;
     padding-left: 0px;
     color: #000;
-
+    text-decoration: wavy;
     i {
         font-size: 7.4vh;
     }
+}
+
+.sellButton[disabled] {
+    opacity: 0.6;
+    color: rgba(0, 0, 0, 0.50);
 }
 
 .btn-specs {
@@ -18,6 +23,7 @@
     float: left;
     font-weight: bolder;
     font-size: 30px;
+    text-transform: capitalize;
 
     .spec-price {
         font-size: 20px;
@@ -68,28 +74,30 @@
     font-size: 22px;
 }
 
-.table-name {
-    font-size: 20px;
-    display: inline;
-}
-
 .proCard {
     p.card-text {
         .price {
             float: left;
-            width: 50%
+            width: 37%
         }
 
         .category {
             font-size: 10px;
             text-align: right;
+            font-weight: bold;
             float: right;
-            width: 50%
+            width: 63%
         }
     }
 }
 
-.catButton{
+.catButton {
     font-weight: bold;
     font-size: 1.3vw;
+    height: 47.65px;
+}
+
+.humanIcon {
+    font-size: 20px !important;
+    padding: 0 2 0 2 !important;
 }

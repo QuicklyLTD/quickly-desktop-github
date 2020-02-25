@@ -10,16 +10,16 @@ import { SettingsService } from '../../services/settings.service';
   providers: [SettingsService]
 })
 export class ReportsComponent implements OnInit {
+  day: number;
+
   selected: number;
-  closedTotal: number;
   freeTotal: number;
+  closedTotal: number;
   canceledTotal: number;
   activeTotal: number;
   generalTotal: number;
   sellingActivity: Activity;
-  day: number;
 
-  PieOptions: any;
   ChartOptions: any;
   ChartLegend: boolean = true;
   ChartType: string = 'bar';
@@ -37,9 +37,12 @@ export class ReportsComponent implements OnInit {
   activityLabels: Array<string>;
   activityLegend: boolean = true;
 
+  salesReport: any = { cash: 0, card: 0, coupon: 0, free: 0, discount: 0, partial: null };
+
   pieData: Array<any>;
   pieLabels: Array<any>;
   pieColors: Array<any>;
+  pieOptions: any;
 
   constructor(private mainService: MainService, private settingsService: SettingsService) {
     this.settingsService.DateSettings.subscribe(res => {
@@ -55,7 +58,19 @@ export class ReportsComponent implements OnInit {
     this.ChartLabels = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
     this.ChartOptions = {
       responsive: false,
-      legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
+      legend: {
+        labels: {
+          fontColor: 'rgb(255, 255, 255)',
+          fontStyle: 'bolder'
+        }
+      },
+      tooltips: {
+        callbacks: {
+          label: function (value) {
+            return ' ' + Number(value.yLabel).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+          }
+        }
+      },
       elements: {
         line: {
           tension: 0.5,
@@ -74,7 +89,11 @@ export class ReportsComponent implements OnInit {
         }],
         yAxes: [{
           ticks: {
-            fontColor: 'rgba(255,255,255)'
+            fontColor: 'rgba(255,255,255)',
+            callback: function (value, index, values) {
+              return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+            }
+
           },
           gridLines: {
             color: 'rgba(255,255,255)',
@@ -91,14 +110,26 @@ export class ReportsComponent implements OnInit {
       { backgroundColor: '#DF691A' },
       { backgroundColor: '#FFFFFF' },
     ];
-    this.pieColors = [{ backgroundColor: ['#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f'] }];
-    this.PieOptions = {
-      legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
+    this.pieColors = [{ backgroundColor: ['#5cb85c', '#f0ad4e', '#5bc0de', '#d9534f'] }];
+    this.pieOptions = {
+      legend: {
+        labels: { fontColor: 'rgb(255, 255, 255)', fontStyle: 'bolder' }
+      },
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            var dataLabel = data.labels[tooltipItem.index];
+            var value = ': ' + Number(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ₺';
+            return dataLabel + value;
+          }
+        }
+      },
     }
   }
 
   ngOnInit() {
     this.fillData();
+    this.dailySalesReport();
   }
 
   normalWeekOrder(array: Array<any>) {
@@ -132,33 +163,29 @@ export class ReportsComponent implements OnInit {
             let card = { label: 'Kart', data: [] };
             let free = { label: 'İkram', data: [] };
             let total = { label: 'Toplam', data: [] };
-            let checks = { label: 'Hesap Adedi', data: [] };
             this.monthlyLabels.forEach((monthName, index2) => {
               let monthWillProcess = Days.filter(obj => obj.month == index2);
               if (monthWillProcess.length > 1) {
-                cash.data[index2] = monthWillProcess.map(obj => obj.cash).reduce((a, b) => a + b);
+                cash.data[index2] = monthWillProcess.map(obj => obj.cash).reduce((a, b) => a + b, 0);
                 card.data[index2] = monthWillProcess.map(obj => obj.card).reduce((a, b) => a + b);
                 coupon.data[index2] = monthWillProcess.map(obj => obj.coupon).reduce((a, b) => a + b);
                 free.data[index2] = monthWillProcess.map(obj => obj.free).reduce((a, b) => a + b);
                 total.data[index2] = monthWillProcess.map(obj => obj.total).reduce((a, b) => a + b);
-                checks.data[index2] = monthWillProcess.map(obj => obj.checks).reduce((a, b) => a + b);
               } else if (monthWillProcess.length == 1) {
                 cash.data[index2] = monthWillProcess[0].cash;
                 card.data[index2] = monthWillProcess[0].card;
                 coupon.data[index2] = monthWillProcess[0].coupon;
                 free.data[index2] = monthWillProcess[0].free;
-                checks.data[index2] = monthWillProcess[0].checks;
                 total.data[index2] = monthWillProcess[0].total;
               } else {
                 cash.data[index2] = 0;
                 card.data[index2] = 0;
                 coupon.data[index2] = 0;
                 free.data[index2] = 0;
-                checks.data[index2] = 0;
                 total.data[index2] = 0;
               }
               if (index2 == this.monthlyLabels.length - 1) {
-                Months.push(cash, coupon, card, free, total, checks);
+                Months.push(cash, coupon, card, free, total);
                 this.monthlyData = Months;
                 this.monthlyLoaded = true;
               }
@@ -181,30 +208,15 @@ export class ReportsComponent implements OnInit {
       this.activityData = [{ data: this.sellingActivity.activity, label: 'Gelir Endeksi' }, { data: this.sellingActivity.activity_count, label: 'Doluluk Oranı ( % )' }];
       this.activityLabels = this.sellingActivity.activity_time;
     });
-    this.mainService.getAllBy('checks', {}).then(res => {
-      const activeChecks = res.docs;
-      if (res.docs.length > 0) {
-        this.activeTotal = activeChecks.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b);
-      }
-    });
     this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
       let report: Array<Report> = res.docs;
       report = report.filter(obj => obj.connection_id !== 'Genel').sort((a, b) => b.connection_id.localeCompare(a.connection_id));
       report.forEach((element, index) => {
-        if (element.connection_id !== 'İkram') {
-          this.closedTotal += element.weekly[this.day];
-        } else {
-          this.freeTotal += element.weekly[this.day];
-        }
-        this.pieData.push(element.weekly[this.day]);
-        this.pieLabels.push(element.connection_id);
         element.weekly = this.normalWeekOrder(element.weekly);
-
         let chartObj = { data: element.weekly, label: element.connection_id };
         this.ChartData.push(chartObj);
         if (report.length - 1 == index) {
           this.ChartLoaded = true;
-          this.generalTotal = this.closedTotal + this.activeTotal;
         };
       });
     });
@@ -213,5 +225,63 @@ export class ReportsComponent implements OnInit {
         this.canceledTotal = res.docs.map((obj) => obj.total_price).reduce((a, b) => a + b);
       }
     });
+  }
+
+  dailySalesActivity() {
+    this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+      this.sellingActivity = res.docs[0];
+      this.activityData = [{ data: this.sellingActivity.activity, label: 'Gelir Endeksi' }, { data: this.sellingActivity.activity_count, label: 'Doluluk Oranı ( % )' }];
+      this.activityLabels = this.sellingActivity.activity_time;
+    });
+  }
+
+  dailySalesReport() {
+    this.mainService.getAllBy('checks', {}).then(res => {
+      this.activeTotal = res.docs.map(obj => obj.total_price + obj.discount).reduce((a, b) => a + b, 0);
+    });
+
+    this.mainService.getAllBy('closed_checks', {}).then(res => {
+
+      const checks = res.docs.filter(({ type }) => type !== 3);
+      
+      this.salesReport.cash = checks.filter(obj => obj.payment_method == 'Nakit').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+      this.salesReport.card = checks.filter(obj => obj.payment_method == 'Kart').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+      this.salesReport.coupon = checks.filter(obj => obj.payment_method == 'Kupon').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+      this.salesReport.free = checks.filter(obj => obj.payment_method == 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+      this.salesReport.discount = checks.filter(obj => obj.hasOwnProperty('discount')).map(obj => obj.discount).reduce((a, b) => a + b, 0);
+
+      this.salesReport.partial = checks.filter(obj => obj.payment_method == 'Parçalı')
+
+      this.salesReport.partial.forEach(element => {
+        element.payment_flow.forEach(payment => {
+          if (payment.method == 'Nakit') {
+            this.salesReport.cash += payment.amount;
+          }
+          if (payment.method == 'Kart') {
+            this.salesReport.card += payment.amount;
+          }
+          if (payment.method == 'Kupon') {
+            this.salesReport.coupon += payment.amount;
+          }
+          if (payment.method == 'İkram') {
+            this.salesReport.free += payment.amount;
+          }
+        })
+      });
+
+      this.closedTotal = this.salesReport.cash + this.salesReport.card + this.salesReport.coupon;
+      this.generalTotal = this.closedTotal + this.activeTotal;
+
+      this.pieData.push(this.salesReport.cash);
+      this.pieData.push(this.salesReport.card);
+      this.pieData.push(this.salesReport.coupon);
+      this.pieData.push(this.salesReport.free);
+
+      this.pieLabels.push('Nakit');
+      this.pieLabels.push('Kart');
+      this.pieLabels.push('Kupon');
+      this.pieLabels.push('İkram');
+
+    })
   }
 }
