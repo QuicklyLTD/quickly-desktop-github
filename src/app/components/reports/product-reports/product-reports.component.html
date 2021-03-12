@@ -96,9 +96,9 @@
                 </button>
               </div>
               <div class="card-body p-0 flow">
-                <table class="table table-bordered table-striped table-hover">
+                <table class="table table-sm  table-bordered table-striped table-hover">
                   <thead class="thead-dark">
-                    <tr >
+                    <tr>
                       <th class="text-center" width="10%">
                         <i class="fa fa-glass" aria-hidden="true"></i>
                       </th>
@@ -111,8 +111,8 @@
                     <tr *ngFor="let item of productList; let i = index" (click)="getItemReport(item)">
                       <td class="text-center">{{i+1}}</td>
                       <td style="text-transform:capitalize;">
-                        {{item.description}}
-                        <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.update_time | timeAgo }}</small>
+                        <span>{{item.description}}</span>
+                        <!-- <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.update_time | timeAgo }}</small> -->
                       </td>
                       <td class="text-right">{{item.count | number:'1.0-2'}} Adet</td>
                       <td class="text-right">{{item.amount | price }}</td>
@@ -135,7 +135,7 @@
         <h5 class="mt-2">Bildirimler</h5>
       </div>
       <div class="card-body tab-height p-0 flow">
-        <table class="table table-striped table-bordered">
+        <table class="table table-striped  table-bordered">
           <thead class="thead-dark">
             <tr>
               <th width="10%">Kullanıcı</th>

@@ -162,6 +162,8 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
+            .control('LF')
+            .control('LF')
             .cut()
             .beep(3, 2)
             .close();
@@ -356,7 +358,7 @@ ipcMain.on('printEndDay', (event, device, data, logo) => {
               .size(2, 2)
               .control('LF')
               .align('ct')
-              .text(((data.total_income - data.canceled_total) + (data.incomes - data.outcomes)).toFixed(2) + ' TL')
+              .text(((data.total_income) + (data.incomes - data.outcomes)).toFixed(2) + ' TL')
               .control('LF')
               .align('lt')
               .size(1, 1)

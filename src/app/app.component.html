@@ -37,7 +37,8 @@
         </ul>
         <form class="form-inline my-2 my-lg-0 text-white">
           <span class="mr-3">{{date | date:'d / M / y - HH:mm'}}</span>
-          <i class="fa fa-circle mr-3" [ngClass]="connectionStatus ? 'text-success': 'text-warning'"></i>
+          <!-- (click)="callMe()" -->
+          <i class="fa fa-circle mr-3" (click)="callMe()" [ngClass]="connectionStatus ? 'text-success': 'text-warning'"></i>
           <span class="mr-3">v{{version}} </span>
           <i class="fa fa-arrows-alt mr-3" (click)="changeWindow()" aria-hidden="true"></i>
           <i class="fa fa-sign-out" (click)="exitProgram()"> Çıkış</i>
@@ -52,8 +53,7 @@
       </div>
       <div [hidden]="!onSync" id="syncHolder" class="col-lg-12">
         <p class="text-center  mt-5 pt-5" [ngClass]="!hasError ? 'text-primary': 'text-danger animated fadeIn'">
-          <i class="fa fa-5x" [ngClass]="!hasError ? 'fa-refresh fa-spin': 'fa-times'" style="font-size:50vh"
-            aria-hidden="true"></i>
+          <i class="fa fa-5x" [ngClass]="!hasError ? 'fa-refresh fa-spin': 'fa-times'" style="font-size:50vh" aria-hidden="true"></i>
         </p>
         <h1 *ngIf="!hasError" class="text-primary text-center font-weight-bold mt-5" style="font-weight:bolder">
           Veriler Senkronize Ediliyor
@@ -65,4 +65,5 @@
     </div>
   </section>
   <app-keyboard></app-keyboard>
+  <app-caller></app-caller>
 </section>

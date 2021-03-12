@@ -59,23 +59,41 @@ export class ElectronService {
     return this.ipAddress[0];
   }
 
-  saveLogo(url) {
-    url = url.replace(/^http:\/\//i, 'https://');
+  saveLogo(data) {
+
+
+    var base64Data = data.replace(/^data:image\/png;base64,/, "");
+    // base64Data += base64Data.replace('+', ' ');
+
+    let binaryData = new Buffer(base64Data, 'base64') //.toString('binary')
+
+    // fs.writeFile(this.appRealPath + '/data/customer.png', binaryData, function (err) {
+    //   console.log(err);
+    // });
+
     fs.exists(this.appRealPath + '/data/', (exists) => {
       if (!exists) {
         fs.mkdir(this.appRealPath + '/data/', (err) => {
           if (!err) {
-            let file = fs.createWriteStream(this.appRealPath + '/data/customer.png');
-            let request = https.get(url, (response) => {
-              response.pipe(file);
+
+            fs.writeFile(this.appRealPath + '/data/customer.png', binaryData, function (err) {
+              console.log(err);
             });
+            // let file = fs.createWriteStream(this.appRealPath + '/data/customer.png');
+            // let request = https.get(url, (response) => {
+            //   response.pipe(file);
+            // });
           }
         });
       } else {
-        let file = fs.createWriteStream(this.appRealPath + '/data/customer.png');
-        let request = https.get(url, (response) => {
-          response.pipe(file);
+        fs.writeFile(this.appRealPath + '/data/customer.png', binaryData, function (err) {
+          console.log(err);
         });
+
+        // let file = fs.createWriteStream(this.appRealPath + '/data/customer.png');
+        // let request = https.get(url, (response) => {
+        //   response.pipe(file);
+        // });
       }
     });
   }
@@ -90,7 +108,7 @@ export class ElectronService {
       if (!exists) {
         fs.mkdir(this.appRealPath + '/data/backup/', (err) => {
           if (!err) {
-            fs.writeFile(this.appRealPath + '/data/backup/' + date + '.qdat', json, (err) => {
+            fs.writeFile(this.appRealPath + '/data/backup/' + date, json, (err) => {
               if (err) {
                 console.log(err);
               }
@@ -98,7 +116,7 @@ export class ElectronService {
           }
         });
       } else {
-        fs.writeFile(this.appRealPath + '/data/backup/' + date + '.qdat', json, (err) => {
+        fs.writeFile(this.appRealPath + '/data/backup/' + date, json, (err) => {
           if (err) {
             console.log(err);
           }
@@ -133,7 +151,30 @@ export class ElectronService {
   }
 
   shellCommand(command: string) {
-    childProcess.exec(command);
+    childProcess.exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.error(`stderr: ${stderr}`);
+    });
+  }
+
+  shellSpawn(command: string, args?: string[], opts?: childProcess.SpawnOptions) {
+    const shell = childProcess.spawn(command, args, opts);
+
+    shell.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    shell.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    shell.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+    });
   }
 
   reloadProgram() {

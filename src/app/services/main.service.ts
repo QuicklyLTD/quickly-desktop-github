@@ -35,6 +35,7 @@ export class MainService {
       credits: new PouchDB('local_credits', db_opts),
       customers: new PouchDB('local_customers', db_opts),
       orders: new PouchDB('local_orders', db_opts),
+      calls: new PouchDB('local_calls', db_opts),
       cashbox: new PouchDB('local_cashbox', db_opts),
       categories: new PouchDB('local_categories', db_opts),
       sub_categories: new PouchDB('local_sub_cats', db_opts),
@@ -48,6 +49,7 @@ export class MainService {
       endday: new PouchDB('local_endday', db_opts),
       reports: new PouchDB('local_reports', db_opts),
       logs: new PouchDB('local_logs', db_opts),
+      commands: new PouchDB('local_commands', db_opts),
       settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
@@ -85,21 +87,25 @@ export class MainService {
     });
   }
 
-  getAllData(db: string) {
+  getAllData(db: string): Promise<any> {
     return this.LocalDB[db].allDocs({ include_docs: true });
   }
 
-  getAllBy(db: string, $schema) {
+  getAllBy(db: string, $schema): Promise<any> {
     return this.LocalDB[db].find({
       selector: $schema
     });
   }
 
-  getData(db: string, id: string) {
+  getData(db: string, id: string): Promise<any> {
     return this.LocalDB[db].get(id);
   }
 
-  addData(db, schema) {
+  getBulk(db: string, docs: Array<string>): Promise<any> {
+    return this.LocalDB[db].bulkGet(docs);
+  }
+
+  addData(db, schema): Promise<any> {
     return this.LocalDB[db].post(schema).then(res => {
       let doc = Object.assign(schema, { db_name: db, db_seq: 0 });
       delete doc._rev;
@@ -112,7 +118,7 @@ export class MainService {
     });;
   }
 
-  changeData(db, id, schema: any) {
+  changeData(db, id, schema: any): Promise<any> {
     this.LocalDB['allData'].upsert(id, schema).catch(err => {
       console.log('changeData-Local', err);
     });
@@ -134,7 +140,7 @@ export class MainService {
     });
   }
 
-  removeData(db: string, id: string) {
+  removeData(db: string, id: string): Promise<any> {
     this.LocalDB['allData'].get(id).then((doc) => {
       this.LocalDB['allData'].remove(doc).catch(err => {
         console.log('removeData-All', err);
@@ -147,19 +153,19 @@ export class MainService {
     });
   }
 
-  putDoc(db: string, doc: any) {
+  putDoc(db: string, doc: any): Promise<any> {
     return this.LocalDB[db].put(doc);
   }
 
-  removeDoc(db: string, doc: any) {
+  removeDoc(db: string, doc: any): Promise<any> {
     return this.LocalDB[db].remove(doc);
   }
 
-  putAll(db: string, docs: Array<any>) {
+  putAll(db: string, docs: Array<any>): Promise<any> {
     return this.LocalDB[db].bulkDocs(docs);
   }
 
-  removeAll(db: string, $schema: any) {
+  removeAll(db: string, $schema: any): Promise<any> {
     return this.getAllBy(db, $schema).then(res => {
       return res.docs.map(obj => {
         return { _id: obj._id, _rev: obj._rev, _deleted: true };
@@ -169,7 +175,7 @@ export class MainService {
     });
   }
 
-  createIndex(db: string, fields: Array<string>) {
+  createIndex(db: string, fields: Array<string>): Promise<any> {
     return this.LocalDB[db].createIndex({
       index: {
         fields: fields
@@ -213,6 +219,7 @@ export class MainService {
       credits: new PouchDB('local_credits', db_opts),
       customers: new PouchDB('local_customers', db_opts),
       orders: new PouchDB('local_orders', db_opts),
+      calls: new PouchDB('local_calls', db_opts),
       cashbox: new PouchDB('local_cashbox', db_opts),
       categories: new PouchDB('local_categories', db_opts),
       sub_categories: new PouchDB('local_sub_cats', db_opts),
@@ -226,6 +233,7 @@ export class MainService {
       endday: new PouchDB('local_endday', db_opts),
       reports: new PouchDB('local_reports', db_opts),
       logs: new PouchDB('local_logs', db_opts),
+      commands: new PouchDB('local_commands', db_opts),
       settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
@@ -284,31 +292,32 @@ export class MainService {
     return new Promise((resolve, reject) => {
       this.getAllBy('allData', {}).then(res => {
         let docs = res.docs;
-        if (docs.length > 0) {
-          docs.forEach((element, index) => {
-            const db = element.db_name;
-            if (db !== undefined) {
-              if (db !== 'settings') {
-                delete element.db_name;
-                delete element.db_seq;
-                delete element._rev;
-                this.LocalDB[db].put(element).then(res => {
-                  if (docs.length == index + 1) {
-                    resolve(true);
-                  }
-                }).catch(err => {
-                  console.log(err);
-                  if (docs.length == index + 1) {
-                    resolve(true);
-                  }
-                });
-              }
-            }
-          });
-        } else {
-          reject(false);
-        }
-      });
+        let docsWillPut = docs.filter(obj => obj.db_name !== 'settings');
+        docsWillPut.map(obj => {
+          delete obj.db_seq;
+          delete obj._rev;
+          return obj;
+        });
+        let promisesAll = [];
+        docsWillPut.forEach(element => {
+          const db = element.db_name;
+          delete element.db_name;
+          if (db !== undefined) {
+            let promise = this.LocalDB[db].put(element);
+            promisesAll.push(promise);
+          }
+        });
+        Promise.all(promisesAll).then(res => {
+          resolve(true)
+        }).catch(err => {
+          console.log(err);
+          //// Should Be False Reject
+          resolve(true)
+        })
+      }).catch(err => {
+        console.log(err);
+        reject(false);
+      })
     });
   }
 
@@ -349,7 +358,7 @@ export class MainService {
 
   replicateDB(db_configrations) {
     let db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
-    return db.replicate.to(this.LocalDB['allData']);
+    return db.replicate.to(this.LocalDB['allData'], { batch_size: 500, batches_limit: 50 });
   }
 
   replicateFrom() {

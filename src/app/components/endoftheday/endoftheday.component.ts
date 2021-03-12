@@ -57,7 +57,7 @@ export class EndofthedayComponent implements OnInit {
       this.isStarted = res.value.started;
       this.day = res.value.day;
       this.dateToReport = res.value.time;
-      this.endDayReport = new EndDay(this.dateToReport, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+      this.endDayReport = new EndDay(this.dateToReport, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { male: 0, female: 0 }, '');
     })
     this.settingsService.AppSettings.subscribe(res => this.lastDay = res.value.last_day);
     this.settingsService.RestaurantInfo.subscribe(res => this.restaurantID = res.value.id);
@@ -145,18 +145,27 @@ export class EndofthedayComponent implements OnInit {
 
   stepChecks() {
     this.mainService.getAllBy('closed_checks', {}).then(res => {
+
       this.progress = 'Kapatılan Hesaplar Yedekleniyor...';
       this.checks = res.docs;
+
       const checksBackup = new BackupData('closed_checks', this.checks);
+
       this.backupData.push(checksBackup);
-      let canceledTotal = 0;
-      try {
-        canceledTotal = res.docs.filter(obj => obj.type == 3).map(obj => obj.total_price).reduce((a, b) => a + b);
-      } catch (error) {
-        console.log('İptal Hesap Bulunamadı..')
-      }
+
+      let canceledTotal = this.checks.filter(obj => obj.type == 3).map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+      let discountTotal = this.checks.filter(obj => obj.type !== 3).map(obj => obj.discount).reduce((a, b) => a + b, 0);
+      let customerMale = this.checks.filter(obj => obj.type !== 3).map(obj => obj.occupation.male).reduce((a, b) => a + b, 0);
+      let customerFemale = this.checks.filter(obj => obj.type !== 3).map(obj => obj.occupation.female).reduce((a, b) => a + b, 0);
+
+
       this.endDayReport.canceled_total = canceledTotal;
       this.endDayReport.check_count = this.checks.length;
+      this.endDayReport.discount_total = discountTotal;
+
+      this.endDayReport.customers.male = customerMale;
+      this.endDayReport.customers.female = customerFemale;
+
       this.mainService.removeAll('closed_checks', {}).then(() => {
         this.mainService.removeAll('allData', { db_name: 'closed_checks' }).then(() => {
           this.progress = 'Kapatılan Hesaplar Temizlendi...';
@@ -259,7 +268,7 @@ export class EndofthedayComponent implements OnInit {
 
   stepFinal() {
     let finalDate = Date.now();
-    this.endDayReport.data_file = finalDate + '.qdat';
+    this.endDayReport.data_file = finalDate.toString();
     this.progress = 'Yerel Süreç Tamamlanıyor...';
     this.mainService.addData('endday', this.endDayReport).then(() => {
       this.electronService.backupData(this.backupData, finalDate);
@@ -304,7 +313,7 @@ export class EndofthedayComponent implements OnInit {
   }
 
   refreshToken() {
-    this.httpService.post('token/refresh/', { token: this.token }).subscribe(res => {
+    this.httpService.post('/store/refresh', null, this.token).subscribe(res => {
       if (res.ok) {
         const token = res.json().token;
         localStorage.setItem('AccessToken', token);
@@ -322,7 +331,7 @@ export class EndofthedayComponent implements OnInit {
 
   purgeData(token) {
     this.mainService.getAllBy('allData', {}).then(res => {
-      this.httpService.post(`v1/management/restaurants/${this.restaurantID}/reset_database/`, { docs: res.docs }, token).subscribe(res => {
+      this.httpService.post(`/store/endday`, { docs: res.docs }, token).subscribe(res => {
         if (res.ok) {
           this.progress = 'Uzak Sunucu İsteği Onaylandı!';
           let databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings')
@@ -363,7 +372,7 @@ export class EndofthedayComponent implements OnInit {
           });
         }
       }, err => {
-        console.log(err);
+        // console.log(err);
         $('#endDayModal').modal('hide');
         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program Yeniden Başlatılacak', 'success');
         // setTimeout(() => {

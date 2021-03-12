@@ -4,9 +4,9 @@
       <div class="card-header">
         <div class="row">
           <div class="col-xl-10 col-lg-9">
-              <div class="table-name">
-                <b>{{check?.table_id | general:'tables' | async}}</b>
-              </div>
+            <div class="table-name">
+              <b>{{check?.table_id | general:'tables' | async}}</b>
+            </div>
           </div>
           <div class="col-xl-2 col-lg-3 pr-1">
             <button type="button" [routerLink]="['/selling-screen',check_type, check_id]" class="btn btn-danger btn-sm btn-block">
@@ -96,7 +96,7 @@
                       <p *ngIf="payment.discount > 0" class="text-danger m-0">
                         <small>
                           <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Tutarı
-                          <span class="pull-right">{{payment.discount | price}} </span>
+                          <span class="pull-right">{{payment.discount.toFixed(2) | price}} </span>
                         </small>
                       </p>
                       <p class="m-0 font-weight-bold">
@@ -151,7 +151,7 @@
                 </h5>
                 <h5 *ngIf="discount !== undefined" class="mb-1">İndirim Tutarı:
                   <span class="text-danger pull-right">
-                    <small>{{discount}} %</small> -
+                    <small>{{discount.toFixed(2)}} %</small> -
                     <b>{{discountAmount | price }} </b>
                   </span>
                 </h5>
@@ -245,7 +245,7 @@
         <div class="row">
           <div class="col">
             <div class="input-group">
-              <input #discountInput type="number" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg">
+              <input #discountInput type="number" min="1" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg">
               <div class="input-group-append normal">
                 <div class="input-group-text">
                   <i class="fa fa-turkish-lira fa-2x" aria-hidden="true"></i>
@@ -285,7 +285,9 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <input #customerInput type="text" placeholder="Müşteri Adı" class="form-control form-control-lg">
+          <select #customerInput class="form-control form-control-lg">
+            <option *ngFor="let customer of customers" value={{customer._id}}>{{customer.name}} {{customer.surname}}</option>
+          </select>
         </div>
         <div class="form-group mb-0">
           <input #creditNote type="text" placeholder="Cari Hesap Notu" class="form-control form-control-lg">
@@ -294,7 +296,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
         <button class="btn btn-primary btn-lg" [disabled]="creditNote.value == '' || creditNote.value == ' ' || customerInput.value == '' || customerInput.value == ' '" (click)="createCredit(customerInput.value,creditNote.value)" type="button">
-          <i class="fa fa-arrow-down" aria-hidden="true"></i> Alacaklı Kapat
+          <i class="fa fa-arrow-down" aria-hidden="true"></i> Cari Kapat
         </button>
       </div>
     </div>

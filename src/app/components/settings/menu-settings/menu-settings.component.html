@@ -221,7 +221,7 @@
               </div>
               <div id="productHolder" class="card-body p-0 flow">
                 <div *ngIf="products !== undefined && products.length > 0">
-                  <table class="table table-dark table-bordered table-hover table-striped mb-0">
+                  <table class="table table-dark  table-bordered table-hover table-striped mb-0">
                     <thead class="thead-dark">
                       <tr>
                         <th width="7%">#</th>
@@ -464,7 +464,13 @@
                   <div class="input-group-prepend">
                     <div class="input-group-text">Ürün Hakkında</div>
                   </div>
-                  <textarea name="description" rows="6" class="form-control form-control-lg" ngModel></textarea>
+                  <textarea name="description" rows="2" class="form-control form-control-lg" ngModel></textarea>
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Ürün Notları</div>
+                  </div>
+                  <textarea name="notes" rows="3" class="form-control form-control-lg" ngModel></textarea>
                 </div>
               </div>
             </div>
@@ -496,7 +502,7 @@
                 <div class="card-header">Ürün İçeriği</div>
                 <div class="card-body p-0 flow" style="height:277px;">
                   <div *ngIf="hasRecipe">
-                    <table class="table table-bordered table-hover table-dark table-striped">
+                    <table class="table  table-bordered table-hover table-dark table-striped">
                       <thead class="thead-dark">
                         <tr>
                           <th width="85%">İçerik</th>
@@ -544,7 +550,7 @@
                 </div>
                 <div class="card-header">Ürün Durumları</div>
                 <div class="card-body p-0 flow" style="height:277px;">
-                  <table *ngIf="productSpecs.length > 0" class="table table-hover table-bordered table-dark table-striped">
+                  <table *ngIf="productSpecs.length > 0" class="table table-hover  table-bordered table-dark table-striped">
                     <thead class="thead-dark">
                       <tr>
                         <th width="85%">Durum</th>

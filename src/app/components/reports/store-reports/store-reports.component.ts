@@ -18,6 +18,7 @@ import { SettingsService } from '../../../services/settings.service';
 export class StoreReportsComponent implements OnInit {
   AllChecks: Array<ClosedCheck>;
   FastChecks: Array<ClosedCheck>;
+  DeliveryChecks: Array<ClosedCheck>;
   NormalChecks: Array<ClosedCheck>;
   NotPayedChecks: Array<ClosedCheck>;
   checkDetail: any;
@@ -26,6 +27,7 @@ export class StoreReportsComponent implements OnInit {
   selectedPaymentIndex: number;
   NormalTotal: number = 0;
   FastTotal: number = 0;
+  DeliveryTotal: number = 0;
   printers: Array<any>;
   sellingLogs: Array<Log>;
   day: number;
@@ -260,7 +262,7 @@ export class StoreReportsComponent implements OnInit {
 
   getLogs() {
     this.mainService.getAllBy('logs', {}).then(res => {
-      this.sellingLogs = res.docs.filter(obj => obj.type >= logType.CHECK_CREATED && obj.type <= logType.ORDER_MOVED || obj.type == logType.DISCOUNT).sort((a, b) => b.timestamp - a.timestamp);
+      this.sellingLogs = res.docs.filter(obj => obj.type >= logType.CHECK_CREATED && obj.type <= logType.ORDER_MOVED || obj.type == logType.DISCOUNT).sort((a, b) => b.timestamp - a.timestamp, 0);
     });
   }
 
@@ -269,14 +271,13 @@ export class StoreReportsComponent implements OnInit {
       if (res.docs.length > 0) {
         this.AllChecks = res.docs;
         this.AllChecks.sort((a, b) => b.timestamp - a.timestamp);
-        this.NotPayedChecks = this.AllChecks.filter((obj) => obj.type == 3);
-        this.FastChecks = this.AllChecks.filter(obj => obj.type == 2);
-        this.NormalChecks = this.AllChecks.filter(obj => obj.type == 1);
-        try {
-          this.NormalTotal = this.NormalChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
-          this.FastTotal = this.FastChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b);
-        } catch (err) {
-        }
+        this.NotPayedChecks = this.AllChecks.filter((obj) => obj.type == CheckType.CANCELED);
+        this.FastChecks = this.AllChecks.filter(obj => obj.type == CheckType.FAST);
+        this.NormalChecks = this.AllChecks.filter(obj => obj.type == CheckType.NORMAL);
+        this.DeliveryChecks = this.AllChecks.filter(obj => obj.type == CheckType.ORDER)
+        this.NormalTotal = this.NormalChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+        this.FastTotal = this.FastChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+        this.DeliveryTotal = this.DeliveryChecks.filter(obj => obj.payment_method !== 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
       }
     });
   }

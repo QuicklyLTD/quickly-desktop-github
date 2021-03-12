@@ -117,11 +117,10 @@ export class TableReportsComponent implements OnInit {
   getItemReport(report: Report) {
     this.DetailLoaded = false;
     this.ItemReport = report;
-    let detailLabel;
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
-      this.DetailData = [{ data: res.weekly, label: 'Hesap Tutarı' }, { data: res.weekly_count, label: 'Hesap Adedi' }];
+      this.DetailData = [{ data: res.weekly, label: 'Hesap Tutarı' }]; // { data: res.weekly_count, label: 'Hesap Adedi' }
       this.DetailLoaded = true;
       $('#reportDetail').modal('show');
     });

@@ -2,25 +2,28 @@ import { Injectable } from '@angular/core';
 import { Headers, Http, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
-
-const AUTH_PREFIX = "JWT ";
+import { MainService } from './main.service';
 
 @Injectable()
 export class HttpService {
   headers: Headers;
   options: RequestOptions;
   baseUrl: string;
-  apiVersion: string;
+  store_id: string;
 
-  constructor(private http: Http) {
+  constructor(private http: Http, private mainService: MainService) {
     this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     this.options = new RequestOptions({ headers: this.headers });
-    this.baseUrl = 'https://api.quickly.com.tr/';
-    this.apiVersion = 'v1';
+    this.baseUrl = 'http://localhost:3000'; // 'https://hq.quickly.com.tr';
+
+    this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
+      this.store_id = res.docs[0].value._id;
+    })
   }
 
   private _createAuthorizationHeader(headers: Headers, token?: string) {
-    headers.set('Authorization', AUTH_PREFIX + token);
+    headers.set('Authorization', token);
+    headers.set('Store', this.store_id);
   }
 
   get(url, token?) {

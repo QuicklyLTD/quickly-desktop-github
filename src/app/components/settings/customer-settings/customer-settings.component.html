@@ -18,159 +18,46 @@
 </ul>
 
 <div class="tab-content">
-  <!-- <div class="tab-pane active" id="groups" role="tabpanel">
-        <div class="card ntb">
-          <div class="card-header">
-            <div class="row">
-              <div class="col-lg-8">
-                <h5 class="mt-2">Kullanıcı Grupları</h5>
-              </div>
-              <div class="col-lg-4 pr-2 pl-0">
-                <button class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#groupModal">
-                  <i class="fa fa-plus"></i> Kullanıcı Grubu Ekle
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body p-0 tab-height">
-            <div class="row">
-              <div class="col-lg-3 pr-0">
-                <div class="card tab-inside-height">
-                  <div class="card-header">
-                    Gruplar
-                  </div>
-                  <div class="card-body p-0 flow">
-                    <div class="list-group">
-                      <div *ngFor="let item of groups" class="btn-group btn-group-justify">
-                        <button (click)="getGroup(item._id)" [ngClass]="{'list-group-item-warning' : selectedGroup == item._id}"
-                          type="button" class="list-group-item list-group-item-action">{{item.name}}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-9 pl-0">
-                <form #groupDetailForm="ngForm" (ngSubmit)="updateGroup(groupDetailForm)">
-                  <div class="card tab-inside-height">
-                    <div class="card-header">
-                      Ayrıntılar
-                    </div>
-                    <div class="card-body p-2 flow">
-                      <h1 *ngIf="selectedGroup == undefined" class="text-center mt-5">Listeden Grup Seçiniz</h1>
-                      <div [hidden]="selectedGroup == undefined">
-                        <input type="hidden" name="_id" ngModel />
-                        <input type="hidden" name="_rev" ngModel />
-                        <input type="hidden" name="status" ngModel />
-                        <input type="hidden" name="timestamp" ngModel />
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-prepend">
-                              <div class="input-group-text">Grup Adı</div>
-                            </div>
-                            <input type="text" name="name" class="form-control form-control-lg" ngModel />
-                          </div>
-                        </div>
-                        <div class="form-group mb-2">
-                          <div class="input-group">
-                            <div class="input-group-prepend">
-                              <div class="input-group-text">Grup Açıklaması</div>
-                            </div>
-                            <input type="text" name="description" class="form-control form-control-lg" ngModel />
-                          </div>
-                        </div>
-                        <h5 class="mt-4">Erişim Hakları</h5>
-                        <table class="table table-bordered text-center mb-0">
-                          <thead>
-                            <tr>
-                              <th class="text-center">Satış</th>
-                              <th class="text-center">Kasa</th>
-                              <th class="text-center">Gün Sonu</th>
-                              <th class="text-center">Raporlar</th>
-                              <th class="text-center">Ayarlar</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr class="text-center">
-                              <td>
-                                <input type="checkbox" name="store" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="cashbox" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="endoftheday" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="reports" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="settings" class="form-control" ngModel />
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <h5 class="mt-3">Grup İzinleri</h5>
-                        <table class="table table-bordered text-center">
-                          <thead>
-                            <tr>
-                              <th width="20%" class="text-center">Hesap İptal</th>
-                              <th width="20%" class="text-center">Ürün İptal</th>
-                              <th width="20%" class="text-center">Ödeme</th>
-                              <th width="20%" class="text-center">İndirim</th>
-                              <th width="20%" class="text-center">Gün Sonu</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr class="text-center">
-                              <td>
-                                <input type="checkbox" name="cancelCheck" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="cancelProduct" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="payment" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="discount" class="form-control" ngModel />
-                              </td>
-                              <td>
-                                <input type="checkbox" name="end" class="form-control" ngModel />
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="card-footer" [hidden]="selectedGroup == undefined">
-                      <div class="row">
-                        <div class="col pr-1">
-                          <button type="button" (click)="removeGroup(selectedGroup)" class="btn btn-danger btn-md btn-block">
-                            <i class="fa fa-times" aria-hidden="true"></i> Grubu Sil</button>
-                        </div>
-                        <div class="col pl-1">
-                          <button type="submit" class="btn btn-success btn-md btn-block">
-                            <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
-          </div>
-        </div>
-      </div> -->
   <div class="tab-pane active" id="customers" role="tabpanel">
     <div class="card ntb">
       <div class="card-header">
-        <h5 class="mt-2">Müşteriler</h5>
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Müşteriler</h5>
+          </div>
+          <div class="col-lg-4 pr-2 pl-0">
+            <button class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#customerModal">
+              <i class="fa fa-plus"></i> Müşteri Ekle
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="card-body tab-height flow">
+      <div class="card-body tab-height p-0 flow">
+        <table class="table table-sm table-bordered table-striped table-hover">
+          <thead class="thead-dark">
+            <tr>
+              <th class="text-center" width="8%">#</th>
+              <th class="text-center" width="62%">Müşteri</th>
+              <th class="text-right" width="30%">Telefon</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of customers; let i = index" (click)="updateCustomer(item._id)">
+              <td class="text-center">{{i+1}}</td>
+              <td style="text-transform:capitalize;">
+                {{item.name}} {{item.surname}}
+                <br>
+                <strong class="text-success">{{item.address }}</strong>
+              </td>
+              <td class="text-right">
+                0{{item.phone_number | mask: ' (000) 000 00 00' }}
+                <br>
+                <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.timestamp | timeAgo }}</small>
+              </td>
 
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
@@ -180,10 +67,87 @@
   <div class="tab-pane" id="accounts" role="tabpanel">
     <div class="card ntb">
       <div class="card-header">
-        <h5 class="mt-2">Müşteri Hesapları</h5>
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="mt-2">Hesaplar</h5>
+          </div>
+          <div class="col-lg-4 pr-2 pl-0">
+            <!-- <button class="btn btn-danger btn-md btn-block" (click)="setDefault()" data-toggle="modal" data-target="#groupModal">
+              <i class="fa fa-plus"></i> Müşteri Ekle
+            </button> -->
+          </div>
+        </div>
       </div>
-      <div class="card-body tab-height flow">
-
+      <div class="card-body tab-height p-0">
+        <div class="row">
+          <div class="col-lg-3 pr-0">
+            <div class="card tab-inside-height">
+              <div class="card-header">
+                Müşteriler
+              </div>
+              <div class="card-body p-0 flow">
+                <div class="list-group">
+                  <div *ngFor="let customer of customers" class="btn-group btn-group-justify">
+                    <button (click)="filterChecks(customer._id)" type="button" class="list-group-item list-group-item-action">{{customer.name}}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-9 pl-0">
+            <form #stockCatDetailForm="ngForm" (ngSubmit)="updateCategory(stockCatDetailForm)">
+              <div class="card tab-inside-height">
+                <div class="card-header">
+                  Hesaplar
+                </div>
+                <div class="card-body p-0 flow">
+                  <table class="table table-sm table-bordered table-striped table-hover">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th class="text-center" width="8%">#</th>
+                        <th class="text-left" width="62%">Müşteri</th>
+                        <th class="text-right" width="30%">Tutar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of creditsView; let i = index" (click)="getDetail(item)">
+                        <td class="text-center">
+                          {{i+1}}
+                        </td>
+                        <td style="text-transform:capitalize;">
+                          {{item.table_id | general: 'customers' | async }}
+                          <br>
+                          <strong class="text-muted">
+                            Açıklama: {{item.note}}
+                          </strong>
+                        </td>
+                        <td class="text-right text-success">
+                          {{item.total_price | price }}
+                          <br>
+                          <small class="pull-right"><i class="fa fa-clock-o"></i>
+                            {{item.timestamp | timeAgo }}
+                          </small>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="card-footer" [hidden]="selectedCat == undefined">
+                  <div class="row">
+                    <div class="col-lg-6 pr-1">
+                      <button type="button" (click)="removeCategory(selectedCat._id)" class="btn btn-danger btn-md btn-block">
+                        <i class="fa fa-times" aria-hidden="true"></i> Kategoriyi Sil</button>
+                    </div>
+                    <div class="col-lg-6 pl-1">
+                      <button type="submit" class="btn btn-success btn-md btn-block">
+                        <i class="fa fa-check" aria-hidden="true"></i> Değişiklikleri Kaydet</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
@@ -195,8 +159,37 @@
       <div class="card-header">
         <h5 class="mt-2">Müşteri Kredileri</h5>
       </div>
-      <div class="card-body tab-height flow">
-
+      <div class="card-body tab-height flow p-0">
+        <table class="table table-sm table-bordered table-striped table-hover">
+          <thead class="thead-dark">
+            <tr>
+              <th class="text-center" width="8%">#</th>
+              <th class="text-center" width="42%">Müşteri</th>
+              <th class="text-center" width="20%">Telefon</th>
+              <th class="text-center" width="30%">Kredi Tutarı</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of customers; let i = index">
+              <td class="text-center">{{i+1}}</td>
+              <td style="text-transform:capitalize;">
+                {{item.name}} {{item.surname}}
+                <br>
+                <strong class="text-success">{{item.address }}</strong>
+              </td>
+              <td class="text-center">
+                0{{item.phone_number | mask: ' (000) 000 00 00' }}
+              </td>
+              <td class="text-center text-success">
+                <h3>
+                  <strong>
+                    {{ customerCredit(item._id) | price }}
+                  </strong>
+                </h3>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
@@ -213,6 +206,172 @@
       </div>
       <div class="card-footer">
         <i class="fa fa-question-circle" aria-hidden="true"></i> Yardım
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><strong>Müşteri Ekle</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #customerForm="ngForm" (ngSubmit)="addCustomer(customerForm)">
+        <div class="modal-body">
+          <div *ngIf="onUpdate">
+            <input type="hidden" name="_id" ngModel>
+            <input type="hidden" name="_rev" ngModel>
+            <input type="hidden" name="picture" ngModel>
+            <input type="hidden" name="timestamp" ngModel>
+          </div>
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Adı</div>
+              </div>
+              <input type="text" name="name" class="form-control form-control-lg" ngModel />
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Soyadı</div>
+              </div>
+              <input type="text" name="surname" class="form-control form-control-lg" ngModel />
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Telefon
+                </div>
+              </div>
+              <input type="text" prefix="0" mask=" (000) 000 00 00" placeholder="0 (000) 000 00 00" name="phone_number" class="form-control form-control-lg" ngModel />
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  Adres
+                </div>
+              </div>
+              <input type="text" name="address" class="form-control form-control-lg" ngModel />
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Müşteri Tipi</div>
+              </div>
+              <select #role name="type" class="form-control form-control-lg" ngModel>
+                <option value="0">Restoran</option>
+                <option value="1">Paket Servis</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+          <button *ngIf="onUpdate" type="button" class="btn btn-danger btn-lg" (click)="removeCustomer(selectedCustomer)">
+            Müşteriyi Sil</button>
+          <button type="submit" class="btn btn-primary btn-lg">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reportDetail" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-tie" id="modelTieId">Hesap Detayı
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="card checkDetail">
+          <div class="card-header">
+            <b>{{checkDetail?.table_id | general:'customers' | async}}
+              <small class="text-muted"> ({{checkDetail?.timestamp | date:'dd/M/y HH:mm'}})</small>
+            </b>
+            <span class="pull-right text-muted"> Hesap Türü : Cari</span>
+          </div>
+          <div class="card-body flow p-0">
+            <table *ngIf="checkDetail?.payment_method != 'Parçalı'" class="table table-striped  table-bordered table-sm mb-0">
+              <thead class="thead-dark">
+                <th width="6%">#</th>
+                <th width="44%">Ürün</th>
+                <th width="17%">Garson</th>
+                <th width="14%">Saat</th>
+                <th width="17%">Fiyat</th>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of checkDetail?.products; let i = index;" [ngClass]="{'table-danger': item.status == 3}">
+                  <td>{{i+1}}</td>
+                  <td>{{item.name}}
+                    <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
+                  </td>
+                  <td>{{item.owner | general:'users' | async}}</td>
+                  <td>{{item.timestamp |date:'HH:mm'}}</td>
+                  <td>{{item.price | price}} </td>
+                </tr>
+              </tbody>
+            </table>
+            <section *ngIf="checkDetail?.payment_method == 'Parçalı'">
+              <table *ngFor="let item of checkDetail?.payment_flow; let i = index;" class="table table-sm  table-bordered table-striped mb-0">
+                <thead class="thead-dark">
+                  <th width="6%">#</th>
+                  <th width="45%">{{item.owner}}</th>
+                  <th width="15%">{{item.method}}</th>
+                  <th width="15%">{{item.timestamp | date:'HH:mm'}}</th>
+                  <th width="17%">{{item.amount + item.discount | price}} </th>
+                </thead>
+                <tbody>
+                  <tr *ngIf="item.discount > 0" class="table-info">
+                    <td><i class="fa fa-arrow-down" aria-hidden="true"></i></td>
+                    <td colspan="3">İndirim Tutarı</td>
+                    <td>{{item.discount | price }} </td>
+                  </tr>
+                  <tr *ngFor="let product of item.payed_products; let i = index;" [ngClass]="{'table-danger': product.status == 3}">
+                    <td width="4%">{{i+1}}</td>
+                    <td width="48%">{{product.name}}
+                      <small *ngIf="product.note !== '' && product.note !== undefined" class="text-muted">({{product.note}})</small>
+                    </td>
+                    <td width="15%">{{product.owner}}</td>
+                    <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
+                    <td width="17%">{{product.price | price}} </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+          </div>
+          <div class="card-footer">
+            <b>
+              <i class="fa fa-user mr-1" aria-hidden="true"></i> Kullanıcı:
+              <span class="pull-right">{{checkDetail?.owner}}</span>
+            </b>
+          </div>
+          <div *ngIf="checkDetail?.discount > 0" class="card-footer">
+            <b>
+              <i class="fa fa-arrow-down" aria-hidden="true"></i> Toplam İndirim Tutarı:
+              <span class="pull-right">{{checkDetail?.discount | price}} </span>
+            </b>
+          </div>
+          <div class="card-footer">
+            <b>
+              <i class="fa fa-check" aria-hidden="true"></i> Cari Tutarı:
+              <span class="pull-right">{{checkDetail?.total_price | price}} </span>
+            </b>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer pr-2 text-center">
+        <button (click)="rePrintCheck(checkDetail)" class="btn btn-primary btn-lg">
+          <i class="fa fa-print" aria-hidden="true"></i> Yazdır</button>
+        <button type="button" (click)="reOpenCheck(checkDetail)" class="btn btn-info btn-lg" data-dismiss="modal">
+          <i class="fa fa-undo"></i> Hesabı Geri Aç</button>
       </div>
     </div>
   </div>

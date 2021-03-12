@@ -71,15 +71,16 @@
                   </div>
                   <div id="productHolder" class="card-body pt-0 pb-0 flow">
                     <div class="row">
-                      <div *ngFor="let product of productsView" (click)="addToCheck(product)" class="col-xl-4 col-lg-6 col-card">
+                      <div *ngFor="let product of productsView" (click)="addToCheck(product)" class="col-xl-3 col-lg-4 col-card">
                         <div class="card mb-1 mt-1 proCard">
                           <div class="card-body">
                             <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
                             <p class="card-text text-danger">
-                              <span class="price">
+                              <!-- <span class="price">
                                 <b> {{product.price | price }} </b>
-                              </span>
-                              <small *ngIf="selectedCat !== undefined" class="category mt-1 text-white">
+                              </span> -->
+                              <!-- *ngIf="selectedCat !== undefined" -->
+                              <small  class="category mt-1 text-white">
                                 {{product.cat_id | general:'categories':'name'| async}}
                               </small>
                             </p>
@@ -114,12 +115,12 @@
                       <div class="input-group-prepend normal">
                         <div class="input-group-text humanIcon"><i class="fa fa-male" aria-hidden="true"></i></div>
                       </div>
-                      <input type="number" readonly value="{{customers.male}}" class="form-control form-contol-sm" style="font-weight: bolder; font-size: 20px;">
+                      <input type="number" readonly value="{{check.occupation.male}}" class="form-control form-contol-sm" style="font-weight: bolder; font-size: 20px;">
                       <div class="input-group-append normal">
-                        <button (click)="customers.male = customers.male +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                        <button (click)="check.occupation.male = check.occupation.male +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
                       </div>
                       <div class="input-group-append normal">
-                        <button [disabled]="customers.  male == 0" (click)="customers.male = customers.male -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                        <button [disabled]="check.occupation.male == 0" (click)="check.occupation.male = check.occupation.male -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
                       </div>
                     </div>
                   </div>
@@ -128,12 +129,12 @@
                       <div class="input-group-prepend normal">
                         <div class="input-group-text humanIcon"><i class="fa fa-female" aria-hidden="true"></i></div>
                       </div>
-                      <input type="number" readonly value="{{customers.female}}" class="form-control form-contol-sm" style="font-weight: bolder; font-size: 20px;">
+                      <input type="number" readonly value="{{check.occupation.female}}" class="form-control form-contol-sm" style="font-weight: bolder; font-size: 20px;">
                       <div class="input-group-append normal">
-                        <button (click)="customers.female = customers.female +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                        <button (click)="check.occupation.female = check.occupation.female +1" class="btn btn-success"><i class="fa fa-plus"></i></button>
                       </div>
                       <div class="input-group-append normal">
-                        <button [disabled]="customers.female == 0" (click)="customers.female = customers.female -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                        <button [disabled]="check.occupation.female == 0" (click)="check.occupation.female = check.occupation.female -1" class="btn btn-danger"><i class="fa fa-minus"></i></button>
                       </div>
                     </div>
                   </div>
@@ -149,7 +150,7 @@
                     </div>
                     <div class="product-price">{{item.price | price }} </div>
                     <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
-                      <i class="fa fa-user" aria-hidden="true"></i> {{item.owner}}
+                      <i class="fa fa-user" aria-hidden="true"></i> {{item.owner | general:'users' | async }}
                       <span class="pull-right">
                         <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
                     </div>
@@ -219,8 +220,10 @@
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block mt-2" data-toggle="buttons">
-                  <button (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
-                  <button [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
+                  <button *ngIf="this.check.type == 5" [routerLink]="['/store']" class="btn btn-secondary btn-lg btn-block"><strong><i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</strong></button>
+                  <button *ngIf="this.check.type !== 5" (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
+                  <button *ngIf="this.check.type !== 5" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
+                  <button *ngIf="this.check.type == 5 && this.check.status !== 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
                 </div>
               </div>
             </div>
@@ -264,9 +267,15 @@
       <form #noteForm="ngForm" (ngSubmit)="addNote(noteForm)">
         <div class="modal-body">
           <div class="form-group">
-            <input type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
+            <input #noteInput type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
           </div>
-          <!-- <div *ngFor="let note of selectedProduct?.description.slice(',')">{{note}}</div>  -->
+          <div *ngIf="readyNotes?.length > 0" class="row pr-0 pl-0">
+            <div *ngFor="let note of readyNotes" class="col-lg-4 mb-2">
+              <button type="button" class="btn bg-teal btn-lg btn-block" (click)="addReadyNotes(note)">
+                {{note}}
+              </button>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
@@ -305,7 +314,7 @@
 
 
 <div class="modal" id="printersModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-xl" role="document">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">Yazıcı Seç
@@ -536,6 +545,52 @@
   </div>
 </div>
 
+
+<div class="modal" id="occupationModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Kişi Şayısı</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="input-group input-group-lg">
+              <div class="input-group-prepend normal">
+                <div class="input-group-text humanIcon"><i class="fa fa-male" aria-hidden="true"></i></div>
+              </div>
+              <input type="number" readonly value="{{check.occupation.male}}" class="form-control form-contol-lg" style="font-weight: bolder; font-size: 20px;">
+              <div *ngFor="let item of [1,2,3,4,5,6,7,8]" class="input-group-append normal">
+                <button (click)="check.occupation.male = item" class="btn btn-outline-success" [ngClass]="{'active': check.occupation.male == item}">{{item}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-lg-12">
+            <div class="input-group input-group-lg">
+              <div class="input-group-prepend normal">
+                <div class="input-group-text humanIcon"><i class="fa fa-female" aria-hidden="true"></i></div>
+              </div>
+              <input type="number" readonly value="{{check.occupation.female}}" class="form-control form-contol-lg" style="font-weight: bolder; font-size: 20px;">
+              <div *ngFor="let item of [1,2,3,4,5,6,7,8]" class="input-group-append normal">
+                <button (click)="check.occupation.female = item" class="btn btn-outline-success" [ngClass]="{'active': check.occupation.female == item}">{{item}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal fade" id="checkDiscount" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
@@ -549,7 +604,7 @@
         <div class="row">
           <div class="col">
             <div class="input-group">
-              <input #discountInput type="number" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg">
+              <input #discountInput type="number" min="0" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg">
               <div class="input-group-append normal">
                 <div class="input-group-text"><i class="fa fa-turkish-lira fa-2x" aria-hidden="true"></i></div>
               </div>

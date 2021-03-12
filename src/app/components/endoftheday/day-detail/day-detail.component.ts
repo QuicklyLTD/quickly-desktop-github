@@ -74,6 +74,9 @@ export class DayDetailComponent implements OnInit {
   }
 
   ngOnInit() {
+
+    console.log(this.detailData);
+
     this.detailTitle = 'Genel Detaylar & Grafik';
     this.pieColors = [];
     this.pieData = [];

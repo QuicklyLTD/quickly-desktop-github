@@ -7,6 +7,7 @@ import { PrinterService } from '../../../providers/printer.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
+import { Customer } from 'app/mocks/customer.mock';
 
 @Component({
   selector: 'app-payment-screen',
@@ -45,6 +46,7 @@ export class PaymentScreenComponent implements OnInit {
   day: number;
   changes: any;
   paymentMethods: Array<PaymentMethod>
+  customers: Array<Customer>;
   @ViewChild('discountInput') discountInput: ElementRef;
   @ViewChild('customerInput') customerInput: ElementRef;
   @ViewChild('creditNote') creditNote: ElementRef;
@@ -68,7 +70,7 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.discounts = [5, 10, 15, 20, 25, 50];
+    this.discounts = [5, 10, 15, 20, 25, 40];
     this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "✔"]];
     this.setDefault();
     this.payedShow = false;
@@ -175,7 +177,7 @@ export class PaymentScreenComponent implements OnInit {
         this.discount = undefined;
         this.discountAmount = 0;
       }
-      this.logService.createLog(logType.CHECK_CREATED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
+      this.logService.createLog(logType.CHECK_PAYED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
       this.togglePayed();
       this.isFirstTime = true;
     }
@@ -193,10 +195,10 @@ export class PaymentScreenComponent implements OnInit {
       this.check.discount += this.priceWillPay;
       total_discounts = this.check.payment_flow.map(obj => obj.discount).reduce((a, b) => a + b);
       let total_price = this.check.payment_flow.map(obj => obj.amount).reduce((a, b) => a + b);
-      checkWillClose = new ClosedCheck(this.check.table_id, total_price, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), this.check.type, method, this.check.payment_flow);
+      checkWillClose = new ClosedCheck(this.check.table_id, total_price, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), this.check.type, method, this.check.payment_flow, null, this.check.occupation);
     } else {
       total_discounts = this.discountAmount;
-      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), this.check.type, method);
+      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), this.check.type, method, null, null, this.check.occupation);
     }
     if (this.askForPrint) {
       this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
@@ -228,8 +230,8 @@ export class PaymentScreenComponent implements OnInit {
   createCredit(customer: string, creditNote: string) {
     if (this.check.payment_flow !== undefined) {
       let paymentMethod;
-      (this.check.payment_flow.length > 1) ? paymentMethod = 'Parçalı' : paymentMethod = this.check.payment_flow[0].method;
-      let checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, 0, this.userName, '', this.check.status, this.check.products, Date.now(), this.check.type, paymentMethod, this.check.payment_flow, '');
+      (this.check.payment_flow.length > 0) ? paymentMethod = 'Parçalı' : paymentMethod = this.check.payment_flow[0].method;
+      let checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, 0, this.userName, '', this.check.status, this.check.products, Date.now(), this.check.type, paymentMethod, this.check.payment_flow, null, this.check.occupation);
       this.updateSellingReport(paymentMethod);
       this.updateTableReport(this.check, paymentMethod);
       this.mainService.addData('closed_checks', checkWillClose);
@@ -452,8 +454,11 @@ export class PaymentScreenComponent implements OnInit {
       if (res.value.ask_print_check == 'Sor') {
         this.askForPrint = true;
       } else {
-        this.askForPrint = false;
+        this.askForPrint = false; 
       }
     });
+    this.mainService.getAllBy('customers', {}).then(res => {
+      this.customers = res.docs;
+    })
   }
 }

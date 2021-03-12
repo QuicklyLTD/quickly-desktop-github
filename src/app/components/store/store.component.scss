@@ -1,80 +1,79 @@
 #floorHolder {
-    .card {
-        height: 68.1px;
-    }
+  .card {
+    height: 68.1px;
+  }
 
-    .card-body {
-        padding: 0.75rem;
-    }
+  .card-body {
+    padding: 0.75rem;
+  }
 
-    h2 {
-        font-size: 1.7vw;
-        font-weight: bolder;
-        text-transform: capitalize;
-    }
+  h2 {
+    font-size: 1.7vw;
+    font-weight: bolder;
+    text-transform: capitalize;
+  }
 }
 
 .normal {
-    width: auto !important;
+  width: auto !important;
 }
 
 .nav-link.active {
-    background-color: #4e5d6c;
-    border-color: #43505e;
-    border-bottom-color: #4e5d6c;
+  background-color: #4e5d6c;
+  border-color: #43505e;
+  border-bottom-color: #4e5d6c;
 }
 
 .check-card {
-    height: 288px;
-    margin-bottom: 5px;
+  height: 288px;
+  margin-bottom: 5px;
 
-    .card-header {
-        span.float-left {
-            width: 62%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+  .card-header {
+    span.float-left {
+      width: 62%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
+  }
 
-    .card-body {
-        height: 200px;
-        overflow: hidden;
-    }
+  .card-body {
+    height: 200px;
+    overflow: hidden;
+  }
 }
 
 .check-product {
-    border-bottom: 1px dashed #5b6977;
-    font-size: 13px;
-    color: #1B2731;
+  border-bottom: 1px dashed #5b6977;
+  font-size: 13px;
+  color: #1b2731;
 }
 
 .relativeTable {
-    position: absolute !important;
-    box-shadow: 1px 1px 4px rgb(43, 62, 80);
+  position: absolute !important;
+  box-shadow: 1px 1px 4px rgb(43, 62, 80);
 }
 
 .tableInfo {
-    position: absolute;
-    bottom: 10px;
-    width: 77%;
+  position: absolute;
+  bottom: 5px;
+  width: 85%;
 }
 
-
 @media screen and (min-width: 900px) {
-    #plan {
-        position: relative;
-        transform: scaleX(0.75) scaleY(0.8);
-        left: -110px;
-        flex: 1 1 auto;
-    }
+  #plan {
+    position: relative;
+    transform: scaleX(0.75) scaleY(0.8);
+    left: -110px;
+    flex: 1 1 auto;
+  }
 }
 
 @media screen and (min-width: 1200px) {
-    #plan {
-        position: relative;
-        transform: scaleX(1) scaleY(1);
-        left: 0px !important;
-        flex: 1 1 auto;
-    }
+  #plan {
+    position: relative;
+    transform: scaleX(1) scaleY(1);
+    left: 0px !important;
+    flex: 1 1 auto;
+  }
 }

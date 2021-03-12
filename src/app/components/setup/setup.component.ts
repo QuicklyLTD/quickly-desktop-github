@@ -31,7 +31,7 @@ export class SetupComponent implements OnInit {
   constructor(private mainService: MainService, private settingsService: SettingsService, private http: Http, private electron: ElectronService, private message: MessageService, private router: Router) {
     this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     this.options = new RequestOptions({ headers: this.headers });
-    this.baseUrl = 'https://api.quickly.com.tr';
+    this.baseUrl = 'https://hq.quickly.com.tr';
   }
 
   ngOnInit() {
@@ -54,11 +54,21 @@ export class SetupComponent implements OnInit {
     localStorage.setItem('AppType', 'Secondary');
     this.electron.openDevTools();
     this.mainService.replicateDB(serverSettings.value)
+
       .on('active', () => {
         this.progressBar(5);
       })
+      .on('denied', (ass) => {
+        console.log(ass, 'denied')
+      })
+      .on('error', (err) => {
+        console.log(err)
+        this.mainService.syncToLocal().then(res => {
+          this.getConfigrations(connectionForm);
+        });
+      })
       .on('change', (sync) => {
-        this.statusMessage = `${sync.docs_written} - Senkorinize Ediliyor `;
+        this.statusMessage = `${sync.docs_written} - Senkronize Ediliyor `;
       })
       .on('complete', info => {
         this.mainService.addData('settings', serverSettings);
@@ -71,23 +81,27 @@ export class SetupComponent implements OnInit {
           }
         });
       }).catch(err => {
-        connectionForm.reset();
-        this.message.sendMessage('Sunucuya Bağlanılamıyor.');
+        // connectionForm.reset();
+        // this.message.sendMessage('Sunucuya Bağlanılamıyor.');
+        console.log(err)
+        this.mainService.syncToLocal().then(res => {
+          this.getConfigrations(connectionForm);
+        });
       });
   }
 
   makeLogin(loginForm: NgForm) {
     let Form = loginForm.value;
-    this.http.post(this.baseUrl + '/token/', { username: Form.username, password: Form.password }, this.options).subscribe((res: Response) => {
+    this.http.post(this.baseUrl + '/store/login/', { username: Form.username, password: Form.password }, this.options).subscribe((res: Response) => {
       localStorage.setItem('AccessToken', res.json().token);
-      this.headers.append('Authorization', 'JWT ' + res.json().token);
-      this.http.get(this.baseUrl + '/v1/management/restaurants/', new RequestOptions({ headers: this.headers })).subscribe((body: Response) => {
+      this.headers.append('Authorization', res.json().token);
+      this.http.get(this.baseUrl + '/store/list/', new RequestOptions({ headers: this.headers })).subscribe((body: Response) => {
         this.message.sendMessage('Giriş Başarılı!');
-        if (body.json().results.length > 1) {
-          this.stores = body.json().results;
+        if (body.json().length > 1) {
+          this.stores = body.json();
           this.setupStep = 2;
         } else {
-          this.makeAuth(body.json().results[0]);
+          this.makeAuth(body.json()[0]);
         }
       }, (err) => {
         this.message.sendMessage('Giriş Başarısız!');
@@ -108,21 +122,24 @@ export class SetupComponent implements OnInit {
     this.electron.saveLogo(Data.logo);
     let activationStatus = new Settings('ActivationStatus', true, Data.auth.database_name, Date.now());
     let dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() }, 'Tarih-Zaman Ayarları', Date.now());
-    let authInfo = new Settings('AuthInfo', new AuthInfo(Data.remote.host, Data.remote.port, Data.auth.database_name, Data.auth.app_id, Data.auth.app_token), 'Giriş Bilgileri Oluşturuldu', Date.now());
+    let authInfo = new Settings('AuthInfo', new AuthInfo('31.210.89.218', '5984', Data.auth.database_name, Data.auth.database_user, Data.auth.database_password), 'Giriş Bilgileri Oluşturuldu', Date.now());
     let restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
     let appSettings = new Settings('AppSettings', { timeout: 120, keyboard: 'Kapalı', takeaway: 'Açık', ask_print_order: 'Sor', ask_print_check: 'Sor', last_day: 0 }, 'Uygulama Ayarları', Date.now());
-    let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.app_id }, 'Sunucu Ayarları', Date.now());
+    let serverSettings = new Settings('ServerSettings', { type: 0, status: 0, ip_address: this.electron.getLocalIP(), ip_port: 3000, key: Data.auth.database_id }, 'Sunucu Ayarları', Date.now());
     let printerSettings = new Settings('Printers', [], 'Yazıcılar', Date.now());
+    // let lastSeenSettings = new Settings('LastSeen', { last_seen: new Date().toLocaleString('tr-TR'), user: 'Setup' }, 'Son Görülme', Date.now());
     localStorage.setItem('AppType', 'Primary');
     this.mainService.addData('settings', restaurantInfo);
     this.mainService.addData('settings', authInfo);
     this.mainService.addData('settings', appSettings);
     this.mainService.addData('settings', printerSettings);
     this.mainService.addData('settings', serverSettings);
+    // this.mainService.addData('settings', Object.assign({ _id: 'lastseen' }, lastSeenSettings));
     this.mainService.addData('settings', dateSettings);
     this.mainService.addData('settings', activationStatus).then((result) => {
       this.progressBar(3);
     });
+    this.progressBar(3);
   }
 
   makeAdmin(adminForm: NgForm) {

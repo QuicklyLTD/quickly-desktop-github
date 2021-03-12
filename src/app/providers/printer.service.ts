@@ -112,4 +112,11 @@ export class PrinterService {
   getUSBPrinters() {
     return escpos.USB.findPrinter();
   }
+
+  getSerialPrinters(path: string) {
+    return escpos.Serial(path, {
+      baudRate: 14400,
+      stopBit: 2
+    });
+  }
 }

@@ -205,7 +205,7 @@ export class MenuSettingsComponent implements OnInit {
         return false;
       }
     }
-    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.tax_value, form.barcode, form.subcat_id, this.productSpecs, form._id, form._rev);
+    let schema = new Product(form.cat_id, form.type, form.description, form.name, form.price, 1, form.tax_value, form.barcode, form.notes, form.subcat_id, this.productSpecs, form._id, form._rev);
     if (form._id == undefined) {
       this.mainService.addData('products', schema).then((response) => {
         this.mainService.addData('reports', new Report('Product', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], schema.name, Date.now())).then(res => {
@@ -261,6 +261,9 @@ export class MenuSettingsComponent implements OnInit {
       this.productSpecs = result.specifies;
       if (result.subcat_id == undefined) {
         result.subcat_id = "";
+      }
+      if(!result.notes){
+        result.notes = '';
       }
       this.productType = result.type;
       this.productForm.setValue(result);
@@ -351,15 +354,15 @@ export class MenuSettingsComponent implements OnInit {
     let item = new Ingredient(form.stock_id, form.amount);
     this.mainService.getData('stocks', form.stock_id).then(result => {
       // if (form.amount < result.left_total) {
-        if (this.productRecipe.find(item => item.stock_id == form.stock_id)) {
-          this.messageService.sendMessage('İçerik daha önce tanımlanmış!');
-        } else if (this.oldRecipes.find(item => item.id == form.stock_id)) {
-          this.messageService.sendMessage('İçerik daha önce tanımlanmış!');
-        } else {
-          this.productRecipe.push(item);
-          this.recipesTable.push({ id: form.stock_id, name: this.stockName, amount: form.amount, unit: this.stockUnit });
-          this.hasRecipe = true;
-        }
+      if (this.productRecipe.find(item => item.stock_id == form.stock_id)) {
+        this.messageService.sendMessage('İçerik daha önce tanımlanmış!');
+      } else if (this.oldRecipes.find(item => item.id == form.stock_id)) {
+        this.messageService.sendMessage('İçerik daha önce tanımlanmış!');
+      } else {
+        this.productRecipe.push(item);
+        this.recipesTable.push({ id: form.stock_id, name: this.stockName, amount: form.amount, unit: this.stockUnit });
+        this.hasRecipe = true;
+      }
       // } else {
       //   this.messageService.sendMessage('Elinizdeki  kalan stok miktarından fazla giremezsiniz.')
       // }

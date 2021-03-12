@@ -49,8 +49,8 @@ export class ApplicationSettingsComponent implements OnInit {
       this.restInfo = res.value
       this.restMap = res.value.geolocation;
       this.appLogo = this.restInfo.logo;
-      if (this.restInfo.last_seen) delete this.restInfo.last_seen;
-      this.restaurantForm.setValue(this.restInfo);
+      // if (this.restInfo.last_seen) delete this.restInfo.last_seen;
+      // this.restaurantForm.setValue(this.restInfo);
     });
     this.settings.ServerSettings.subscribe(res => {
       this.serverSettingsForm.setValue(res.value);
@@ -157,6 +157,16 @@ export class ApplicationSettingsComponent implements OnInit {
         break;
       case 'LAN':
         this.printerProcess = 'LAN';
+        this.printersFound = [];
+        this.selectedPrinter = {};
+        break;
+      case 'SERIAL':
+        this.printerProcess = 'SERIAL';
+        this.printersFound = this.printerService.getSerialPrinters('/dev/ttyS0');
+        this.selectedPrinter = {};
+        break;
+      case 'BLUETOOTH':
+        this.printerProcess = 'BLUETOOTH';
         this.printersFound = [];
         this.selectedPrinter = {};
         break;

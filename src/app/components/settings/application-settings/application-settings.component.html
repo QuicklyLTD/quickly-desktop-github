@@ -12,9 +12,9 @@
       <i class="fa fa-briefcase" aria-hidden="true"></i> İşletme</a>
   </li>
   <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#account" role="tab">
-        <i class="fa fa-asterisk" aria-hidden="true"></i> Hesap</a>
-    </li>
+    <a class="nav-link" data-toggle="tab" href="#account" role="tab">
+      <i class="fa fa-asterisk" aria-hidden="true"></i> Hesap</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -39,18 +39,15 @@
               </div>
               <div class="card-body p-0 flow">
                 <div class="list-group">
-                  <button (click)="getSettingsDetail('AppSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AppSettings'}"
-                    type="button" class="list-group-item list-group-item-action">
+                  <button (click)="getSettingsDetail('AppSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AppSettings'}" type="button" class="list-group-item list-group-item-action">
                     Uygulama Ayarları
                   </button>
-                  <button (click)="getSettingsDetail('ServerSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'ServerSettings'}"
-                    type="button" class="list-group-item list-group-item-action">
+                  <button (click)="getSettingsDetail('ServerSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'ServerSettings'}" type="button" class="list-group-item list-group-item-action">
                     Sunucu Ayarları
                   </button>
-                  <button (click)="getSettingsDetail('AccountSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AccountSettings'}"
-                    type="button" class="list-group-item list-group-item-action">
+                  <!-- <button (click)="getSettingsDetail('AccountSettings')" [ngClass]="{'list-group-item-warning' : currentSection == 'AccountSettings'}" type="button" class="list-group-item list-group-item-action">
                     Hesap Ayarları
-                  </button>
+                  </button> -->
                 </div>
               </div>
             </div>
@@ -64,9 +61,9 @@
                     <div class="form-group mb-2">
                       <div class="input-group text-center">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Zaman Aşımı</div>
+                          <div class="input-group-text">Zaman Aşımı</div>
                         </div>
-                        <input name="timeout" type="number" class="form-control form-control-lg" ngModel/>
+                        <input name="timeout" type="number" class="form-control form-control-lg" ngModel />
                         <div class="input-group-append">
                           <div class="input-group-text">Saniye</div>
                         </div>
@@ -86,7 +83,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text"> Parakende Satış</div>
+                          <div class="input-group-text"> Parakende Satış</div>
                         </div>
                         <select name="takeaway" class="form-control form-control-lg" id="" ngModel>
                           <option>Açık</option>
@@ -108,7 +105,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Hesap Fişi İçin</div>
+                          <div class="input-group-text">Hesap Fişi İçin</div>
                         </div>
                         <select name="ask_print_check" class="form-control form-control-lg" ngModel>
                           <option>Sor</option>
@@ -119,7 +116,7 @@
                     <div class="form-group mb-0">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Son Gün</div>
+                          <div class="input-group-text">Son Gün</div>
                         </div>
                         <select name="last_day" class="form-control form-control-lg" ngModel>
                           <option value="1">Pazartesi</option>
@@ -148,7 +145,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Sunucu Modu</div>
+                          <div class="input-group-text">Sunucu Modu</div>
                         </div>
                         <select name="type" class="form-control form-control-lg" ngModel>
                           <option value="0">Birincil</option>
@@ -159,7 +156,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Sunucu Durumu</div>
+                          <div class="input-group-text">Sunucu Durumu</div>
                         </div>
                         <select name="status" class="form-control form-control-lg" ngModel>
                           <option value="0">Kapalı</option>
@@ -170,23 +167,23 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Sunucu Adresi</div>
+                          <div class="input-group-text">Sunucu Adresi</div>
                         </div>
-                        <input type="text" name="ip_address" class="form-control form-control-lg" ngModel/>
+                        <input type="text" name="ip_address" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Sunucu Portu</div>
+                          <div class="input-group-text">Sunucu Portu</div>
                         </div>
-                        <input type="text" name="ip_port" class="form-control form-control-lg" ngModel/>
+                        <input type="text" name="ip_port" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Sunucu Anahtarı</div>
+                          <div class="input-group-text">Sunucu Anahtarı</div>
                         </div>
                         <textarea rows="3" name="key" class="form-control form-control-lg" ngModel></textarea>
                         <div class="input-group-append">
@@ -205,15 +202,15 @@
               </form>
             </section>
             <section [hidden]="currentSection !== 'AccountSettings'">
-              <form #restaurantForm="ngForm" (ngSubmit)="saveRestSettings(restaurantForm)">
-                <input type="hidden" name="state" ngModel/>
-                <input type="hidden" name="city" ngModel/>
-                <input type="hidden" name="geolocation" ngModel/>
-                <input type="hidden" name="_order" ngModel/>
-                <input type="hidden" name="created_at" ngModel/>
-                <input type="hidden" name="logo" ngModel/>
-                <input type="hidden" name="is_premium" ngModel/>
-                <input type="hidden" name="owner" ngModel/>
+              <!-- <form #restaurantForm="ngForm" (ngSubmit)="saveRestSettings(restaurantForm)">
+                <input type="hidden" name="state" ngModel />
+                <input type="hidden" name="city" ngModel />
+                <input type="hidden" name="geolocation" ngModel />
+                <input type="hidden" name="_order" ngModel />
+                <input type="hidden" name="created_at" ngModel />
+                <input type="hidden" name="logo" ngModel />
+                <input type="hidden" name="is_premium" ngModel />
+                <input type="hidden" name="owner" ngModel />
                 <div class="card tab-inside-height">
                   <div class="card-header">
                     Hesap Ayarları
@@ -222,7 +219,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">İşletme Logo</div>
+                          <div class="input-group-text">İşletme Logo</div>
                         </div>
                         <div class="img-thumbnail subCatInput">
                           <img src="{{appLogo}}" class="img-responsive mx-auto d-body" alt="">
@@ -232,47 +229,47 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">İşletme Adı</div>
+                          <div class="input-group-text">İşletme Adı</div>
                         </div>
-                        <input name="name" type="text" class="form-control form-control-lg" ngModel/>
+                        <input name="name" type="text" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">İşletme No</div>
+                          <div class="input-group-text">İşletme No</div>
                         </div>
-                        <input name="id" type="string" class="form-control form-control-lg" readonly ngModel/>
+                        <input name="_id" type="string" class="form-control form-control-lg" readonly ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Telefon</div>
+                          <div class="input-group-text">Telefon</div>
                         </div>
-                        <input name="phone_number" type="text" class="form-control form-control-lg" ngModel/>
+                        <input name="phone_number" type="text" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Şehir</div>
+                          <div class="input-group-text">Şehir</div>
                         </div>
-                        <input name="city" type="text" class="form-control form-control-lg" ngModel/>
+                        <input name="city" type="text" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Bölge</div>
+                          <div class="input-group-text">Bölge</div>
                         </div>
-                        <input name="state" type="text" class="form-control form-control-lg" ngModel/>
+                        <input name="state" type="text" class="form-control form-control-lg" ngModel />
                       </div>
                     </div>
                     <div class="form-group mb-0">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Adres</div>
+                          <div class="input-group-text">Adres</div>
                         </div>
                         <textarea name="address" rows="2" class="form-control form-control-lg" ngModel></textarea>
                       </div>
@@ -283,7 +280,7 @@
                       <i class="fa fa-check" aria-hidden="true"></i> Ayarları Kaydet</button>
                   </div>
                 </div>
-              </form>
+              </form> -->
             </section>
           </div>
         </div>
@@ -335,7 +332,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Yazıcı Adı</div>
+                          <div class="input-group-text">Yazıcı Adı</div>
                         </div>
                         <input type="text" name="name" class="form-control form-control-lg" ngModel>
                       </div>
@@ -343,7 +340,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Açıklama</div>
+                          <div class="input-group-text">Açıklama</div>
                         </div>
                         <textarea name="note" rows="3" class="form-control form-control-lg" ngModel></textarea>
                       </div>
@@ -351,7 +348,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Tip</div>
+                          <div class="input-group-text">Tip</div>
                         </div>
                         <input type="text" readonly name="type" class="form-control form-control-lg" ngModel>
                       </div>
@@ -359,7 +356,7 @@
                     <div class="form-group mb-2">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Adres</div>
+                          <div class="input-group-text">Adres</div>
                         </div>
                         <input type="text" readonly name="device_port" class="form-control form-control-lg" ngModel>
                       </div>
@@ -367,7 +364,7 @@
                     <div class="form-group mb-0">
                       <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">Tür</div>
+                          <div class="input-group-text">Tür</div>
                         </div>
                         <select name="mission" class="form-control form-control-lg" ngModel>
                           <option value="Adisyon">Hesap Yazıcısı</option>
@@ -458,13 +455,23 @@
           <section *ngIf="printerProcess == undefined" id="selection">
             <p class="text-muted">Lütfen eklemek istediğiniz yazıcı tipini seçiniz.</p>
             <div class="row">
-              <div class="col-lg-6">
+              <div class="col-lg-6 pr-2">
                 <button type="button" (click)="getPrinters('USB')" class="btn btn-primary btn-lg btn-block">
                   <i class="fa fa-usb" aria-hidden="true"></i> USB</button>
               </div>
-              <div class="col-lg-6">
-                <button type="button" (click)="getPrinters('LAN')" class="btn btn-info btn-lg btn-block">
+              <div class="col-lg-6 pl-2">
+                <button type="button" (click)="getPrinters('LAN')" class="btn btn-primary btn-lg btn-block">
                   <i class="fa fa-sitemap" aria-hidden="true"></i> LAN</button>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-lg-6 pr-2">
+                <button type="button" (click)="getPrinters('SERIAL')" class="btn btn-primary btn-lg btn-block">
+                  <i class="fa fa-plug" aria-hidden="true"></i> SERIAL</button>
+              </div>
+              <div class="col-lg-6 pl-2">
+                <button type="button" (click)="getPrinters('BLUETOOTH')" class="btn btn-primary btn-lg btn-block">
+                  <i class="fa fa-bluetooth" aria-hidden="true"></i> BLUETOOTH</button>
               </div>
             </div>
           </section>

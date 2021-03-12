@@ -27,7 +27,6 @@ export class MessageService {
                     value: true,
                     visible: true,
                     className: "btn btn-lg btn-success",
-                    buttonsStyling: false,
                     closeModal: true
                 }
             }
@@ -42,7 +41,6 @@ export class MessageService {
                     value: false,
                     visible: true,
                     className: "btn btn-lg btn-danger",
-                    buttonsStyling: false,
                     closeModal: true,
                 },
                 confirm: {
@@ -50,7 +48,6 @@ export class MessageService {
                     value: true,
                     visible: true,
                     className: "btn btn-lg btn-success",
-                    buttonsStyling: false,
                     closeModal: true
                 }
             },

@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo, Occupation } from '../../../mocks/check.mock';
 import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../mocks/product.mock';
 import { PaymentMethod, Printer } from '../../../mocks/settings.mock';
 import { Floor, Table, TableStatus } from '../../../mocks/table.mock';
@@ -64,16 +64,17 @@ export class SellingScreenComponent implements OnInit {
   changes: any;
   discounts: Array<number>;
   selectedQuantity: number;
-  customers: any = { male: 0, female: 0 };
   takeaway: boolean;
-  @ViewChild('productName') productFilterInput: ElementRef
-  @ViewChild('specsUnit') productUnit: ElementRef
+  @ViewChild('productName') productFilterInput: ElementRef;
+  @ViewChild('specsUnit') productUnit: ElementRef;
+  @ViewChild('noteInput') noteInput: ElementRef;
+  readyNotes: string[] = [];
 
   constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settingsService: SettingsService, private logService: LogService) {
     this.owner = this.settingsService.getUser('name');
     this.ownerRole = this.settingsService.getUser('type');
     this.ownerId = this.settingsService.getUser('id');
-    this.discounts = [5,10, 15, 20, 25, 50];
+    this.discounts = [5, 10, 15, 20, 25, 40];
     this.selectedQuantity = 1;
     this.paymentMethods = [
       new PaymentMethod('Nakit', 'Nakit Ödeme', '#5cb85c', 'fa-money', 1, 1),
@@ -91,21 +92,29 @@ export class SellingScreenComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.type = params['type'];
-      if (this.type == 'Normal') {
-        this.check = new Check(this.id, 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.NORMAL, CheckNo());
-        this.getCheck({ table_id: this.id });
-      } else {
-        if (this.id == 'New') {
-          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
-        } else {
-          this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
+      switch (this.type) {
+        case 'Normal':
+          this.check = new Check(this.id, 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.NORMAL, CheckNo());
+          this.getCheck({ table_id: this.id });
+          break;
+        case 'Fast':
+          if (this.id == 'New') {
+            this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
+          } else {
+            this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
+            this.getCheck({ _id: this.id });
+          }
+          break;
+        case 'Order':
+          this.check = new Check('Paket Servis', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.ORDER, CheckNo());
           this.getCheck({ _id: this.id });
-        }
+          break;
+        default:
+          break;
       }
     });
     this.settingsService.DateSettings.subscribe(res => {
       this.day = res.value.day;
-
     });
     this.settingsService.AppSettings.subscribe(res => {
       let takeaway = res.value.takeaway;
@@ -139,10 +148,20 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     });
+    setTimeout(() => {
+      if (this.check.status == CheckStatus.PASSIVE) {
+        $('#occupationModal').modal('show');
+      }
+    }, 500)
   }
 
   ngOnDestroy() {
     this.changes.cancel();
+    if (this.check.type == CheckType.ORDER && this.check.status == CheckStatus.PASSIVE) {
+      if (this.check.products.length == 0 && !this.check.hasOwnProperty('payment_flow')) {
+        this.mainService.removeData('checks', this.check._id);
+      }
+    }
   }
 
   goPayment() {
@@ -166,17 +185,37 @@ export class SellingScreenComponent implements OnInit {
   }
 
   getCheck(filter: object) {
-    this.mainService.getAllBy('checks', filter).then((result) => {
-      if (result.docs.length > 0) {
-        this.check = result.docs[0];
-        this.check_id = result.docs[0]._id;
-      }
-    });
+    if (this.type !== 'Order') {
+      this.mainService.getAllBy('checks', filter).then((result) => {
+        if (result.docs.length > 0) {
+          this.check = result.docs[0];
+          this.check_id = result.docs[0]._id;
+        }
+      });
+    } else {
+      this.mainService.getAllBy('checks', filter).then((result) => {
+        if (result.docs.length > 0) {
+          this.check = result.docs[0];
+          this.check_id = result.docs[0]._id;
+        }
+      }).catch(err => {
+        console.log('Checks', err);
+      });
+      this.mainService.getAllBy('closed_checks', filter).then((result) => {
+        if (result.docs.length > 0) {
+          this.check = result.docs[0];
+          this.check_id = result.docs[0]._id;
+          this.check.occupation = { male: 0, female: 0 };
+        }
+      }).catch(err => {
+        console.log('Closed Checks', err);
+      });
+    }
   }
 
   addToCheck(product: Product) {
-    this.selectedIndex = undefined;
-    this.selectedProduct = undefined;
+    // this.selectedIndex = undefined;
+    // this.selectedProduct = undefined;
     if (product.type == ProductType.MANUEL) {
       this.isFirstTime = true;
       this.productWithSpecs = product;
@@ -187,16 +226,23 @@ export class SellingScreenComponent implements OnInit {
       $('#productSpecs').modal('show');
     } else {
       this.productFilterInput.nativeElement.value = '';
-      let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.owner, Date.now(), product.tax_value, product.barcode);
+      let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.ownerId, Date.now(), product.tax_value, product.barcode);
       for (let index = 0; index < this.selectedQuantity; index++) {
         this.countProductsData(product._id, product.price);
         this.check.total_price = this.check.total_price + product.price;
         this.check.products.push(newProduct);
         this.newOrders.push(newProduct);
       }
+      this.selectedIndex = this.check.products.length - 1;
+      this.selectedProduct = this.check.products[this.selectedIndex];
+      try {
+        this.readyNotes = product.notes.split(',');
+      } catch (error) {
+        this.readyNotes = [];
+      }
       if (product.specifies.length > 0) {
-        this.selectedIndex = this.check.products.length - 1;
-        this.selectedProduct = this.check.products[this.selectedIndex];
+        // this.selectedIndex = this.check.products.length - 1;
+        // this.selectedProduct = this.check.products[this.selectedIndex];
         this.getSpecies(newProduct);
         $('#specsModal').modal('show');
       }
@@ -280,17 +326,49 @@ export class SellingScreenComponent implements OnInit {
   }
 
   sendCheck() {
-    if (this.check.type == CheckType.FAST) {
-      if (this.check.note == '' || this.check.note == undefined) {
-        this.message.sendConfirm('Hızlı Hesap oluşturmanız için hesaba not eklemek zorundasınız.').then(isOk => {
-          if (isOk) {
-            $('#checkNote').modal('show');
-            return false;
-          } else {
-            return false;
-          }
-        })
-      } else {
+    // if (this.check.type == CheckType.FAST) {
+    //   if (this.check.note == '' || this.check.note == undefined) {
+    //     this.message.sendConfirm('Hızlı Hesap oluşturmanız için hesaba not eklemek zorundasınız.').then(isOk => {
+    //       if (isOk) {
+    //         $('#checkNote').modal('show');
+    //         return false;
+    //       } else {
+    //         return false;
+    //       }
+    //     })
+    //   } else {
+    //     if (this.askForPrint) {
+    //       this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
+    //         if (isOk) {
+    //           this.printOrder();
+    //           this.confirmCheck();
+    //         } else {
+    //           this.confirmCheck();
+    //         }
+    //       });
+    //     } else {
+    //       this.printOrder();
+    //       this.confirmCheck();
+    //     }
+    //   }
+    // } else {
+    //   if (this.askForPrint) {
+    //     this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
+    //       if (isOk) {
+    //         this.printOrder();
+    //         this.confirmCheck();
+    //       } else {
+    //         this.confirmCheck();
+    //       }
+    //     });
+    //   } else {
+    //     this.printOrder();
+    //     this.confirmCheck();
+    //   }
+    // }
+
+    switch (this.check.type) {
+      case CheckType.NORMAL:
         if (this.askForPrint) {
           this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
             if (isOk) {
@@ -304,21 +382,58 @@ export class SellingScreenComponent implements OnInit {
           this.printOrder();
           this.confirmCheck();
         }
-      }
-    } else {
-      if (this.askForPrint) {
-        this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
-          if (isOk) {
+        break;
+      case CheckType.FAST:
+        if (this.check.note == '' || this.check.note == undefined) {
+          this.message.sendConfirm('Hızlı Hesap oluşturmanız için hesaba not eklemek zorundasınız.').then(isOk => {
+            if (isOk) {
+              $('#checkNote').modal('show');
+              return false;
+            } else {
+              return false;
+            }
+          })
+        } else {
+          if (this.askForPrint) {
+            this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
+              if (isOk) {
+                this.printOrder();
+                this.confirmCheck();
+              } else {
+                this.confirmCheck();
+              }
+            });
+          } else {
             this.printOrder();
             this.confirmCheck();
-          } else {
-            this.confirmCheck();
+          }
+        }
+        break;
+      case CheckType.ORDER:
+        this.check.products.map(element => {
+          if (element.status === 1) {
+            element.status = 2;
           }
         });
-      } else {
-        this.printOrder();
-        this.confirmCheck();
-      }
+        if (this.check.status == CheckStatus.PASSIVE) {
+          this.check.status = CheckStatus.READY;
+          this.mainService.updateData('checks', this.check._id, this.check).then(res => {
+            if (res.ok) {
+              let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
+              this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
+            }
+          });
+        } else {
+          this.mainService.updateData('closed_checks', this.check_id, this.check).then(res => {
+            if (res.ok) {
+              this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabı ${this.owner} tarafından güncellendi.`);
+            }
+          });
+        }
+        this.router.navigate(['/store']);
+        this.updateUserReport();
+        this.updateProductReport(this.countData);
+        break;
     }
   }
 
@@ -346,30 +461,40 @@ export class SellingScreenComponent implements OnInit {
       }
     }
     $('#closeCheck').modal('hide');
-    let checkWillClose = new ClosedCheck(this.check.table_id, (this.check.total_price + this.check.discount) - general_discount, total_discounts, this.check.owner, this.check.note, this.check.status, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow);
+    let checkWillClose = new ClosedCheck(this.check.table_id, (this.check.total_price + this.check.discount) - general_discount, total_discounts, this.check.owner, this.check.note, CheckStatus.OCCUPIED, this.check.products, this.check.timestamp, this.check.type, method, this.check.payment_flow, null, this.check.occupation);
+    if (this.check.type == CheckType.ORDER) {
+      checkWillClose.products.map(obj => obj.status = 2);
+      checkWillClose.status = 2;
+    }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.updateSellingReport(method);
     });
     if (this.check._id !== undefined) {
       this.mainService.removeData('checks', this.check._id);
     }
-    if (this.check.type == CheckType.NORMAL) {
-      this.mainService.updateData('tables', this.check.table_id, { status: 1 });
-      this.updateTableReport(this.check);
+    if (this.check.type == CheckType.NORMAL || this.check.type == CheckType.ORDER) {
+      if (this.check.type == CheckType.ORDER) {
+        this.updateProductReport(this.countData);
+      } else {
+        this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+        this.updateTableReport(this.check);
+      }
       this.router.navigate(['/store']);
     } else {
       this.updateUserReport();
       this.updateProductReport(this.countData);
-      if(this.takeaway){
+      if (this.takeaway) {
         this.router.navigate(['']);
-      }else{
+      } else {
         this.router.navigate(['/store']);
       }
     }
     if (this.check.type == CheckType.FAST) {
       this.logService.createLog(logType.CHECK_CLOSED, this.ownerId, `${this.owner} tarafından ${this.check.table_id} Hesabı ${this.check.total_price} TL ${method} ödeme alınarak kapatıldı.`)
-    } else {
+    } else if (this.check.type == CheckType.NORMAL) {
       this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner} tarafından ${this.table.name} Masası ${this.check.total_price} TL '${method}' ödeme alınarak kapatıldı.`)
+    } else {
+      this.logService.createLog(logType.CHECK_CLOSED, this.check._id, `${this.owner} tarafından Paket Servis- ${this.check.note} hesabı ${this.check.total_price} TL '${method}' ödeme alınarak kapatıldı.`)
     }
     if (this.askForCheckPrint) {
       this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
@@ -459,6 +584,11 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.selectedProduct = this.check.products[index];
       this.selectedIndex = index;
+      try {
+        this.readyNotes = this.products.find(obj => obj._id == this.selectedProduct.id).notes.split(',');
+      } catch (error) {
+        this.readyNotes = [];
+      }
     }
   }
 
@@ -466,11 +596,16 @@ export class SellingScreenComponent implements OnInit {
     this.productSpecs = this.products.find(obj => obj._id == product.id).specifies;
   }
 
+
+  recalculateTotal() {
+    this.check.total_price = this.check.products.filter(obj => obj.status != 3).map(obj => obj.price).reduce((a, b) => a + b, 0);
+  }
+
   changeSpecs(spec) {
     const oldPrice = this.selectedProduct.price;
     this.selectedProduct.name = this.selectedProduct.name + ' ' + spec.spec_name;
     this.selectedProduct.price = spec.spec_price;
-    this.check.total_price = (this.check.total_price - oldPrice) + spec.spec_price;
+    this.recalculateTotal();
     $('#specsModal').modal('hide');
   }
 
@@ -485,6 +620,12 @@ export class SellingScreenComponent implements OnInit {
         $('#noteModal').modal('hide');
       }
     }
+  }
+
+  addReadyNotes(note: string) {
+    // this.check.products[this.selectedIndex].note += note + ', ';
+    this.noteInput.nativeElement.value += note + ', ';
+    this.noteInput.nativeElement.dispatchEvent(new Event('input'));
   }
 
   makeGift() {
@@ -530,7 +671,7 @@ export class SellingScreenComponent implements OnInit {
       this.check.products = this.check.products.filter(obj => obj.status !== 1);
       let analizeCheck = this.check.products.some(obj => obj.status !== 3);
       if (analizeCheck) {
-        this.mainService.updateData('checks', this.check_id, this.check).then((res) => {
+        this.mainService.updateData(this.check.type == CheckType.ORDER ? 'closed_checks' : 'checks', this.check_id, this.check).then((res) => {
           if (res.ok) {
             if (this.check.type == CheckType.NORMAL) {
               let pCat = this.categories.find(obj => obj._id == this.check.products[this.selectedIndex].cat_id);
@@ -553,7 +694,7 @@ export class SellingScreenComponent implements OnInit {
       } else {
         $('#cancelProduct').modal('hide');
         let canceledTotalPrice = this.check.products.map(obj => obj.price).reduce((a, b) => a + b);
-        let checkToCancel = new ClosedCheck(this.check.table_id, canceledTotalPrice, 0, this.owner, this.check.note, 3, this.check.products, Date.now(), 3, 'İkram', []);
+        let checkToCancel = new ClosedCheck(this.check.table_id, canceledTotalPrice, 0, this.owner, this.check.note, 3, this.check.products, Date.now(), 3, 'İkram', [], null, this.check.occupation);
         checkToCancel.description = 'Bütün Ürünler İptal Edildi';
         this.mainService.addData('closed_checks', checkToCancel).then(res => {
           this.message.sendMessage('Hesap İptal Edildi');
@@ -580,7 +721,7 @@ export class SellingScreenComponent implements OnInit {
               }
             });
           });
-          let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
+          let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow, null, this.check.occupation);
           this.mainService.addData('closed_checks', checksForPayed);
         }
         this.mainService.removeData('checks', this.check._id);
@@ -820,7 +961,7 @@ export class SellingScreenComponent implements OnInit {
                           });
                         });
                       });
-                      let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
+                      let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow, null, this.check.occupation);
                       this.mainService.addData('closed_checks', checksForPayed);
                     }
                     this.mainService.removeData('checks', this.check._id).then(res => {
@@ -873,7 +1014,7 @@ export class SellingScreenComponent implements OnInit {
                     });
                   });
                 });
-                let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow);
+                let checksForPayed = new ClosedCheck(this.check.table_id, this.check.discount, payedDiscounts, this.owner, this.check.note, this.check.status, [], Date.now(), this.check.type, 'Parçalı', this.check.payment_flow, null, this.check.occupation);
                 this.mainService.addData('closed_checks', checksForPayed);
               }
               this.mainService.removeData('checks', this.check._id).then(res => {

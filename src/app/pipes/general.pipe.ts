@@ -19,11 +19,7 @@ export class GeneralPipe implements PipeTransform {
         return result.name;
       }
     }).catch((err) => {
-      if (value !== 'Hızlı Satış') {
-        return 'Bilinmiyor';
-      } else {
-        return value;
-      }
+      return value;
     });
   }
 

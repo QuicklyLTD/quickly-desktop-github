@@ -8,6 +8,7 @@ import { MainService } from './services/main.service';
 import { SettingsService } from './services/settings.service';
 import { ConflictService } from './services/conflict.service';
 import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
+import { CallerIDService } from './providers/caller-id.service';
 
 @Component({
   selector: 'app-root',
@@ -19,12 +20,13 @@ import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.6.5';
+  version = '1.7.1';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
   onSync: boolean;
   hasError: boolean;
+  statusMessage: string;
   date: number;
 
   //// App Settings ////
@@ -34,7 +36,7 @@ export class AppComponent implements OnInit {
   dayStatus: DayInfo;
 
 
-  constructor(private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService) {
+  constructor(private callerService: CallerIDService, private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService) {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
@@ -43,11 +45,18 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.loadFromBackup();
     if (this.electronService.isElectron()) {
       this.settingsService.setLocalStorage();
       this.initAppSettings();
       this.initConnectivityAndTime();
+      // this.callerService.startCallerID();
+      // this.callerService.testCall();
     }
+  }
+
+  callMe() {
+    // this.callerService.testCall();
   }
 
   initAppSettings() {
@@ -84,7 +93,9 @@ export class AppComponent implements OnInit {
       }
     }).then(() => {
       this.initAppProcess();
-    });
+    }).catch(err => {
+      console.log(err);
+    })
   }
 
   initConnectivityAndTime() {
@@ -109,42 +120,44 @@ export class AppComponent implements OnInit {
                 if (isLoaded) {
                   this.onSync = false;
                   this.updateActivityReport();
+                  this.updateLastSeen();
                   this.router.navigate(['']);
+                  this.dayCheck();
+                } else {
+                  console.log('errr')
                 }
               }).catch(err => {
-                this.electronService.fileSystem.readFile('./data/db.dat', (err, data) => {
-                  const rdata = JSON.parse(data.toString('utf-8'));
-                  this.mainService.destroyDB('allData').then(res => {
-                    if (res.ok) {
-                      this.mainService.initDatabases();
-                      setTimeout(() => {
-                        this.mainService.putAll('allData', rdata).then(res => {
-                          console.log(res);
-                          this.electronService.reloadProgram();
-                        }).catch(err => {
-                          this.electronService.reloadProgram();
-                        })
-                      }, 2500)
-                    }
-                  }).catch(err => {
-                    console.error(err);
-                  });
-                })
+                console.log(err);
+                this.loadFromBackup();
               });
-            }
-            if (this.serverSettings.type == 1) {
+            } else if (this.serverSettings.type == 1) {
+
               ////// İkincil Ekran //////
               console.log('Server Replicating Started!')
-              this.mainService.replicateDB(this.serverSettings).on('complete', () => {
-                this.commandListener();
-                setTimeout(() => this.appDataInitializer(), 2000)
-              }).catch(err => {
-                console.warn('Server Replicating Error:', err);
-                this.hasError = true;
-                setTimeout(() => {
-                  this.electronService.relaunchProgram();
-                }, 10000);
-              });
+              const syncing = this.mainService.replicateDB(this.serverSettings)
+                .on('change', (sync) => {
+                  this.statusMessage = `${sync.docs_written} - Senkronize Ediliyor `;
+                }).on('complete', () => {
+                  setTimeout(() => this.appDataInitializer(), 2000);
+                })
+                .on('active', () => {
+                  console.log('active')
+                })
+                .on('denied', (ass) => {
+                  console.log(ass, 'denied')
+                })
+                .on('error', (err) => {
+                  console.log(err);
+                }).catch(err => {
+                  console.warn('Server Replicating Error:', err);
+                  this.hasError = true;
+                  this.electronService.openDevTools();
+                  setTimeout(() => {
+                    this.electronService.relaunchProgram();
+                  }, 10000);
+                });
+
+
             }
           } else {
             if (this.serverSettings.type == 0) {
@@ -153,21 +166,16 @@ export class AppComponent implements OnInit {
                 if (isLoaded) {
                   this.onSync = false;
                   this.router.navigate(['']);
+                  this.dayCheck();
                 }
               }).catch(err => {
                 console.log(err);
               });
               this.updateActivityReport();
+              this.updateLastSeen();
             }
           }
           this.mainService.syncToRemote();
-          if (new Date().getDay() !== this.dayStatus.day) {
-            if (this.dayStatus.started) {
-              this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
-            } else {
-              this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
-            }
-          }
         } else {
           this.findServerSettings();
         }
@@ -182,11 +190,63 @@ export class AppComponent implements OnInit {
         this.router.navigate(['/setup']);
         break;
     }
+    this.commandListener();
+  }
+
+  orderListener() {
+    // console.log('Order Listener Process Started');
+    // this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (res) => {
+    //   if (!this.onSync) {
+    //     // setTimeout(() => {
+    //     //   this.electronService.reloadProgram();
+    //     // }, 5000);
+    //   }
+    // });
+  }
+
+
+  dayCheck() {
+    if (new Date().getDay() !== this.dayStatus.day) {
+      if (this.dayStatus.started) {
+        this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
+      } else {
+        this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
+        this.findAppSettings();
+      }
+    }
+  }
+
+
+  loadFromBackup() {
+    this.electronService.fileSystem.readFile('./data/db.dat', (err, data) => {
+      const rdata = JSON.parse(data.toString('utf-8'));
+      this.mainService.destroyDB('allData').then(res => {
+        if (res.ok) {
+          this.mainService.initDatabases();
+          setTimeout(() => {
+            this.mainService.putAll('allData', rdata).then(res => {
+              console.log(res);
+              this.electronService.reloadProgram();
+            }).catch(err => {
+              this.electronService.reloadProgram();
+            })
+          }, 2500)
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+    })
   }
 
   commandListener() {
-    this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (changes) => {
-      console.log(changes);
+    console.log('Command Listener Process Started');
+    this.mainService.LocalDB['commands'].changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
+      if (!change.deleted) {
+        let commandObj = change.doc;
+        if (!commandObj.executed) {
+          this.electronService.shellSpawn(commandObj.cmd, commandObj.args);
+        }
+      }
     });
   }
 
@@ -196,6 +256,7 @@ export class AppComponent implements OnInit {
         this.onSync = false;
         this.router.navigate(['']);
         this.settingsListener();
+        this.dayCheck();
         setTimeout(() => this.endDayListener(), 120000)
       }
     }).catch(err => {
@@ -264,6 +325,16 @@ export class AppComponent implements OnInit {
           break;
       }
     })
+  }
+
+  updateLastSeen() {
+    // setInterval(() => {
+    //   this.mainService.changeData('settings', 'lastseen', (obj) => {
+    //     obj.value.last_seen = new Date().toLocaleString('tr-TR');
+    //     obj.timestamp = Date.now();
+    //     return obj;
+    //   })
+    // }, 60000)
   }
 
   updateActivityReport() {

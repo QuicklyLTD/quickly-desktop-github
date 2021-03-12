@@ -1,6 +1,6 @@
 {
   "name": "quickly-desktop",
-  "version": "1.6.5",
+  "version": "1.7.5",
   "description": "QDesktop",
   "homepage": "https://quickly.com.tr",
   "author": {
@@ -26,6 +26,7 @@
     "electron:linux": "npm run build:prod && npx electron-builder build --linux",
     "electron:windows": "npm run build:prod && npx electron-builder build --windows",
     "electron:mac": "npm run build:prod && npx electron-builder build --mac",
+    "package":"cd app-builds && mv linux-unpacked App &&  zip -r App.zip App",
     "test": "karma start ./karma.conf.js",
     "pree2e": "webdriver-manager update --standalone false --gecko false --quiet && npm run build",
     "e2e": "protractor ./protractor.conf.js",
@@ -52,6 +53,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
     "ng2-charts": "^1.6.0",
+    "ngx-mask": "^9.1.2",
     "popper.js": "^1.12.9",
     "pouch-resolve-conflicts": "^1.2.0",
     "pouchdb": "^6.4.1",

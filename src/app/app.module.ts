@@ -35,8 +35,6 @@ import { ProductReportsComponent } from './components/reports/product-reports/pr
 import { TableReportsComponent } from './components/reports/table-reports/table-reports.component';
 import { StockReportsComponent } from './components/reports/stock-reports/stock-reports.component';
 import { UserReportsComponent } from './components/reports/user-reports/user-reports.component';
-//////  External Components
-import { ChartsModule } from 'ng2-charts';
 //////  Servisler
 import { MainService } from './services/main.service';
 import { ApplicationService } from './services/application.service';
@@ -51,12 +49,14 @@ import { MessageService } from "./providers/message.service";
 import { PrinterService } from "./providers/printer.service"
 import { ElectronService } from './providers/electron.service';
 import { TerminalService } from './providers/terminal.service';
+import { CallerIDService } from './providers/caller-id.service';
 //////  Pipes
 import { GeneralPipe } from './pipes/general.pipe';
 import { TimeAgoPipe } from './pipes/timeago.pipe';
 //////  Helpers
 import { KeyboardComponent } from './components/helpers/keyboard/keyboard.component';
 import { MessageComponent } from './components/helpers/message/message.component';
+import { CallerComponent } from './components/helpers/caller/caller.component';
 //////  Directives
 import { KeyboardDirective } from './directives/keyboard.directive';
 import { ButtonDirective } from './directives/button.directive';
@@ -64,14 +64,17 @@ import { PrinterSettingsComponent } from './components/settings/printer-settings
 import { RecipeSettingsComponent } from './components/settings/recipe-settings/recipe-settings.component';
 import { CustomerSettingsComponent } from './components/settings/customer-settings/customer-settings.component';
 import { PricePipe } from './pipes/price.pipe';
-import { OrderComponent } from './components/helpers/order/order.component';
 import { ActivityReportsComponent } from './components/reports/activity-reports/activity-reports.component';
 import { CashboxReportsComponent } from './components/reports/cashbox-reports/cashbox-reports.component';
 import { NotificationsReportsComponent } from './components/reports/notifications-reports/notifications-reports.component';
 
-//// Error Handler Sentry
+//////  3rd Party Modules
+import { ChartsModule } from 'ng2-charts';
+import { NgxMaskModule } from 'ngx-mask'
+
+// Error Handler Sentry
 // import * as Raven from 'raven-js';
-// Raven.config('https://8b40ef17376d472eb66f7b67bfccfd47@sentry.io/233500').install();
+// Raven.config('https://99ca5e8959c5432ca68bdf99d6360fb0@o380332.ingest.sentry.io/5206016').install();
 // export class RavenErrorHandler implements ErrorHandler {
 //   handleError(err: any): void {
 //     console.error(err);
@@ -115,7 +118,7 @@ import { NotificationsReportsComponent } from './components/reports/notification
     PrinterSettingsComponent,
     RecipeSettingsComponent,
     CustomerSettingsComponent,
-    OrderComponent,
+    CallerComponent,
     ActivityReportsComponent,
     CashboxReportsComponent,
     NotificationsReportsComponent,
@@ -125,10 +128,11 @@ import { NotificationsReportsComponent } from './components/reports/notification
     FormsModule,
     HttpModule,
     AppRoutingModule,
-    ChartsModule
+    ChartsModule,
+    NgxMaskModule.forRoot(),
   ],
   providers: [
-    //{ provide: ErrorHandler, useClass: RavenErrorHandler },
+    // { provide: ErrorHandler, useClass: RavenErrorHandler },
     ElectronService,
     MainService,
     ApplicationService,
@@ -140,6 +144,7 @@ import { NotificationsReportsComponent } from './components/reports/notification
     PrinterService,
     TerminalService,
     ConflictService,
+    CallerIDService,
     HttpService
   ],
   bootstrap: [AppComponent]

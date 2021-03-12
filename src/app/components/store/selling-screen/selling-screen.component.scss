@@ -82,19 +82,22 @@
         }
 
         .category {
-            font-size: 10px;
+            font-size: 8px;
             text-align: right;
             font-weight: bold;
             float: right;
-            width: 63%
+            // width: 63%
         }
     }
 }
 
 .catButton {
+    padding-top: 3px !important;
     font-weight: bold;
+    white-space: pre-line;
     font-size: 1.3vw;
     height: 47.65px;
+    text-align: start;
 }
 
 .humanIcon {
