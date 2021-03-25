@@ -14,7 +14,8 @@ export class HttpService {
   constructor(private http: Http, private mainService: MainService) {
     this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     this.options = new RequestOptions({ headers: this.headers });
-    this.baseUrl = 'http://localhost:3000'; // 'https://hq.quickly.com.tr';
+    // this.baseUrl = 'http://localhost:3000'; // 'https://hq.quickly.com.tr';
+    this.baseUrl = 'https://hq.quickly.com.tr';
 
     this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
       this.store_id = res.docs[0].value._id;

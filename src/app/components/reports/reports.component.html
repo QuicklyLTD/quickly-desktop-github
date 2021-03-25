@@ -154,7 +154,7 @@
                           </p>
                           <p class="mb-0" style="font-size: larger;">
                             <strong>Kapalı Hesaplar:
-                              <span class="pull-right">{{closedTotal - canceledTotal | price}}</span>
+                              <span class="pull-right">{{closedTotal | price}}</span>
                             </strong>
                           </p>
                         </div>
@@ -162,7 +162,7 @@
                           <strong>
                             <p class="mb-0" style="font-size: larger;">
                               <strong>Genel Toplam:
-                                <span class="pull-right">{{ generalTotal + activeTotal | price }}</span>
+                                <span class="pull-right">{{ closedTotal + activeTotal | price }}</span>
                               </strong>
                             </p>
                           </strong>

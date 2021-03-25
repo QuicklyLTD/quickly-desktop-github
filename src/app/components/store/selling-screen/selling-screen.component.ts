@@ -860,6 +860,13 @@ export class SellingScreenComponent implements OnInit {
     });
   }
 
+
+  qrCode() {
+    let slug = 'kosmos-db15';
+    let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+    this.printerService.printQRCode(this.printers[0], qrdata, this.table.name, this.owner);
+  }
+
   printOrder() {
     if (this.printers.length > 0) {
       let orders = this.check.products.filter(obj => obj.status == 1);
@@ -884,7 +891,7 @@ export class SellingScreenComponent implements OnInit {
               table_name = this.table.name;
             }
             splitPrintArray.forEach(order => {
-              this.printerService.printOrder(order.printer, table_name, order.products);
+              this.printerService.printOrder(order.printer, table_name, order.products, this.owner);
             });
           }
         });
@@ -1119,9 +1126,19 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
+  catName(cat_id) {
+    return this.categories.find(obj => obj._id == cat_id).name;
+  }
+
   filterProducts(value: string) {
-    let regexp = new RegExp(value, 'i');
-    this.productsView = this.products.filter(({ name }) => name.match(regexp));
+    if (value !== '') {
+      let regexp = new RegExp(value, 'i');
+      this.productsView = this.products.filter(({ name }) => name.match(regexp));
+      this.selectedCat = 'OnSearch';
+    } else {
+      this.selectedCat = undefined;
+    }
+
   }
 
   filterTables(id) {

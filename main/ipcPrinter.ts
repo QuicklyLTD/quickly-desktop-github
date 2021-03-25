@@ -1,3 +1,4 @@
+import { EndDay } from '../src/app/mocks/endoftheday.mock';
 import { ipcMain } from 'electron';
 import * as escpos from 'escpos';
 
@@ -80,6 +81,59 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
     event.sender.send('error', 'Yazıcı Bulunamadı');
   }
 });
+
+
+
+ipcMain.on('printQRcode', (event, device, data, table, owner) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    let date = new Date();
+
+    let imageData = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=' + data;
+
+    new escpos.Image.load(imageData, function (image) {
+      deviceToPrint.open((err) => {
+        if (err) {
+          event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+        } else {
+          printer
+            .align('ct')
+            .size(2, 2)
+            .text(' ')
+            .text('Masa: ' + table, '857')
+            .size(1, 1)
+            .text(line)
+            .align('ct')
+            .size(2, 2)
+            .control('LF')
+            .image(image, 'd24')
+            .control('LF')
+            .text('1. QR Kodu Okut ', '857')
+            .text('2. Siparisi Ver ', '857')
+            .text('3. Temassiz Öde ', '857')
+            .control('LF')
+            .size(1, 1)
+            .text('www.quickly.com.tr', '857')
+            .align('lt')
+          printer.size(1, 1).text(line);
+          printer
+            .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+            .text(' ')
+            .control('LF')
+            .beep(3, 2)
+            .text(' ')
+            .cut()
+            .close();
+        }
+      });
+    })
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+
 
 ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
   // .text(storeInfo.name, '857')
@@ -302,7 +356,7 @@ ipcMain.on('printReport', (event, device, category, reports) => {
   }
 });
 
-ipcMain.on('printEndDay', (event, device, data, logo) => {
+ipcMain.on('printEndDay', (event, device, data: EndDay, logo) => {
   let deviceToPrint = findDevice(device);
   const printer = new escpos.Printer(deviceToPrint);
   let date = new Date();
@@ -332,6 +386,7 @@ ipcMain.on('printEndDay', (event, device, data, logo) => {
               .text(fitText('Kupon Satis Toplam:', data.coupon_total + ' TL', 1), '857')
               .text(fitText('Ikram Hesap Toplam:', data.free_total + ' TL', 1), '857')
               .text(fitText('Iptal Hesap Toplam:', data.canceled_total + ' TL', 1), '857')
+              .text(fitText('Iptal Hesap Toplam:', data.discount_total + ' TL', 1), '857')
               .text(line)
               .text(fitText('Toplam Satis:', data.total_income + ' TL', 1), '857')
               .text(fitText('Toplam Hesap Sayisi:', data.check_count + ' Adet', 1), '857')

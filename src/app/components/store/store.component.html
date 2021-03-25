@@ -4,20 +4,31 @@
       <div class="card-header pb-0">
         <div class="row">
           <div class="col-lg-9 pl-1 pr-1">
-            <!-- Masalar -->
-            <ul class="nav nav-tabs nav-justify">
+            <!-- Masalar  nav-justified -->
+            <ul class="nav nav-tabs">
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Masalar'}" (click)="changeSection('Masalar')"><i class="fa fa-square" aria-hidden="true"></i> Masalar</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Hesaplar'}" (click)="changeSection('Hesaplar')"><i class="fa fa-sticky-note" aria-hidden="true"></i> Hesaplar</a>
+                <a class="nav-link" [ngClass]="{'active': section == 'Masalar'}" (click)="changeSection('Masalar')"><i class="fa fa-square" aria-hidden="true"></i>
+                  Masalar
+                </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" [ngClass]="{'active': section == 'Kroki'}" (click)="changeSection('Kroki')"><i class="fa fa-map" aria-hidden="true"></i> Kroki</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Paket Servis'}" (click)="changeSection('Paket Servis')"><i class="fa fa-motorcycle" aria-hidden="true"></i> Paket Servis</a>
+                <a class="nav-link" [ngClass]="{'active': section == 'Hesaplar'}" (click)="changeSection('Hesaplar')"><i class="fa fa-sticky-note" aria-hidden="true"></i>
+                  Hesaplar
+                  <span class="badge bg-danger">{{checks?.length}}</span>
+                </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': section == 'Siparişler'}" (click)="changeSection('Siparişler')"><i class="fa fa-paper-plane" aria-hidden="true"></i>
+                  Siparişler
+                  <span *ngIf="ordersView.length > 0" class="badge bg-danger animated flash infinite slow">{{ordersView?.length}}</span>
+                </a>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': section == 'Paket Servis'}" (click)="changeSection('Paket Servis')"><i class="fa fa-motorcycle" aria-hidden="true"></i> Paket Servis</a>
+              </li> -->
             </ul>
           </div>
           <div class="col-lg-3 pr-2">
@@ -104,28 +115,70 @@
         </section>
       </div>
 
-      <div *ngIf="section == 'Kroki'" class="card-body p-0">
-        <section id="plan">
-          <div *ngFor="let table of tableViews" draggable='true' (dragstart)="dragStart($event,table)" (dragend)="changePosition($event,table)" [routerLink]="['/selling-screen','Normal', table._id]" class="relativeTable p-2" [ngClass]="{'bg-success': table.status == 2, 'bg-warning text-dark':table.status == 1, 'bg-danger text-white animated heartBeat slow infinite': table.status == 3 }"
-            [style.height.px]="table.position.height" [style.width.px]="table.position.width" [style.left.px]="table.position.x" [style.top.px]="table.position.y">
-            <h5>
-              <strong>{{table.name}}</strong>
-            </h5>
-            <small>
-              <p>
-                <i class="fa fa-user"></i> {{table.capacity}}
-                <span *ngIf="table.status == 2" class="pull-right">
-                  <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | timeAgo }}
-                </span>
-                <span *ngIf="table.status == 3" class="pull-right">
-                  <i class="fa fa-print" aria-hidden="true"></i>
-                </span>
-              </p>
-            </small>
+      <div *ngIf="section == 'Siparişler'" class="card-body pt-0 flow">
+        <section id="orders">
+          <div class="row">
+            <ng-container *ngFor="let order of ordersView">
+              <div class="col-xl-3 col-lg-4 mt-2 col-card check-card mb-3">
+                <div class="card text-dark animated slow" [ngClass]="{'bg-warning': order.status == 0, 'bg-info' : order.status == 1 , 'bg-teal fadeOut' : order.status == 2, 'bg-success fadeOut' : order.status == 4, 'bg-danger fadeOut' : order.status == 3}">
+                  <div class="card-header pr-2 pl-2">
+                    <b>
+                      <span class="float-left">{{order.user.name | titlecase }} <small style="font-weight: bold;">{{statusNote(order.status)}}</small></span>
+                      <span class="float-right">{{order.timestamp | date: 'HH:mm'}}</span>
+                    </b>
+                  </div>
+                  <div class="card-body pr-2 pl-2 pt-1 check-flow">
+                    <div *ngFor="let product of order.items" class="check-product">
+                      <div class="product-name">
+                        {{product.name}} {{product.type | titlecase}}
+                        <p *ngIf="product.note"><small>{{product.note}}</small></p>
+                      </div>
+                      <div class="product-price">
+                        {{product.price | price }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer p-2">
+                    <div *ngIf="order.status == 0" class="btn-group btn-group-justify btn-block">
+                      <button type="button" (click)="cancelOrder(order)" class="btn btn-danger ">İptal</button>
+                      <button type="button" (click)="acceptOrder(order)" class="btn btn-success btn-block">Onayla</button>
+                    </div>
+                    <button *ngIf="order.status == 1" type="button" (click)="approoveOrder(order)" class="btn btn-success btn-block">Tamamla</button>
+                    <h4 *ngIf="order.status == 2" class="text-center mb-1 mt-1">Teslim Edildi</h4>
+                    <h4 *ngIf="order.status == 3" class="text-center mb-1 mt-1">İptal Edildi</h4>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
           </div>
         </section>
       </div>
-      <div *ngIf="section == 'Paket Servis'" class="card-body p-0 flow">
+
+      <div *ngIf="section == 'Kroki'" class="card-body p-0">
+        <section id="plan">
+          <ng-container *ngFor="let table of tableViews">
+            <div *ngIf="table.position" draggable='true' (dragstart)="dragStart($event,table)" (dragend)="changePosition($event,table)" [routerLink]="['/selling-screen','Normal', table._id]" class="relativeTable p-2" [ngClass]="{'bg-success': table.status == 2, 'bg-warning text-dark':table.status == 1, 'bg-danger text-white animated heartBeat slow infinite': table.status == 3 }"
+              [style.height.px]="table.position.height" [style.width.px]="table.position.width" [style.left.px]="table.position.x" [style.top.px]="table.position.y">
+              <h5>
+                <strong>{{table.name}}</strong>
+              </h5>
+              <small>
+                <p>
+                  <i class="fa fa-user"></i> {{table.capacity}}
+                  <span *ngIf="table.status == 2" class="pull-right">
+                    <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | timeAgo }}
+                  </span>
+                  <span *ngIf="table.status == 3" class="pull-right">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                  </span>
+                </p>
+              </small>
+            </div>
+          </ng-container>
+        </section>
+      </div>
+
+      <!-- <div *ngIf="section == 'Paket Servis'" class="card-body p-0 flow">
         <table class="table  table-bordered table-striped table-hover">
           <thead class="thead-dark">
             <tr>
@@ -151,7 +204,8 @@
           </tbody>
         </table>
         <h3 *ngIf="closedDelivery == undefined || closedDelivery.length == 0" class="text-center mt-5">Çağrı Yok</h3>
-      </div>
+      </div> -->
+
     </div>
   </div>
   <div id="floorHolder" class="col-lg-2">

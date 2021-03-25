@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Cashbox } from '../../mocks/cashbox.mock';
-import { ClosedCheck } from '../../mocks/check.mock';
+import { CheckType, ClosedCheck } from '../../mocks/check.mock';
 import { BackupData, EndDay } from '../../mocks/endoftheday.mock';
 import { Log } from '../../mocks/log.mock';
 import { Report } from '../../mocks/report.mock';
@@ -28,7 +28,6 @@ export class EndofthedayComponent implements OnInit {
   endDayReport: EndDay;
   endDayData: Array<EndDay>;
   backupData: Array<BackupData>;
-  total: number;
   checks: Array<ClosedCheck>;
   reports: Array<Report>;
   cashbox: Array<Cashbox>;
@@ -50,7 +49,6 @@ export class EndofthedayComponent implements OnInit {
 
   ngOnInit() {
     this.progress = 'Veriler Senkorinize Ediliyor...'
-    this.total = 0;
     this.endDayData = [];
     this.backupData = [];
     this.settingsService.DateSettings.subscribe(res => {
@@ -143,28 +141,62 @@ export class EndofthedayComponent implements OnInit {
     }
   }
 
+
+  StoreSalesReport = (checks: Array<ClosedCheck>) => {
+    let SalesReport = { cash: 0, card: 0, coupon: 0, free: 0, canceled: 0, discount: 0, checks: checks.length, customers: { male: 0, female: 0 } };
+    SalesReport.cash = checks.filter(obj => obj.payment_method == 'Nakit').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.card = checks.filter(obj => obj.payment_method == 'Kart').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.coupon = checks.filter(obj => obj.payment_method == 'Kupon').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.free = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.payment_method == 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.canceled = checks.filter(obj => obj.type == CheckType.CANCELED).map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.discount = checks.filter(obj => obj.type !== CheckType.CANCELED).map(obj => obj.discount).reduce((a, b) => a + b, 0);
+    SalesReport.customers.male = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.hasOwnProperty('occupation')).map(obj => obj.occupation.male).reduce((a, b) => a + b, 0);
+    SalesReport.customers.female = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.hasOwnProperty('occupation')).map(obj => obj.occupation.female).reduce((a, b) => a + b, 0);
+    const partial = checks.filter(obj => obj.payment_method == 'Parçalı');
+    partial.forEach(element => {
+      SalesReport.discount += element.discount;
+      element.payment_flow.forEach(payment => {
+        if (payment.method == 'Nakit') {
+          SalesReport.cash += payment.amount;
+        }
+        if (payment.method == 'Kart') {
+          SalesReport.card += payment.amount;
+        }
+        if (payment.method == 'Kupon') {
+          SalesReport.coupon += payment.amount;
+        }
+        if (payment.method == 'İkram') {
+          SalesReport.free += payment.amount;
+        }
+      })
+    });
+    return SalesReport;
+  }
+
   stepChecks() {
     this.mainService.getAllBy('closed_checks', {}).then(res => {
 
       this.progress = 'Kapatılan Hesaplar Yedekleniyor...';
       this.checks = res.docs;
-
       const checksBackup = new BackupData('closed_checks', this.checks);
-
       this.backupData.push(checksBackup);
 
-      let canceledTotal = this.checks.filter(obj => obj.type == 3).map(obj => obj.total_price).reduce((a, b) => a + b, 0);
-      let discountTotal = this.checks.filter(obj => obj.type !== 3).map(obj => obj.discount).reduce((a, b) => a + b, 0);
-      let customerMale = this.checks.filter(obj => obj.type !== 3).map(obj => obj.occupation.male).reduce((a, b) => a + b, 0);
-      let customerFemale = this.checks.filter(obj => obj.type !== 3).map(obj => obj.occupation.female).reduce((a, b) => a + b, 0);
+      const Sales = this.StoreSalesReport(this.checks);
 
+      this.endDayReport.card_total = Sales.card;
+      this.endDayReport.cash_total = Sales.cash;
+      this.endDayReport.coupon_total = Sales.coupon;
+      this.endDayReport.free_total = Sales.free;
 
-      this.endDayReport.canceled_total = canceledTotal;
+      this.endDayReport.discount_total = Sales.discount;
+      this.endDayReport.canceled_total = Sales.canceled;
+
+      this.endDayReport.total_income = Sales.cash + Sales.card + Sales.coupon;
+
       this.endDayReport.check_count = this.checks.length;
-      this.endDayReport.discount_total = discountTotal;
 
-      this.endDayReport.customers.male = customerMale;
-      this.endDayReport.customers.female = customerFemale;
+      this.endDayReport.customers.male = Sales.customers.male;
+      this.endDayReport.customers.female = Sales.customers.female;
 
       this.mainService.removeAll('closed_checks', {}).then(() => {
         this.mainService.removeAll('allData', { db_name: 'closed_checks' }).then(() => {
@@ -213,23 +245,12 @@ export class EndofthedayComponent implements OnInit {
       const reportsBackup = new BackupData('reports', res.docs);
       this.backupData.push(reportsBackup);
       const activities = res.docs.filter(obj => obj.type == 'Activity');
-      const storeData = res.docs.filter(obj => obj.type == 'Store' && obj.connection_id !== 'İkram');
-      storeData.forEach(element => {
-        this.total += element.weekly[this.day];
-      });
-      let cashTotal = this.reports.filter(obj => obj.connection_id == 'Nakit')[0].weekly[this.day];
-      let cardTotal = this.reports.filter(obj => obj.connection_id == 'Kart')[0].weekly[this.day];
-      let couponTotal = this.reports.filter(obj => obj.connection_id == 'Kupon')[0].weekly[this.day];
-      let freeTotal = this.reports.filter(obj => obj.connection_id == 'İkram')[0].weekly[this.day];
-      this.endDayReport.cash_total = cashTotal;
-      this.endDayReport.card_total = cardTotal;
-      this.endDayReport.coupon_total = couponTotal;
-      this.endDayReport.free_total = freeTotal;
-      this.endDayReport.total_income = this.total;
+
       this.mainService.localSyncBeforeRemote('reports').on('complete', () => {
         this.progress = 'Raporlar Temizlendi...';
         this.stepLogs();
       });
+
       activities.forEach(element => {
         this.mainService.changeData('reports', element._id, (doc) => {
           doc.activity = [];
@@ -238,6 +259,7 @@ export class EndofthedayComponent implements OnInit {
           return doc;
         });
       });
+
       if (this.day == this.lastDay) {
         this.reports.forEach((element) => {
           this.mainService.changeData('reports', element._id, (doc) => {
@@ -246,7 +268,6 @@ export class EndofthedayComponent implements OnInit {
             return doc;
           });
         });
-        // localStorage.setItem('WeekStatus', '{"started": false, "time": ' + Date.now() + '}');
       }
     });
   }
@@ -287,10 +308,23 @@ export class EndofthedayComponent implements OnInit {
               }
             }
             this.progress = 'Veritabanı Yedekleniyor!';
-            this.coverData();
+            this.uploadBackup(this.backupData, finalDate);
           }, 5000);
         }
       });
+    });
+  }
+
+
+  uploadBackup(data: Array<BackupData>, timestamp: number) {
+    this.httpService.post('/store/backup', { data: data, timestamp: timestamp }, this.token).subscribe(res => {
+      if (res.ok) {
+        this.coverData();
+      }
+    }, err => {
+      console.log(err);
+      this.messageService.sendAlert('Hata!', 'Veritabanı Yedeği İletilemedi', 'error');
+      this.coverData();
     });
   }
 
@@ -323,9 +357,9 @@ export class EndofthedayComponent implements OnInit {
       console.log(err);
       $('#endDayModal').modal('hide');
       this.messageService.sendAlert('Hata!', 'Sunucudan İzin Alınamadı', 'error');
-      setTimeout(() => {
-        this.electronService.relaunchProgram();
-      }, 5000);
+      // setTimeout(() => {
+      //   this.electronService.relaunchProgram();
+      // }, 5000);
     });
   }
 
@@ -372,7 +406,7 @@ export class EndofthedayComponent implements OnInit {
           });
         }
       }, err => {
-        // console.log(err);
+        console.log(err);
         $('#endDayModal').modal('hide');
         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program Yeniden Başlatılacak', 'success');
         // setTimeout(() => {
@@ -401,12 +435,6 @@ export class EndofthedayComponent implements OnInit {
         // });
       });
     })
-  }
-
-  sendData() {
-    this.httpService.post(`v1/management/restaurants/${this.restaurantID}/report_generator/`, { timestamp: this.dateToReport, data: this.backupData }, this.token).subscribe(res => {
-      console.log(res);
-    });
   }
 
   fillData() {

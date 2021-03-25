@@ -3,6 +3,8 @@ import { MainService } from '../../services/main.service';
 import { Router } from '@angular/router';
 import { Floor, Table } from '../../mocks/table.mock';
 import { Check, CheckType } from '../../mocks/check.mock';
+import { Order, OrderItem, OrderStatus, OrderType } from '../../mocks/order';
+
 
 @Component({
   selector: 'app-store',
@@ -11,17 +13,22 @@ import { Check, CheckType } from '../../mocks/check.mock';
 })
 
 export class StoreComponent implements OnInit {
-  floors: Array<Floor>;
-  tables: Array<Table>;
-  tableViews: Array<Table>;
+  floors: Array<Floor> = [];
+  tables: Array<Table> = [];
+  tableViews: Array<Table> = [];
   loweredTables: Array<Table>;
-  checks: Array<Check>;
-  checksView: Array<Check>;
-  fastChecks: Array<Check>;
-  deliveryChecks: Array<Check>;
+  checks: Array<Check> = [];
+  checksView: Array<Check> = [];
+  fastChecks: Array<Check> = [];
+  deliveryChecks: Array<Check> = [];
+
+  orders: Array<Order> = [];
+  ordersView: Array<Order> = [];
+
   selected: string;
   tableChanges: any;
   checkChanges: any;
+  orderChanges: any;
   section: any;
   closedDelivery: Array<any>;
 
@@ -41,6 +48,12 @@ export class StoreComponent implements OnInit {
         this.checks = result.docs;
       });
     });
+    this.orderChanges = this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (change) => {
+      this.mainService.getAllBy('orders', {}).then((result) => {
+        this.orders = result.docs;
+        this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
+      });
+    });
     this.tableChanges = this.mainService.LocalDB['tables'].changes({ since: 'now', live: true }).on('change', (change) => {
       this.mainService.getAllBy('tables', {}).then((result) => {
         this.tables = result.docs;
@@ -57,6 +70,7 @@ export class StoreComponent implements OnInit {
   ngOnDestroy() {
     this.tableChanges.cancel();
     this.checkChanges.cancel();
+    this.orderChanges.cancel();
   }
 
   changeSection(section) {
@@ -102,6 +116,50 @@ export class StoreComponent implements OnInit {
     this.checksView = this.checks.filter(({ table_id }) => this.tableViews.some(table => table._id == table_id));
   }
 
+  statusNote(status: OrderStatus): string {
+    switch (status) {
+      case OrderStatus.WAITING:
+        return "Onay Bekliyor";
+      case OrderStatus.PREPARING:
+        return "Hazırlanıyor";
+      case OrderStatus.APPROVED:
+        return "Onaylandı";
+      case OrderStatus.CANCELED:
+        return "İptal Edildi";
+      case OrderStatus.PAYED:
+        return "Ödeme Yapıldı";
+      default:
+        break;
+    }
+  }
+
+  acceptOrder(order: Order) {
+    order.status = 1;
+    this.mainService.updateData('orders', order._id, { status: OrderStatus.PREPARING }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  approoveOrder(order: Order) {
+    order.status = 2;
+    this.mainService.updateData('orders', order._id, { status: OrderStatus.APPROVED }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  cancelOrder(order: Order) {
+    order.status = 3;
+    this.mainService.updateData('orders', order._id, { status: OrderStatus.CANCELED }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
   fillData() {
     this.selected = '';
 
@@ -126,6 +184,11 @@ export class StoreComponent implements OnInit {
       } catch (error) {
 
       }
+    })
+
+    this.mainService.getAllBy('orders', {}).then(res => {
+      this.orders = res.docs;
+      this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
     })
 
     this.mainService.getAllBy('tables', {}).then((result) => {

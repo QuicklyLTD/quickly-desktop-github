@@ -50,6 +50,8 @@ import { PrinterService } from "./providers/printer.service"
 import { ElectronService } from './providers/electron.service';
 import { TerminalService } from './providers/terminal.service';
 import { CallerIDService } from './providers/caller-id.service';
+import { ScalerService } from './providers/scaler.service';
+
 //////  Pipes
 import { GeneralPipe } from './pipes/general.pipe';
 import { TimeAgoPipe } from './pipes/timeago.pipe';
@@ -145,6 +147,7 @@ import { NgxMaskModule } from 'ngx-mask'
     TerminalService,
     ConflictService,
     CallerIDService,
+    ScalerService,
     HttpService
   ],
   bootstrap: [AppComponent]

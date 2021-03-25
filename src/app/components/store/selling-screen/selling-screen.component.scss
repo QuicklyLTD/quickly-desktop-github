@@ -76,6 +76,7 @@
 
 .proCard {
     p.card-text {
+        width: 95%;
         .price {
             float: left;
             width: 37%
@@ -85,7 +86,6 @@
             font-size: 8px;
             text-align: right;
             font-weight: bold;
-            float: right;
             // width: 63%
         }
     }

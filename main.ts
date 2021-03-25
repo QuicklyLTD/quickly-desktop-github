@@ -1,7 +1,9 @@
 import { app, BrowserWindow, screen, webContents, ipcMain } from 'electron';
+
 import './main/ipcPrinter';
 import './main/appServer';
 import './main/callerServer';
+import './main/scalerServer';
 
 let win: BrowserWindow;
 let serve: any;

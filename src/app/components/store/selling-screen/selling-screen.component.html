@@ -48,24 +48,46 @@
         <div class="row">
           <div class="col-xl-8 col-lg-7">
             <div class="row">
-              <div class="col-xl-3 col-lg-3 inside-height check-flow pl-0 pr-0">
+              <!-- <div class="col-xl-3 col-lg-3 inside-height check-flow pl-0 pr-0">
                 <div class="btn-group-vertical btn-block btn-group-lg">
                   <button (click)="productsView = products; selectedCat = undefined; subCatsView = undefined;" [ngClass]="{'btn-danger bg-danger text-white':selectedCat == undefined}" class="btn btn-secondary dark-bg catButton">Bütün
                     Ürünler
                   </button>
                   <button *ngFor="let cat of categories" [ngClass]="{'btn-danger bg-danger text-white':selectedCat == cat._id}" (click)="getProductsBy(cat._id)" class="btn btn-secondary dark-bg catButton">{{cat.name}}</button>
                 </div>
-              </div>
-              <div class="col-xl-8 col-lg-8  pr-0 pl-0">
+              </div> -->
+              <div *ngIf="selectedCat == undefined" class="col-xl-11 col-lg-11  pr-0 pl-0">
                 <div class="card inside-height">
-                  <div *ngIf="subCatsView !== undefined && subCatsView.length > 0">
+                  <div id="categoryHolder" class="card-body pt-0 pb-0 flow">
+                    <div class="row">
+                      <div *ngFor="let cat of categories" (click)="getProductsBy(cat._id)" class="col-xl-3 col-lg-4 col-card">
+                        <div class="card mb-1 mt-1 catCard">
+                          <div class="card-body">
+                            <h2 class="card-title text-center">{{cat.name}}</h2>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="selectedCat !== undefined" class="col-xl-11 col-lg-11  pr-0 pl-0">
+                <div class="card inside-height">
+                  <div>
                     <div class="card-header pt-1 pb-1 pr-1 pl-1">
                       <div class="row ml-0 mr-0">
-                        <div *ngFor="let item of subCatsView" class="col p-0 pr-1 pl-1 mb-1">
-                          <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning text-dark btn-block">
-                            <b>{{item.name}}</b>
+                        <div class="col-xl-3 col-lg-4 p-0 pr-2 pl-2 mb-0">
+                          <button (click)="selectedCat = undefined" class="btn btn-md btn-danger text-dark btn-block">
+                            <b><i class="fa fa-chevron-left" aria-hidden="true"></i> Geri</b>
                           </button>
                         </div>
+                        <ng-container *ngIf="subCatsView !== undefined && subCatsView.length > 0">
+                          <div *ngFor="let item of subCatsView" class="col p-0 pr-1 pl-1 mb-1">
+                            <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning text-dark btn-block">
+                              <b>{{item.name}}</b>
+                            </button>
+                          </div>
+                        </ng-container>
                       </div>
                     </div>
                   </div>
@@ -76,12 +98,12 @@
                           <div class="card-body">
                             <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
                             <p class="card-text text-danger">
-                              <!-- <span class="price">
+                              <span class="price">
                                 <b> {{product.price | price }} </b>
-                              </span> -->
-                              <!-- *ngIf="selectedCat !== undefined" -->
-                              <small  class="category mt-1 text-white">
-                                {{product.cat_id | general:'categories':'name'| async}}
+                              </span>
+                              <small class="category mt-1 text-white">
+                                {{catName(product.cat_id)}}
+                                <!-- {{product.cat_id | general:'categories':'name'| async}} -->
                               </small>
                             </p>
                           </div>
@@ -312,7 +334,6 @@
   </div>
 </div>
 
-
 <div class="modal" id="printersModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -508,7 +529,6 @@
   </div>
 </div>
 
-
 <div class="modal" id="checkOptions" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -536,6 +556,14 @@
               </p>
             </button>
           </div>
+          <div class="col pr-2 pl-2">
+            <button data-toggle="modal" [disabled]="!check._id" data-dismiss="modal" (click)="qrCode()" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
+              <i class="fa fa-qrcode"></i>
+              <p class="mt-1 mb-1">
+                <b>QR Yazdır</b>
+              </p>
+            </button>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -544,7 +572,6 @@
     </div>
   </div>
 </div>
-
 
 <div class="modal" id="occupationModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">
@@ -589,7 +616,6 @@
     </div>
   </div>
 </div>
-
 
 <div class="modal fade" id="checkDiscount" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">

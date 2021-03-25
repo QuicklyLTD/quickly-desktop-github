@@ -9,6 +9,7 @@ import { SettingsService } from './services/settings.service';
 import { ConflictService } from './services/conflict.service';
 import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 import { CallerIDService } from './providers/caller-id.service';
+import { ScalerService } from './providers/scaler.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,7 @@ import { CallerIDService } from './providers/caller-id.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.7.1';
+  version = '1.7.8';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
   dayStatus: DayInfo;
 
 
-  constructor(private callerService: CallerIDService, private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService) {
+  constructor(private callerService: CallerIDService, private scalerService: ScalerService, private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService) {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
@@ -52,6 +53,7 @@ export class AppComponent implements OnInit {
       this.initConnectivityAndTime();
       // this.callerService.startCallerID();
       // this.callerService.testCall();
+      // this.scalerService.startScaler();
     }
   }
 
@@ -382,90 +384,4 @@ export class AppComponent implements OnInit {
     this.electronService.fullScreen(this.windowStatus);
     this.windowStatus = !this.windowStatus;
   }
-
-  // startApp() {
-  //   this.settingsService.ActivationStatus.subscribe(res => {
-  //     if (res) {
-  //       this.setupFinished = true;
-  //       if (this.setupFinished) {
-  //         if (res.value) {
-  //           this.settingsService.DateSettings.subscribe(res => {
-  //             if (new Date().getDay() !== res.value.day) {
-  //               if (res.value.started) {
-  //                 this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
-  //               } else {
-  //                 this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
-  //               }
-  //             }
-  //           });
-  //           this.settingsService.ServerSettings.subscribe(res => {
-  //             let settings: any = res;
-  //             let configrations = res.value;
-  //             if (configrations.type == 0) {
-  //               this.updateActivityReport();
-  //             }
-  //             if (configrations.status == 1) {
-  //               if (configrations.type == 0) {
-  //                 this.electronService.ipcRenderer.send('appServer', configrations.key, configrations.ip_port);
-  //                 this.mainService.syncToServer();
-  //                 this.conflictService.conflictListener();
-  //               } else if (configrations.type == 1) {
-  //                 let listener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', () => {
-  //                   this.onSync = true;
-  //                   listener.cancel();
-  //                   this.mainService.syncToRemote().cancel();
-  //                   this.router.navigate(['/endoftheday_no_guard']).then(() => {
-  //                     $('#endDayModal').modal('show');
-  //                     setTimeout(() => {
-  //                       let databasesArray = Object.keys(this.mainService.LocalDB);
-  //                       this.mainService.destroyDB(databasesArray).then(res => {
-  //                         if (res.ok) {
-  //                           setTimeout(() => {
-  //                             this.mainService.initDatabases();
-  //                             setTimeout(() => {
-  //                               this.mainService.replicateDB(configrations).on('complete', () => {
-  //                                 this.mainService.syncToLocal().then(res => {
-  //                                   if (res) {
-  //                                     delete settings._rev;
-  //                                     this.mainService.putDoc('settings', settings).then(res => {
-  //                                       if (res.ok) {
-  //                                         $('#endDayModal').modal('hide');
-  //                                         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program 5sn içinde kapatılacak.', 'success');
-  //                                         setTimeout(() => {
-  //                                           this.electronService.shellCommand('shutdown now');
-  //                                         }, 5000);
-  //                                       }
-  //                                     })
-  //                                   }
-  //                                 })
-  //                               });
-  //                             }, 60000);
-  //                           }, 5000)
-  //                         }
-  //                       });
-  //                     }, 10000);
-  //                   });
-  //                 });
-  //                 this.mainService.LocalDB['settings'].changes({ since: 'now', live: true }).on('change', (res) => {
-  //                   if (!this.onSync) {
-  //                     clearInterval(this.conflictService.conflictListener());
-  //                     setTimeout(() => {
-  //                       this.electronService.reloadProgram();
-  //                     }, 5000);
-  //                   }
-  //                 });
-  //               }
-  //             }
-  //             this.mainService.syncToRemote();
-  //           });
-  //         } else {
-  //           this.setupFinished = false;
-  //           this.router.navigate(['/activation']);
-  //         }
-  //       }
-  //     } else {
-  //       this.router.navigate(['/setup']);
-  //     }
-  //   });
-  // }
 }

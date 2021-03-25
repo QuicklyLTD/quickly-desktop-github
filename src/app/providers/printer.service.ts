@@ -22,7 +22,7 @@ export class PrinterService {
     this.electron.ipcRenderer.send('printTest', device);
   }
 
-  printOrder(device, table, orders) {
+  printOrder(device, table, orders, owner) {
     let ordersArray = [];
     orders.forEach(element => {
       let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
@@ -35,7 +35,7 @@ export class PrinterService {
         ordersArray.push(schema);
       }
     });
-    this.electron.ipcRenderer.send('printOrder', device, table, ordersArray, orders[0].owner);
+    this.electron.ipcRenderer.send('printOrder', device, table, ordersArray, owner);
   }
 
   printCheck(device, table, check) {
@@ -107,6 +107,10 @@ export class PrinterService {
 
   printCancel(device, product, reason, table, owner) {
     this.electron.ipcRenderer.send('printCancel', device, product, reason, table, owner);
+  }
+
+  printQRCode(device, data, table, owner) {
+    this.electron.ipcRenderer.send('printQRcode', device, data, table, owner);
   }
 
   getUSBPrinters() {
