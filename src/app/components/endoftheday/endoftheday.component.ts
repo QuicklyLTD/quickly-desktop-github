@@ -357,9 +357,9 @@ export class EndofthedayComponent implements OnInit {
       console.log(err);
       $('#endDayModal').modal('hide');
       this.messageService.sendAlert('Hata!', 'Sunucudan İzin Alınamadı', 'error');
-      // setTimeout(() => {
-      //   this.electronService.relaunchProgram();
-      // }, 5000);
+      setTimeout(() => {
+        this.electronService.relaunchProgram();
+      }, 5000);
     });
   }
 

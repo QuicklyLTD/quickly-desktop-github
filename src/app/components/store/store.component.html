@@ -17,7 +17,7 @@
               <li class="nav-item">
                 <a class="nav-link" [ngClass]="{'active': section == 'Hesaplar'}" (click)="changeSection('Hesaplar')"><i class="fa fa-sticky-note" aria-hidden="true"></i>
                   Hesaplar
-                  <span class="badge bg-danger">{{checks?.length}}</span>
+                  <span *ngIf="checks.length > 0" class="badge bg-danger">{{checks?.length}}</span>
                 </a>
               </li>
               <li class="nav-item">

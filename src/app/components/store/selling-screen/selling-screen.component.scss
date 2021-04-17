@@ -1,106 +1,107 @@
 .sellButton {
-    font-family: Quickly;
-    margin-bottom: 3.8px;
-    margin-top: 0px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-right: 0px;
-    padding-left: 0px;
-    color: #000;
-    text-decoration: wavy;
-    i {
-        font-size: 7.4vh;
-    }
+  font-family: Quickly;
+  margin-bottom: 3.8px;
+  margin-top: 0px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 0px;
+  padding-left: 0px;
+  color: #000;
+  text-decoration: wavy;
+  i {
+    font-size: 7.4vh;
+  }
 }
 
 .sellButton[disabled] {
-    opacity: 0.6;
-    color: rgba(0, 0, 0, 0.50);
+  opacity: 0.6;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .btn-specs {
-    padding: 25px;
-    float: left;
-    font-weight: bolder;
-    font-size: 30px;
-    text-transform: capitalize;
+  padding: 25px;
+  float: left;
+  font-weight: bolder;
+  font-size: 30px;
+  text-transform: capitalize;
 
-    .spec-price {
-        font-size: 20px;
-        color: #8a5f25;
-        margin-left: 5px;
-    }
+  .spec-price {
+    font-size: 20px;
+    color: #8a5f25;
+    margin-left: 5px;
+  }
 }
 
 .payment-flow {
-    height: 35vh;
-    overflow: hidden;
-    overflow-y: scroll;
-    overflow-x: hidden;
+  height: 35vh;
+  overflow: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
 
-    p {
-        font-weight: bolder;
-    }
+  p {
+    font-weight: bolder;
+  }
 }
 
 #productHolder {
-    overflow-y: scroll;
-    // background-color: #ebebeb;
+  overflow-y: scroll;
+  // background-color: #ebebeb;
 }
 
 .normal {
-    width: auto !important;
+  width: auto !important;
 }
 
 .tFlow {
-    height: 60vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
+  height: 60vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .modal-big {
-    max-width: 1300px;
+  max-width: 1300px;
 }
 
 .payedLayer {
-    border-top: 1px solid white;
+  border-top: 1px solid white;
 }
 
 .payed-things {
-    min-height: 200px;
+  min-height: 200px;
 }
 
 .numpad {
-    font-size: 22px;
+  font-size: 22px;
 }
 
 .proCard {
-    p.card-text {
-        width: 95%;
-        .price {
-            float: left;
-            width: 37%
-        }
-
-        .category {
-            font-size: 8px;
-            text-align: right;
-            font-weight: bold;
-            // width: 63%
-        }
+  p.card-text {
+    width: 95%;
+    .price {
+      float: left;
+      width: 37%;
     }
+
+    .category {
+      position: relative;
+      left: 10px;
+      font-size: 8px;
+      text-align: right;
+      font-weight: bold;
+    }
+  }
 }
 
 .catButton {
-    padding-top: 3px !important;
-    font-weight: bold;
-    white-space: pre-line;
-    font-size: 1.3vw;
-    height: 47.65px;
-    text-align: start;
+  padding-top: 3px !important;
+  font-weight: bold;
+  white-space: pre-line;
+  font-size: 1.3vw;
+  height: 47.65px;
+  text-align: start;
 }
 
 .humanIcon {
-    font-size: 20px !important;
-    padding: 0 2 0 2 !important;
+  font-size: 20px !important;
+  padding: 0 2 0 2 !important;
 }

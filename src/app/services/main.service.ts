@@ -35,6 +35,7 @@ export class MainService {
       credits: new PouchDB('local_credits', db_opts),
       customers: new PouchDB('local_customers', db_opts),
       orders: new PouchDB('local_orders', db_opts),
+      receipts: new PouchDB('local_receipts', db_opts),
       calls: new PouchDB('local_calls', db_opts),
       cashbox: new PouchDB('local_cashbox', db_opts),
       categories: new PouchDB('local_categories', db_opts),
@@ -50,6 +51,7 @@ export class MainService {
       reports: new PouchDB('local_reports', db_opts),
       logs: new PouchDB('local_logs', db_opts),
       commands: new PouchDB('local_commands', db_opts),
+      comments: new PouchDB('local_comments', db_opts),
       settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
@@ -219,6 +221,7 @@ export class MainService {
       credits: new PouchDB('local_credits', db_opts),
       customers: new PouchDB('local_customers', db_opts),
       orders: new PouchDB('local_orders', db_opts),
+      receipts: new PouchDB('local_receipts', db_opts),
       calls: new PouchDB('local_calls', db_opts),
       cashbox: new PouchDB('local_cashbox', db_opts),
       categories: new PouchDB('local_categories', db_opts),
@@ -234,6 +237,7 @@ export class MainService {
       reports: new PouchDB('local_reports', db_opts),
       logs: new PouchDB('local_logs', db_opts),
       commands: new PouchDB('local_commands', db_opts),
+      comments: new PouchDB('local_comments', db_opts),
       settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
@@ -303,7 +307,7 @@ export class MainService {
           const db = element.db_name;
           delete element.db_name;
           if (db !== undefined) {
-            let promise = this.LocalDB[db].put(element);
+            let promise = this.LocalDB[db].put(element)
             promisesAll.push(promise);
           }
         });

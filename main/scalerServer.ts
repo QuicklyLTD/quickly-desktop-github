@@ -1,4 +1,13 @@
 import { ipcMain } from 'electron';
+
+// const SerialPort = require('serialport');
+
+// const port = new SerialPort('/dev/ttyS0')
+
+// port.on('data', function (data) {
+//     console.log('Data:', data)
+// })
+
 const proc = require('child_process');
 
 var i = 0;

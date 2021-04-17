@@ -26,8 +26,8 @@
     "electron:linux": "npm run build:prod && npx electron-builder build --linux",
     "electron:windows": "npm run build:prod && npx electron-builder build --windows",
     "electron:mac": "npm run build:prod && npx electron-builder build --mac",
-    "release":"rm -rf app-builds && run-s electron:linux",
-    "package":"cd app-builds && mv linux-unpacked App &&  zip -r App.zip App",
+    "release": "rm -rf app-builds && run-s electron:linux",
+    "package": "cd app-builds && mv linux-unpacked App &&  zip -r App.zip App",
     "test": "karma start ./karma.conf.js",
     "pree2e": "webdriver-manager update --standalone false --gecko false --quiet && npm run build",
     "e2e": "protractor ./protractor.conf.js",
@@ -65,6 +65,7 @@
     "rabin-bindings": "^1.7.4",
     "raven-js": "^3.22.1",
     "rxjs": "5.5.2",
+    "serialport": "^9.0.7",
     "sweetalert": "^2.1.0",
     "tether": "^1.4.3",
     "zone.js": "^0.8.18"

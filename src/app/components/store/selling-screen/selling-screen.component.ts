@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Order, OrderItem, OrderStatus, OrderType } from '../../../mocks/order';
 import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo, Occupation } from '../../../mocks/check.mock';
 import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../mocks/product.mock';
 import { PaymentMethod, Printer } from '../../../mocks/settings.mock';
@@ -148,11 +149,11 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => {
-      if (this.check.status == CheckStatus.PASSIVE) {
-        $('#occupationModal').modal('show');
-      }
-    }, 500)
+    // setTimeout(() => {
+    //   if (this.check.status == CheckStatus.PASSIVE) {
+    //     $('#occupationModal').modal('show');
+    //   }
+    // }, 500)
   }
 
   ngOnDestroy() {
@@ -287,17 +288,39 @@ export class SellingScreenComponent implements OnInit {
 
   confirmCheck() {
     this.router.navigate(['/store']);
+    let timestamp = Date.now();
     this.check.products.map(element => {
       if (element.status === 1) {
         element.status = 2;
+        element.timestamp = timestamp;
       }
     });
+
     if (this.check.status !== CheckStatus.PASSIVE) {
       if (this.check.type == CheckType.NORMAL) {
         this.mainService.updateData('tables', this.id, { status: 2 });
       }
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
         if (res.ok) {
+
+          let newOrder = new Order(this.check._id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.INSIDE, timestamp)
+
+          this.newOrders.forEach(order => {
+            let orderItem: OrderItem = {
+              name: order.name,
+              price: order.price,
+              note: order.note,
+              product_id: order.id
+            }
+            newOrder.items.push(orderItem);
+          })
+
+          this.mainService.addData('orders', newOrder).then(res => {
+            console.log(res);
+          }).catch(err => {
+            console.log(err);
+          })
+
           let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
           if (this.check.type == CheckType.NORMAL) {
             this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
@@ -326,47 +349,6 @@ export class SellingScreenComponent implements OnInit {
   }
 
   sendCheck() {
-    // if (this.check.type == CheckType.FAST) {
-    //   if (this.check.note == '' || this.check.note == undefined) {
-    //     this.message.sendConfirm('Hızlı Hesap oluşturmanız için hesaba not eklemek zorundasınız.').then(isOk => {
-    //       if (isOk) {
-    //         $('#checkNote').modal('show');
-    //         return false;
-    //       } else {
-    //         return false;
-    //       }
-    //     })
-    //   } else {
-    //     if (this.askForPrint) {
-    //       this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
-    //         if (isOk) {
-    //           this.printOrder();
-    //           this.confirmCheck();
-    //         } else {
-    //           this.confirmCheck();
-    //         }
-    //       });
-    //     } else {
-    //       this.printOrder();
-    //       this.confirmCheck();
-    //     }
-    //   }
-    // } else {
-    //   if (this.askForPrint) {
-    //     this.message.sendConfirm('Fiş Yazdırılsın mı ?').then(isOk => {
-    //       if (isOk) {
-    //         this.printOrder();
-    //         this.confirmCheck();
-    //       } else {
-    //         this.confirmCheck();
-    //       }
-    //     });
-    //   } else {
-    //     this.printOrder();
-    //     this.confirmCheck();
-    //   }
-    // }
-
     switch (this.check.type) {
       case CheckType.NORMAL:
         if (this.askForPrint) {
@@ -862,7 +844,7 @@ export class SellingScreenComponent implements OnInit {
 
 
   qrCode() {
-    let slug = 'kosmos-db15';
+    let slug = 'mansion-besiktas';
     let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
     this.printerService.printQRCode(this.printers[0], qrdata, this.table.name, this.owner);
   }
@@ -1127,6 +1109,7 @@ export class SellingScreenComponent implements OnInit {
   }
 
   catName(cat_id) {
+    console.log(cat_id);
     return this.categories.find(obj => obj._id == cat_id).name;
   }
 

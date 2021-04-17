@@ -2,8 +2,10 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import { MainService } from '../../services/main.service';
 import { Router } from '@angular/router';
 import { Floor, Table } from '../../mocks/table.mock';
-import { Check, CheckType } from '../../mocks/check.mock';
+import { Check, CheckProduct, CheckType } from '../../mocks/check.mock';
 import { Order, OrderItem, OrderStatus, OrderType } from '../../mocks/order';
+import { Product } from 'app/mocks/product.mock';
+import { SettingsService } from '../../services/settings.service';
 
 
 @Component({
@@ -22,6 +24,7 @@ export class StoreComponent implements OnInit {
   fastChecks: Array<Check> = [];
   deliveryChecks: Array<Check> = [];
 
+  products: Array<Product> = [];
   orders: Array<Order> = [];
   ordersView: Array<Order> = [];
 
@@ -32,7 +35,14 @@ export class StoreComponent implements OnInit {
   section: any;
   closedDelivery: Array<any>;
 
-  constructor(private mainService: MainService, private router: Router) {
+  owner: any;
+  ownerId: any;
+
+  constructor(private mainService: MainService, private router: Router, private settingsService: SettingsService) {
+
+    this.owner = this.settingsService.getUser('name');
+    this.ownerId = this.settingsService.getUser('id');
+
     this.fillData();
     if (localStorage.getItem('selectedSection')) {
       let selectedSection = localStorage['selectedSection'];
@@ -46,6 +56,10 @@ export class StoreComponent implements OnInit {
     this.checkChanges = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', (change) => {
       this.mainService.getAllBy('checks', {}).then((result) => {
         this.checks = result.docs;
+        if (localStorage.getItem('selectedFloor')) {
+          let selectedID = JSON.parse(localStorage['selectedFloor']);
+          this.getTablesBy(selectedID);
+        }
       });
     });
     this.orderChanges = this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (change) => {
@@ -144,8 +158,21 @@ export class StoreComponent implements OnInit {
 
   approoveOrder(order: Order) {
     order.status = 2;
-    this.mainService.updateData('orders', order._id, { status: OrderStatus.APPROVED }).then(res => {
-      console.log(res);
+    let approveTime = Date.now();
+    this.mainService.changeData('checks', order.check, (check: Check) => {
+      order.items.forEach(orderItem => {
+        let mappedProduct = this.products.find(product => product._id == orderItem.product_id || product.name == orderItem.name);
+        let newProduct = new CheckProduct(mappedProduct._id, mappedProduct.cat_id, mappedProduct.name + (orderItem.type ? ' ' + orderItem.type : ''), orderItem.price, orderItem.note, 2, this.ownerId, approveTime, mappedProduct.tax_value, mappedProduct.barcode);
+        check.total_price = check.total_price + newProduct.price;
+        check.products.push(newProduct);
+      })
+      return check;
+    }).then(isOk => {
+      this.mainService.updateData('orders', order._id, { status: OrderStatus.APPROVED, timestamp: approveTime }).then(res => {
+        // console.log(res);
+      }).catch(err => {
+        console.log(err);
+      })
     }).catch(err => {
       console.log(err);
     })
@@ -162,19 +189,19 @@ export class StoreComponent implements OnInit {
 
   fillData() {
     this.selected = '';
-
+    this.mainService.getAllBy('products', {}).then((result) => {
+      this.products = result.docs;
+    });
     this.mainService.getAllBy('floors', {}).then((result) => {
       this.floors = result.docs;
       this.floors = this.floors.sort((a, b) => a.timestamp - b.timestamp);
     });
-
     this.mainService.getAllBy('checks', {}).then(res => {
       this.checks = res.docs;
       this.checksView = this.checks;
       this.fastChecks = this.checks.filter(obj => obj.type == CheckType.FAST);
       this.deliveryChecks = this.checks.filter(obj => obj.type == CheckType.ORDER);
     })
-
     this.mainService.getAllBy('closed_checks', { type: CheckType.ORDER }).then(res => {
       this.closedDelivery = res.docs.sort((a, b) => b.timestamp - a.timestamp);
       try {
@@ -182,25 +209,21 @@ export class StoreComponent implements OnInit {
           this.closedDelivery.unshift(check);
         })
       } catch (error) {
-
+        console.log(error);
       }
     })
-
     this.mainService.getAllBy('orders', {}).then(res => {
       this.orders = res.docs;
       this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
     })
-
     this.mainService.getAllBy('tables', {}).then((result) => {
       this.tables = result.docs;
       this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name, 'tr', { numeric: true, sensitivity: 'base' }));
-
       this.loweredTables = JSON.parse(JSON.stringify(result.docs));
       this.loweredTables.map(obj => {
         obj.name = obj.name.replace(/-/g, '').toLowerCase();
         return obj;
       });
-
       this.tableViews = this.tables;
       if (localStorage.getItem('selectedFloor')) {
         let selectedID = JSON.parse(localStorage['selectedFloor']);

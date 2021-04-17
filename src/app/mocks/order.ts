@@ -13,16 +13,17 @@ export interface OrderItem {
     type?: string;
 }
 
-export interface Order {
-    db_name: string,
-    check: any,
-    user: User,
-    items: Array<OrderItem>,
-    status: OrderStatus,
-    type: OrderType,
-    timestamp: number,
-    _id?: string;
-    _rev?: string;
+export class Order {
+    constructor(
+        public check: any,
+        public user: User,
+        public items: Array<OrderItem>,
+        public status: OrderStatus,
+        public type: OrderType,
+        public timestamp: number,
+        public _id?: string,
+        public _rev?: string,
+    ) { }
 }
 
 export enum OrderType {
