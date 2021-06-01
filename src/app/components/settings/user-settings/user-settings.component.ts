@@ -147,7 +147,7 @@ export class UserSettingsComponent implements OnInit {
             let role = result.name;
             let schema = new User(form.name, role, form.role_id, form.pincode, 1, Date.now());
             this.mainService.addData('users', schema).then((response) => {
-              this.mainService.addData('reports', new Report('User', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], form.name, Date.now())).then(res => {
+              this.mainService.addData('reports', new Report('User', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], new Date().getMonth(), new Date().getFullYear(), form.name, Date.now())).then(res => {
                 this.logService.createLog(logType.USER_CREATED, res.id, `${form.name} Adlı Kullanıcı Oluşturuldu`);
               });
               this.messageService.sendMessage('Kullanıcı Oluşturuldu!');

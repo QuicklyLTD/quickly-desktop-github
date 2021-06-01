@@ -21,7 +21,7 @@ import { ScalerService } from './providers/scaler.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.7.8';
+  version = '1.8.5';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -118,6 +118,7 @@ export class AppComponent implements OnInit {
               this.electronService.ipcRenderer.send('appServer', this.serverSettings.key, this.serverSettings.ip_port);
               this.mainService.syncToServer();
               this.conflictService.conflictListener();
+
               this.mainService.loadAppData().then((isLoaded: boolean) => {
                 if (isLoaded) {
                   this.onSync = false;
@@ -192,18 +193,22 @@ export class AppComponent implements OnInit {
         this.router.navigate(['/setup']);
         break;
     }
+    if (this.serverSettings.type == 0) {
+      setTimeout(() => this.orderListener(), 10000)
+    }
     this.commandListener();
   }
 
   orderListener() {
-    // console.log('Order Listener Process Started');
-    // this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (res) => {
-    //   if (!this.onSync) {
-    //     // setTimeout(() => {
-    //     //   this.electronService.reloadProgram();
-    //     // }, 5000);
-    //   }
-    // });
+    console.log('Order Listener Process Started');
+    this.mainService.LocalDB['orders'].changes({ since: 'now', live: true, include_docs: true }).on('change', (res) => {
+      if (!this.onSync) {
+        console.log(res);
+        // setTimeout(() => {
+        //   this.electronService.reloadProgram();
+        // }, 5000);
+      }
+    });
   }
 
 

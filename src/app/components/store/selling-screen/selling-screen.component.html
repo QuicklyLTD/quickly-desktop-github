@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-xl-8 col-lg-7">
             <div class="row">
-              <div class="col-lg-6">
+              <div class="col-lg-5">
                 <div class="table-name">
                   <!-- <span *ngIf="check?.type == 1">Masa:</span> -->
                   <b>{{check?.table_id | general:'tables' | async}}</b>
@@ -14,7 +14,7 @@
                   </span>
                 </div>
               </div>
-              <div class="col-lg-2 humanIcon pr-2 pl-0 text-right">
+              <div class="col-lg-3 humanIcon pr-2 pl-0 text-right">
                 <i class="fa fa-clock-o"></i>
                 {{check?.timestamp | timeAgo}}
               </div>

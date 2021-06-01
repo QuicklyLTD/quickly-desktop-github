@@ -336,6 +336,25 @@ export class SellingScreenComponent implements OnInit {
       }
       this.mainService.addData('checks', this.check).then(res => {
         if (res.ok) {
+
+          let newOrder = new Order(res._id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.INSIDE, timestamp)
+
+          this.newOrders.forEach(order => {
+            let orderItem: OrderItem = {
+              name: order.name,
+              price: order.price,
+              note: order.note,
+              product_id: order.id
+            }
+            newOrder.items.push(orderItem);
+          })
+
+          this.mainService.addData('orders', newOrder).then(res => {
+            console.log(res);
+          }).catch(err => {
+            console.log(err);
+          })
+
           if (this.check.type == CheckType.NORMAL) {
             this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
           } else {
@@ -508,10 +527,12 @@ export class SellingScreenComponent implements OnInit {
         if (res.docs.length > 0) {
           let doc = res.docs[0];
           doc.count++;
-          doc.weekly_count[this.day]++;
           doc.amount += (this.check.total_price + this.check.discount) - general_discount;
           doc.weekly[this.day] += (this.check.total_price + this.check.discount) - general_discount;
-          doc.update_time = Date.now();
+          doc.weekly_count[this.day]++;
+          doc.monthly[new Date().getMonth()] += (this.check.total_price + this.check.discount) - general_discount;
+          doc.monthly_count[new Date().getMonth()] ++;
+          doc.timestamp = Date.now();
           this.mainService.updateData('reports', doc._id, doc);
         }
       });
@@ -521,10 +542,12 @@ export class SellingScreenComponent implements OnInit {
         this.check.payment_flow.forEach((obj, index) => {
           let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
           reportWillChange.count++;
-          reportWillChange.weekly_count[this.day]++;
           reportWillChange.amount += obj.amount;
           reportWillChange.weekly[this.day] += obj.amount;
-          reportWillChange.update_time = Date.now();
+          reportWillChange.weekly_count[this.day]++;
+          reportWillChange.monthly[new Date().getMonth()] += obj.amount;
+          reportWillChange.monthly_count[new Date().getMonth()] ++;
+          reportWillChange.timestamp = Date.now();
           if (this.check.payment_flow.length == index + 1) {
             sellingReports.forEach((report) => {
               if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
@@ -542,9 +565,11 @@ export class SellingScreenComponent implements OnInit {
       let report = res.docs[0];
       report.count++;
       report.amount += this.check.total_price + this.check.discount;
-      report.update_time = Date.now();
+      report.timestamp = Date.now();
       report.weekly[this.day] += this.check.total_price + this.check.discount;
       report.weekly_count[this.day]++;
+      report.monthly[new Date().getMonth()] += this.check.total_price + this.check.discount;
+      report.monthly_count[new Date().getMonth()] ++;
       this.mainService.updateData('reports', report._id, report);
     });
   }
@@ -690,10 +715,12 @@ export class SellingScreenComponent implements OnInit {
               payedDiscounts += obj.discount;
               let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
               reportWillChange.count++;
-              reportWillChange.weekly_count[this.day]++;
               reportWillChange.amount += obj.amount;
               reportWillChange.weekly[this.day] += obj.amount;
-              reportWillChange.update_time = Date.now();
+              reportWillChange.weekly_count[this.day]++;
+              reportWillChange.monthly[new Date().getMonth()] += obj.amount;
+              reportWillChange.monthly_count[new Date().getMonth()] ++;
+              reportWillChange.timestamp = Date.now();
               if (this.check.payment_flow.length == index + 1) {
                 sellingReports.forEach((report, dd) => {
                   if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
@@ -795,10 +822,12 @@ export class SellingScreenComponent implements OnInit {
         doc.count++;
         doc.weekly[this.day] += pricesTotal;
         doc.weekly_count[this.day]++;
+        doc.monthly[new Date().getMonth()] += pricesTotal;
+        doc.monthly_count[new Date().getMonth()] ++;
         if (doc.weekly_count[this.day] == 100) {
           this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
         }
-        doc.update_time = Date.now();
+        doc.timestamp = Date.now();
         this.mainService.updateData('reports', doc._id, doc).then();
       });
     }
@@ -811,9 +840,11 @@ export class SellingScreenComponent implements OnInit {
         this.mainService.changeData('reports', report._id, (doc) => {
           doc.count += obj.count;
           doc.amount += obj.total;
-          doc.update_time = Date.now();
+          doc.timestamp = Date.now();
           doc.weekly[this.day] += obj.total;
           doc.weekly_count[this.day] += obj.count;
+          doc.monthly[new Date().getMonth()] += obj.total;
+          doc.monthly_count[new Date().getMonth()] ++;
           return doc;
         });
       });
@@ -844,7 +875,7 @@ export class SellingScreenComponent implements OnInit {
 
 
   qrCode() {
-    let slug = 'mansion-besiktas';
+    let slug = 'kosmos-db15';
     let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
     this.printerService.printQRCode(this.printers[0], qrdata, this.table.name, this.owner);
   }
@@ -945,7 +976,9 @@ export class SellingScreenComponent implements OnInit {
                             doc.weekly_count[this.day]++;
                             doc.amount += obj.amount;
                             doc.weekly[this.day] += obj.amount;
-                            doc.update_time = Date.now();
+                            doc.monthly[new Date().getMonth()] += obj.amount;
+                            doc.monthly_count[new Date().getMonth()] ++;
+                            doc.timestamp = Date.now();
                             return doc;
                           });
                         });
@@ -998,7 +1031,9 @@ export class SellingScreenComponent implements OnInit {
                       doc.weekly_count[this.day]++;
                       doc.amount += obj.amount;
                       doc.weekly[this.day] += obj.amount;
-                      doc.update_time = Date.now();
+                      doc.monthly[new Date().getMonth()] += obj.amount;
+                      doc.monthly_count[new Date().getMonth()] ++;
+                      doc.timestamp = Date.now();
                       return doc;
                     });
                   });
@@ -1108,9 +1143,12 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
-  catName(cat_id) {
-    console.log(cat_id);
-    return this.categories.find(obj => obj._id == cat_id).name;
+  catName(cat_id: string) {
+    try {
+      return this.categories.find(obj => obj._id == cat_id).name;
+    } catch (error) {
+      return '';
+    }
   }
 
   filterProducts(value: string) {

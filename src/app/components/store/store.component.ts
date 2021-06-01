@@ -4,9 +4,13 @@ import { Router } from '@angular/router';
 import { Floor, Table } from '../../mocks/table.mock';
 import { Check, CheckProduct, CheckType } from '../../mocks/check.mock';
 import { Order, OrderItem, OrderStatus, OrderType } from '../../mocks/order';
-import { Product } from 'app/mocks/product.mock';
+import { Ingredient, Product } from 'app/mocks/product.mock';
 import { SettingsService } from '../../services/settings.service';
+import { Stock } from 'app/mocks/stocks.mock';
+import { Report } from 'app/mocks/report.mock';
+import { DayInfo } from 'app/mocks/settings.mock';
 
+export interface CountData { product: string; count: number; total: number; };
 
 @Component({
   selector: 'app-store',
@@ -159,15 +163,18 @@ export class StoreComponent implements OnInit {
   approoveOrder(order: Order) {
     order.status = 2;
     let approveTime = Date.now();
+    let CountData: Array<CountData> = [];
     this.mainService.changeData('checks', order.check, (check: Check) => {
       order.items.forEach(orderItem => {
         let mappedProduct = this.products.find(product => product._id == orderItem.product_id || product.name == orderItem.name);
         let newProduct = new CheckProduct(mappedProduct._id, mappedProduct.cat_id, mappedProduct.name + (orderItem.type ? ' ' + orderItem.type : ''), orderItem.price, orderItem.note, 2, this.ownerId, approveTime, mappedProduct.tax_value, mappedProduct.barcode);
+        this.countProductsData(CountData, newProduct.id, newProduct.price)
         check.total_price = check.total_price + newProduct.price;
         check.products.push(newProduct);
       })
       return check;
     }).then(isOk => {
+      this.updateProductReport(CountData);
       this.mainService.updateData('orders', order._id, { status: OrderStatus.APPROVED, timestamp: approveTime }).then(res => {
         // console.log(res);
       }).catch(err => {
@@ -230,5 +237,73 @@ export class StoreComponent implements OnInit {
         this.getTablesBy(selectedID);
       }
     });
+  }
+
+
+  countProductsData = (counDataArray: Array<CountData>, id: string, price: number, manuelCount?: number): Array<CountData> => {
+    let countObj: CountData;
+    if (manuelCount) {
+      countObj = { product: id, count: manuelCount, total: price };
+    } else {
+      countObj = { product: id, count: 1, total: price };
+    }
+    let contains = counDataArray.some(obj => obj.product === id);
+    if (contains) {
+      let index = counDataArray.findIndex(p_id => p_id.product == id);
+      if (manuelCount) {
+        counDataArray[index].count += manuelCount;
+      } else {
+        counDataArray[index].count++;
+      }
+      counDataArray[index].total += price;
+    } else {
+      counDataArray.push(countObj);
+    }
+    return counDataArray;
+  }
+
+  updateProductReport = async (count_data: Array<CountData>): Promise<boolean> => {
+    try {
+      const StoreDayInfo: DayInfo = await (await this.mainService.LocalDB['allData'].find({ selector: { key: 'DateSettings' } })).docs[0].value;
+      const Month = new Date(StoreDayInfo.time).getMonth();
+
+      count_data.forEach(async (obj: CountData) => {
+        const ProductReport: Report = await (await this.mainService.LocalDB['allData'].find({ selector: { db_name: 'reports', connection_id: obj.product } })).docs[0];
+        const ProductRecipe: Array<Ingredient> = await (await this.mainService.LocalDB['allData'].find({ selector: { db_name: 'recipes', product_id: obj.product } })).docs[0];
+        if (ProductReport) {
+          this.mainService.LocalDB['allData'].upsert(ProductReport._id, (doc: Report) => {
+            doc.count += obj.count;
+            doc.amount += obj.total;
+            doc.timestamp = Date.now();
+            doc.weekly[StoreDayInfo.day] += obj.total;
+            doc.weekly_count[StoreDayInfo.day] += obj.count;
+            doc.monthly[Month] += obj.total;
+            doc.weekly_count[Month] += obj.count;
+            return doc;
+          })
+        }
+        if (ProductRecipe) {
+          ProductRecipe.forEach(ingredient => {
+            let downStock = ingredient.amount * obj.count;
+            this.mainService.LocalDB['allData'].upsert(ingredient.stock_id, (doc: Stock) => {
+              doc.left_total -= downStock;
+              doc.quantity = doc.left_total / doc.total;
+              if (doc.left_total < doc.warning_limit) {
+                if (doc.left_total <= 0) {
+                  doc.left_total = 0;
+                  // this.logService.createLog(logType.STOCK_CHECKPOINT, doc._id, `${doc.name} adlı stok tükendi!`);
+                } else {
+                  // this.logService.createLog(logType.STOCK_CHECKPOINT, doc._id, `${doc.name} adlı stok bitmek üzere! - Kalan: '${doc.left_total + ' ' + doc.unit}'`);
+                }
+              }
+              return doc;
+            });
+          });
+        }
+      });
+      return true;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
