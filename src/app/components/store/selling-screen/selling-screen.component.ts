@@ -337,7 +337,7 @@ export class SellingScreenComponent implements OnInit {
       this.mainService.addData('checks', this.check).then(res => {
         if (res.ok) {
 
-          let newOrder = new Order(res._id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.INSIDE, timestamp)
+          let newOrder = new Order(res.id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.INSIDE, timestamp)
 
           this.newOrders.forEach(order => {
             let orderItem: OrderItem = {
