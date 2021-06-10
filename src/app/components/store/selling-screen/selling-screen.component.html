@@ -30,14 +30,20 @@
           </div>
           <div class="col-xl-4 col-lg-5">
             <div class="row">
-              <div class="col-lg-6 pr-1 pl-1">
+              <div class="col-lg-4 pr-1 pl-1">
                 <button data-toggle="modal" (click)="onProductChange = false" data-target="#splitTable" [disabled]="tablesView?.length == 0 || check.products.length == 0 || check.status == 0" class="btn btn-danger btn-block btn-sm">
                   <strong>Masa Değiştir</strong>
                 </button>
               </div>
-              <div class="col-lg-6 pr-1 pl-1">
+              <div class="col-lg-4 pr-1 pl-1">
                 <button data-toggle="modal" data-target="#checkOptions" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">
                   <strong>Hesap İşlemleri</strong>
+                </button>
+              </div>
+              <div class="col-lg-4 pr-1 pl-1">
+                <button data-toggle="modal" data-target="#qrPrintersModal" class="btn btn-secondary text-info border-info btn-block btn-sm " [disabled]="tablesView?.length == 0 || check.type == 2">
+                  <i class="fa fa-qrcode"></i>
+                  <strong>QR Yazdır</strong>
                 </button>
               </div>
             </div>
@@ -242,32 +248,55 @@
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block mt-2" data-toggle="buttons">
+                  <button *ngIf="this.check.type == 1 || this.check.type == 2" (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
+                  <button *ngIf="this.check.type == 1 || this.check.type == 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
+
+                  <button *ngIf="this.check.type == 1 && check.payment_flow && check.total_price == 0" (click)="endCheck()" [disabled]="check?.payment_flow.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-success" ><strong><i style="font-size: 1.5em;" class="fa fa-check-square animated tada slow infinite"></i></strong></button>
+
                   <button *ngIf="this.check.type == 5" [routerLink]="['/store']" class="btn btn-secondary btn-lg btn-block"><strong><i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</strong></button>
-                  <button *ngIf="this.check.type !== 5" (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
-                  <button *ngIf="this.check.type !== 5" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
                   <button *ngIf="this.check.type == 5 && this.check.status !== 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
+
+                  <!-- <button *ngIf="this.check.type == 7" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary"><strong>Kapat</strong></button> -->
                 </div>
               </div>
             </div>
           </div>
           <div class="col-xl-1 col-lg-1 pr-0 pl-1">
-            <button (click)="sendCheck()" [oneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sellButton">
-              <i class="fa fa-paper-plane fa-5x"></i>
+            <button (click)="sendCheck()" [oneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sendButton">
+              <div>
+                <i class="fa fa-paper-plane fa-5x"></i>
+                <p>Gönder</p>
+              </div>
             </button>
-            <button data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1" data-target="#noteModal" class="btn btn-warning btn-block sellButton">
-              <i class="fa fa-sticky-note fa-5x"></i>
+            <button data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1" data-target="#noteModal" class="btn btn-warning btn-block sendButton">
+              <div>
+                <i class="fa fa-sticky-note fa-5x"></i>
+                <p>Not Ekle</p>
+              </div>
             </button>
-            <button (click)="undoChanges()" [disabled]="newOrders.length == 0" class="btn btn-primary btn-block sellButton">
-              <i class="fa fa-undo fa-5x"></i>
+            <button (click)="undoChanges()" [disabled]="newOrders.length == 0" class="btn btn-primary btn-block sendButton">
+              <div>
+                <i class="fa fa-undo fa-5x"></i>
+                <p>Geri Al</p>
+              </div>
             </button>
-            <button data-toggle="modal" data-target="#cancelProduct" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2 || !permissions.cancelProduct" class="btn btn-danger btn-block sellButton">
-              <i class="fa fa-times fa-5x"></i>
+            <button data-toggle="modal" data-target="#cancelProduct" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2 || !permissions.cancelProduct" class="btn btn-danger btn-block sendButton">
+              <div>
+                <i class="fa fa-times fa-5x"></i>
+                <p>İptal Et</p>
+              </div>
             </button>
-            <button data-toggle="modal" (click)="onProductChange = true" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2" data-target="#splitTable" class="btn btn-info btn-block sellButton">
-              <i class="fa fa-exchange fa-5x"></i>
+            <button data-toggle="modal" (click)="onProductChange = true" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2" data-target="#splitTable" class="btn btn-info btn-block sendButton">
+              <div>
+                <i class="fa fa-exchange fa-5x"></i>
+                <p>Ürün Taşı</p>
+              </div>
             </button>
-            <button data-toggle="modal" data-target="#printersModal" oneShot [disabled]="check.products.length == 0 || check.status == 0" class="btn dark-bg btn-block sellButton">
-              <i style="color:lightgray !important;" class="fa fa-print fa-5x"></i>
+            <button data-toggle="modal" data-target="#printersModal" oneShot [disabled]="check.products.length == 0 || check.status == 0" class="btn dark-bg btn-block sendButton">
+              <div>
+                <i style="color:lightgray !important;" class="fa fa-print fa-5x"></i>
+                <p style="color:lightgray !important;">Yazdır</p>
+              </div>
             </button>
           </div>
         </div>
@@ -349,6 +378,29 @@
           <ng-container *ngFor="let printer of printers">
             <div *ngIf="printer.mission == 'Adisyon'" class="col pr-2 pl-2 mb-2">
               <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="printCheck(printer)">{{printer.name}}</button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="qrPrintersModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Yazıcı Seç
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div *ngIf="printers?.length > 0" class="modal-body">
+        <div class="row">
+          <ng-container *ngFor="let printer of printers">
+            <div *ngIf="printer.mission == 'Adisyon'" class="col pr-2 pl-2 mb-2">
+              <button class="btn btn-warning btn-lg btn-block btn-specs" (click)="qrCode(printer)">{{printer.name}}</button>
             </div>
           </ng-container>
         </div>
@@ -556,14 +608,14 @@
               </p>
             </button>
           </div>
-          <div class="col pr-2 pl-2">
+          <!-- <div class="col pr-2 pl-2">
             <button data-toggle="modal" [disabled]="!check._id" data-dismiss="modal" (click)="qrCode()" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
               <i class="fa fa-qrcode"></i>
               <p class="mt-1 mb-1">
-                <b>QR Yazdır</b>
+                <b>QR qrCode</b>
               </p>
             </button>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="modal-footer">

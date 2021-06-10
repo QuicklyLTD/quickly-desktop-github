@@ -18,6 +18,10 @@
   width: auto !important;
 }
 
+.nav-link{
+  font-size: 1.40vw;
+}
+
 .nav-link.active {
   background-color: #4e5d6c;
   border-color: #43505e;
@@ -52,12 +56,19 @@
 .relativeTable {
   position: absolute !important;
   box-shadow: 1px 1px 4px rgb(43, 62, 80);
+  overflow:hidden;
 }
 
 .tableInfo {
   position: absolute;
   bottom: 5px;
   width: 85%;
+}
+
+.absTableInfo{
+  margin-top: 16px;
+  bottom: 5px;
+  width: 100%;
 }
 
 @media screen and (min-width: 900px) {

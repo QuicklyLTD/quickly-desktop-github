@@ -10,6 +10,11 @@ import { ConflictService } from './services/conflict.service';
 import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
 import { CallerIDService } from './providers/caller-id.service';
 import { ScalerService } from './providers/scaler.service';
+import { PrinterService } from './providers/printer.service';
+import { Order, OrderStatus, OrderType } from './mocks/order';
+import { Category } from './mocks/product.mock';
+import { Check, CheckProduct } from './mocks/check.mock';
+import { Table } from './mocks/table.mock';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +26,7 @@ import { ScalerService } from './providers/scaler.service';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.8.5';
+  version = '1.8.7';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -30,6 +35,9 @@ export class AppComponent implements OnInit {
   statusMessage: string;
   date: number;
 
+  printers: Array<any>;
+  categories: Array<Category>;
+
   //// App Settings ////
 
   activationStatus: boolean;
@@ -37,7 +45,7 @@ export class AppComponent implements OnInit {
   dayStatus: DayInfo;
 
 
-  constructor(private callerService: CallerIDService, private scalerService: ScalerService, private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService) {
+  constructor(private callerService: CallerIDService, private scalerService: ScalerService, private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService, private printerService: PrinterService) {
     this.date = Date.now();
     this.windowStatus = false;
     this.setupFinished = false;
@@ -51,6 +59,10 @@ export class AppComponent implements OnInit {
       this.settingsService.setLocalStorage();
       this.initAppSettings();
       this.initConnectivityAndTime();
+
+      this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
+
+
       // this.callerService.startCallerID();
       // this.callerService.testCall();
       // this.scalerService.startScaler();
@@ -201,14 +213,43 @@ export class AppComponent implements OnInit {
 
   orderListener() {
     console.log('Order Listener Process Started');
-    this.mainService.LocalDB['orders'].changes({ since: 'now', live: true, include_docs: true }).on('change', (res) => {
-      if (!this.onSync) {
-        console.log(res);
-        // setTimeout(() => {
-        //   this.electronService.reloadProgram();
-        // }, 5000);
-      }
-    });
+    this.mainService.getAllBy('settings', { key: 'Printers' }).then(prints => {
+      let printers = prints.docs[0].value;
+      this.mainService.LocalDB['orders'].changes({ since: 'now', live: true, include_docs: true }).on('change', (res) => {
+        if (!this.onSync) {
+          let Order: Order = res.doc;
+          if (Order.status == OrderStatus.APPROVED && Order.type !== OrderType.EMPLOOYEE) {
+            this.mainService.getAllBy('categories', {}).then(cats => {
+              let categories = cats.docs;
+              this.mainService.getData('checks', Order.check).then((check: Check) => {
+                this.mainService.getData('tables', check.table_id).then((table: Table) => {
+                  let orders: Array<CheckProduct> = check.products.filter(product => Order.timestamp == product.timestamp);
+                  if (orders.length > 0) {
+                    let splitPrintArray = [];
+                    orders.forEach((obj, index) => {
+                      let catPrinter = categories.filter(cat => cat._id == obj.cat_id)[0].printer || printers[0].name;
+                      let contains = splitPrintArray.some(element => element.printer.name == catPrinter);
+                      if (contains) {
+                        let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter);
+                        splitPrintArray[index].products.push(obj);
+                      } else {
+                        let thePrinter = printers.filter(obj => obj.name == catPrinter)[0];
+                        let splitPrintOrder = { printer: thePrinter, products: [obj] };
+                        splitPrintArray.push(splitPrintOrder);
+                      }
+                    });
+                    splitPrintArray.forEach(order => {
+                      this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + ' (Müşteri)');
+                    });
+                  };
+                });
+              });
+            })
+          }
+        }
+      });
+    })
+
   }
 
 

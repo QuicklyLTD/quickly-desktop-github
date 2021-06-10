@@ -2,8 +2,8 @@
   font-family: Quickly;
   margin-bottom: 3.8px;
   margin-top: 0px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10.5px;
+  padding-bottom: 10.5px;
   padding-right: 0px;
   padding-left: 0px;
   color: #000;
@@ -16,6 +16,33 @@
 .sellButton[disabled] {
   opacity: 0.6;
   color: rgba(0, 0, 0, 0.5);
+}
+
+.sendButton {
+  font-family: Quickly;
+  margin-bottom: 3.8px;
+  margin-top: 0px;
+  padding-top: 10.5px;
+  padding-bottom: 10.5px;
+  padding-right: 0px;
+  padding-left: 0px;
+  color: #000;
+  text-decoration: wavy;
+  i {
+    font-size: 7.4vh;
+  }
+}
+
+.sendButton[disabled] {
+  opacity: 0.6;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.sendButton{
+  p{
+    font-size: smaller;
+    margin: 0px !important;
+  }
 }
 
 .btn-specs {

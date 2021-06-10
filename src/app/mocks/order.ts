@@ -29,7 +29,8 @@ export class Order {
 export enum OrderType {
     INSIDE,
     OUTSIDE,
-    TAKEAWAY
+    TAKEAWAY,
+    EMPLOOYEE
 }
 
 export enum OrderStatus {

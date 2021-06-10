@@ -156,6 +156,7 @@ export class SellingScreenComponent implements OnInit {
     // }, 500)
   }
 
+
   ngOnDestroy() {
     this.changes.cancel();
     if (this.check.type == CheckType.ORDER && this.check.status == CheckStatus.PASSIVE) {
@@ -295,16 +296,13 @@ export class SellingScreenComponent implements OnInit {
         element.timestamp = timestamp;
       }
     });
-
     if (this.check.status !== CheckStatus.PASSIVE) {
       if (this.check.type == CheckType.NORMAL) {
         this.mainService.updateData('tables', this.id, { status: 2 });
       }
       this.mainService.updateData('checks', this.check_id, this.check).then(res => {
         if (res.ok) {
-
-          let newOrder = new Order(this.check._id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.INSIDE, timestamp)
-
+          let newOrder = new Order(this.check._id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.EMPLOOYEE, timestamp)
           this.newOrders.forEach(order => {
             let orderItem: OrderItem = {
               name: order.name,
@@ -314,19 +312,16 @@ export class SellingScreenComponent implements OnInit {
             }
             newOrder.items.push(orderItem);
           })
-
           this.mainService.addData('orders', newOrder).then(res => {
-            console.log(res);
+            let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
+            if (this.check.type == CheckType.NORMAL) {
+              this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
+            } else {
+              this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
+            }
           }).catch(err => {
             console.log(err);
           })
-
-          let pricesTotal = this.newOrders.map(obj => obj.price).reduce((a, b) => a + b);
-          if (this.check.type == CheckType.NORMAL) {
-            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.table.name} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
-          } else {
-            this.logService.createLog(logType.CHECK_UPDATED, this.check._id, `${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş eklendi.`);
-          }
         }
       });
     } else {
@@ -336,9 +331,7 @@ export class SellingScreenComponent implements OnInit {
       }
       this.mainService.addData('checks', this.check).then(res => {
         if (res.ok) {
-
-          let newOrder = new Order(res.id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.INSIDE, timestamp)
-
+          let newOrder = new Order(res.id, { id: this.ownerId, name: this.owner + ' ( Personel )' }, [], OrderStatus.APPROVED, OrderType.EMPLOOYEE, timestamp)
           this.newOrders.forEach(order => {
             let orderItem: OrderItem = {
               name: order.name,
@@ -348,18 +341,15 @@ export class SellingScreenComponent implements OnInit {
             }
             newOrder.items.push(orderItem);
           })
-
           this.mainService.addData('orders', newOrder).then(res => {
-            console.log(res);
+            if (this.check.type == CheckType.NORMAL) {
+              this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
+            } else {
+              this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
+            }
           }).catch(err => {
             console.log(err);
           })
-
-          if (this.check.type == CheckType.NORMAL) {
-            this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.table.name} Masasına '${this.owner}' tarafından hesap açıldı`);
-          } else {
-            this.logService.createLog(logType.CHECK_CREATED, res.id, `${this.check.note} Notlu Hızlı Hesap '${this.owner}' tarafından açıldı`);
-          }
         }
       });
     }
@@ -436,6 +426,23 @@ export class SellingScreenComponent implements OnInit {
         this.updateProductReport(this.countData);
         break;
     }
+  }
+
+  endCheck() {
+    this.message.sendConfirm('Dikkat! Hesap Kapatılacak.').then(isOK => {
+      if (isOK) {
+        let checkWillClose = new ClosedCheck(this.check.table_id, (this.check.total_price + this.check.discount) - 0, 0, this.check.owner, this.check.note, CheckStatus.OCCUPIED, this.check.products, this.check.timestamp, this.check.type, 'Parçalı', this.check.payment_flow, null, this.check.occupation);
+        this.mainService.addData('closed_checks', checkWillClose).then(res => {
+          this.updateSellingReport('Parçalı');
+        });
+        if (this.check._id !== undefined) {
+          this.mainService.removeData('checks', this.check._id);
+          this.mainService.updateData('tables', this.check.table_id, { status: 1 });
+          this.updateTableReport(this.check);
+        }
+        this.router.navigate(['/store']);
+      }
+    });
   }
 
   closeCheck(method: string) {
@@ -531,7 +538,7 @@ export class SellingScreenComponent implements OnInit {
           doc.weekly[this.day] += (this.check.total_price + this.check.discount) - general_discount;
           doc.weekly_count[this.day]++;
           doc.monthly[new Date().getMonth()] += (this.check.total_price + this.check.discount) - general_discount;
-          doc.monthly_count[new Date().getMonth()] ++;
+          doc.monthly_count[new Date().getMonth()]++;
           doc.timestamp = Date.now();
           this.mainService.updateData('reports', doc._id, doc);
         }
@@ -546,7 +553,7 @@ export class SellingScreenComponent implements OnInit {
           reportWillChange.weekly[this.day] += obj.amount;
           reportWillChange.weekly_count[this.day]++;
           reportWillChange.monthly[new Date().getMonth()] += obj.amount;
-          reportWillChange.monthly_count[new Date().getMonth()] ++;
+          reportWillChange.monthly_count[new Date().getMonth()]++;
           reportWillChange.timestamp = Date.now();
           if (this.check.payment_flow.length == index + 1) {
             sellingReports.forEach((report) => {
@@ -569,7 +576,7 @@ export class SellingScreenComponent implements OnInit {
       report.weekly[this.day] += this.check.total_price + this.check.discount;
       report.weekly_count[this.day]++;
       report.monthly[new Date().getMonth()] += this.check.total_price + this.check.discount;
-      report.monthly_count[new Date().getMonth()] ++;
+      report.monthly_count[new Date().getMonth()]++;
       this.mainService.updateData('reports', report._id, report);
     });
   }
@@ -719,7 +726,7 @@ export class SellingScreenComponent implements OnInit {
               reportWillChange.weekly[this.day] += obj.amount;
               reportWillChange.weekly_count[this.day]++;
               reportWillChange.monthly[new Date().getMonth()] += obj.amount;
-              reportWillChange.monthly_count[new Date().getMonth()] ++;
+              reportWillChange.monthly_count[new Date().getMonth()]++;
               reportWillChange.timestamp = Date.now();
               if (this.check.payment_flow.length == index + 1) {
                 sellingReports.forEach((report, dd) => {
@@ -823,7 +830,7 @@ export class SellingScreenComponent implements OnInit {
         doc.weekly[this.day] += pricesTotal;
         doc.weekly_count[this.day]++;
         doc.monthly[new Date().getMonth()] += pricesTotal;
-        doc.monthly_count[new Date().getMonth()] ++;
+        doc.monthly_count[new Date().getMonth()]++;
         if (doc.weekly_count[this.day] == 100) {
           this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
         }
@@ -844,7 +851,7 @@ export class SellingScreenComponent implements OnInit {
           doc.weekly[this.day] += obj.total;
           doc.weekly_count[this.day] += obj.count;
           doc.monthly[new Date().getMonth()] += obj.total;
-          doc.monthly_count[new Date().getMonth()] ++;
+          doc.monthly_count[new Date().getMonth()]++;
           return doc;
         });
       });
@@ -874,10 +881,43 @@ export class SellingScreenComponent implements OnInit {
   }
 
 
-  qrCode() {
-    let slug = 'kosmos-db15';
-    let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
-    this.printerService.printQRCode(this.printers[0], qrdata, this.table.name, this.owner);
+  qrCode(printer) {
+    $('#qrPrintersModal').modal('hide');
+    if (!printer) {
+      printer = this.printers[0];
+    }
+    const slug = 'kosmos-db15';
+    console.log(this.check)
+    if (this.check._id !== undefined) {
+      let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+      this.printerService.printQRCode(printer, qrdata, this.table.name, this.owner);
+    } else {
+      this.check.status = CheckStatus.OCCUPIED;
+      // this.check.type = CheckType.SELF;
+      if (this.check.products.some(obj => obj.status == 1)) {
+        this.check.products = this.check.products.filter(obj => obj.status !== 1);
+        this.mainService.addData('checks', this.check).then(res => {
+          this.mainService.updateData('tables', this.table._id, { status: 2, timestamp: Date.now() }).then(() => {
+            console.log(this.check._id);
+            setTimeout(() => {
+              let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+              this.printerService.printQRCode(printer, qrdata, this.table.name, this.owner);
+            }, 100)
+          });
+        })
+      } else {
+        this.mainService.addData('checks', this.check).then(res => {
+          this.mainService.updateData('tables', this.table._id, { status: 2, timestamp: Date.now() }).then(() => {
+            console.log(this.check._id);
+            setTimeout(() => {
+              let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+              this.printerService.printQRCode(printer, qrdata, this.table.name, this.owner);
+            }, 100)
+          });
+        })
+      }
+    }
+    this.router.navigate(['/store']);
   }
 
   printOrder() {
@@ -977,7 +1017,7 @@ export class SellingScreenComponent implements OnInit {
                             doc.amount += obj.amount;
                             doc.weekly[this.day] += obj.amount;
                             doc.monthly[new Date().getMonth()] += obj.amount;
-                            doc.monthly_count[new Date().getMonth()] ++;
+                            doc.monthly_count[new Date().getMonth()]++;
                             doc.timestamp = Date.now();
                             return doc;
                           });
@@ -1032,7 +1072,7 @@ export class SellingScreenComponent implements OnInit {
                       doc.amount += obj.amount;
                       doc.weekly[this.day] += obj.amount;
                       doc.monthly[new Date().getMonth()] += obj.amount;
-                      doc.monthly_count[new Date().getMonth()] ++;
+                      doc.monthly_count[new Date().getMonth()]++;
                       doc.timestamp = Date.now();
                       return doc;
                     });

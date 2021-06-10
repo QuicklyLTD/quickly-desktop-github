@@ -3,6 +3,7 @@ import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
 import * as escpos from 'escpos';
+import { Order } from 'app/mocks/order';
 
 @Injectable()
 export class PrinterService {
@@ -36,6 +37,22 @@ export class PrinterService {
       }
     });
     this.electron.ipcRenderer.send('printOrder', device, table, ordersArray, owner);
+  }
+
+  printTableOrder(device, table, order: Order) {
+    let ordersArray = [];
+    order.items.forEach(element => {
+      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
+      if (contains) {
+        let index = ordersArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        ordersArray[index].price += element.price;
+        ordersArray[index].count++;
+      } else {
+        let schema = { name: element.name, note: element.note, price: element.price, count: 1 };
+        ordersArray.push(schema);
+      }
+    });
+    this.electron.ipcRenderer.send('printOrder', device, table, ordersArray, order.user.name);
   }
 
   printCheck(device, table, check) {

@@ -2,13 +2,15 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import { MainService } from '../../services/main.service';
 import { Router } from '@angular/router';
 import { Floor, Table } from '../../mocks/table.mock';
-import { Check, CheckProduct, CheckType } from '../../mocks/check.mock';
-import { Order, OrderItem, OrderStatus, OrderType } from '../../mocks/order';
-import { Ingredient, Product } from 'app/mocks/product.mock';
+import { Check, CheckProduct, CheckType, PaymentStatus } from '../../mocks/check.mock';
+import { Order, OrderItem, OrderStatus, OrderType, User } from '../../mocks/order';
+import { Ingredient, Product } from '../../mocks/product.mock';
 import { SettingsService } from '../../services/settings.service';
-import { Stock } from 'app/mocks/stocks.mock';
-import { Report } from 'app/mocks/report.mock';
-import { DayInfo } from 'app/mocks/settings.mock';
+import { Stock } from '../../mocks/stocks.mock';
+import { Report } from '../../mocks/report.mock';
+import { DayInfo } from '../../mocks/settings.mock';
+import { logType } from '../../services/log.service';
+import { Receipt, ReceiptMethod, ReceiptStatus, ReceiptType } from '../../mocks/receipt';
 
 export interface CountData { product: string; count: number; total: number; };
 
@@ -29,14 +31,21 @@ export class StoreComponent implements OnInit {
   deliveryChecks: Array<Check> = [];
 
   products: Array<Product> = [];
+
   orders: Array<Order> = [];
   ordersView: Array<Order> = [];
 
-  selected: string;
+  receipts: Array<Receipt> = [];
+  receiptsView: Array<Receipt> = [];
+
   tableChanges: any;
   checkChanges: any;
   orderChanges: any;
+  receiptChanges: any;
+
+  selected: string;
   section: any;
+
   closedDelivery: Array<any>;
 
   owner: any;
@@ -72,6 +81,12 @@ export class StoreComponent implements OnInit {
         this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
       });
     });
+    this.receiptChanges = this.mainService.LocalDB['receipts'].changes({ since: 'now', live: true }).on('change', (change) => {
+      this.mainService.getAllBy('receipts', {}).then((result) => {
+        this.receipts = result.docs;
+        this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == ReceiptStatus.WAITING || order.status == ReceiptStatus.READY)
+      });
+    });
     this.tableChanges = this.mainService.LocalDB['tables'].changes({ since: 'now', live: true }).on('change', (change) => {
       this.mainService.getAllBy('tables', {}).then((result) => {
         this.tables = result.docs;
@@ -89,6 +104,7 @@ export class StoreComponent implements OnInit {
     this.tableChanges.cancel();
     this.checkChanges.cancel();
     this.orderChanges.cancel();
+    this.receiptChanges.cancel();
   }
 
   changeSection(section) {
@@ -152,7 +168,7 @@ export class StoreComponent implements OnInit {
   }
 
   acceptOrder(order: Order) {
-    order.status = 1;
+    order.status = OrderStatus.PREPARING;
     this.mainService.updateData('orders', order._id, { status: OrderStatus.PREPARING }).then(res => {
       console.log(res);
     }).catch(err => {
@@ -161,7 +177,7 @@ export class StoreComponent implements OnInit {
   }
 
   approoveOrder(order: Order) {
-    order.status = 2;
+    order.status = OrderStatus.APPROVED;
     let approveTime = Date.now();
     let CountData: Array<CountData> = [];
     this.mainService.changeData('checks', order.check, (check: Check) => {
@@ -186,12 +202,135 @@ export class StoreComponent implements OnInit {
   }
 
   cancelOrder(order: Order) {
-    order.status = 3;
+    order.status = OrderStatus.CANCELED;
     this.mainService.updateData('orders', order._id, { status: OrderStatus.CANCELED }).then(res => {
       console.log(res);
     }).catch(err => {
       console.log(err);
     })
+  }
+
+  acceptReceipt(receipt: Receipt) {
+    receipt.status = ReceiptStatus.READY;
+    receipt.timestamp = Date.now();
+    this.mainService.updateData('receipts', receipt._id, { status: ReceiptStatus.READY }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  approoveReceipt(receipt: Receipt) {
+    // const orderRequestType: any = this.checks.find(check => check._id == receipt.check);
+    // switch (receipt.type == ReceiptType.) {
+    // case 'checks':
+    let Check: Check = this.checks.find(check => check._id == receipt.check);
+    let User: User = receipt.user;
+    let userItems = receipt.orders.filter(order => order.status == OrderStatus.APPROVED);
+
+    userItems.map(obj => {
+      obj.status = OrderStatus.PAYED;
+      return obj;
+    })
+
+    let productsWillPay: Array<CheckProduct> = Check.products.filter(product => userItems.map(obj => obj.timestamp).includes(product.timestamp));
+
+    let receiptMethod: 'Nakit' | 'Kart' | 'Kupon' | 'İkram' = (receipt.method == ReceiptMethod.CARD ? 'Kart' : receipt.method == ReceiptMethod.CASH ? 'Nakit' : receipt.method == ReceiptMethod.COUPON ? 'Kupon' : 'İkram')
+
+    const newPayment: PaymentStatus = { owner: User.name, method: receiptMethod, amount: receipt.total, discount: receipt.discount, timestamp: Date.now(), payed_products: productsWillPay };
+
+    if (Check.payment_flow == undefined) {
+      Check.payment_flow = [];
+    }
+
+    Check.payment_flow.push(newPayment);
+    Check.discount += newPayment.amount;
+    Check.products = Check.products.filter(product => !productsWillPay.includes(product));
+    Check.total_price = Check.products.map(product => product.price).reduce((a, b) => a + b, 0);
+
+
+    receipt.status = ReceiptStatus.APPROVED;
+    receipt.timestamp = Date.now();
+
+    this.mainService.LocalDB['allData'].bulkDocs(userItems).then(order_res => {
+
+      this.mainService.updateData('receipts', receipt._id, { status: ReceiptStatus.APPROVED, timestamp: Date.now() }).then(isOK => {
+
+        this.mainService.updateData('checks', Check._id, Check).then(isCheckUpdated => {
+          if (isCheckUpdated.ok) {
+
+          }
+
+        }).catch(err => {
+          console.log('Check Update Error on Payment Process', err);
+        })
+      }).catch(err => {
+        console.log('Receipt Update Error on Payment Process', err);
+      })
+    }).catch(err => {
+      console.log('Orders Update Error on Payment Process', err);
+    })
+    //   break;
+    // case 'customers':
+    //   let Customer = orderRequestType;
+    //   receipt.status = ReceiptStatus.APPROVED;
+    //   delete receipt.orders[0]._rev;
+    //   this.mainService.LocalDB['allData'].put(receipt.orders[0]).then(order_res => {
+    //     receipt.orders[0].status = OrderStatus.PREPARING;
+    //     delete receipt._rev;
+    //     this.mainService.LocalDB['allData'].put(receipt).then(isOk => {
+    //     }).catch(err => {
+    //       console.log(err);
+    //     })
+    //   }).catch(err => {
+    //     console.log(err);
+    //   })
+    //   break;
+    // default:
+    //   break;
+    // }
+  }
+
+  cancelReceipt(receipt: Receipt) {
+    receipt.status = ReceiptStatus.CANCELED;
+    receipt.timestamp = Date.now();
+    this.mainService.updateData('receipts', receipt._id, { status: ReceiptStatus.CANCELED }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  paymentNote(method: ReceiptMethod): string {
+    switch (method) {
+      case ReceiptMethod.CASH:
+        return "Nakit";
+      case ReceiptMethod.CARD:
+        return "Kredi Kartı";
+      case ReceiptMethod.COUPON:
+        return "Yemek Kartı - Kupon";
+      case ReceiptMethod.MOBILE:
+        return "Mobil Ödeme";
+      case ReceiptMethod.CRYPTO:
+        return "Bitcoin";
+      default:
+        break;
+    }
+  }
+
+  paymentStatus(status: ReceiptStatus): string {
+    switch (status) {
+      case ReceiptStatus.WAITING:
+        return "Onay Bekliyor";
+      case ReceiptStatus.READY:
+        return "İşlemde";
+      case ReceiptStatus.APPROVED:
+        return "Onaylandı";
+      case ReceiptStatus.CANCELED:
+        return "İptal Edildi";
+      default:
+        break;
+    }
   }
 
   fillData() {
@@ -223,6 +362,10 @@ export class StoreComponent implements OnInit {
       this.orders = res.docs;
       this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
     })
+    this.mainService.getAllBy('receipts', {}).then(res => {
+      this.receipts = res.docs;
+      this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(receipt => receipt.status == ReceiptStatus.WAITING || receipt.status == ReceiptStatus.READY)
+    })
     this.mainService.getAllBy('tables', {}).then((result) => {
       this.tables = result.docs;
       this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name, 'tr', { numeric: true, sensitivity: 'base' }));
@@ -239,6 +382,11 @@ export class StoreComponent implements OnInit {
     });
   }
 
+  findTable(check_id: string) {
+    const check = this.checks.find(obj => obj._id == check_id);
+    const table = this.tables.find(obj => obj._id == check.table_id);
+    return table.name;
+  }
 
   countProductsData = (counDataArray: Array<CountData>, id: string, price: number, manuelCount?: number): Array<CountData> => {
     let countObj: CountData;
