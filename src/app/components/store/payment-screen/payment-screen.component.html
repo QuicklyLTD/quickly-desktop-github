@@ -52,7 +52,10 @@
               </div>
               <div class="col-xl-6 col-lg-6 pl-1 pr-0">
                 <div class="card inside-height">
-                  <div class="card-header"><b>Ödenecek Ürünler</b></div>
+                  <div class="card-header pr-2">
+                    <b>Ödenecek Ürünler</b>
+                    <i *ngIf="productsWillPay.length > 0" data-toggle="modal" data-target="#calculator" class="fa fa-calculator pull-right" style="font-size: 1.5em;" aria-hidden="true"></i>
+                  </div>
                   <div class="card-body p-2 check-flow dark-bg">
                     <div *ngFor="let item of productsWillPay" class="animated slideInLeft">
                       <div *ngIf="item.status == 2" style="cursor:pointer" (click)="addProductToCheck(item)" class="check-product text-danger mb-0">
@@ -263,6 +266,51 @@
           <div *ngFor="let item of discounts;" class="col-lg-4 mb-2 pr-1 pl-1">
             <button type="button" (click)="setDiscount(item)" class="btn btn-primary btn-block btn-lg btn-discount">{{item}}
               %</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="calculator" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Ödeme Bölme</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <div class="input-group">
+              <!-- <input type="number" [value]="priceWillPay" min="1" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg"> -->
+              <div class="input-group-append normal">
+                <div class="input-group-text">
+                  Bölünecek Tutar:
+                </div>
+              </div>
+              <div class="input-group-append normal">
+                <div class="input-group-text">
+                  <h2 style="font-weight: bold; width: 100%;" class="m-0 text-right">{{priceWillPay | price }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-lg-12 pr-3 pl-3">
+            <h4>Bölüm Sayısı:</h4>
+          </div>
+        </div>
+        <div class="row mt-4 pr-2 pl-2">
+          <div *ngFor="let item of [2,3,4,5];" class="col-lg-3 mb-2 pr-1 pl-1">
+            <button type="button" (click)="divideWillPay(item)" class="btn btn-outline-warning btn-block btn-lg btn-discount">{{item}}</button>
           </div>
         </div>
       </div>

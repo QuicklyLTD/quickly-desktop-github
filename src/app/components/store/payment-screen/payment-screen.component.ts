@@ -262,6 +262,14 @@ export class PaymentScreenComponent implements OnInit {
     $('#discount').modal('hide');
   }
 
+
+  divideWillPay(division: number) {
+      this.payedPrice = this.priceWillPay / division;
+      this.setChange();
+      this.numpad = this.payedPrice.toString();
+      $('#calculator').modal('hide');
+  }
+
   togglePayed() {
     if (this.payedShow) {
       this.payedShow = false;
@@ -454,7 +462,7 @@ export class PaymentScreenComponent implements OnInit {
       if (res.value.ask_print_check == 'Sor') {
         this.askForPrint = true;
       } else {
-        this.askForPrint = false; 
+        this.askForPrint = false;
       }
     });
     this.mainService.getAllBy('customers', {}).then(res => {

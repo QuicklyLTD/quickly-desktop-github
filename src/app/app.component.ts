@@ -26,7 +26,7 @@ import { Table } from './mocks/table.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.8.7';
+  version = '1.9.0';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;

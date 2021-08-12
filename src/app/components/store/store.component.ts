@@ -50,6 +50,8 @@ export class StoreComponent implements OnInit {
 
   owner: any;
   ownerId: any;
+  waitingOrders: number = 0;
+  waitingReceipts: number = 0;
 
   constructor(private mainService: MainService, private router: Router, private settingsService: SettingsService) {
 
@@ -76,15 +78,17 @@ export class StoreComponent implements OnInit {
       });
     });
     this.orderChanges = this.mainService.LocalDB['orders'].changes({ since: 'now', live: true }).on('change', (change) => {
-      this.mainService.getAllBy('orders', {}).then((result) => {
+      this.mainService.getAllBy('orders', { type: { $ne: OrderType.EMPLOOYEE } }).then((result) => {
         this.orders = result.docs;
         this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
+        this.waitingOrders = this.ordersView.length;
       });
     });
     this.receiptChanges = this.mainService.LocalDB['receipts'].changes({ since: 'now', live: true }).on('change', (change) => {
       this.mainService.getAllBy('receipts', {}).then((result) => {
         this.receipts = result.docs;
         this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == ReceiptStatus.WAITING || order.status == ReceiptStatus.READY)
+        this.waitingReceipts = this.receiptsView.length;
       });
     });
     this.tableChanges = this.mainService.LocalDB['tables'].changes({ since: 'now', live: true }).on('change', (change) => {
@@ -118,10 +122,14 @@ export class StoreComponent implements OnInit {
       localStorage.setItem('selectedFloor', JSON.stringify(id));
       this.tableViews = this.tables.filter(obj => obj.floor_id == id);
       this.checksView = this.checks.filter(({ table_id }) => this.tableViews.some(table => table._id == table_id));
+      this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING).filter(({ check }) => this.checksView.some(obj => obj._id == check));
+      this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(receipt => receipt.status == ReceiptStatus.WAITING || receipt.status == ReceiptStatus.READY).filter(({ check }) => this.checksView.some(obj => obj._id == check));
     } else {
       this.selected = '';
       this.tableViews = this.tables;
       this.checksView = this.checks;
+      this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING);
+      this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(receipt => receipt.status == ReceiptStatus.WAITING || receipt.status == ReceiptStatus.READY);
       localStorage.removeItem('selectedFloor');
     }
   }
@@ -148,6 +156,8 @@ export class StoreComponent implements OnInit {
     let regexp = new RegExp(value, 'i');
     this.tableViews = this.tables.filter(({ name }) => name.match(regexp));
     this.checksView = this.checks.filter(({ table_id }) => this.tableViews.some(table => table._id == table_id));
+    this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING).filter(({ check }) => this.checksView.some(obj => obj._id == check));
+    this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(receipt => receipt.status == ReceiptStatus.WAITING || receipt.status == ReceiptStatus.READY).filter(({ check }) => this.checksView.some(obj => obj._id == check));
   }
 
   statusNote(status: OrderStatus): string {
@@ -333,6 +343,11 @@ export class StoreComponent implements OnInit {
     }
   }
 
+  isOwner(check_id: string) {
+    const checkThatProcess = this.checks.find(obj => obj._id == check_id);
+    return (checkThatProcess.owner == this.owner ? true : false);
+  }
+
   fillData() {
     this.selected = '';
     this.mainService.getAllBy('products', {}).then((result) => {
@@ -358,13 +373,15 @@ export class StoreComponent implements OnInit {
         console.log(error);
       }
     })
-    this.mainService.getAllBy('orders', {}).then(res => {
+    this.mainService.getAllBy('orders', { type: { $ne: OrderType.EMPLOOYEE }}).then(res => {
       this.orders = res.docs;
       this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING)
+      this.waitingOrders = this.ordersView.length;
     })
     this.mainService.getAllBy('receipts', {}).then(res => {
       this.receipts = res.docs;
       this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(receipt => receipt.status == ReceiptStatus.WAITING || receipt.status == ReceiptStatus.READY)
+      this.waitingReceipts = this.receiptsView.length;
     })
     this.mainService.getAllBy('tables', {}).then((result) => {
       this.tables = result.docs;

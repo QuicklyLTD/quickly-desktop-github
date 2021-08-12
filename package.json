@@ -1,6 +1,6 @@
 {
   "name": "quickly-desktop",
-  "version": "1.8.7",
+  "version": "1.9.0",
   "description": "QDesktop",
   "homepage": "https://quickly.com.tr",
   "author": {
@@ -26,12 +26,14 @@
     "electron:linux": "npm run build:prod && npx electron-builder build --linux",
     "electron:windows": "npm run build:prod && npx electron-builder build --windows",
     "electron:mac": "npm run build:prod && npx electron-builder build --mac",
-    "release": "rm -rf app-builds && run-s electron:linux",
+    "release": "rm -rf app-builds && run-s -c electron:linux package",
     "package": "cd app-builds && mv linux-unpacked App &&  zip -r App.zip App",
     "test": "karma start ./karma.conf.js",
     "pree2e": "webdriver-manager update --standalone false --gecko false --quiet && npm run build",
     "e2e": "protractor ./protractor.conf.js",
-    "compodoc": "./node_modules/.bin/compodoc -p ./tsconfig.json"
+    "compodoc": "./node_modules/.bin/compodoc -p ./tsconfig.json",
+    "upload":"scp -r ./app-builds/App.zip root@quickly.com.tr:/var/www/cdn.quickly.com.tr/app",
+    "publish": "npm-run-all -s -c release package upload"
   },
   "dependencies": {
     "@angular/common": "5.0.3",
