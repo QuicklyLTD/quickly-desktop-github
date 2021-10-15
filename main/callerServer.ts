@@ -4,9 +4,9 @@ const proc = require('child_process');
 var i = 0;
 
 ipcMain.on('startCaller', (event) => {
-    const shell = proc.spawn('unbuffer', [__dirname + '/cidshow']);
+    const shell = proc.spawn('unbuffer', ['/home/quickly/App' + '/cidshow']);
 
-    event.sender.send('callerPath', __dirname + '/cidshow');
+    event.sender.send('callerPath', '/home/quickly/App' + '/cidshow');
 
     shell.stdout.on('data', (data) => {
         event.sender.send('callerError', data);

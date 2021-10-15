@@ -281,10 +281,46 @@ export class EndofthedayComponent implements OnInit {
       this.mainService.removeAll('logs', {}).then(() => {
         this.mainService.removeAll('allData', { db_name: 'logs' }).then(() => {
           this.progress = 'Kayıtlar Temizlendi...';
+          this.stepOrders();
+        });
+      });
+    }).catch(err => {
+      console.log('Logs Clearing Error:', err)
+    })
+  }
+
+  stepOrders() {
+    this.mainService.getAllBy('orders', {}).then(res => {
+      this.progress = 'Siparişler Yedekleniyor...';
+      this.logs = res.docs;
+      const logsBackup = new BackupData('orders', this.logs);
+      this.backupData.push(logsBackup);
+      this.mainService.removeAll('orders', {}).then(() => {
+        this.mainService.removeAll('allData', { db_name: 'orders' }).then(() => {
+          this.progress = 'Siparişler Temizlendi...';
+          this.stepReceipts();
+        });
+      });
+    }).catch(err => {
+      console.log('Orders Clearing Error:', err)
+    })
+  }
+
+  stepReceipts() {
+    this.mainService.getAllBy('receipts', {}).then(res => {
+      this.progress = 'Ödemeler Yedekleniyor...';
+      this.logs = res.docs;
+      const logsBackup = new BackupData('receipts', this.logs);
+      this.backupData.push(logsBackup);
+      this.mainService.removeAll('receipts', {}).then(() => {
+        this.mainService.removeAll('allData', { db_name: 'receipts' }).then(() => {
+          this.progress = 'Ödemeler Temizlendi...';
           this.stepFinal();
         });
       });
-    });
+    }).catch(err => {
+      console.log('Receipts Clearing Error:', err)
+    })
   }
 
   stepFinal() {
@@ -312,7 +348,9 @@ export class EndofthedayComponent implements OnInit {
           }, 5000);
         }
       });
-    });
+    }).catch(err => {
+      console.log('Final Step Error: Document Post Error',err);
+    })
   }
 
 

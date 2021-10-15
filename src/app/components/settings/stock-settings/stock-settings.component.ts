@@ -83,13 +83,13 @@ export class StockSettingsComponent implements OnInit {
     if (!form.name) {
       this.messageService.sendMessage('Stok Adı Belirtmelisiniz');
       return false;
-    } else if (!form.cat_id) {
+    } else if (!form.category) {
       this.messageService.sendMessage('Kategori Seçmelisiniz');
       return false;
     }
     if (form._id == undefined) {
       let left_total = form.total * form.quantity;
-      let schema = new Stock(form.name, form.description, form.cat_id, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * form.warning_value / 100, form.warning_value, Date.now());
+      let schema = new Stock(form.name, form.description, form.category, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * form.warning_value / 100, form.warning_value, Date.now());
       this.mainService.addData('stocks', schema).then((res) => {
         this.logService.createLog(logType.STOCK_CREATED, res.id, `${form.name} adlı Stok oluşturuldu.`);
         this.fillData();

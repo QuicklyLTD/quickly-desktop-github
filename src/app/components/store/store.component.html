@@ -23,6 +23,10 @@
                   <span *ngIf="checks.length > 0" class="badge bg-danger">{{checks?.length}}</span>
                 </a>
               </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': section == 'Paket Servis'}" (click)="changeSection('Kroki')">
+                  <i class="fa fa-motorcycle" aria-hidden="true"></i> Paket Servis</a>
+              </li> -->
               <li class="nav-item">
                 <a class="nav-link" [ngClass]="{'active': section == 'Siparişler'}" (click)="changeSection('Siparişler')">
                   <i class="fa fa-paper-plane" aria-hidden="true"></i>

@@ -6,6 +6,7 @@
   <base href="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
 </head>
 <body>
   <app-root>
@@ -13,5 +14,23 @@
       <img src="assets/logo.svg" style="position: absolute;top:25%;left:25%;height:50vh;width:50vw;margin-left:23vw;margin-right:auto;" alt="">
     </div>
   </app-root>
+  <script>
+    function handleNonLeftClick (e) {
+      e.preventDefault();
+      // e.button will be 1 for the middle mouse button.
+      // if (e.button === 1) {
+      //   console.log('test');
+      //     // Check if it is a link (a) element; if so, prevent the execution.
+      //     if (e.target.tagName.toLowerCase() === "a") {
+            
+      //         e.preventDefault();
+      //     }
+      // }
+    }
+    window.onload = () => {
+        // Attach the listener to the whole document.
+        document.addEventListener("auxclick", handleNonLeftClick);
+    }
+  </script>
 </body>
 </html>

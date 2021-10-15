@@ -130,6 +130,11 @@ export class PrinterService {
     this.electron.ipcRenderer.send('printQRcode', device, data, table, owner);
   }
 
+  kickCashdraw(device) {
+    console.log('kickMustWork',device)
+    this.electron.ipcRenderer.send('kickCashdraw', device);
+  }
+
   getUSBPrinters() {
     return escpos.USB.findPrinter();
   }

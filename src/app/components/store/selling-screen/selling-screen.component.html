@@ -251,7 +251,7 @@
                   <button *ngIf="this.check.type == 1 || this.check.type == 2" (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
                   <button *ngIf="this.check.type == 1 || this.check.type == 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
 
-                  <button *ngIf="this.check.type == 1 && check.payment_flow && check.total_price == 0" (click)="endCheck()" [disabled]="check?.payment_flow.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-success" ><strong><i style="font-size: 1.5em;" class="fa fa-check-square animated tada slow infinite"></i></strong></button>
+                  <button *ngIf="this.check.type == 1 && check.payment_flow && check.total_price == 0" (click)="endCheck()" [disabled]="check?.payment_flow.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-success"><strong><i style="font-size: 1.5em;" class="fa fa-check-square animated tada slow infinite"></i></strong></button>
 
                   <button *ngIf="this.check.type == 5" [routerLink]="['/store']" class="btn btn-secondary btn-lg btn-block"><strong><i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</strong></button>
                   <button *ngIf="this.check.type == 5 && this.check.status !== 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
@@ -331,7 +331,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
           <button type="button" (click)="dontGive()" class="btn btn-warning btn-lg">Verme</button>
-          <button type="button" (click)="makeGift()" class="btn btn-danger btn-lg">İkram</button>
+          <button *ngIf="permissions.discount" type="button" (click)="makeGift()" class="btn btn-danger btn-lg">İkram</button>
           <button type="submit" class="btn btn-primary btn-lg">Not Ekle</button>
         </div>
       </form>
@@ -518,12 +518,15 @@
       </div>
       <div class="modal-body p-0">
         <div class="card">
-          <div class="card-header">Miktar</div>
-          <div class="card-body p-0">
+          <!-- <div class="card-header">Miktar</div> -->
+          <div class="card-body p-0" class="tareClass">
             <div class="input-group">
               <input #specsInput type="text" readonly class="form-control form-control-lg" [ngModel]="numpad" />
               <div class="input-group-append normal">
                 <div #specsUnit class="input-group-text">{{productStock?.stock_id | general:'stocks':'unit' | async}}</div>
+              </div>
+              <div class="input-group-append normal">
+                <button type="button" (click)="tareScaler()" class="btn btn-lg btn-danger btn-block">Dara</button>
               </div>
             </div>
           </div>

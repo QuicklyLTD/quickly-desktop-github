@@ -26,7 +26,7 @@ import { Table } from './mocks/table.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.9.0';
+  version = '1.9.2';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -146,33 +146,8 @@ export class AppComponent implements OnInit {
                 this.loadFromBackup();
               });
             } else if (this.serverSettings.type == 1) {
-
               ////// İkincil Ekran //////
-              console.log('Server Replicating Started!')
-              const syncing = this.mainService.replicateDB(this.serverSettings)
-                .on('change', (sync) => {
-                  this.statusMessage = `${sync.docs_written} - Senkronize Ediliyor `;
-                }).on('complete', () => {
-                  setTimeout(() => this.appDataInitializer(), 2000);
-                })
-                .on('active', () => {
-                  console.log('active')
-                })
-                .on('denied', (ass) => {
-                  console.log(ass, 'denied')
-                })
-                .on('error', (err) => {
-                  console.log(err);
-                }).catch(err => {
-                  console.warn('Server Replicating Error:', err);
-                  this.hasError = true;
-                  this.electronService.openDevTools();
-                  setTimeout(() => {
-                    this.electronService.relaunchProgram();
-                  }, 10000);
-                });
-
-
+              this.serverReplication();
             }
           } else {
             if (this.serverSettings.type == 0) {
@@ -208,7 +183,36 @@ export class AppComponent implements OnInit {
     if (this.serverSettings.type == 0) {
       setTimeout(() => this.orderListener(), 10000)
     }
-    this.commandListener();
+    // this.commandListener();
+  }
+
+
+  serverReplication(){
+    this.hasError = false;
+    console.log('Server Replicating Started!')
+    this.mainService.replicateDB(this.serverSettings)
+      .on('change', (sync) => {
+        this.statusMessage = `${sync.docs_written} - Senkronize Ediliyor `;
+      }).on('complete', () => {
+        setTimeout(() => this.appDataInitializer(), 2000);
+      })
+      .on('active', () => {
+        console.log('active')
+      })
+      .on('denied', (ass) => {
+        console.log(ass, 'denied')
+      })
+      .on('error', (err) => {
+        console.log(err);
+      }).catch(err => {
+        console.warn('Server Replicating Error:', err);
+        this.hasError = true;
+        this.electronService.openDevTools();
+        this.serverReplication();
+        // setTimeout(() => {
+        //   this.electronService.relaunchProgram();
+        // }, 10000);
+      });
   }
 
   orderListener() {
@@ -258,8 +262,30 @@ export class AppComponent implements OnInit {
       if (this.dayStatus.started) {
         this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
       } else {
-        this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
-        this.findAppSettings();
+        this.mainService.RemoteDB.find({ selector: { db_name:'settings', key: 'DateSettings' }, limit:5000 }).then((res) => {
+          let serverDate: DayInfo = res.docs[0].value;
+          if (serverDate.started) {
+            this.mainService.getData('settings',res.docs[0]._id).then(settingsDoc => {
+              this.mainService.LocalDB['settings'].get(settingsDoc._id).then(localDoc => {
+                localDoc.value = serverDate;
+                this.mainService.LocalDB['settings'].put(localDoc).then(isUpdated => {
+                  this.electronService.reloadProgram();
+                }).catch(err => {
+                  console.log(err);
+                })
+              }).catch(err => {
+                 console.log(err);
+              })
+            }).catch(err => {
+              console.log(err);
+            })
+          } else {
+            this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
+          }
+        }).catch(err => {
+          this.dayCheck();
+        })
+        // this.findAppSettings();
       }
     }
   }
@@ -323,7 +349,8 @@ export class AppComponent implements OnInit {
         if (res.ok) {
           this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program kapatılacak.', 'success');
           setTimeout(() => {
-            this.electronService.shellCommand('shutdown now');
+            // this.electronService.shellCommand('shutdown now');
+            this.electronService.relaunchProgram();
             console.log('Endday Finished')
           }, 5000);
         }

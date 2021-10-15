@@ -135,17 +135,27 @@ export class AdminComponent implements OnInit {
   }
 
   refreshToken() {
+    // let username = prompt('username');
+    // let password = prompt('password');
+
     let oldToken = localStorage['AccessToken'];
-    this.httpService.post('token/refresh/', { token: oldToken })
-      .subscribe(res => {
+    this.httpService.post('/store/refresh', null, oldToken).toPromise().then(res => {
         if (res.ok) {
           const token = res.json().token;
           localStorage.setItem('AccessToken', token);
           alert('İşlem Başarılı');
-        } else {
-          alert('Başarısız');
         }
-      });
+      }).catch(err => {
+        this.httpService.post('/store/login',{ username:'quickly', password:'asdtd155+1' }).toPromise().then(res => {
+          if (res.ok) {
+            const token = res.json().token;
+            localStorage.setItem('AccessToken', token);
+            alert('İşlem Başarılı');
+          } else {
+            alert('Başarısız');
+          }
+        })
+      })
   }
 
   resolveDB() {

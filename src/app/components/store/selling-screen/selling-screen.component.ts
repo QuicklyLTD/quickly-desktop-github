@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, NgZone } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Order, OrderItem, OrderStatus, OrderType } from '../../../mocks/order';
@@ -12,6 +12,8 @@ import { PrinterService } from '../../../providers/printer.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
+import { ScalerService } from '../../../providers/scaler.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-selling-screen',
@@ -66,12 +68,15 @@ export class SellingScreenComponent implements OnInit {
   discounts: Array<number>;
   selectedQuantity: number;
   takeaway: boolean;
+  readyNotes: string[] = [];
+  scalerListener: Subscription;
+  tareNumber: number;
+
   @ViewChild('productName') productFilterInput: ElementRef;
   @ViewChild('specsUnit') productUnit: ElementRef;
   @ViewChild('noteInput') noteInput: ElementRef;
-  readyNotes: string[] = [];
 
-  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settingsService: SettingsService, private logService: LogService) {
+  constructor(private mainService: MainService, private printerService: PrinterService, private route: ActivatedRoute, private router: Router, private electron: ElectronService, private message: MessageService, private settingsService: SettingsService, private scalerService: ScalerService, private logService: LogService, private zone: NgZone) {
     this.owner = this.settingsService.getUser('name');
     this.ownerRole = this.settingsService.getUser('type');
     this.ownerId = this.settingsService.getUser('id');
@@ -130,6 +135,7 @@ export class SellingScreenComponent implements OnInit {
     if (localStorage.getItem('selectedFloor')) {
       this.selectedFloor = JSON.parse(localStorage['selectedFloor']);
     }
+    this.tareNumber = 0;
   }
 
   ngOnInit() {
@@ -149,11 +155,19 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     });
-    // setTimeout(() => {
-    //   if (this.check.status == CheckStatus.PASSIVE) {
-    //     $('#occupationModal').modal('show');
-    //   }
-    // }, 500)
+    setTimeout(() => {
+      if (this.check.status == CheckStatus.PASSIVE) {
+        $('#occupationModal').modal('show');
+      }
+    }, 500)
+
+    this.zone.run(() => {
+      let unsub = () => this.scalerListener.unsubscribe();
+      $('#productSpecs').on('hide.bs.modal', function (event) {
+        unsub();
+      })
+    })
+
   }
 
 
@@ -215,6 +229,11 @@ export class SellingScreenComponent implements OnInit {
     }
   }
 
+
+  tareScaler() {
+    this.tareNumber = this.numpad;
+  }
+
   addToCheck(product: Product) {
     // this.selectedIndex = undefined;
     // this.selectedProduct = undefined;
@@ -224,6 +243,18 @@ export class SellingScreenComponent implements OnInit {
       this.mainService.getAllBy('recipes', { product_id: product._id }).then(res => {
         this.productStock = res.docs[0].recipe[0];
         this.numpad = this.productStock.amount;
+        this.scalerListener = this.scalerService.listenScalerEvent().subscribe((weight: number) => {
+          if (weight && weight !== 0) {
+            this.numpad = weight * this.productStock.amount;
+
+            console.log
+
+            if (this.tareNumber !== 0) {
+              this.numpad = this.numpad - this.tareNumber;
+            }
+
+          }
+        })
       });
       $('#productSpecs').modal('show');
     } else {
@@ -272,6 +303,8 @@ export class SellingScreenComponent implements OnInit {
       this.newOrders.push(newProduct);
     }
     this.countProductsData(this.productWithSpecs._id, newAmount, countFor);
+    this.tareNumber = 0;
+    this.numpad = 0;
     $('#productSpecs').modal('hide');
   }
 
@@ -446,6 +479,9 @@ export class SellingScreenComponent implements OnInit {
   }
 
   closeCheck(method: string) {
+    if (method == 'Nakit') {
+      this.printerService.kickCashdraw(this.printers[0])
+    }
     let total_discounts = 0;
     let general_discount = 0;
     if (this.check.payment_flow) {
@@ -886,10 +922,10 @@ export class SellingScreenComponent implements OnInit {
     if (!printer) {
       printer = this.printers[0];
     }
-    const slug = 'kosmos-db15';
+    const slug = localStorage.getItem('Slug')
     console.log(this.check)
     if (this.check._id !== undefined) {
-      let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+      let qrdata = `https://quickly.cafe/${slug}/${this.check._id}`;
       this.printerService.printQRCode(printer, qrdata, this.table.name, this.owner);
     } else {
       this.check.status = CheckStatus.OCCUPIED;
@@ -900,7 +936,7 @@ export class SellingScreenComponent implements OnInit {
           this.mainService.updateData('tables', this.table._id, { status: 2, timestamp: Date.now() }).then(() => {
             console.log(this.check._id);
             setTimeout(() => {
-              let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+              let qrdata = `https://quickly.cafe/${slug}/${this.check._id}`;
               this.printerService.printQRCode(printer, qrdata, this.table.name, this.owner);
             }, 100)
           });
@@ -910,7 +946,7 @@ export class SellingScreenComponent implements OnInit {
           this.mainService.updateData('tables', this.table._id, { status: 2, timestamp: Date.now() }).then(() => {
             console.log(this.check._id);
             setTimeout(() => {
-              let qrdata = `https://qr.quickly.com.tr/${slug}/${this.check._id}`;
+              let qrdata = `https://quickly.cafe//${slug}/${this.check._id}`;
               this.printerService.printQRCode(printer, qrdata, this.table.name, this.owner);
             }, 100)
           });
@@ -1125,7 +1161,7 @@ export class SellingScreenComponent implements OnInit {
             $('#splitTable').modal('hide');
             this.router.navigate(['/store']);
           }
-        });
+        })
       }
     } else {
       this.message.sendConfirm(`Bütün Ürünler, ${this.selectedTable.name} Masasına Aktarılacak.`).then(isOk => {

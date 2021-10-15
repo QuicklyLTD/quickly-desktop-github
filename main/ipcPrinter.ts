@@ -3,8 +3,9 @@ import { ipcMain } from 'electron';
 import * as escpos from 'escpos';
 
 const line = '------------------------------------------------';
-// const line = '------------------------------------------';
 
+// const line = '------------------------------------------';
+// const line = '------------------------------------------';
 // const line = '------------------------------------------';
 
 
@@ -229,6 +230,8 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
   }
 });
 
+
+
 ipcMain.on('printPayment', (event, device, payment, table, logo) => {
   let deviceToPrint = findDevice(device);
   if (deviceToPrint) {
@@ -316,6 +319,23 @@ ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
 });
 
 
+ipcMain.on('kickCashdraw', (event, device) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer.cashdraw().close();
+      }
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+
 ipcMain.on('printReport', (event, device, category, reports) => {
   let deviceToPrint = findDevice(device);
   if (deviceToPrint) {
@@ -386,7 +406,7 @@ ipcMain.on('printEndDay', (event, device, data: EndDay, logo) => {
               .text(fitText('Kupon Satis Toplam:', data.coupon_total + ' TL', 1), '857')
               .text(fitText('Ikram Hesap Toplam:', data.free_total + ' TL', 1), '857')
               .text(fitText('Iptal Hesap Toplam:', data.canceled_total + ' TL', 1), '857')
-              .text(fitText('Iptal Hesap Toplam:', data.discount_total + ' TL', 1), '857')
+              .text(fitText('İndirim Toplamı:', data.discount_total + ' TL', 1), '857')
               .text(line)
               .text(fitText('Toplam Satis:', data.total_income + ' TL', 1), '857')
               .text(fitText('Toplam Hesap Sayisi:', data.check_count + ' Adet', 1), '857')

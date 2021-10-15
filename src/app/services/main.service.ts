@@ -4,6 +4,7 @@ import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBUpsert from 'pouchdb-upsert';
 import * as PouchDBResolve from 'pouch-resolve-conflicts';
 import * as PouchDBInMemory from 'pouchdb-adapter-memory';
+import * as PouchDBReplicationStream from 'pouchdb-replication-stream';
 
 import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
 
@@ -24,6 +25,8 @@ export class MainService {
     PouchDB.plugin(PouchDBUpsert);
     PouchDB.plugin(PouchDBResolve);
     PouchDB.plugin(PouchDBInMemory);
+    PouchDB.plugin(PouchDBReplicationStream.plugin);
+    
 
     const db_opts = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
 
@@ -95,7 +98,8 @@ export class MainService {
 
   getAllBy(db: string, $schema): Promise<any> {
     return this.LocalDB[db].find({
-      selector: $schema
+      selector: $schema,
+      limit:10000
     });
   }
 
@@ -362,7 +366,7 @@ export class MainService {
 
   replicateDB(db_configrations) {
     let db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
-    return db.replicate.to(this.LocalDB['allData'], { batch_size: 500, batches_limit: 50 });
+    return db.replicate.to(this.LocalDB['allData'], { batch_size: 500, batches_limit: 50, timeout:60000 });
   }
 
   replicateFrom() {

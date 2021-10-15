@@ -32,10 +32,11 @@ function createWindow() {
   if (serve) {
     win.setFullScreen(false);
     win.webContents.openDevTools();
-    require('devtron').install();
   }
+  require('devtron').install();
   win.on('closed', () => {
     win = null;
+    // exec('killall quickly-desktop')
   });
 }
 
@@ -49,6 +50,8 @@ try {
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit();
+      // exec('killall quickly-desktop')
+
     }
   });
 } catch (e) {

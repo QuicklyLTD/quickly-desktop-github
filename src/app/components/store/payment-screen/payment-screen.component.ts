@@ -103,6 +103,9 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   payProducts(method: string) {
+    // if(method == 'Nakit'){
+    //   this.printerService.kickCashdraw(this.printers[0])
+    // }
     if (this.discountAmount > 0) {
       this.logService.createLog(logType.DISCOUNT, this.userId, `${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
     }

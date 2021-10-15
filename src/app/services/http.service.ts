@@ -17,6 +17,8 @@ export class HttpService {
     // this.baseUrl = 'http://localhost:3000'; // 'https://hq.quickly.com.tr';
     this.baseUrl = 'https://hq.quickly.com.tr';
 
+    // this.baseUrl = 'http://192.168.0.29:3000'
+
     this.mainService.getAllBy('settings', { key: 'RestaurantInfo' }).then(res => {
       this.store_id = res.docs[0].value._id;
     })
