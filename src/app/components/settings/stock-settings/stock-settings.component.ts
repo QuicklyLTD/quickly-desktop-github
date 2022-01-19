@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Stock, StockCategory } from '../../../mocks/stocks.mock';
+import { Stock, StockCategory } from '../../../mocks/stocks';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
@@ -42,7 +42,7 @@ export class StockSettingsComponent implements OnInit {
   }
 
   getStocks(id) {
-    this.mainService.getAllBy('stocks', { cat_id: id }).then((result) => {
+    this.mainService.getAllBy('stocks', { sub_category: id }).then((result) => {
       this.stocks = result.docs;
     });
   }
@@ -89,13 +89,13 @@ export class StockSettingsComponent implements OnInit {
     }
     if (form._id == undefined) {
       let left_total = form.total * form.quantity;
-      let schema = new Stock(form.name, form.description, form.category, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * form.warning_value / 100, form.warning_value, Date.now());
-      this.mainService.addData('stocks', schema).then((res) => {
-        this.logService.createLog(logType.STOCK_CREATED, res.id, `${form.name} adlı Stok oluşturuldu.`);
-        this.fillData();
-        stockForm.reset();
-        this.messageService.sendMessage('Stok oluşturuldu');
-      });
+      // let schema = new Stock(form.name, form.description, form.category, form.quantity, form.unit, form.total, left_total, form.quantity, (form.total * form.quantity) * form.warning_value / 100, form.warning_value, Date.now());
+      // this.mainService.addData('stocks', schema).then((res) => {
+      //   this.logService.createLog(logType.STOCK_CREATED, res.id, `${form.name} adlı Stok oluşturuldu.`);
+      //   this.fillData();
+      //   stockForm.reset();
+      //   this.messageService.sendMessage('Stok oluşturuldu');
+      // });
     } else {
       form.warning_limit = (form.total * form.quantity) * form.warning_value / 100;
       this.mainService.updateData('stocks', form._id, form).then(() => {

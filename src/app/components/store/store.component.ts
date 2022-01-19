@@ -1,14 +1,14 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import { MainService } from '../../services/main.service';
 import { Router } from '@angular/router';
-import { Floor, Table } from '../../mocks/table.mock';
-import { Check, CheckProduct, CheckType, PaymentStatus } from '../../mocks/check.mock';
+import { Floor, Table } from '../../mocks/table';
+import { Check, CheckProduct, CheckType, PaymentStatus } from '../../mocks/check';
 import { Order, OrderItem, OrderStatus, OrderType, User } from '../../mocks/order';
-import { Ingredient, Product } from '../../mocks/product.mock';
+import { Ingredient, Product } from '../../mocks/product';
 import { SettingsService } from '../../services/settings.service';
-import { Stock } from '../../mocks/stocks.mock';
-import { Report } from '../../mocks/report.mock';
-import { DayInfo } from '../../mocks/settings.mock';
+import { Stock } from '../../mocks/stocks';
+import { Report } from '../../mocks/report';
+import { DayInfo } from '../../mocks/settings';
 import { logType } from '../../services/log.service';
 import { Receipt, ReceiptMethod, ReceiptStatus, ReceiptType } from '../../mocks/receipt';
 
@@ -131,6 +131,15 @@ export class StoreComponent implements OnInit {
       this.ordersView = this.orders.sort((a, b) => b.timestamp - a.timestamp).filter(order => order.status == OrderStatus.WAITING || order.status == OrderStatus.PREPARING);
       this.receiptsView = this.receipts.sort((a, b) => b.timestamp - a.timestamp).filter(receipt => receipt.status == ReceiptStatus.WAITING || receipt.status == ReceiptStatus.READY);
       localStorage.removeItem('selectedFloor');
+    }
+  }
+
+  getTableTotal(table_id){
+    let thatCheck = this.checks.find(check => check.table_id == table_id);
+    if(thatCheck){
+      return thatCheck.total_price;
+    }else{
+      return null;
     }
   }
 

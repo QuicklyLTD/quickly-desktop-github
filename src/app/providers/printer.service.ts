@@ -3,7 +3,9 @@ import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
 import * as escpos from 'escpos';
-import { Order } from 'app/mocks/order';
+import { Order } from '../mocks/order';
+import { PrintOut, PrintOutStatus } from '../mocks/print';
+import { MainService } from '../services/main.service';
 
 @Injectable()
 export class PrinterService {
@@ -11,12 +13,20 @@ export class PrinterService {
   quicklyLogo: string;
   storeInfo: any;
 
-  constructor(private electron: ElectronService, private messageService: MessageService, private settings: SettingsService) {
+  constructor(private electron: ElectronService, private mainService:MainService, private messageService: MessageService, private settings: SettingsService) {
     this.storeLogo = this.electron.appRealPath + '/data/customer.png';
     this.quicklyLogo = this.electron.appPath + '/assets/quickly.png';
-    this.electron.ipcRenderer.on('error', (event, message) => {
+
+    this.electron.ipcRenderer.on('error', (event, message, check, device) => {
       this.messageService.sendMessage(message);
+      let newPrint = new PrintOut('Check',PrintOutStatus.WAITING,check._id,device);
+      this.mainService.addData('prints',newPrint).then(isSended => {
+        console.log('Print Sended!')
+      }).catch(err => {
+        console.log('Hata Yazıcıya Ulaşılamadı');
+      })
     });
+    
   }
 
   printTest(device) {

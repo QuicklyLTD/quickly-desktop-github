@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log.mock';
-import { Report } from '../../../mocks/report.mock';
-import { Printer } from '../../../mocks/settings.mock';
+import { Log, logType } from '../../../mocks/log';
+import { Report } from '../../../mocks/report';
+import { Printer } from '../../../mocks/settings';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
-import { Category } from '../../../mocks/product.mock';
+import { Category } from '../../../mocks/product';
 import { PrinterService } from '../../../providers/printer.service';
 
 @Component({

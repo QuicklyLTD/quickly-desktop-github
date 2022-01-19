@@ -4,6 +4,7 @@ import './main/ipcPrinter';
 import './main/appServer';
 import './main/callerServer';
 import './main/scalerServer';
+import { exec } from 'child_process';
 
 let win: BrowserWindow;
 let serve: any;
@@ -36,7 +37,7 @@ function createWindow() {
   require('devtron').install();
   win.on('closed', () => {
     win = null;
-    // exec('killall quickly-desktop')
+    exec('killall cidshow');
   });
 }
 
@@ -50,7 +51,8 @@ try {
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit();
-      // exec('killall quickly-desktop')
+      exec('killall cidshow');
+
 
     }
   });

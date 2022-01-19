@@ -30,7 +30,8 @@ export enum OrderType {
     INSIDE,
     OUTSIDE,
     TAKEAWAY,
-    EMPLOOYEE
+    EMPLOOYEE,
+    DEVICE
 }
 
 export enum OrderStatus {

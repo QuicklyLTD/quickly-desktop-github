@@ -105,7 +105,7 @@
                       <td class="text-center">{{i+1}}</td>
                       <td style="text-transform:capitalize;">
                         {{item.description}}
-                        <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.update_time | timeAgo }}</small>
+                        <small class="pull-right"><i class="fa fa-clock-o"></i> {{item.timestamp | timeAgo }}</small>
                       </td>
                       <td class="text-right">{{item.count | number:'1.0-2'}} Adet</td>
                       <td class="text-right">{{item.amount | price }}</td>
@@ -128,7 +128,7 @@
                       <td>{{item.description}}</td>
                       <td>{{item.count}} Adet</td>
                       <td>{{item.amount | number:'1.0-2'}} TL</td>
-                      <td>{{item.update_time | date: 'd/M/y HH:mm'}}</td>
+                      <td>{{item.timestamp | date: 'd/M/y HH:mm'}}</td>
                     </tr>
                   </tbody>
                 </table> -->

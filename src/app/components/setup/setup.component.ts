@@ -6,9 +6,9 @@ import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
 import { ElectronService } from '../../providers/electron.service';
 import { MessageService } from '../../providers/message.service';
-import { Settings, AuthInfo } from '../../mocks/settings.mock';
-import { Report, Activity } from '../../mocks/report.mock';
-import { UserGroup, User, UserAuth, ComponentsAuth } from '../../mocks/user.mock';
+import { Settings, AuthInfo } from '../../mocks/settings';
+import { Report, Activity } from '../../mocks/report';
+import { UserGroup, User, UserAuth, ComponentsAuth } from '../../mocks/user';
 
 @Component({
   selector: 'app-setup',

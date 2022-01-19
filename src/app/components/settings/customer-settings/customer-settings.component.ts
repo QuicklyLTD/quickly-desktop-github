@@ -3,9 +3,9 @@ import { MainService } from '../../../services/main.service';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
 import { NgForm } from '@angular/forms';
-import { Customer } from '../../../mocks/customer.mock';
-import { Report } from '../../../mocks/report.mock';
-import { Check, CheckNo, CheckType } from '../../../mocks/check.mock';
+import { Customer } from '../../../mocks/customer';
+import { Report } from '../../../mocks/report';
+import { Check, CheckNo, CheckType } from '../../../mocks/check';
 import { PrinterService } from '../../../providers/printer.service';
 import { SettingsService } from '../../../services/settings.service';
 

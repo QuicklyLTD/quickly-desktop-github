@@ -7,14 +7,15 @@ import { AuthService } from './services/auth.service';
 import { MainService } from './services/main.service';
 import { SettingsService } from './services/settings.service';
 import { ConflictService } from './services/conflict.service';
-import { Settings, ServerInfo, DayInfo } from './mocks/settings.mock';
+import { Settings, ServerInfo, DayInfo } from './mocks/settings';
 import { CallerIDService } from './providers/caller-id.service';
 import { ScalerService } from './providers/scaler.service';
 import { PrinterService } from './providers/printer.service';
 import { Order, OrderStatus, OrderType } from './mocks/order';
-import { Category } from './mocks/product.mock';
-import { Check, CheckProduct } from './mocks/check.mock';
-import { Table } from './mocks/table.mock';
+import { Category } from './mocks/product';
+import { Check, CheckProduct } from './mocks/check';
+import { Table } from './mocks/table';
+import { PrintOut, PrintOutStatus } from './mocks/print';
 
 @Component({
   selector: 'app-root',
@@ -26,7 +27,7 @@ import { Table } from './mocks/table.mock';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.9.2';
+  version = '1.9.5';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -131,6 +132,7 @@ export class AppComponent implements OnInit {
               this.mainService.syncToServer();
               this.conflictService.conflictListener();
 
+
               this.mainService.loadAppData().then((isLoaded: boolean) => {
                 if (isLoaded) {
                   this.onSync = false;
@@ -147,7 +149,14 @@ export class AppComponent implements OnInit {
               });
             } else if (this.serverSettings.type == 1) {
               ////// İkincil Ekran //////
-              this.serverReplication();
+              // this.mainService.destroyDB('allData').then(res => {
+              //   this.mainService.initDatabases();
+              //   setTimeout(() => this.serverReplication(), 1000)
+              // }).catch(err => {
+              //   console.log(err);
+              //   this.hasError = true;
+              // })
+              this.serverReplication()
             }
           } else {
             if (this.serverSettings.type == 0) {
@@ -182,12 +191,13 @@ export class AppComponent implements OnInit {
     }
     if (this.serverSettings.type == 0) {
       setTimeout(() => this.orderListener(), 10000)
+      // this.printsListener();
     }
     // this.commandListener();
   }
 
 
-  serverReplication(){
+  serverReplication() {
     this.hasError = false;
     console.log('Server Replicating Started!')
     this.mainService.replicateDB(this.serverSettings)
@@ -209,9 +219,6 @@ export class AppComponent implements OnInit {
         this.hasError = true;
         this.electronService.openDevTools();
         this.serverReplication();
-        // setTimeout(() => {
-        //   this.electronService.relaunchProgram();
-        // }, 10000);
       });
   }
 
@@ -222,6 +229,7 @@ export class AppComponent implements OnInit {
       this.mainService.LocalDB['orders'].changes({ since: 'now', live: true, include_docs: true }).on('change', (res) => {
         if (!this.onSync) {
           let Order: Order = res.doc;
+          console.log(Order);
           if (Order.status == OrderStatus.APPROVED && Order.type !== OrderType.EMPLOOYEE) {
             this.mainService.getAllBy('categories', {}).then(cats => {
               let categories = cats.docs;
@@ -243,7 +251,7 @@ export class AppComponent implements OnInit {
                       }
                     });
                     splitPrintArray.forEach(order => {
-                      this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + ' (Müşteri)');
+                      this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + (Order.type == OrderType.INSIDE ? ' (Müşteri)' : '(El Terminali)'));
                     });
                   };
                 });
@@ -262,10 +270,10 @@ export class AppComponent implements OnInit {
       if (this.dayStatus.started) {
         this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
       } else {
-        this.mainService.RemoteDB.find({ selector: { db_name:'settings', key: 'DateSettings' }, limit:5000 }).then((res) => {
+        this.mainService.RemoteDB.find({ selector: { db_name: 'settings', key: 'DateSettings' }, limit: 5000 }).then((res) => {
           let serverDate: DayInfo = res.docs[0].value;
           if (serverDate.started) {
-            this.mainService.getData('settings',res.docs[0]._id).then(settingsDoc => {
+            this.mainService.getData('settings', res.docs[0]._id).then(settingsDoc => {
               this.mainService.LocalDB['settings'].get(settingsDoc._id).then(localDoc => {
                 localDoc.value = serverDate;
                 this.mainService.LocalDB['settings'].put(localDoc).then(isUpdated => {
@@ -274,7 +282,7 @@ export class AppComponent implements OnInit {
                   console.log(err);
                 })
               }).catch(err => {
-                 console.log(err);
+                console.log(err);
               })
             }).catch(err => {
               console.log(err);
@@ -365,6 +373,33 @@ export class AppComponent implements OnInit {
         setTimeout(() => {
           this.electronService.reloadProgram();
         }, 5000);
+      }
+    });
+  }
+
+  printsListener() {
+    console.log('Printer Listener Process Started');
+    return this.mainService.LocalDB['prints'].changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
+      if (!this.onSync) {
+        if (!change.deleted) {
+          let printObj: PrintOut = change.doc;
+          console.log(printObj)
+          if (printObj.type == 'Check' && printObj.status == PrintOutStatus.WAITING) {
+            this.mainService.getData('checks', printObj.connection).then((check: Check) => {
+              this.mainService.getData('tables', check.table_id).then((table) => {
+                this.mainService.updateData('prints',printObj._id,{status:PrintOutStatus.PRINTED}).then((isOK) => {
+                  this.printerService.printCheck(printObj.printer, table.name, check)
+                }).catch(err => {
+                  console.log(err);
+                })
+              }).catch(err => {
+                this.mainService.updateData('prints',printObj._id,{status:PrintOutStatus.ERROR});
+              })
+            }).catch(err => {
+              this.mainService.updateData('prints',printObj._id,{status:PrintOutStatus.ERROR});
+            })
+          }
+        }
       }
     });
   }

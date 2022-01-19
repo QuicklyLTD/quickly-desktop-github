@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CallerIDService } from '../../../providers/caller-id.service';
 import { MainService } from '../../../services/main.service';
-import { Customer, CustomerType } from '../../../mocks/customer.mock';
-import { Check, CheckType, CheckStatus, CheckNo } from '../../../mocks/check.mock';
+import { Customer, CustomerType } from '../../../mocks/customer';
+import { Check, CheckType, CheckStatus, CheckNo } from '../../../mocks/check';
 import { SettingsService } from '../../../services/settings.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { Call } from '../../../mocks/caller.mock';
+import { Call } from '../../../mocks/caller';
 
 @Component({
   selector: 'app-caller',

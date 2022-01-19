@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Printer } from 'app/mocks/settings.mock';
-import { Category, Ingredient, Product, ProductSpecs, Recipe, SubCategory } from '../../../mocks/product.mock';
-import { Report } from '../../../mocks/report.mock';
+import { Printer } from 'app/mocks/settings';
+import { Category, Ingredient, Product, ProductSpecs, Recipe, SubCategory } from '../../../mocks/product';
+import { Report } from '../../../mocks/report';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';

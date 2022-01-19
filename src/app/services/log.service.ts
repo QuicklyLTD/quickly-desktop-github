@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Log, logType } from '../mocks/log.mock';
+import { Log, logType } from '../mocks/log';
 import { MainService } from './main.service';
-export { logType } from '../mocks/log.mock';
+export { logType } from '../mocks/log';
 
 @Injectable()
 export class LogService {

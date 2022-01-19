@@ -1,6 +1,7 @@
-import { EndDay } from '../src/app/mocks/endoftheday.mock';
+import { EndDay } from '../src/app/mocks/endoftheday';
 import { ipcMain } from 'electron';
 import * as escpos from 'escpos';
+// import { ClosedCheck } from 'app/mocks/check';
 
 const line = '------------------------------------------------';
 
@@ -69,14 +70,57 @@ ipcMain.on('printOrder', (event, device, table, orders, owner) => {
             printer.size(1, 1).text('      Not: ' + orders[prop].note, '857');
           }
         }
+        if (device.name !== 'Kasa') {
+          printer.beep(2, 3);
+        }
         printer.size(1, 1).text(line);
         printer
           .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
           .control('LF')
-          .beep(3, 2)
-          .cut()
+          // .beep(3,2)
+          .cut(true)
           .close();
       }
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
+
+ipcMain.on('printOrderInd', (event, device, table, orders, owner) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    let date = new Date();
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        for (let prop in orders) {
+          printer
+            .align('lt')
+            .size(2, 2)
+            .text(' ')
+            .text('Masa No: ' + table, '857')
+            .size(1, 1)
+            .text(line)
+            .align('lt');
+          let text = fitText(orders[prop].count + 'x ' + orders[prop].name, '', 2);
+          printer.size(2, 2).text(text, '857');
+          if (orders[prop].note !== '') {
+            printer.size(1, 1).text('      Not: ' + orders[prop].note, '857');
+          }
+          printer.size(1, 1).text(line);
+          printer
+            .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+            .control('LF')
+            .beep(1, 3)
+            .cut()
+          // .close();
+        }
+      }
+      printer.close();
     });
   } else {
     event.sender.send('error', 'Yazıcı Bulunamadı');
@@ -93,42 +137,42 @@ ipcMain.on('printQRcode', (event, device, data, table, owner) => {
 
     let imageData = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=' + data;
 
-    new escpos.Image.load(imageData, function (image) {
-      deviceToPrint.open((err) => {
-        if (err) {
-          event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
-        } else {
-          printer
-            .align('ct')
-            .size(2, 2)
-            .text(' ')
-            .text('Masa: ' + table, '857')
-            .size(1, 1)
-            .text(line)
-            .align('ct')
-            .size(2, 2)
-            .control('LF')
-            .image(image, 'd24')
-            .control('LF')
-            .text('1. QR Kodu Okut ', '857')
-            .text('2. Siparisi Ver ', '857')
-            .text('3. Temassiz Öde ', '857')
-            .control('LF')
-            .size(1, 1)
-            .text('www.quickly.com.tr', '857')
-            .align('lt')
-          printer.size(1, 1).text(line);
-          printer
-            .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-            .text(' ')
-            .control('LF')
-            .beep(3, 2)
-            .text(' ')
-            .cut()
-            .close();
-        }
-      });
-    })
+    // new escpos.Image.load(imageData, function (image) {
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer
+          .align('ct')
+          .size(2, 2)
+          .text(' ')
+          .text('Masa: ' + table, '857')
+          .size(1, 1)
+          .text(line)
+          .align('ct')
+          .size(2, 2)
+          .control('LF');
+        printer.align('ct').qrimage(data, { type: 'png', margin: 4, size: 10 }, function (err) {
+          this.control('LF')
+          this.text('1. QR Kodu Okut ', '857')
+          this.text('2. Siparisi Ver ', '857')
+          this.text('3. Temassiz Öde ', '857')
+          this.control('LF')
+          this.size(1, 1)
+          this.text('www.quickly.com.tr', '857')
+          this.align('lt')
+          this.size(1, 1).text(line)
+          this.text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+          this.text(' ')
+          this.control('LF')
+          this.beep(3, 2)
+          this.text(' ')
+          this.cut();
+          this.close();
+        });
+      }
+    });
+    // })
   } else {
     event.sender.send('error', 'Yazıcı Bulunamadı');
   }
@@ -148,15 +192,15 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
     new escpos.Image.load(logo, function (image) {
       deviceToPrint.open((err) => {
         if (err) {
-          event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+          event.sender.send('error', 'Yazıcı Bulunamadı', check, device);
         } else {
           printer
             .align('ct')
             .size(1, 1)
             .image(image, 'd24')
             .control('LF')
-            .text('Quickly')
-            .text('www.quickly.com.tr')
+            .text('Instagram')
+            .text('@kallavikahvetr')
             .align('lt')
             .control('LF');
           if (check.products.length > 0) {
@@ -165,16 +209,15 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               .text(line);
             for (let prop in check.products) {
               if (check.products[prop].status !== 3) {
-                let text = fitText((check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name, check.products[prop].price + ' TL' + '   ' + (check.products[prop].total_price.toString().length > 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
-                printer.text(text, '857');
+                let text = fitText(
+                  (check.products[prop].count >= 10 ? check.products[prop].count : ' ' + check.products[prop].count) + ' x  ' + check.products[prop].name.substr(0,24).padEnd(26,'..'),
+                  check.products[prop].price + ' TL' + '   ' + 
+                  (check.products[prop].total_price.toString().length == 3 ? check.products[prop].total_price : (check.products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.products[prop].total_price) + ' TL', 1);
+                  printer.text(text, '857');
               }
             }
-            printer
-              .text(line)
-              .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
-              .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
-              .control('LF');
           }
+          printer.text(line);
           if (check.payment_flow) {
             printer
               .size(2, 2)
@@ -186,7 +229,7 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               .text(line);
             for (let prop in check.payed_products) {
               if (check.payed_products[prop].status !== 3) {
-                let text = fitText((check.payed_products[prop].count >= 10 ? check.payed_products[prop].count : ' ' + check.payed_products[prop].count) + ' x  ' + check.payed_products[prop].name, check.payed_products[prop].price + ' TL' + '   ' + (check.payed_products[prop].total_price.toString().length > 3 ? check.payed_products[prop].total_price : (check.payed_products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.payed_products[prop].total_price) + ' TL', 1);
+                let text = fitText((check.payed_products[prop].count >= 10 ? check.payed_products[prop].count : ' ' + check.payed_products[prop].count) + ' x  ' + check.payed_products[prop].name.substr(0,24).padEnd(26,'..'), check.payed_products[prop].price + ' TL' + '   ' + (check.payed_products[prop].total_price.toString().length == 3 ? check.payed_products[prop].total_price : (check.payed_products[prop].total_price.toString().length >= 2 ? ' ' : '  ') + check.payed_products[prop].total_price) + ' TL', 1);
                 printer.text(text, '857');
               }
             }
@@ -199,8 +242,28 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             }
           }
           printer
+          .text(fitText('Masa: ' + table, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear(), 1), '857')
+          .text(fitText('Yetkili: ' + check.owner, date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+          if (check.db_name == "closed_checks") {
+            if (check.payment_method == 'Parçalı') {
+              printer
+                .size(1, 1)
+                .text(fitText('Metod: ', check.payment_method, 1),'857');
+                check.payment_flow.forEach(element => {
+                  printer
+                    .text(fitText(element.method + ': ', element.amount.toFixed(2) + ' TL', 1),'857');
+                });
+            } else {
+              printer
+                .size(1, 1)
+                .text(fitText('Metod: ', check.payment_method, 1),'857');
+            }
+          }
+          printer
+            .control('LF')
             .align('ct')
             .size(1, 1);
+
           if (check.discountPercent !== undefined) {
             printer
               .text(fitText('Hesap Toplam:', check.total_price + ' TL', 1), '857')
@@ -213,11 +276,12 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
               .size(2, 2)
               .text('Toplam:  ' + check.total_price + ' TL');
           }
+
           printer
             .control('LF')
             .size(1, 1)
             .text('Mali degeri yoktur.', '857')
-            .control('LF')
+            .text('Teşekkürler', '857')
             .control('LF')
             .cut()
             .beep(3, 2)
@@ -226,11 +290,9 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
       });
     });
   } else {
-    event.sender.send('error', 'Yazıcı Bulunamadı');
+    event.sender.send('error', 'Yazıcı Bulunamadı', check, device);
   }
 });
-
-
 
 ipcMain.on('printPayment', (event, device, payment, table, logo) => {
   let deviceToPrint = findDevice(device);
@@ -246,8 +308,8 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .align('ct')
             .size(1, 1)
             .image(image, 'd24')
-            .text('Quickly')
-            .text('www.quickly.com.tr')
+            .text('Instagram ')
+            .text('@kallavikahvetr')
             .align('lt')
             .control('LF')
             .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
@@ -318,7 +380,6 @@ ipcMain.on('printCancel', (event, device, product, reason, table, owner) => {
   }
 });
 
-
 ipcMain.on('kickCashdraw', (event, device) => {
   let deviceToPrint = findDevice(device);
   if (deviceToPrint) {
@@ -334,7 +395,6 @@ ipcMain.on('kickCashdraw', (event, device) => {
     event.sender.send('error', 'Yazıcı Bulunamadı');
   }
 });
-
 
 ipcMain.on('printReport', (event, device, category, reports) => {
   let deviceToPrint = findDevice(device);
@@ -471,7 +531,7 @@ function textPad(first, second, lineWidth, diffWidth) {
 }
 
 function fitText(header, text, size) {
-  header = header.replace('ş', 's').replace('ğ', 'g').replace('İ', 'I');
+  header = header.replace('ş', 's').replace('ğ', 'g').replace('İ', 'I').replace('ç','c');
   let space = line.length / size;
   let middleSpace = repeat(' ', space - text.toString().length - header.toString().length);
   let fixed = header + middleSpace + text;

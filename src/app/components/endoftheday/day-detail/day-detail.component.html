@@ -38,6 +38,10 @@
             <i class="fa fa-bell fa-2x" aria-hidden="true"></i>
             <span>Sistem Kayıtları</span>
           </button>
+          <button (click)="printEndday()" type="button" class="list-group-item list-group-item-action">
+            <i class="fa fa-print fa-2x" aria-hidden="true"></i>
+            <span>Yazdır</span>
+          </button>
         </div>
       </div>
       <div class="card-footer p-1 text-center">
@@ -259,7 +263,7 @@
                     <td><strong>% {{(product.weekly[detailDay]/detailData.total_income) * 100 | number:'1.0-2' }}</strong></td>
                     <td>{{product.weekly[detailDay] | price }} </td>
                     <td>{{product.weekly_count[detailDay]}} Adet</td>
-                    <td>{{product.update_time | date:'HH:mm'}}</td>
+                    <td>{{product.timestamp | date:'HH:mm'}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -283,7 +287,7 @@
                     <td><strong>% {{(user.weekly[detailDay]/detailData.total_income) * 100 | number:'1.0-2' }}</strong></td>
                     <td>{{user.weekly[detailDay] | price }} </td>
                     <td>{{user.weekly_count[detailDay]}} Adet</td>
-                    <td>{{user.update_time | date:'HH:mm'}}</td>
+                    <td>{{user.timestamp | date:'HH:mm'}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -308,7 +312,7 @@
                     <td><strong>% {{(table.weekly[detailDay]/detailData.total_income) * 100 | number:'1.0-2'}}</strong></td>
                     <td>{{table.weekly[detailDay] | price }} </td>
                     <td>{{table.weekly_count[detailDay]}} Adet</td>
-                    <td>{{table.update_time | date:'HH:mm'}}</td>
+                    <td>{{table.timestamp | date:'HH:mm'}}</td>
                   </tr>
                 </tbody>
               </table>

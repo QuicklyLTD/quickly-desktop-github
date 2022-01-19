@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Cashbox } from '../../mocks/cashbox.mock';
-import { CheckType, ClosedCheck } from '../../mocks/check.mock';
-import { BackupData, EndDay } from '../../mocks/endoftheday.mock';
-import { Log } from '../../mocks/log.mock';
-import { Report } from '../../mocks/report.mock';
+import { Cashbox } from '../../mocks/cashbox';
+import { CheckType, ClosedCheck } from '../../mocks/check';
+import { BackupData, EndDay } from '../../mocks/endoftheday';
+import { Log } from '../../mocks/log';
+import { Report } from '../../mocks/report';
 import { ElectronService } from '../../providers/electron.service';
 import { MessageService } from '../../providers/message.service';
 import { PrinterService } from '../../providers/printer.service';
@@ -126,7 +126,7 @@ export class EndofthedayComponent implements OnInit {
     if (this.isStarted) {
       this.mainService.getAllBy('checks', {}).then((res) => {
         if (res.docs.length == 0) {
-          $('#endDayModal').modal('show');
+          $('#endDayModal').modal({backdrop:'static',keyboard:false});
           clearInterval(this.conflictService.conflictListener());
           setTimeout(() => {
             this.stepChecks();
@@ -278,10 +278,12 @@ export class EndofthedayComponent implements OnInit {
       this.logs = res.docs;
       const logsBackup = new BackupData('logs', this.logs);
       this.backupData.push(logsBackup);
-      this.mainService.removeAll('logs', {}).then(() => {
-        this.mainService.removeAll('allData', { db_name: 'logs' }).then(() => {
-          this.progress = 'Kayıtlar Temizlendi...';
-          this.stepOrders();
+      this.mainService.removeAll('prints', {}).then(() => {
+        this.mainService.removeAll('logs', {}).then(() => {
+          this.mainService.removeAll('allData', { db_name: 'logs' }).then(() => {
+            this.progress = 'Kayıtlar Temizlendi...';
+            this.stepOrders();
+          });
         });
       });
     }).catch(err => {
@@ -447,9 +449,9 @@ export class EndofthedayComponent implements OnInit {
         console.log(err);
         $('#endDayModal').modal('hide');
         this.messageService.sendAlert('Gün Sonu Tamamlandı!', 'Program Yeniden Başlatılacak', 'success');
-        // setTimeout(() => {
-        //   this.electronService.relaunchProgram();
-        // }, 5000);
+        setTimeout(() => {
+          this.electronService.relaunchProgram();
+        }, 5000);
         // const serverSelectedRevs = res.json();
         // this.electronService.fileSystem.readFile(this.electronService.appRealPath + '/data/db.dat', 'utf-8', (err, data) => {
         //   if (!err) {

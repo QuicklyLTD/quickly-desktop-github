@@ -1,13 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check.mock';
-import { Printer, PaymentMethod } from '../../../mocks/settings.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check';
+import { Printer, PaymentMethod } from '../../../mocks/settings';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
-import { Customer } from 'app/mocks/customer.mock';
+import { Customer } from 'app/mocks/customer';
 
 @Component({
   selector: 'app-payment-screen',
@@ -161,7 +161,7 @@ export class PaymentScreenComponent implements OnInit {
         }
         this.priceWillPay -= this.payedPrice;
         this.currentAmount -= (this.payedPrice - this.discountAmount);
-        this.numpad = this.priceWillPay.toString();
+        this.numpad = this.priceWillPay.toFixed(2).toString();
       } else {
         newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
       }
@@ -269,7 +269,7 @@ export class PaymentScreenComponent implements OnInit {
   divideWillPay(division: number) {
       this.payedPrice = this.priceWillPay / division;
       this.setChange();
-      this.numpad = this.payedPrice.toString();
+      this.numpad = this.payedPrice.toFixed(2).toString();
       $('#calculator').modal('hide');
   }
 
@@ -288,7 +288,7 @@ export class PaymentScreenComponent implements OnInit {
     this.productsWillPay.push(product);
     this.check.total_price -= product.price;
     this.priceWillPay += product.price;
-    this.numpad = this.priceWillPay.toString();
+    this.numpad = this.priceWillPay.toFixed(2).toString();
     this.payedShow = false;
     this.payedTitle = 'Ödemeleri Göster';
     this.setChange();
@@ -299,7 +299,7 @@ export class PaymentScreenComponent implements OnInit {
     this.check.products.push(product);
     this.check.total_price += product.price;
     this.priceWillPay -= product.price;
-    this.numpad = this.priceWillPay.toString();
+    this.numpad = this.priceWillPay.toFixed(2).toString();
     this.setChange();
   }
 
@@ -310,7 +310,7 @@ export class PaymentScreenComponent implements OnInit {
     })
     this.priceWillPay = this.productsWillPay.map(obj => obj.price).reduce((a, b) => a + b);
     this.check.products = [];
-    this.numpad = this.priceWillPay.toString();
+    this.numpad = this.priceWillPay.toFixed(2).toString();
     this.check.total_price = 0;
     this.setChange();
   }
@@ -391,9 +391,11 @@ export class PaymentScreenComponent implements OnInit {
           let doc = res.docs[0];
           doc.count++;
           doc.weekly_count[this.day]++;
+          doc.monthly_count[new Date().getMonth()]++;
           doc.amount += this.currentAmount;
           doc.weekly[this.day] += this.currentAmount;
-          doc.update_time = Date.now();
+          doc.monthly[new Date().getMonth()] += this.currentAmount;
+          doc.timestamp = Date.now();
           this.mainService.updateData('reports', doc._id, doc);
         }
       });
@@ -404,9 +406,11 @@ export class PaymentScreenComponent implements OnInit {
           let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
           reportWillChange.count++;
           reportWillChange.weekly_count[this.day]++;
+          reportWillChange.monthly_count[new Date().getMonth()] += obj.amount;
           reportWillChange.amount += obj.amount;
           reportWillChange.weekly[this.day] += obj.amount;
-          reportWillChange.update_time = Date.now();
+          reportWillChange.monthly[new Date().getMonth()] += obj.amount;
+          reportWillChange.timestamp = Date.now();
           if (this.check.payment_flow.length == index + 1) {
             sellingReports.forEach((report) => {
               if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
@@ -425,16 +429,20 @@ export class PaymentScreenComponent implements OnInit {
       if (method !== 'Parçalı') {
         report.count++;
         report.amount += this.currentAmount;
-        report.update_time = Date.now();
+        report.timestamp = Date.now();
         report.weekly[this.day] += this.currentAmount;
         report.weekly_count[this.day]++;
+        report.monthly[new Date().getMonth()] += this.currentAmount;
+        report.monthly_count[new Date().getMonth()]++;
       } else {
         report.count++;
         report.weekly_count[this.day]++;
-        report.update_time = Date.now();
+        report.monthly_count[new Date().getMonth()]++;
+        report.timestamp = Date.now();
         this.check.payment_flow.forEach((obj, index) => {
           report.amount += obj.amount;
           report.weekly[this.day] += obj.amount;
+          report.monthly[new Date().getMonth()] +=obj.amount;
         });
       }
       this.mainService.updateData('reports', report._id, report);

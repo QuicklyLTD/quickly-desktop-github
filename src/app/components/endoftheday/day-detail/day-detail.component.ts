@@ -1,10 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Cashbox } from '../../../mocks/cashbox.mock';
-import { ClosedCheck } from '../../../mocks/check.mock';
-import { BackupData, EndDay } from '../../../mocks/endoftheday.mock';
-import { Report } from '../../../mocks/report.mock';
-import { ElectronService } from '../../../providers/electron.service';
-import { Log, logType } from '../../../mocks/log.mock';
+import { Cashbox } from '../../../mocks/cashbox';
+import { ClosedCheck } from '../../../mocks/check';
+import { BackupData, EndDay } from '../../../mocks/endoftheday';
+import { Report } from '../../../mocks/report';
+import { ElectronService,  } from '../../../providers/electron.service';
+import { Log, logType } from '../../../mocks/log';
+import { PrinterService } from '../../../providers/printer.service';
+import { SettingsService } from '../../../services/settings.service';
+
 
 @Component({
   selector: 'app-day-detail',
@@ -13,6 +16,7 @@ import { Log, logType } from '../../../mocks/log.mock';
 })
 export class DayDetailComponent implements OnInit {
   @Input('data') detailData: EndDay;
+  @Input('printers') printers: any;
   oldBackupData: Array<BackupData>;
   oldChecks: any;
   oldCashbox: any;
@@ -39,7 +43,8 @@ export class DayDetailComponent implements OnInit {
   pieColors: Array<any>;
   detailTitle: string;
   detailDay: number;
-  constructor(private electronService: ElectronService) {
+  constructor(private electronService: ElectronService, private printerService: PrinterService, private settingsService:SettingsService) {
+
     this.pieOptions = { responsive: false, legend: { labels: { fontColor: 'rgb(255, 255, 255)' } } };
     this.activityOptions = {
       responsive: false,
@@ -74,8 +79,8 @@ export class DayDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    console.log(this.detailData);
+    // this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
+    console.log(this.detailData,this.printers);
 
     this.detailTitle = 'Genel Detaylar & Grafik';
     this.pieColors = [];
@@ -144,6 +149,10 @@ export class DayDetailComponent implements OnInit {
     } else {
       alert('Senkorinizasyon işleminin bitmesini bekleyin.')
     }
+  }
+
+  printEndday(){
+    this.printerService.printEndDay(this.printers[0], this.detailData);
   }
 
   showCheckDetail(check) {

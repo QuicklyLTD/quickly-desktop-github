@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log.mock';
-import { Stock, StockCategory } from '../../../mocks/stocks.mock';
+import { Log, logType } from '../../../mocks/log';
+import { Stock, StockCategory } from '../../../mocks/stocks';
 import { MainService } from '../../../services/main.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class StockReportsComponent implements OnInit {
   }
 
   getStocksByCategory(cat_id) {
-    this.stocksView = this.allStocks.filter(obj => obj.cat_id == cat_id);
+    this.stocksView = this.allStocks.filter(obj => obj.sub_category == cat_id);
     this.selectedCat = cat_id;
   }
 

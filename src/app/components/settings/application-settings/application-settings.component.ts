@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Printer } from '../../../mocks/settings.mock';
+import { Printer } from '../../../mocks/settings';
 import { ElectronService } from '../../../providers/electron.service';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';

@@ -18,8 +18,8 @@
   width: auto !important;
 }
 
-.nav-link{
-  font-size: 1.40vw;
+.nav-link {
+  font-size: 1.4vw;
 }
 
 .nav-link.active {
@@ -56,7 +56,7 @@
 .relativeTable {
   position: absolute !important;
   box-shadow: 1px 1px 4px rgb(43, 62, 80);
-  overflow:hidden;
+  overflow: hidden;
 }
 
 .tableInfo {
@@ -65,7 +65,7 @@
   width: 85%;
 }
 
-.absTableInfo{
+.absTableInfo {
   margin-top: 16px;
   bottom: 5px;
   width: 100%;
@@ -87,4 +87,11 @@
     left: 0px !important;
     flex: 1 1 auto;
   }
+}
+
+#err {
+  position: fixed;
+  text-align: center;
+  top: 50%;
+  width: 79%;
 }

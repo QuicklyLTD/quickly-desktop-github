@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log.mock';
-import { Report } from '../../../mocks/report.mock';
+import { Log, logType } from '../../../mocks/log';
+import { Report } from '../../../mocks/report';
 import { MainService } from '../../../services/main.service';
 @Component({
   selector: 'app-user-reports',

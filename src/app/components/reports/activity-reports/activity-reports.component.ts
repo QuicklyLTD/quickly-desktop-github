@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MainService } from '../../../services/main.service';
-import { Activity } from '../../../mocks/report.mock';
+import { Activity } from '../../../mocks/report';
 
 @Component({
   selector: 'app-activity-reports',

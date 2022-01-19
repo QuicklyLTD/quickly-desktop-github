@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Recipe, Ingredient, Product } from '../../../mocks/product.mock';
+import { Recipe, Ingredient, Product } from '../../../mocks/product';
 import { MainService } from '../../../services/main.service';
 
 @Component({

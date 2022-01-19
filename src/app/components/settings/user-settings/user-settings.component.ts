@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Report } from '../../../mocks/report.mock';
-import { ComponentsAuth, User, UserAuth, UserGroup } from '../../../mocks/user.mock';
+import { Report } from '../../../mocks/report';
+import { ComponentsAuth, User, UserAuth, UserGroup } from '../../../mocks/user';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';

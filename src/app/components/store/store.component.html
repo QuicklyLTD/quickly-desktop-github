@@ -60,9 +60,10 @@
             <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
               <div [ngClass]="{'bg-success': table.status == 2, 'bg-warning text-dark':table.status == 1, 'bg-danger text-white animated flash slow infinite': table.status == 3, 'bg-indigo text-white animated tada slow infinite': table.status == 4 }" class="card tableCard">
                 <div class="card-body p-2">
-                  <h1 [ngClass]="{'long-name mb-4': table.name.length >= 7}" class="card-title mb-2">{{table.name}}</h1>
+                  <h1 [ngClass]="{'long-name mb-3': table.name.length >= 7}" class="card-title mb-2">{{table.name}}</h1>
+                  <span *ngIf="getTableTotal(table._id)" style="font-weight:bolder; position: relative; top:-5px;">{{getTableTotal(table._id) | price}}</span>
                   <p class="tableInfo">
-                    <i class="fa fa-user"></i> {{table.capacity}}
+                      <i class="fa fa-user"></i> {{table.capacity}}
                     <span *ngIf="table.status == 2" class="pull-right">
                       <i class="fa fa-clock-o" aria-hidden="true"></i> {{table.timestamp | timeAgo }}
                     </span>
@@ -168,7 +169,10 @@
       </div>
 
       <div *ngIf="section == 'Kroki'" class="card-body p-0">
-        <section id="plan">
+        <section *ngIf="selected == ''" id="err">
+          <h1>Lütfen Sağ Taraftan Bölüm Seçiniz</h1>
+        </section>
+        <section *ngIf="selected !== ''" id="plan">
           <ng-container *ngFor="let table of tableViews">
             <div *ngIf="table.position" draggable='true' (dragstart)="dragStart($event,table)" (dragend)="changePosition($event,table)" [routerLink]="['/selling-screen','Normal', table._id]" class="relativeTable p-2"
               [ngClass]="{'bg-success': table.status == 2, 'bg-warning text-dark':table.status == 1, 'bg-danger text-white animated heartBeat slow infinite': table.status == 3, 'bg-indigo text-white animated tada slow infinite': table.status == 4 }" [style.height.px]="table.position.height" [style.width.px]="table.position.width" [style.left.px]="table.position.x"

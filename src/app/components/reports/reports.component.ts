@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Activity, Report } from '../../mocks/report.mock';
+import { Activity, Report } from '../../mocks/report';
 import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
 

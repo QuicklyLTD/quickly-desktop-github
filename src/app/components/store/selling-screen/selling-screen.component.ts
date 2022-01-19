@@ -2,10 +2,10 @@ import { Component, ElementRef, OnInit, ViewChild, NgZone } from '@angular/core'
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Order, OrderItem, OrderStatus, OrderType } from '../../../mocks/order';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo, Occupation } from '../../../mocks/check.mock';
-import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../mocks/product.mock';
-import { PaymentMethod, Printer } from '../../../mocks/settings.mock';
-import { Floor, Table, TableStatus } from '../../../mocks/table.mock';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo, Occupation } from '../../../mocks/check';
+import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../mocks/product';
+import { PaymentMethod, Printer } from '../../../mocks/settings';
+import { Floor, Table, TableStatus } from '../../../mocks/table';
 import { ElectronService } from '../../../providers/electron.service';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
@@ -101,19 +101,31 @@ export class SellingScreenComponent implements OnInit {
       switch (this.type) {
         case 'Normal':
           this.check = new Check(this.id, 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.NORMAL, CheckNo());
-          this.getCheck({ table_id: this.id });
+          this.getCheck({ table_id: this.id }).finally(() => {
+            if (this.check.status == CheckStatus.PASSIVE) {
+              $('#occupationModal').modal({ backdrop: 'static', keyboard: false });
+            }
+          })
           break;
         case 'Fast':
           if (this.id == 'New') {
             this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
           } else {
             this.check = new Check('Hızlı Satış', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.FAST, CheckNo());
-            this.getCheck({ _id: this.id });
+            this.getCheck({ _id: this.id }).finally(() => {
+              if (this.check.status == CheckStatus.PASSIVE) {
+                $('#occupationModal').modal({ backdrop: 'static', keyboard: false });
+              }
+            })
           }
           break;
         case 'Order':
           this.check = new Check('Paket Servis', 0, 0, this.owner, '', CheckStatus.PASSIVE, [], Date.now(), CheckType.ORDER, CheckNo());
-          this.getCheck({ _id: this.id });
+          this.getCheck({ _id: this.id }).finally(() => {
+            if (this.check.status == CheckStatus.PASSIVE) {
+              $('#occupationModal').modal({ backdrop: 'static', keyboard: false });
+            }
+          })
           break;
         default:
           break;
@@ -155,21 +167,24 @@ export class SellingScreenComponent implements OnInit {
         }
       }
     });
-    setTimeout(() => {
-      if (this.check.status == CheckStatus.PASSIVE) {
-        $('#occupationModal').modal('show');
-      }
-    }, 500)
+    // setTimeout(() => {
+    //   if (this.check.status == CheckStatus.PASSIVE) {
+    //     $('#occupationModal').modal({backdrop:'static',keyboard:false});
+    //   }
+    // }, 500)
 
     this.zone.run(() => {
       let unsub = () => this.scalerListener.unsubscribe();
       $('#productSpecs').on('hide.bs.modal', function (event) {
         unsub();
       })
+      let setdefquntity = () => this.selectedQuantity = 1;
+      $('#specsModal').on('hide.bs.modal', function (event) {
+        setdefquntity();
+      })
     })
 
   }
-
 
   ngOnDestroy() {
     this.changes.cancel();
@@ -202,14 +217,14 @@ export class SellingScreenComponent implements OnInit {
 
   getCheck(filter: object) {
     if (this.type !== 'Order') {
-      this.mainService.getAllBy('checks', filter).then((result) => {
+      return this.mainService.getAllBy('checks', filter).then((result) => {
         if (result.docs.length > 0) {
           this.check = result.docs[0];
           this.check_id = result.docs[0]._id;
         }
       });
     } else {
-      this.mainService.getAllBy('checks', filter).then((result) => {
+      return this.mainService.getAllBy('checks', filter).then((result) => {
         if (result.docs.length > 0) {
           this.check = result.docs[0];
           this.check_id = result.docs[0]._id;
@@ -217,15 +232,21 @@ export class SellingScreenComponent implements OnInit {
       }).catch(err => {
         console.log('Checks', err);
       });
-      this.mainService.getAllBy('closed_checks', filter).then((result) => {
-        if (result.docs.length > 0) {
-          this.check = result.docs[0];
-          this.check_id = result.docs[0]._id;
-          this.check.occupation = { male: 0, female: 0 };
-        }
-      }).catch(err => {
-        console.log('Closed Checks', err);
-      });
+
+      // setTimeout(() => {
+      //   if (this.check.status == CheckStatus.PASSIVE) {
+      //     $('#occupationModal').modal({backdrop:'static',keyboard:false});
+      //   }
+      // }, 500)
+      // this.mainService.getAllBy('closed_checks', filter).then((result) => {
+      //   if (result.docs.length > 0) {
+      //     this.check = result.docs[0];
+      //     this.check_id = result.docs[0]._id;
+      //     this.check.occupation = { male: 0, female: 0 };
+      //   }
+      // }).catch(err => {
+      //   console.log('Closed Checks', err);
+      // });
     }
   }
 
@@ -246,9 +267,6 @@ export class SellingScreenComponent implements OnInit {
         this.scalerListener = this.scalerService.listenScalerEvent().subscribe((weight: number) => {
           if (weight && weight !== 0) {
             this.numpad = weight * this.productStock.amount;
-
-            console.log
-
             if (this.tareNumber !== 0) {
               this.numpad = this.numpad - this.tareNumber;
             }
@@ -260,12 +278,22 @@ export class SellingScreenComponent implements OnInit {
     } else {
       this.productFilterInput.nativeElement.value = '';
       let newProduct = new CheckProduct(product._id, product.cat_id, product.name, product.price, '', 1, this.ownerId, Date.now(), product.tax_value, product.barcode);
-      for (let index = 0; index < this.selectedQuantity; index++) {
-        this.countProductsData(product._id, product.price);
-        this.check.total_price = this.check.total_price + product.price;
+      if (![0.5, 1.5].includes(this.selectedQuantity)) {
+        for (let index = 0; index < this.selectedQuantity; index++) {
+          this.countProductsData(product._id, product.price);
+          this.check.total_price = this.check.total_price + product.price;
+          this.check.products.push(newProduct);
+          this.newOrders.push(newProduct);
+        }
+      } else {
+        this.countProductsData(product._id, (product.price * this.selectedQuantity), this.selectedQuantity);
+        this.check.total_price = this.check.total_price + (product.price * this.selectedQuantity);
+        newProduct.price = (product.price * this.selectedQuantity);
+        newProduct.name = newProduct.name + ' ' + this.selectedQuantity + ' Porsiyon'
         this.check.products.push(newProduct);
         this.newOrders.push(newProduct);
       }
+
       this.selectedIndex = this.check.products.length - 1;
       this.selectedProduct = this.check.products[this.selectedIndex];
       try {
@@ -277,13 +305,15 @@ export class SellingScreenComponent implements OnInit {
         // this.selectedIndex = this.check.products.length - 1;
         // this.selectedProduct = this.check.products[this.selectedIndex];
         this.getSpecies(newProduct);
-        $('#specsModal').modal('show');
+        $('#specsModal').modal({ backdrop: 'static', keyboard: false });
+      } else {
+        this.selectedQuantity = 1;
       }
     }
     setTimeout(() => {
       $('#check-products').scrollTop(999999);
     }, 200)
-    this.selectedQuantity = 1;
+    // this.selectedQuantity = 1;
   }
 
   numpadToCheck() {
@@ -653,8 +683,13 @@ export class SellingScreenComponent implements OnInit {
 
   changeSpecs(spec) {
     const oldPrice = this.selectedProduct.price;
-    this.selectedProduct.name = this.selectedProduct.name + ' ' + spec.spec_name;
-    this.selectedProduct.price = spec.spec_price;
+    if (![0.5, 1.5].includes(this.selectedQuantity)) {
+      this.selectedProduct.name = this.selectedProduct.name + ' ' + spec.spec_name;
+      this.selectedProduct.price = spec.spec_price;
+    } else {
+      this.selectedProduct.name = this.selectedProduct.name + ' ' + spec.spec_name;
+      this.selectedProduct.price = (spec.spec_price * this.selectedQuantity);
+    }
     this.recalculateTotal();
     $('#specsModal').modal('hide');
   }

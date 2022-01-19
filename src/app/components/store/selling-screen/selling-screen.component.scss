@@ -103,6 +103,9 @@
 .payedLayer {
   border-top: 1px solid white;
 }
+.payedLayer:hover{
+  background-color: rgba(0, 0, 0, 0.8);
+}
 
 .payed-things {
   min-height: 200px;

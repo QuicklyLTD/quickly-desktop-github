@@ -6,7 +6,7 @@ import * as PouchDBResolve from 'pouch-resolve-conflicts';
 import * as PouchDBInMemory from 'pouchdb-adapter-memory';
 import * as PouchDBReplicationStream from 'pouchdb-replication-stream';
 
-import { AuthInfo, ServerInfo } from '../mocks/settings.mock';
+import { AuthInfo, ServerInfo } from '../mocks/settings';
 
 @Injectable()
 export class MainService {
@@ -55,6 +55,7 @@ export class MainService {
       logs: new PouchDB('local_logs', db_opts),
       commands: new PouchDB('local_commands', db_opts),
       comments: new PouchDB('local_comments', db_opts),
+      prints: new PouchDB('local_prints', db_opts),
       settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
@@ -242,6 +243,7 @@ export class MainService {
       logs: new PouchDB('local_logs', db_opts),
       commands: new PouchDB('local_commands', db_opts),
       comments: new PouchDB('local_comments', db_opts),
+      prints: new PouchDB('local_prints', db_opts),
       settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };

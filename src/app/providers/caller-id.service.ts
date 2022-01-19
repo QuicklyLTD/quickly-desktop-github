@@ -3,7 +3,7 @@ import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
 import { Subject, Observable } from 'rxjs';
-import { Call } from '../mocks/caller.mock';
+import { Call } from '../mocks/caller';
 
 @Injectable()
 export class CallerIDService {

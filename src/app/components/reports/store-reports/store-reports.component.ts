@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Check, ClosedCheck, PaymentStatus, CheckType, CheckStatus, CheckNo } from '../../../mocks/check.mock';
-import { Log } from '../../../mocks/log.mock';
+import { Check, ClosedCheck, PaymentStatus, CheckType, CheckStatus, CheckNo } from '../../../mocks/check';
+import { Log } from '../../../mocks/log';
 import { MessageService } from '../../../providers/message.service';
 import { PrinterService } from '../../../providers/printer.service';
 import { LogService, logType } from '../../../services/log.service';

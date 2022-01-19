@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log.mock';
-import { Report } from '../../../mocks/report.mock';
+import { Log, logType } from '../../../mocks/log';
+import { Report } from '../../../mocks/report';
 import { MainService } from '../../../services/main.service';
-import { Floor } from '../../../mocks/table.mock';
+import { Floor } from '../../../mocks/table';
 
 @Component({
   selector: 'app-table-reports',

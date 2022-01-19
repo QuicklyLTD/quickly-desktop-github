@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '../../mocks/user.mock';
+import { User } from '../../mocks/user';
 import { MessageService } from "../../providers/message.service";
 import { AuthService } from "../../services/auth.service";
 import { MainService } from '../../services/main.service';

@@ -1,12 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { MainService } from '../../services/main.service';
-import { Report } from '../../mocks/report.mock';
+import { Report } from '../../mocks/report';
 
 import * as fs from 'fs';
-import { ServerInfo, Settings } from '../../mocks/settings.mock';
-import { Product } from '../../mocks/product.mock';
-import { Table } from '../../mocks/table.mock';
+import { ServerInfo, Settings } from '../../mocks/settings';
+import { Product } from '../../mocks/product';
+import { Table } from '../../mocks/table';
 
 @Component({
   selector: 'app-admin',
@@ -168,9 +168,9 @@ export class AdminComponent implements OnInit {
             if (element.hasOwnProperty('timestamp')) {
               if (a.timestamp > b.timestamp) return a;
               if (b.timestamp > a.timestamp) return b;
-            } else if (element.hasOwnProperty('update_time')) {
-              if (a.update_time > b.update_time) return a;
-              if (b.update_time > a.update_time) return b;
+            } else if (element.hasOwnProperty('timestamp')) {
+              if (a.timestamp > b.timestamp) return a;
+              if (b.timestamp > a.timestamp) return b;
             } else if (element.hasOwnProperty('time')) {
               if (a.time > b.time) return a;
               if (b.time > a.time) return b;

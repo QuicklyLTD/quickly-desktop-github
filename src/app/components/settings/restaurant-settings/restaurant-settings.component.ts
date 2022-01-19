@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Report } from '../../../mocks/report.mock';
-import { Floor, FloorSpecs, Table } from '../../../mocks/table.mock';
+import { Report } from '../../../mocks/report';
+import { Floor, FloorSpecs, Table } from '../../../mocks/table';
 import { MessageService } from '../../../providers/message.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
