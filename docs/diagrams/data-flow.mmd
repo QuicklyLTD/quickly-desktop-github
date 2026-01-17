@@ -1,0 +1,123 @@
+# Data Flow Diagrams
+
+## Complete Data Flow
+
+```mermaid
+graph TB
+    subgraph "UI Layer"
+        UI[Angular Components]
+    end
+    
+    subgraph "Service Layer"
+        MS[MainService]
+        SS[SyncService]
+        CS[ConflictService]
+    end
+    
+    subgraph "Local DB Layer"
+        LocalDB[LocalDB 28 Databases]
+        AllData[allData Master DB]
+    end
+    
+    subgraph "Remote DB Layer"
+        ServerDB[ServerDB Express-PouchDB]
+        RemoteDB[RemoteDB Cloud]
+    end
+    
+    subgraph "File System"
+        Backup[data/db.dat Backup File]
+    end
+    
+    UI -->|CRUD Operations| MS
+    MS -->|Dual Write| LocalDB
+    MS -->|Dual Write| AllData
+    
+    LocalDB -->|Change Feed| AllData
+    AllData -->|LAN Sync| ServerDB
+    AllData -->|Cloud Sync| RemoteDB
+    
+    MS -->|loadAppData| AllData
+    AllData -->|Populate| LocalDB
+    
+    SS -->|serverReplication| ServerDB
+    SS -->|syncToRemote| RemoteDB
+    SS -->|loadFromBackup| Backup
+    SS -->|appDataInitializer| AllData
+    
+    CS -->|resolve conflicts| AllData
+    
+    style AllData fill:#f9f,stroke:#333,stroke-width:4px
+    style LocalDB fill:#bbf,stroke:#333,stroke-width:2px
+    style ServerDB fill:#bfb,stroke:#333,stroke-width:2px
+    style RemoteDB fill:#fbf,stroke:#333,stroke-width:2px
+```
+
+## CRUD Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant UI as Angular Component
+    participant MS as MainService
+    participant LDB as LocalDB[db]
+    participant AD as allData
+    participant Sync as SyncService
+    
+    Note over UI,Sync: CREATE Operation
+    UI->>MS: addData('products', product)
+    MS->>LDB: post(product)
+    LDB-->>MS: {ok, id, rev}
+    MS->>AD: put(doc + db_name)
+    AD-->>MS: result
+    
+    Note over UI,Sync: READ Operation
+    UI->>MS: getAllBy('products', selector)
+    MS->>LDB: find(selector)
+    LDB-->>MS: docs[]
+    MS-->>UI: docs[]
+    
+    Note over UI,Sync: UPDATE Operation
+    UI->>MS: changeData('products', id, update)
+    MS->>AD: upsert(id, update)
+    MS->>LDB: upsert(id, update)
+    
+    Note over UI,Sync: DELETE Operation
+    UI->>MS: removeData('products', id)
+    MS->>AD: remove(id)
+    MS->>LDB: remove(id)
+```
+
+## Sync Architecture
+
+```mermaid
+graph LR
+    subgraph "Primary Device"
+        P1[LocalDB]
+        P2[allData]
+        P3[Express Server]
+        P1 <--> P2
+        P2 <--> P3
+    end
+    
+    subgraph "Secondary Device 1"
+        S1[LocalDB]
+        S2[allData]
+        S1 <--> S2
+    end
+    
+    subgraph "Secondary Device 2"
+        T1[LocalDB]
+        T2[allData]
+        T1 <--> T2
+    end
+    
+    subgraph "Cloud Server"
+        C[RemoteDB]
+    end
+    
+    S2 <-->|LAN Sync| P3
+    T2 <-->|LAN Sync| P3
+    P2 <-->|Cloud Sync| C
+    
+    style P3 fill:#bfb,stroke:#333,stroke-width:3px
+    style C fill:#fbf,stroke:#333,stroke-width:3px
+```

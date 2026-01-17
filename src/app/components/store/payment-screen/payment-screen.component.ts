@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check';
 import { Printer, PaymentMethod } from '../../../mocks/settings';
@@ -7,6 +7,7 @@ import { PrinterService } from '../../../providers/printer.service';
 import { LogService, logType } from '../../../services/log.service';
 import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
+import { EntityStoreService } from '../../../services/entity-store.service';
 import { Customer } from 'app/mocks/customer';
 
 @Component({
@@ -16,10 +17,11 @@ import { Customer } from 'app/mocks/customer';
   providers: [SettingsService]
 })
 
-export class PaymentScreenComponent implements OnInit {
+export class PaymentScreenComponent implements OnInit, OnDestroy {
   id: string;
   check: Check;
   table: string;
+  tableName = ''; // Resolved table name
   userId: string;
   userName: string;
   payedShow: boolean;
@@ -45,13 +47,15 @@ export class PaymentScreenComponent implements OnInit {
   permissions: Object;
   day: number;
   changes: any;
-  paymentMethods: Array<PaymentMethod>
+  paymentMethods: Array<PaymentMethod>;
   customers: Array<Customer>;
   @ViewChild('discountInput') discountInput: ElementRef;
   @ViewChild('customerInput') customerInput: ElementRef;
   @ViewChild('creditNote') creditNote: ElementRef;
 
-  constructor(private route: ActivatedRoute, private router: Router, private settingsService: SettingsService, private mainService: MainService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
+  constructor(private route: ActivatedRoute, private router: Router, private settingsService: SettingsService,
+    private mainService: MainService, private printerService: PrinterService, private messageService: MessageService,
+    private logService: LogService, private entityStoreService: EntityStoreService) {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.fillData();
@@ -65,13 +69,13 @@ export class PaymentScreenComponent implements OnInit {
     this.permissions = JSON.parse(localStorage['userPermissions']);
     this.settingsService.DateSettings.subscribe(res => {
       this.day = res.value.day;
-    })
+    });
     this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
   }
 
   ngOnInit() {
     this.discounts = [5, 10, 15, 20, 25, 40];
-    this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [".", 0, "✔"]];
+    this.numboard = [[1, 2, 3], [4, 5, 6], [7, 8, 9], ['.', 0, '✔']];
     this.setDefault();
     this.payedShow = false;
     this.payedTitle = 'Ödemeleri Göster';
@@ -79,11 +83,11 @@ export class PaymentScreenComponent implements OnInit {
     this.userName = this.settingsService.getUser('name');
     this.onClosing = false;
     this.changes = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', (change) => {
-      if (change.id == this.id) {
+      if (change.id === this.id) {
         if (!change.deleted) {
           this.mainService.getData('checks', change.id).then(res => {
             this.fillData();
-          })
+          });
         } else {
           this.router.navigate(['/store']);
         }
@@ -107,33 +111,37 @@ export class PaymentScreenComponent implements OnInit {
     //   this.printerService.kickCashdraw(this.printers[0])
     // }
     if (this.discountAmount > 0) {
-      this.logService.createLog(logType.DISCOUNT, this.userId, `${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
+      this.logService.createLog(logType.DISCOUNT, this.userId,
+        `${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
     }
-    if (this.check.total_price == 0 && this.changePrice >= 0) {
+    if (this.check.total_price === 0 && this.changePrice >= 0) {
       this.closeCheck(method);
     } else {
       this.onClosing = true;
       let newPayment: PaymentStatus;
-      let isAnyEqual = this.productsWillPay.some(obj => obj.price == (this.payedPrice + (this.discount ? this.discountAmount : 0)));
-      let isAnyGreat = this.productsWillPay.some(obj => obj.price > (this.payedPrice + (this.discount ? this.discountAmount : 0)));
-      let isAnyLittle = this.productsWillPay.some(obj => obj.price < (this.payedPrice + (this.discount ? this.discountAmount : 0)));
+      const isAnyEqual = this.productsWillPay.some(obj => obj.price === (this.payedPrice + (this.discount ? this.discountAmount : 0)));
+      const isAnyGreat = this.productsWillPay.some(obj => obj.price > (this.payedPrice + (this.discount ? this.discountAmount : 0)));
+      const isAnyLittle = this.productsWillPay.some(obj => obj.price < (this.payedPrice + (this.discount ? this.discountAmount : 0)));
       if (this.changePrice < 0) {
         if (this.discount) {
           this.payedPrice = this.payedPrice + this.discountAmount;
         }
         if (isAnyEqual) {
-          let equalProduct = this.productsWillPay.filter(obj => obj.price == this.payedPrice)[0];
-          let indexOfEqual = this.productsWillPay.findIndex(obj => obj == equalProduct);
-          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), [equalProduct]);
+          const equalProduct = this.productsWillPay.filter(obj => obj.price === this.payedPrice)[0];
+          const indexOfEqual = this.productsWillPay.findIndex(obj => obj === equalProduct);
+          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount),
+            this.discountAmount, Date.now(), [equalProduct]);
           this.productsWillPay.splice(indexOfEqual, 1);
         } else if (isAnyGreat) {
-          let greatOne = this.productsWillPay.sort((a, b) => b.price - a.price)[0];
-          let greatOneCopy = Object.assign({}, greatOne);
+          const greatOne = this.productsWillPay.sort((a, b) => b.price - a.price)[0];
+          const greatOneCopy = Object.assign({}, greatOne);
           greatOneCopy.price = this.payedPrice;
-          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), [greatOneCopy]);
+          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount),
+            this.discountAmount, Date.now(), [greatOneCopy]);
           greatOne.price -= this.payedPrice;
         } else if (isAnyLittle) {
-          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount), this.discountAmount, Date.now(), []);
+          newPayment = new PaymentStatus(this.userName, method, (this.payedPrice - this.discountAmount),
+            this.discountAmount, Date.now(), []);
           let priceCount = this.payedPrice;
           let willRemove = 0;
           this.productsWillPay = this.productsWillPay.filter(obj => obj).sort((a, b) => b.price - a.price);
@@ -147,10 +155,10 @@ export class PaymentScreenComponent implements OnInit {
                 const productWillPush = Object.assign({}, product);
                 productWillPush.price = priceCount;
                 newPayment.payed_products.push(productWillPush);
-                if (product.price - priceCount == 0) {
+                if (product.price - priceCount === 0) {
                   willRemove++;
                 } else {
-                  let pro = this.productsWillPay[index];
+                  const pro = this.productsWillPay[index];
                   pro.price -= priceCount;
                 }
                 priceCount = 0;
@@ -165,7 +173,7 @@ export class PaymentScreenComponent implements OnInit {
       } else {
         newPayment = new PaymentStatus(this.userName, method, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
       }
-      if (this.check.payment_flow == undefined) {
+      if (this.check.payment_flow === undefined) {
         this.check.payment_flow = [];
       }
       this.check.payment_flow.push(newPayment);
@@ -180,7 +188,7 @@ export class PaymentScreenComponent implements OnInit {
         this.discount = undefined;
         this.discountAmount = 0;
       }
-      this.logService.createLog(logType.CHECK_PAYED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`)
+      this.logService.createLog(logType.CHECK_PAYED, this.check._id, `${this.table} Hesabından ${newPayment.amount} TL tutarında ${method} ödeme alındı.`);
       this.togglePayed();
       this.isFirstTime = true;
     }
@@ -191,17 +199,20 @@ export class PaymentScreenComponent implements OnInit {
     let checkWillClose;
     this.onClosing = false;
     if (this.check.payment_flow !== undefined && this.check.payment_flow.length > 0) {
-      let realMethod = method;
+      const realMethod = method;
       method = 'Parçalı';
-      let lastPayment = new PaymentStatus(this.userName, realMethod, this.currentAmount, this.discountAmount, Date.now(), this.productsWillPay);
+      const lastPayment = new PaymentStatus(this.userName, realMethod, this.currentAmount, this.discountAmount,
+        Date.now(), this.productsWillPay);
       this.check.payment_flow.push(lastPayment);
       this.check.discount += this.priceWillPay;
       total_discounts = this.check.payment_flow.map(obj => obj.discount).reduce((a, b) => a + b);
-      let total_price = this.check.payment_flow.map(obj => obj.amount).reduce((a, b) => a + b);
-      checkWillClose = new ClosedCheck(this.check.table_id, total_price, total_discounts, this.userName, this.check.note, this.check.status, this.check.products, Date.now(), this.check.type, method, this.check.payment_flow, null, this.check.occupation);
+      const totalPrice = this.check.payment_flow.map(obj => obj.amount).reduce((a, b) => a + b);
+      checkWillClose = new ClosedCheck(this.check.table_id, totalPrice, total_discounts, this.userName, this.check.note,
+        this.check.status, this.check.products, Date.now(), this.check.type, method, this.check.payment_flow, null, this.check.occupation);
     } else {
       total_discounts = this.discountAmount;
-      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note, this.check.status, this.productsWillPay, Date.now(), this.check.type, method, null, null, this.check.occupation);
+      checkWillClose = new ClosedCheck(this.check.table_id, this.currentAmount, total_discounts, this.userName, this.check.note,
+        this.check.status, this.productsWillPay, Date.now(), this.check.type, method, null, null, this.check.occupation);
     }
     if (this.askForPrint) {
       this.messageService.sendConfirm('Fiş Yazdırılsın mı ?').then(isOK => {
@@ -214,15 +225,16 @@ export class PaymentScreenComponent implements OnInit {
     }
     this.mainService.addData('closed_checks', checkWillClose).then(res => {
       if (res.ok) {
-        this.mainService.removeData('checks', this.check._id).then(res => {
-          if (this.check.type == 1) {
+        this.mainService.removeData('checks', this.check._id).then(resRemove => {
+          if (this.check.type === 1) {
             this.mainService.updateData('tables', this.check.table_id, { status: 1 });
           }
-          this.logService.createLog(logType.CHECK_CLOSED, res.id, `${this.table} Hesabı ${this.currentAmount} TL tutarında ödeme alınarak kapatıldı.`);
+          this.logService.createLog(logType.CHECK_CLOSED, resRemove.id,
+            `${this.table} Hesabı ${this.currentAmount} TL tutarında ödeme alınarak kapatıldı.`);
           this.messageService.sendMessage(`Hesap '${method}' olarak kapatıldı`);
         });
         this.updateSellingReport(method);
-        if (this.check.type == 1) {
+        if (this.check.type === 1) {
           this.updateTableReport(this.check, method);
         }
         this.router.navigate(['/store']);
@@ -233,31 +245,33 @@ export class PaymentScreenComponent implements OnInit {
   createCredit(customer: string, creditNote: string) {
     if (this.check.payment_flow !== undefined) {
       let paymentMethod;
-      (this.check.payment_flow.length > 0) ? paymentMethod = 'Parçalı' : paymentMethod = this.check.payment_flow[0].method;
-      let checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, 0, this.userName, '', this.check.status, this.check.products, Date.now(), this.check.type, paymentMethod, this.check.payment_flow, null, this.check.occupation);
+      paymentMethod = (this.check.payment_flow.length > 0) ? 'Parçalı' : this.check.payment_flow[0].method;
+      const checkWillClose = new ClosedCheck(this.check.table_id, this.check.discount, 0, this.userName, '', this.check.status,
+        this.check.products, Date.now(), this.check.type, paymentMethod, this.check.payment_flow, null, this.check.occupation);
       this.updateSellingReport(paymentMethod);
       this.updateTableReport(this.check, paymentMethod);
       this.mainService.addData('closed_checks', checkWillClose);
     }
-    let newCredit = new Check(customer, this.priceWillPay, CheckStatus.PASSIVE, this.userName, creditNote, 0, this.productsWillPay, Date.now(), CheckType.PASSIVE, CheckNo());
+    const newCredit = new Check(customer, this.priceWillPay, CheckStatus.PASSIVE, this.userName, creditNote, 0,
+      this.productsWillPay, Date.now(), CheckType.PASSIVE, CheckNo());
     this.mainService.addData('credits', newCredit).then(res => {
       if (res.ok) {
-        if (this.check.type == 1) {
+        if (this.check.type === 1) {
           this.mainService.updateData('tables', this.check.table_id, { status: 1 });
         }
-        this.mainService.removeData('checks', this.check._id).then(res => {
-          if (res.ok) {
+        this.mainService.removeData('checks', this.check._id).then(resRemove => {
+          if (resRemove.ok) {
             $('#otherOptions').modal('hide');
             this.router.navigate(['/store']);
           }
-        })
+        });
       }
     });
   }
 
   setDiscount(discount: number) {
     this.discount = discount;
-    if (this.payedPrice == 0) {
+    if (this.payedPrice === 0) {
       this.payedPrice = this.priceWillPay;
     }
     this.setChange();
@@ -267,10 +281,10 @@ export class PaymentScreenComponent implements OnInit {
 
 
   divideWillPay(division: number) {
-      this.payedPrice = this.priceWillPay / division;
-      this.setChange();
-      this.numpad = this.payedPrice.toFixed(2).toString();
-      $('#calculator').modal('hide');
+    this.payedPrice = this.priceWillPay / division;
+    this.setChange();
+    this.numpad = this.payedPrice.toFixed(2).toString();
+    $('#calculator').modal('hide');
   }
 
   togglePayed() {
@@ -307,7 +321,7 @@ export class PaymentScreenComponent implements OnInit {
     this.check.products.forEach(element => {
       this.productsWillPay.push(element);
       this.check.products = this.check.products.filter(obj => obj !== element);
-    })
+    });
     this.priceWillPay = this.productsWillPay.map(obj => obj.price).reduce((a, b) => a + b);
     this.check.products = [];
     this.numpad = this.priceWillPay.toFixed(2).toString();
@@ -335,7 +349,7 @@ export class PaymentScreenComponent implements OnInit {
   }
 
   pushKey(key: any) {
-    if (key === "✔") {
+    if (key === '✔') {
       this.payedPrice = parseFloat(this.numpad);
       this.setChange();
       this.numpad = '';
@@ -388,7 +402,7 @@ export class PaymentScreenComponent implements OnInit {
     if (method !== 'Parçalı') {
       this.mainService.getAllBy('reports', { connection_id: method }).then(res => {
         if (res.docs.length > 0) {
-          let doc = res.docs[0];
+          const doc = res.docs[0];
           doc.count++;
           doc.weekly_count[this.day]++;
           doc.monthly_count[new Date().getMonth()]++;
@@ -400,10 +414,10 @@ export class PaymentScreenComponent implements OnInit {
         }
       });
     } else {
-      this.mainService.getAllBy('reports', { type: "Store" }).then(res => {
-        let sellingReports = res.docs;
+      this.mainService.getAllBy('reports', { type: 'Store' }).then(res => {
+        const sellingReports = res.docs;
         this.check.payment_flow.forEach((obj, index) => {
-          let reportWillChange = sellingReports.find(report => report.connection_id == obj.method);
+          const reportWillChange = sellingReports.find(report => report.connection_id === obj.method);
           reportWillChange.count++;
           reportWillChange.weekly_count[this.day]++;
           reportWillChange.monthly_count[new Date().getMonth()] += obj.amount;
@@ -411,9 +425,9 @@ export class PaymentScreenComponent implements OnInit {
           reportWillChange.weekly[this.day] += obj.amount;
           reportWillChange.monthly[new Date().getMonth()] += obj.amount;
           reportWillChange.timestamp = Date.now();
-          if (this.check.payment_flow.length == index + 1) {
+          if (this.check.payment_flow.length === index + 1) {
             sellingReports.forEach((report) => {
-              if (this.check.payment_flow.some(obj => obj.method == report.connection_id)) {
+              if (this.check.payment_flow.some(pObj => pObj.method === report.connection_id)) {
                 this.mainService.updateData('reports', report._id, report);
               }
             });
@@ -425,7 +439,7 @@ export class PaymentScreenComponent implements OnInit {
 
   updateTableReport(check: Check, method: string) {
     this.mainService.getAllBy('reports', { connection_id: check.table_id }).then(res => {
-      let report = res.docs[0];
+      const report = res.docs[0];
       if (method !== 'Parçalı') {
         report.count++;
         report.amount += this.currentAmount;
@@ -442,7 +456,7 @@ export class PaymentScreenComponent implements OnInit {
         this.check.payment_flow.forEach((obj, index) => {
           report.amount += obj.amount;
           report.weekly[this.day] += obj.amount;
-          report.monthly[new Date().getMonth()] +=obj.amount;
+          report.monthly[new Date().getMonth()] += obj.amount;
         });
       }
       this.mainService.updateData('reports', report._id, report);
@@ -452,25 +466,30 @@ export class PaymentScreenComponent implements OnInit {
   fillData() {
     this.mainService.getData('checks', this.id).then(res => {
       this.check = res;
-      if (this.check.type == 1) {
+      if (this.check.type === 1) {
         this.check_id = this.check.table_id;
         this.check_type = 'Normal';
-        this.mainService.getData('tables', this.check.table_id).then(res => {
-          this.table = res.name;
+        this.tableName = '';
+        this.table = this.tableName;
+        // Resolve table name using EntityStoreService
+        this.entityStoreService.resolveEntity('tables', this.check.table_id).then(name => {
+          this.tableName = name;
+          this.table = name;
         });
       } else {
         this.check_id = this.id;
         this.check_type = 'Fast';
-        this.table = (this.check.note == '' ? 'Hızlı Satış' : this.check.note);
+        this.table = (this.check.note === '' ? 'Hızlı Satış' : this.check.note);
+        this.tableName = this.table;
       }
       if (this.check.discountPercent) {
         this.setDiscount(this.check.discountPercent);
       }
-      this.canceledProducts = this.check.products.filter(obj => obj.status == 3);
-      this.check.products = this.check.products.filter(obj => obj.status == 2);
+      this.canceledProducts = this.check.products.filter(obj => obj.status === 3);
+      this.check.products = this.check.products.filter(obj => obj.status === 2);
     });
     this.settingsService.getAppSettings().subscribe((res: any) => {
-      if (res.value.ask_print_check == 'Sor') {
+      if (res.value.ask_print_check === 'Sor') {
         this.askForPrint = true;
       } else {
         this.askForPrint = false;
@@ -478,6 +497,6 @@ export class PaymentScreenComponent implements OnInit {
     });
     this.mainService.getAllBy('customers', {}).then(res => {
       this.customers = res.docs;
-    })
+    });
   }
 }

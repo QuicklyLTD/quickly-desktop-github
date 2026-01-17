@@ -34,14 +34,10 @@ export class ApplicationService {
   }
 
   connectionStatus() {
-    if (localStorage.getItem('AppType') == 'Primary') {
-      if (navigator.onLine) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
+    if (navigator.onLine) {
       return true;
+    } else {
+      return false;
     }
   }
 
@@ -50,8 +46,11 @@ export class ApplicationService {
       case 'start':
         this.timer = this.appLockTime;
         this.countDown = setInterval(() => {
-          if (this.timer == 0) {
-            if (this.router.url === '/' || this.router.url.match('payment') || this.router.url === '/endoftheday' || this.router.url === '/endoftheday_no_guard' || this.router.url === '/activation' || this.router.url === '/settings' || this.router.url === '/reports' || this.router.url === '/setup' || this.router.url === '/admin') {
+          if (this.timer === 0) {
+            if (this.router.url === '/' || this.router.url.match('payment') || this.router.url === '/endoftheday' ||
+                this.router.url === '/endoftheday_no_guard' || this.router.url === '/activation' ||
+                this.router.url === '/settings' || this.router.url === '/reports' ||
+                this.router.url === '/setup' || this.router.url === '/admin') {
               this.timer = this.appLockTime;
             } else {
               this.timer = this.appLockTime;

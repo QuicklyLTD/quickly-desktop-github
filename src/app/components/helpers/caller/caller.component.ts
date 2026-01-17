@@ -45,7 +45,8 @@ export class CallerComponent implements OnInit {
 
 
   openCheck() {
-    const checkWillOpen = new Check('Paket Servis', 0, 0, this.owner, `${this.customer.name} | ${this.customer.phone_number}`, CheckStatus.PASSIVE, [], Date.now(), CheckType.ORDER, CheckNo());
+    const checkWillOpen = new Check('Paket Servis', 0, 0, this.owner,
+      `${this.customer.name} | ${this.customer.phone_number}`, CheckStatus.PASSIVE, [], Date.now(), CheckType.ORDER, CheckNo());
     this.mainService.addData('checks', checkWillOpen).then(res => {
       $('#callerModal').modal('hide');
       this.router.navigate(['/selling-screen', 'Order', res.id]);
@@ -54,12 +55,14 @@ export class CallerComponent implements OnInit {
 
   saveCustomer() {
     const unknownCustomer = this.customerForm.value;
-    const customerWillCreate = new Customer(unknownCustomer.name, unknownCustomer.surname, this.call.number, unknownCustomer.address, '', CustomerType.FAR, Date.now())
+    const customerWillCreate = new Customer(unknownCustomer.name, unknownCustomer.surname,
+      this.call.number, unknownCustomer.address, '', CustomerType.FAR, Date.now());
     this.mainService.addData('customers', customerWillCreate).then(res => {
-      const checkWillOpen = new Check('Paket Servis', 0, 0, this.owner, `${unknownCustomer.name} | ${this.call.number}`, CheckStatus.PASSIVE, [], Date.now(), CheckType.ORDER, CheckNo());
-      this.mainService.addData('checks', checkWillOpen).then(res => {
+      const checkWillOpen = new Check('Paket Servis', 0, 0, this.owner,
+        `${unknownCustomer.name} | ${this.call.number}`, CheckStatus.PASSIVE, [], Date.now(), CheckType.ORDER, CheckNo());
+      this.mainService.addData('checks', checkWillOpen).then(checkRes => {
         $('#callerModal').modal('hide');
-        this.router.navigate(['/selling-screen', 'Order', res.id]);
+        this.router.navigate(['/selling-screen', 'Order', checkRes.id]);
       });
     });
   }

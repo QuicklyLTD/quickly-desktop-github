@@ -237,7 +237,7 @@
                         <td>{{product.name}}</td>
                         <td class="font-weight-bold">{{product.price}} TL</td>
                         <td>{{product.tax_value}} %</td>
-                        <td>{{product.cat_id | general:'categories':'name' | async}}</td>
+                        <td>{{categoryNames.get(product.cat_id) || product.cat_id}}</td>
                       </tr>
                     </tbody>
                   </table>

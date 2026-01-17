@@ -13,7 +13,7 @@ import { PaymentScreenComponent } from './components/store/payment-screen/paymen
 import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { StoreComponent } from './components/store/store.component';
 import { AnonymousCanActivate, CanActivateViaAuthGuard, DayStarted, SetupFinished } from './guards/auth.guard.service';
-import { AuthService } from "./services/auth.service";
+import { AuthService } from './services/auth.service';
 
 const routes: Routes = [
   {

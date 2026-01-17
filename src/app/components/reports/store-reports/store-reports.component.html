@@ -75,7 +75,7 @@
                   <tbody>
                     <tr *ngFor="let check of NormalChecks let i = index;" (click)="getDetail(check)">
                       <td>{{i+1}}</td>
-                      <td>{{check.table_id | general:'tables' | async}}
+                      <td>{{tableNames.get(check.table_id) || check.table_id}}
                         <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                       </td>
                       <td>{{check.total_price + check.discount | price}}
@@ -218,7 +218,7 @@
               <tbody>
                 <tr *ngFor="let check of NotPayedChecks let i = index;" (click)="getDetail(check)">
                   <td>{{i+1}}</td>
-                  <td>{{check.table_id | general:'tables' | async}}
+                  <td>{{tableNames.get(check.table_id) || check.table_id}}
                     <small *ngIf="check.note !== '' && check.note !== undefined" class="text-muted">({{check.note}})</small>
                   </td>
                   <td>{{check.description}}</td>
@@ -339,7 +339,7 @@
       <div class="modal-body p-0">
         <div class="card checkDetail">
           <div class="card-header">
-            <b>{{checkDetail?.table_id | general:'tables' | async}}
+            <b>{{tableNames.get(checkDetail?.table_id) || checkDetail?.table_id}}
               <small class="text-muted"> ({{checkDetail?.timestamp | date:'dd/M/y HH:mm'}})</small>
             </b>
             <span class="pull-right text-muted"> Hesap Türü : {{checkDetail?.payment_method}}</span>
@@ -359,7 +359,7 @@
                   <td>{{item.name}}
                     <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                   </td>
-                  <td>{{item.owner | general:'users' | async }}</td>
+                  <td>{{userNames.get(item.owner) || item.owner}}</td>
                   <td>{{item.timestamp |date:'HH:mm'}}</td>
                   <td>{{item.price | price}} </td>
                 </tr>
@@ -385,7 +385,7 @@
                     <td width="48%">{{product.name}}
                       <small *ngIf="product.note !== '' && product.note !== undefined" class="text-muted">({{product.note}})</small>
                     </td>
-                    <td width="15%">{{product.owner | general:'users' | async }}</td>
+                    <td width="15%">{{userNames.get(product.owner) || product.owner}}</td>
                     <td width="15%">{{product.timestamp |date:'HH:mm'}}</td>
                     <td width="17%">{{product.price | price}} </td>
                   </tr>

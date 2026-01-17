@@ -8,6 +8,7 @@ import { Report } from '../../../mocks/report';
 import { Check, CheckNo, CheckType } from '../../../mocks/check';
 import { PrinterService } from '../../../providers/printer.service';
 import { SettingsService } from '../../../services/settings.service';
+import { EntityStoreService } from '../../../services/entity-store.service';
 
 @Component({
   selector: 'app-customer-settings',
@@ -26,9 +27,13 @@ export class CustomerSettingsComponent implements OnInit {
   checkDetail: Check;
   day: any;
   printers: any;
+  tableNames: Map<string, string> = new Map();
+  userNames: Map<string, string> = new Map();
 
   constructor(
-    private mainService: MainService, private settingsService: SettingsService, private printerService: PrinterService, private messageService: MessageService, private logService: LogService) {
+    private mainService: MainService, private settingsService: SettingsService,
+    private printerService: PrinterService, private messageService: MessageService,
+    private logService: LogService, private entityStoreService: EntityStoreService) {
   }
 
   ngOnInit() {
@@ -49,33 +54,37 @@ export class CustomerSettingsComponent implements OnInit {
   }
 
   addCustomer(customerForm) {
-    let form = customerForm.value;
-    if (form.name == undefined) {
+    const form = customerForm.value;
+    if (form.name === undefined) {
       this.messageService.sendMessage('Müşteri Adı Girmek Zorundasınız.');
       return false;
     }
-    if (form.type == undefined) {
+    if (form.type === undefined) {
       this.messageService.sendMessage('Müşteri Tipi Seçmek Zorundasınız.');
       return false;
     }
-    if (form.phone_number == undefined) {
+    if (form.phone_number === undefined) {
       this.messageService.sendMessage('Telefon Numarası Girmek Zorundasınız.');
       return false;
     }
-    if (form.address == undefined) {
+    if (form.address === undefined) {
       this.messageService.sendMessage('Adres Girmek Zorundasınız.');
       return false;
     }
-    form.phone_number = parseInt(form.phone_number);
-    if (form._id == undefined) {
+    form.phone_number = parseInt(form.phone_number, 10);
+    if (form._id === undefined) {
       this.mainService.getAllBy('customers', { phone_number: form.phone_number }).then(result => {
         if (result.docs.length > 0) {
           this.messageService.sendMessage('Bu telefon numarası ile başka bir Müşteri kayıtlı. Lütfen başka bir numara deneyin.');
           customerForm.reset();
         } else {
-          let schema = new Customer(form.name, form.surname, form.phone_number, form.address, '', form.type, Date.now());
+          const schema = new Customer(form.name, form.surname, form.phone_number, form.address, '', form.type, Date.now());
           this.mainService.addData('customers', schema).then((response) => {
-            this.mainService.addData('reports', new Report('Customer', response.id, 0, 0, 0, [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], new Date().getMonth(), new Date().getFullYear(), form.name, Date.now())).then(res => {
+          const weeklyZeros = [0, 0, 0, 0, 0];
+          const monthlyZeros = new Array(12).fill(0);
+          const reportData = new Report('Customer', response.id, 0, 0, 0, weeklyZeros, weeklyZeros, monthlyZeros,
+            monthlyZeros, new Date().getMonth(), new Date().getFullYear(), form.name, Date.now());
+            this.mainService.addData('reports', reportData).then(res => {
               this.logService.createLog(logType.CUSTOMER_CREATED, res.id, `${form.name} Adlı Müşteri Oluşturuldu`);
             });
             this.messageService.sendMessage('Müşteri Oluşturuldu!');
@@ -87,7 +96,7 @@ export class CustomerSettingsComponent implements OnInit {
       });
     } else {
       this.mainService.getAllBy('customers', { phone_number: form.phone_number }).then(result => {
-        if (result.docs.length > 0 && result.docs[0].phone_number != form.phone_number) {
+        if (result.docs.length > 0 && result.docs[0].phone_number !== form.phone_number) {
           this.messageService.sendMessage('Bu telefon numarası ile başka bir Müşteri kayıtlı. Lütfen başka bir numara deneyin.');
         } else {
           this.mainService.updateData('customers', form._id, form).then((res) => {
@@ -113,7 +122,7 @@ export class CustomerSettingsComponent implements OnInit {
   }
 
   removeCustomer(id) {
-    let isOk = confirm('Müşteriyi Silmek Üzerisiniz. Bu işlem Geri Alınamaz.');
+    const isOk = confirm('Müşteriyi Silmek Üzerisiniz. Bu işlem Geri Alınamaz.');
     if (isOk) {
       this.mainService.removeData('customers', id).then((result) => {
         this.logService.createLog(logType.CUSTOMER_DELETED, result.id, `${this.customerForm.value.name} Adlı Müşteri Silindi`);
@@ -134,9 +143,11 @@ export class CustomerSettingsComponent implements OnInit {
       check.payment_flow.forEach(element => {
         discount += element.amount;
       });
-      checkWillReOpen = new Check('Hızlı Satış', 0, discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), CheckType.FAST, CheckNo(), check.payment_flow);
+      checkWillReOpen = new Check('Hızlı Satış', 0, discount, check.owner, 'Geri Açılan',
+        check.status, check.products, Date.now(), CheckType.FAST, CheckNo(), check.payment_flow);
     } else {
-      checkWillReOpen = new Check('Hızlı Satış', check.total_price, check.discount, check.owner, 'Geri Açılan', check.status, check.products, Date.now(), CheckType.FAST, CheckNo(), check.payment_flow);
+      checkWillReOpen = new Check('Hızlı Satış', check.total_price, check.discount, check.owner,
+        'Geri Açılan', check.status, check.products, Date.now(), CheckType.FAST, CheckNo(), check.payment_flow);
     }
     this.mainService.addData('checks', checkWillReOpen).then(() => {
       this.mainService.removeData('credits', check._id).then(() => {
@@ -145,24 +156,6 @@ export class CustomerSettingsComponent implements OnInit {
         this.messageService.sendAlert('Başarılı !', 'Hesap Geri Açıldı', 'success');
       });
     });
-    // if (check.payment_method !== 'Parçalı') {
-    //   this.mainService.getAllBy('reports', { connection_id: check.payment_method }).then(res => {
-    //     this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
-    //       doc.weekly[this.day] -= check.total_price;
-    //       doc.weekly_count[this.day]--;
-    //       return doc;
-    //     });
-    //   });
-    // } else {
-    //   check.payment_flow.forEach(element => {
-    //     this.mainService.getAllBy('reports', { connection_id: element.method }).then(res => {
-    //       this.mainService.changeData('reports', res.docs[0]._id, (doc) => {
-    //         doc.weekly[this.day] -= element.amount;
-    //         return doc;
-    //       });
-    //     });
-    //   });
-    // }
   }
 
   rePrintCheck(check) {
@@ -178,16 +171,39 @@ export class CustomerSettingsComponent implements OnInit {
     });
   }
 
-  getDetail(check: Check) {
+  async getDetail(check: Check) {
     this.checkDetail = check;
     $('#reportDetail').modal('show');
+
+    // Resolve names for this specific check detail
+    if (check.table_id) {
+       this.entityStoreService.resolveEntity('customers', check.table_id).then(name => {
+         this.tableNames = new Map([...this.tableNames, [check.table_id, name]]);
+       });
+    }
+
+    if (check.products) {
+       const userIds = check.products.map(p => p.owner).filter(id => id);
+       const resolvedUsers = await this.entityStoreService.resolveEntities('users', userIds);
+       this.userNames = new Map([...this.userNames, ...resolvedUsers]);
+    }
+
+    if (check.payment_flow) {
+      for (const flow of check.payment_flow) {
+        if (flow.payed_products) {
+          const flowUserIds = flow.payed_products.map(p => p.owner).filter(id => id);
+          const resolvedFlowUsers = await this.entityStoreService.resolveEntities('users', flowUserIds);
+          this.userNames = new Map([...this.userNames, ...resolvedFlowUsers]);
+        }
+      }
+    }
   }
 
   cancelCheck(id, note) {
     this.messageService.sendConfirm('Kapanmış Hesap İptal Edilecek! Bu işlem geri alınamaz!').then(isOK => {
       if (isOK) {
         this.mainService.updateData('closed_checks', id, { description: note, type: 3 }).then(res => {
-          this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price} TL tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`)
+          this.logService.createLog(logType.CHECK_CANCELED, id, `${this.checkDetail.total_price} TL tutarındaki kapatılan hesap iptal edildi. Açıklama:'${note}'`);
           this.fillData();
           $('#cancelDetail').modal('hide');
         });
@@ -196,15 +212,21 @@ export class CustomerSettingsComponent implements OnInit {
   }
 
   customerCredit(customer_id: string) {
-    return this.credits.filter(obj => obj.table_id == customer_id).map(obj => obj.total_price).reduce((a, b) => a + b,0) || 0;
+    if (!this.credits || this.credits.length === 0) {
+      return 0;
+    }
+    return this.credits
+      .filter(obj => obj.table_id === customer_id)
+      .map(obj => obj.total_price)
+      .reduce((a, b) => a + b, 0) || 0;
   }
 
   filterChecks(customer_id: string) {
-    this.creditsView = this.credits.filter(obj => obj.table_id == customer_id);
+    this.creditsView = this.credits.filter(obj => obj.table_id === customer_id);
   }
 
   filterCustomers(value: string) {
-    let regexp = new RegExp(value, 'i');
+    const regexp = new RegExp(value, 'i');
     this.mainService.getAllBy('customers', { name: { $regex: regexp } }).then(res => {
       this.customers = res.docs;
     });
@@ -217,6 +239,12 @@ export class CustomerSettingsComponent implements OnInit {
     this.mainService.getAllBy('credits', {}).then(res => {
       this.credits = res.docs;
       this.creditsView = this.credits.sort((a, b) => a.timestamp - b.timestamp);
-    })
+
+      // Resolve customer names for credits
+      const customerIds = this.credits.map(c => c.table_id).filter(id => id);
+      this.entityStoreService.resolveEntities('customers', customerIds).then(resolved => {
+        this.tableNames = resolved;
+      });
+    });
   }
 }

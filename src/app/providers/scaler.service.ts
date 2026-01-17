@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
-import { Subject, Observable } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators/map';
 
 @Injectable()
 export class ScalerService {
     private scalerEvent: Subject<string> = new Subject<string>();
-    private decoder: TextDecoder = new TextDecoder("utf-8");
+    private decoder: TextDecoder = new TextDecoder('utf-8');
 
     constructor(private electron: ElectronService, private messageService: MessageService, private settings: SettingsService) {
         this.electron.ipcRenderer.on('scalerError', (event, message: string) => {
@@ -74,7 +75,7 @@ export class ScalerService {
     // }
 
     startScaler() {
-        console.log('Scaler Service Started...')
+        console.log('Scaler Service Started...');
         this.electron.ipcRenderer.send('startScaler');
         // this.testFlow();
     }
@@ -86,9 +87,9 @@ export class ScalerService {
     listenScalerEvent(): Observable<any> {
         return this.scalerEvent.asObservable().pipe(map((obj: string) => {
             if (obj) {
-                let formatted = obj.replace('S', '').replace('U', '').replace('kg', '').replace('- ', '-').trim();
+                const formatted = obj.replace('S', '').replace('U', '').replace('kg', '').replace('- ', '-').trim();
                 return parseFloat(formatted);
             }
-        }))
+        }));
     }
 }

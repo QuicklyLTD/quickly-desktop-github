@@ -15,7 +15,7 @@ export class HttpService {
     this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     this.options = new RequestOptions({ headers: this.headers });
     // this.baseUrl = 'http://localhost:3000'; // 'https://hq.quickly.com.tr';
-    this.baseUrl = 'https://hq.mindsepter.com';
+    this.baseUrl = 'https://hq.quickly.com.tr';
 
     // this.baseUrl = 'http://192.168.0.29:3000'
 

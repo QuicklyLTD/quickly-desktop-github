@@ -2,32 +2,43 @@ import { Injectable } from '@angular/core';
 import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
-import { Subject, Observable } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 import { Call } from '../mocks/caller';
 
 @Injectable()
 export class CallerIDService {
-    private CallEvent: Subject<Call> = new Subject<any>();
+    private CallEvent: Subject<Call> = new Subject<Call>();
 
-    constructor(private electron: ElectronService, private messageService: MessageService, private settings: SettingsService) {
+    constructor(
+        private electron: ElectronService,
+        private messageService: MessageService,
+        private settings: SettingsService
+    ) {
         this.electron.ipcRenderer.on('callerError', (event, message: string) => {
             this.messageService.sendMessage(message);
         });
         this.electron.ipcRenderer.on('phoneRequest', (event, data) => {
-            if (data.toString().split('.')[1] == undefined || data.toString().split('.')[0] == "    ----    CIDSHOW - 2020  - Sistemler") {
-                console.log('Device Signal...')
+            if (data.toString().split('.')[1] === undefined ||
+                data.toString().split('.')[0] === '    ----    CIDSHOW - 2020  - Sistemler') {
+                console.log('Device Signal...');
             } else {
-                const newCall: Call = { line: data.toString().split('.')[0], number: data.toString().split('.')[1], serial: data.toString().split('.')[3], timestamp: Date.now() };
+                const newCall: Call = {
+                    line: data.toString().split('.')[0],
+                    number: data.toString().split('.')[1],
+                    serial: data.toString().split('.')[3],
+                    timestamp: Date.now()
+                };
                 this.CallEvent.next(newCall);
             }
         });
         this.electron.ipcRenderer.on('callerPath', (event, message) => {
             console.log('CIDSHOW PATH:', message);
-        })
+        });
     }
 
     startCallerID() {
-        console.log('CallerID Service Started...')
+        console.log('CallerID Service Started...');
         this.electron.ipcRenderer.send('startCaller');
     }
 

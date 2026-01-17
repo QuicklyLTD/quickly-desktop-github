@@ -11,33 +11,36 @@ import { Settings, ServerInfo, DayInfo } from './mocks/settings';
 import { CallerIDService } from './providers/caller-id.service';
 import { ScalerService } from './providers/scaler.service';
 import { PrinterService } from './providers/printer.service';
-import { Order, OrderStatus, OrderType } from './mocks/order';
-import { Category } from './mocks/product';
-import { Check, CheckProduct } from './mocks/check';
-import { Table } from './mocks/table';
+import { ConnectionService } from './services/connection.service';
+import { DayManagementService } from './services/day-management.service';
+import { SyncService } from './services/sync.service';
+import { OrderListenerService } from './services/order-listener.service';
+import { Check } from './mocks/check';
 import { PrintOut, PrintOutStatus } from './mocks/print';
+import { POLLING_INTERVALS, SERVER_TYPES, SERVER_STATUS } from './shared/constants';
 
+/**
+ * AppComponent - Application lifecycle orchestrator
+ *
+ * Delegates to:
+ * - ConnectionService: Time and connectivity monitoring
+ * - DayManagementService: Day validation and synchronization
+ * - SyncService: Database replication and data initialization
+ * - OrderListenerService: Order change detection and printer routing
+ */
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [SettingsService]
+  styleUrls: ['./app.component.scss']
 })
 
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '2.1.0';
+  version = '1.9.5';
   windowStatus: boolean;
-  connectionStatus: boolean;
   setupFinished: boolean;
   onSync: boolean;
-  hasError: boolean;
-  statusMessage: string;
-  date: number;
-
-  printers: Array<any>;
-  categories: Array<Category>;
 
   //// App Settings ////
 
@@ -45,13 +48,47 @@ export class AppComponent implements OnInit {
   serverSettings: ServerInfo;
   dayStatus: DayInfo;
 
+  get connectionStatus(): boolean {
+    return this.connectionService.getConnectionStatus();
+  }
 
-  constructor(private callerService: CallerIDService, private scalerService: ScalerService, private electronService: ElectronService, private mainService: MainService, private router: Router, private aplicationService: ApplicationService, private settingsService: SettingsService, private messageService: MessageService, private authService: AuthService, private conflictService: ConflictService, private printerService: PrinterService) {
-    this.date = Date.now();
+  get date(): number {
+    return this.connectionService.getDate();
+  }
+
+  get hasError(): boolean {
+    return this.syncService.hasError;
+  }
+
+  get statusMessage(): string {
+    return this.syncService.statusMessage;
+  }
+
+  constructor(
+    private callerService: CallerIDService,
+    private scalerService: ScalerService,
+    private electronService: ElectronService,
+    private mainService: MainService,
+    private router: Router,
+    private aplicationService: ApplicationService,
+    private settingsService: SettingsService,
+    private messageService: MessageService,
+    private authService: AuthService,
+    private conflictService: ConflictService,
+    private printerService: PrinterService,
+    private connectionService: ConnectionService,
+    private dayManagementService: DayManagementService,
+    private syncService: SyncService,
+    private orderListenerService: OrderListenerService
+  ) {
     this.windowStatus = false;
     this.setupFinished = false;
-    this.onSync = true;
-    this.hasError = false;
+    this.setOnSync(true);
+  }
+
+  private setOnSync(value: boolean) {
+    this.onSync = value;
+    this.orderListenerService.setOnSync(value);
   }
 
   ngOnInit() {
@@ -59,10 +96,7 @@ export class AppComponent implements OnInit {
     if (this.electronService.isElectron()) {
       this.settingsService.setLocalStorage();
       this.initAppSettings();
-      this.initConnectivityAndTime();
-
-      this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
-
+      this.connectionService.startMonitoring();
 
       // this.callerService.startCallerID();
       // this.callerService.testCall();
@@ -77,30 +111,35 @@ export class AppComponent implements OnInit {
   initAppSettings() {
     this.mainService.getAllBy('settings', {}).then(res => {
       if (res.docs.length > 0) {
-        let settings: Array<Settings> = res.docs;
+        const settings: Array<Settings> = res.docs;
         try {
-          let appType = localStorage.getItem('AppType');
+          const appType = localStorage.getItem('AppType');
+          let serverDoc;
           switch (appType) {
             case 'Primary':
-              this.serverSettings = settings.find(obj => obj.key == 'ServerSettings' && obj.value.type == 0).value;
+              serverDoc = settings.find(obj => obj.key === 'ServerSettings' && obj.value.type === 0);
               break;
             case 'Secondary':
-              this.serverSettings = settings.find(obj => obj.key == 'ServerSettings' && obj.value.type == 1).value;
+              serverDoc = settings.find(obj => obj.key === 'ServerSettings' && obj.value.type === 1);
+              break;
             default:
               break;
+          }
+          if (serverDoc && serverDoc.value) {
+            this.serverSettings = serverDoc.value;
           }
         } catch (error) {
           this.messageService.sendAlert('Bağlantı Hatası', 'Sunucu Bağlantı Anahtarı Bulunamadı!', 'error');
           this.findServerSettings();
         }
         try {
-          this.dayStatus = settings.find(obj => obj.key == 'DateSettings').value;
+          this.dayStatus = settings.find(obj => obj.key === 'DateSettings').value;
         } catch (error) {
           this.messageService.sendAlert('Gün Dökümanı Hatası', 'Tarih Eşleştirmesi Başarısız', 'error');
           this.findAppSettings();
         }
         try {
-          this.activationStatus = settings.find(obj => obj.key == 'ActivationStatus').value;
+          this.activationStatus = settings.find(obj => obj.key === 'ActivationStatus').value;
         } catch (error) {
           this.messageService.sendAlert('Aktivasyon Hatası', 'Aktivasyon Anahtarı Bulunamadı!', 'error');
           this.findAppSettings();
@@ -113,21 +152,14 @@ export class AppComponent implements OnInit {
     })
   }
 
-  initConnectivityAndTime() {
-    setInterval(() => {
-      this.date = Date.now();
-      this.connectionStatus = this.aplicationService.connectionStatus();
-    }, 5000);
-  }
-
   initAppProcess() {
     switch (this.activationStatus) {
       case true:
         this.setupFinished = true;
         if (this.serverSettings !== undefined) {
-          if (this.serverSettings.status == 1) {
+          if (this.serverSettings.status === SERVER_STATUS.ACTIVE) {
             ////// Birincil Ekran ///////
-            if (this.serverSettings.type == 0) {
+            if (this.serverSettings.type === SERVER_TYPES.PRIMARY) {
               this.electronService.ipcRenderer.send('appServer', this.serverSettings.key, this.serverSettings.ip_port);
               this.mainService.syncToServer();
               this.conflictService.conflictListener();
@@ -135,19 +167,19 @@ export class AppComponent implements OnInit {
 
               this.mainService.loadAppData().then((isLoaded: boolean) => {
                 if (isLoaded) {
-                  this.onSync = false;
+                  this.setOnSync(false);
                   this.updateActivityReport();
                   this.updateLastSeen();
                   this.router.navigate(['']);
-                  this.dayCheck();
+                  this.dayManagementService.dayCheck(this.dayStatus);
                 } else {
                   console.log('errr')
                 }
               }).catch(err => {
                 console.log(err);
-                this.loadFromBackup();
+                this.syncService.loadFromBackup();
               });
-            } else if (this.serverSettings.type == 1) {
+            } else if (this.serverSettings.type === SERVER_TYPES.SECONDARY) {
               ////// İkincil Ekran //////
               // this.mainService.destroyDB('allData').then(res => {
               //   this.mainService.initDatabases();
@@ -156,16 +188,19 @@ export class AppComponent implements OnInit {
               //   console.log(err);
               //   this.hasError = true;
               // })
-              this.serverReplication()
+              this.syncService.serverReplication(this.serverSettings)
+                .on('complete', () => {
+                  setTimeout(() => this.appDataInitializer(), 2000);
+                });
             }
           } else {
-            if (this.serverSettings.type == 0) {
-              this.onSync = false;
+            if (this.serverSettings.type === SERVER_TYPES.PRIMARY) {
+              this.setOnSync(false);
               this.mainService.loadAppData().then((isLoaded: boolean) => {
                 if (isLoaded) {
-                  this.onSync = false;
+                  this.setOnSync(false);
                   this.router.navigate(['']);
-                  this.dayCheck();
+                  this.dayManagementService.dayCheck(this.dayStatus);
                 }
               }).catch(err => {
                 console.log(err);
@@ -181,161 +216,27 @@ export class AppComponent implements OnInit {
         break;
       case false:
         this.setupFinished = false;
-        this.onSync = false;
+        this.setOnSync(false);
         this.router.navigate(['/activation']);
         break;
       default:
-        this.onSync = false;
+        this.setOnSync(false);
         this.router.navigate(['/setup']);
         break;
     }
-    if (this.serverSettings.type == 0) {
-      setTimeout(() => this.orderListener(), 10000)
+    if (this.serverSettings && this.serverSettings.type === SERVER_TYPES.PRIMARY) {
+      setTimeout(() => this.orderListenerService.startOrderListener(), 10000)
       // this.printsListener();
     }
     // this.commandListener();
   }
 
 
-  serverReplication() {
-    this.hasError = false;
-    console.log('Server Replicating Started!')
-    this.mainService.replicateDB(this.serverSettings)
-      .on('change', (sync) => {
-        this.statusMessage = `${sync.docs_written} - Senkronize Ediliyor `;
-      }).on('complete', () => {
-        setTimeout(() => this.appDataInitializer(), 2000);
-      })
-      .on('active', () => {
-        console.log('active')
-      })
-      .on('denied', (ass) => {
-        console.log(ass, 'denied')
-      })
-      .on('error', (err) => {
-        console.log(err);
-      }).catch(err => {
-        console.warn('Server Replicating Error:', err);
-        this.hasError = true;
-        this.electronService.openDevTools();
-        this.serverReplication();
-      });
-  }
-
-  orderListener() {
-    console.log('Order Listener Process Started');
-    this.mainService.getAllBy('settings', { key: 'Printers' }).then(prints => {
-      let printers = prints.docs[0].value;
-      this.mainService.LocalDB['orders'].changes({ since: 'now', live: true, include_docs: true }).on('change', (res) => {
-        if (!this.onSync) {
-          let Order: Order = res.doc;
-          console.log(Order);
-          if (Order.status == OrderStatus.APPROVED && Order.type !== OrderType.EMPLOOYEE) {
-            this.mainService.getAllBy('categories', {}).then(cats => {
-              let categories = cats.docs;
-              this.mainService.getData('checks', Order.check).then((check: Check) => {
-                this.mainService.getData('tables', check.table_id).then((table: Table) => {
-                  let orders: Array<CheckProduct> = check.products.filter(product => Order.timestamp == product.timestamp);
-                  if (orders.length > 0) {
-                    let splitPrintArray = [];
-                    orders.forEach((obj, index) => {
-                      let catPrinter = categories.filter(cat => cat._id == obj.cat_id)[0].printer || printers[0].name;
-                      if (obj.timeout) {
-                        let thePrinter = printers.filter(pobj => pobj.name == catPrinter)[0];
-                        let splitPrintOrder = { printer: thePrinter, products: [obj], timeout: obj.timeout };
-                        splitPrintArray.push(splitPrintOrder);
-                      } else {
-                        let contains = splitPrintArray.some(element => element.printer.name == catPrinter && !element.timeout);
-                        if (contains) {
-                          let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter && !p_name.timeout);
-                          splitPrintArray[index].products.push(obj);
-                        } else {
-                          let thePrinter = printers.filter(pobj => pobj.name == catPrinter)[0];
-                          let splitPrintOrder = { printer: thePrinter, products: [obj] };
-                          splitPrintArray.push(splitPrintOrder);
-                        }
-                      }
-                    });
-                    splitPrintArray.forEach(order => {
-                      if (order.timeout) {
-                        setTimeout(() => {
-                          this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + (Order.type == OrderType.INSIDE ? ' (Müşteri)' : ''));
-                        }, order.timeout * 60000);
-                      } else {
-                        this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + (Order.type == OrderType.INSIDE ? ' (Müşteri)' : ''));
-                      }
-                    });
-                  };
-                });
-              });
-            })
-          }
-        }
-      });
-    })
-  }
-
-
-  dayCheck() {
-    if (new Date().getDay() !== this.dayStatus.day) {
-      if (this.dayStatus.started) {
-        this.messageService.sendAlert('Dikkat!', 'Gün Sonu Yapılmamış.', 'warning');
-      } else {
-        this.mainService.RemoteDB.find({ selector: { db_name: 'settings', key: 'DateSettings' }, limit: 5000 }).then((res) => {
-          let serverDate: DayInfo = res.docs[0].value;
-          if (serverDate.started) {
-            this.mainService.getData('settings', res.docs[0]._id).then(settingsDoc => {
-              this.mainService.LocalDB['settings'].get(settingsDoc._id).then(localDoc => {
-                localDoc.value = serverDate;
-                this.mainService.LocalDB['settings'].put(localDoc).then(isUpdated => {
-                  this.electronService.reloadProgram();
-                }).catch(err => {
-                  console.log(err);
-                })
-              }).catch(err => {
-                console.log(err);
-              })
-            }).catch(err => {
-              console.log(err);
-            })
-          } else {
-            this.messageService.sendAlert('Dikkat!', 'Gün Başı Yapmalısınız.', 'warning');
-          }
-        }).catch(err => {
-          this.dayCheck();
-        })
-        // this.findAppSettings();
-      }
-    }
-  }
-
-
-  loadFromBackup() {
-    this.electronService.fileSystem.readFile('./data/db.dat', (err, data) => {
-      const rdata = JSON.parse(data.toString('utf-8'));
-      this.mainService.destroyDB('allData').then(res => {
-        if (res.ok) {
-          this.mainService.initDatabases();
-          setTimeout(() => {
-            this.mainService.putAll('allData', rdata).then(res => {
-              console.log(res);
-              this.electronService.reloadProgram();
-            }).catch(err => {
-              this.electronService.reloadProgram();
-            })
-          }, 2500)
-        }
-      }).catch(err => {
-        console.error(err);
-      });
-    })
-  }
-
   commandListener() {
     console.log('Command Listener Process Started');
     this.mainService.LocalDB['commands'].changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
       if (!change.deleted) {
-        let commandObj = change.doc;
+        const commandObj = change.doc;
         if (!commandObj.executed) {
           this.electronService.shellSpawn(commandObj.cmd, commandObj.args);
         }
@@ -344,17 +245,13 @@ export class AppComponent implements OnInit {
   }
 
   appDataInitializer() {
-    this.mainService.loadAppData().then((isLoaded: boolean) => {
-      if (isLoaded) {
-        this.onSync = false;
-        this.router.navigate(['']);
-        this.settingsListener();
-        this.dayCheck();
-        setTimeout(() => this.endDayListener(), 120000)
-      }
-    }).catch(err => {
-      console.warn('LoadApp Data Error:', err);
-    })
+    this.syncService.appDataInitializer(() => {
+      this.setOnSync(false);
+      this.router.navigate(['']);
+      this.settingsListener();
+      this.dayManagementService.dayCheck(this.dayStatus);
+      setTimeout(() => this.endDayListener(), POLLING_INTERVALS.END_DAY_LISTENER_DELAY);
+    });
   }
 
   endDayListener() {
@@ -362,7 +259,7 @@ export class AppComponent implements OnInit {
     const signalListener = this.mainService.LocalDB['endday'].changes({ since: 'now', live: true }).on('change', (changes) => {
       this.mainService.syncToRemote().cancel();
       console.log('Endday Processing...');
-      this.onSync = true;
+      this.setOnSync(true);
       signalListener.cancel();
       this.mainService.destroyDB('allData').then(res => {
         if (res.ok) {
@@ -383,7 +280,7 @@ export class AppComponent implements OnInit {
       if (!this.onSync) {
         setTimeout(() => {
           this.electronService.reloadProgram();
-        }, 5000);
+        }, POLLING_INTERVALS.SETTINGS_RELOAD_DELAY);
       }
     });
   }
@@ -393,21 +290,29 @@ export class AppComponent implements OnInit {
     return this.mainService.LocalDB['prints'].changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
       if (!this.onSync) {
         if (!change.deleted) {
-          let printObj: PrintOut = change.doc;
+          const printObj: PrintOut = change.doc;
           console.log(printObj)
-          if (printObj.type == 'Check' && printObj.status == PrintOutStatus.WAITING) {
+          if (printObj.type === 'Check' && printObj.status === PrintOutStatus.WAITING) {
             this.mainService.getData('checks', printObj.connection).then((check: Check) => {
-              this.mainService.getData('tables', check.table_id).then((table) => {
-                this.mainService.updateData('prints',printObj._id,{status:PrintOutStatus.PRINTED}).then((isOK) => {
-                  this.printerService.printCheck(printObj.printer, table.name, check)
+              if (check) {
+                this.mainService.getData('tables', check.table_id).then((table) => {
+                  if (table) {
+                    this.mainService.updateData('prints', printObj._id, { status: PrintOutStatus.PRINTED }).then((isOK) => {
+                      this.printerService.printCheck(printObj.printer, table.name, check)
+                    }).catch(err => {
+                      console.log(err);
+                    })
+                  } else {
+                    this.mainService.updateData('prints', printObj._id, { status: PrintOutStatus.ERROR });
+                  }
                 }).catch(err => {
-                  console.log(err);
+                  this.mainService.updateData('prints', printObj._id, { status: PrintOutStatus.ERROR });
                 })
-              }).catch(err => {
-                this.mainService.updateData('prints',printObj._id,{status:PrintOutStatus.ERROR});
-              })
+              } else {
+                this.mainService.updateData('prints', printObj._id, { status: PrintOutStatus.ERROR });
+              }
             }).catch(err => {
-              this.mainService.updateData('prints',printObj._id,{status:PrintOutStatus.ERROR});
+              this.mainService.updateData('prints', printObj._id, { status: PrintOutStatus.ERROR });
             })
           }
         }
@@ -426,22 +331,23 @@ export class AppComponent implements OnInit {
 
   findServerSettings() {
     let serverDocument;
-    let AppType = localStorage.getItem('AppType');
+    const AppType = localStorage.getItem('AppType');
     this.mainService.getAllBy('allData', { key: 'ServerSettings' }).then(res => {
       switch (AppType) {
         case 'Primary':
-          serverDocument = res.docs.find(obj => obj.value.type == 0);
+          serverDocument = res.docs.find(obj => obj.value.type === 0);
           delete serverDocument._rev;
-          this.mainService.putDoc('settings', serverDocument).then(res => {
+          this.mainService.putDoc('settings', serverDocument).then(putRes => {
             this.electronService.reloadProgram();
           });
           break;
         case 'Secondary':
-          serverDocument = res.docs.find(obj => obj.value.type == 1);
+          serverDocument = res.docs.find(obj => obj.value.type === 1);
           delete serverDocument._rev;
-          this.mainService.putDoc('settings', serverDocument).then(res => {
+          this.mainService.putDoc('settings', serverDocument).then(putRes => {
             this.electronService.reloadProgram();
           });
+          break;
         default:
           break;
       }
@@ -462,7 +368,7 @@ export class AppComponent implements OnInit {
     setInterval(() => {
       this.mainService.getAllBy('tables', {}).then(tables => {
         this.mainService.getAllBy('checks', {}).then(res => {
-          let checks_total_count = res.docs.length;
+          const checks_total_count = res.docs.length;
           let checks_total_amount;
           let activity_value
           try {
@@ -472,10 +378,10 @@ export class AppComponent implements OnInit {
             checks_total_amount = 0;
             activity_value = 0
           }
-          let activity_count = (checks_total_count * 100) / tables.docs.length;
-          this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
-            let sellingAct = res.docs[0];
-            let date = new Date();
+          const activity_count = (checks_total_count * 100) / tables.docs.length;
+          this.mainService.getAllBy('reports', { type: 'Activity' }).then(reportRes => {
+            const sellingAct = reportRes.docs[0];
+            const date = new Date();
             sellingAct.activity.push(Math.round(activity_value));
             sellingAct.activity_count.push(Math.round(activity_count));
             sellingAct.activity_time.push(date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
@@ -483,7 +389,7 @@ export class AppComponent implements OnInit {
           });
         });
       });
-    }, 360000)
+    }, POLLING_INTERVALS.ACTIVITY_REPORT_UPDATE)
   }
 
   resetTimer() {
@@ -497,67 +403,6 @@ export class AppComponent implements OnInit {
         this.electronService.exitProgram();
       }
     })
-  }
-
-  async updateProductReport(count_data) {
-    try {
-      const StoreDayInfo = await (await this.mainService.LocalDB['allData'].find({ selector: { key: 'DateSettings' } })).docs[0].value;
-      const Month = new Date(StoreDayInfo.time).getMonth();
-      count_data.forEach(async (obj) => {
-        const ProductReport = await (await this.mainService.LocalDB['allData'].find({ selector: { db_name: 'reports', connection_id: obj.product } })).docs[0];
-        const ProductRecipe = await (await this.mainService.LocalDB['allData'].find({ selector: { db_name: 'recipes', product_id: obj.product } })).docs[0];
-        if (ProductReport) {
-          this.mainService.LocalDB['allData'].upsert(ProductReport._id, (doc) => {
-            doc.count += obj.count;
-            doc.amount += obj.total;
-            doc.timestamp = Date.now();
-            doc.weekly[StoreDayInfo.day] += obj.total;
-            doc.weekly_count[StoreDayInfo.day] += obj.count;
-            doc.monthly[Month] += obj.total;
-            doc.weekly_count[Month] += obj.count;
-            return doc;
-          });
-        }
-        if (ProductRecipe) {
-          ProductRecipe.recipe.forEach((ingredient) => {
-            let downStock = ingredient.amount * obj.count;
-            this.mainService.LocalDB['allData'].upsert(ingredient.stock_id, (doc) => {
-              doc.left_total -= downStock;
-              doc.quantity = doc.left_total / doc.total;
-              if (doc.left_total < doc.warning_limit) {
-                // Warning logic could be added here
-              }
-              return doc;
-            });
-          });
-        }
-      });
-      return true;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  countProductsData(counDataArray, id, price, manuelCount?) {
-    let countObj;
-    if (manuelCount) {
-      countObj = { product: id, count: manuelCount, total: price };
-    } else {
-      countObj = { product: id, count: 1, total: price };
-    }
-    let contains = counDataArray.some((obj) => obj.product === id);
-    if (contains) {
-      let index = counDataArray.findIndex((p_id) => p_id.product == id);
-      if (manuelCount) {
-        counDataArray[index].count += manuelCount;
-      } else {
-        counDataArray[index].count++;
-      }
-      counDataArray[index].total += price;
-    } else {
-      counDataArray.push(countObj);
-    }
-    return counDataArray;
   }
 
   changeWindow() {

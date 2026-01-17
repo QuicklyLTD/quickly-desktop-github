@@ -33,7 +33,7 @@ export class FloorSpecs {
     ) { }
 }
 
-export enum TableStatus{
+export enum TableStatus {
     PASSIVE,
     ACTIVE,
     OCCUPIED,

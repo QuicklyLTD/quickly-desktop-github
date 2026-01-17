@@ -45,7 +45,6 @@
                     <div class="bodyquote">
                       <p class="mb-2">
                         <strong [ngClass]="{'text-danger': stock.left_total <= 0}">{{stock.name}}</strong>
-                        <!-- <small>({{stock.cat_id | general:'stocks_cat' | async}})</small> -->
                       </p>
                       <div class="progress">
                         <div [ngClass]="{'bg-danger':stock.warning_limit >= stock.left_total}" class="progress-bar bg-warning progress-bar-striped"

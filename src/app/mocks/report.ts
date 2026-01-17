@@ -23,10 +23,10 @@ export class Report {
 }
 export class Activity {
     constructor(
-        public type:string,
-        public name:string,
-        public activity:Array<number>,
-        public activity_time:Array<any>,
-        public activity_count:Array<number>
+        public type: string,
+        public name: string,
+        public activity: Array<number>,
+        public activity_time: Array<any>,
+        public activity_count: Array<number>
     ) { }
 }

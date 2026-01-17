@@ -1,4 +1,4 @@
-import { Order, User } from "./order";
+import { Order, User } from './order';
 
 export class Receipt {
     constructor(

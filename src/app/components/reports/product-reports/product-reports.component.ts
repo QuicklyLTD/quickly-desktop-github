@@ -6,6 +6,7 @@ import { MainService } from '../../../services/main.service';
 import { SettingsService } from '../../../services/settings.service';
 import { Category } from '../../../mocks/product';
 import { PrinterService } from '../../../providers/printer.service';
+import { EntityStoreService } from '../../../services/entity-store.service';
 
 @Component({
   selector: 'app-product-reports',
@@ -22,6 +23,8 @@ export class ProductReportsComponent implements OnInit {
   chartList: Array<Report>;
   toDay: number;
   printers: Array<Printer>;
+  productNames: Map<string, string> = new Map();
+  ItemReportName: string;
 
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
@@ -72,15 +75,16 @@ export class ProductReportsComponent implements OnInit {
       }]
     },
   };
-  ChartLegend: boolean = true;
-  ChartType: string = 'bar';
+  ChartLegend = true;
+  ChartType = 'bar';
   ChartLoaded: boolean;
 
   ItemReport: Report;
   DetailData: Array<any>;
   DetailLoaded: boolean;
 
-  constructor(private mainService: MainService, private settingsService: SettingsService, private printerService: PrinterService) {
+  constructor(private mainService: MainService, private settingsService: SettingsService,
+    private printerService: PrinterService, private entityStoreService: EntityStoreService) {
     this.DetailLoaded = false;
     this.DetailData = [];
   }
@@ -94,9 +98,9 @@ export class ProductReportsComponent implements OnInit {
   }
 
   normalWeekOrder(array: Array<any>) {
-    var arrayLength = array.length
-    for (var i = 0; i < arrayLength - 1; i++) {
-      var temp = array[i];
+    const arrayLength = array.length;
+    for (let i = 0; i < arrayLength - 1; i++) {
+      const temp = array[i];
       array[i] = array[i + 1];
       array[i + 1] = temp;
     }
@@ -104,7 +108,7 @@ export class ProductReportsComponent implements OnInit {
   }
 
   dailyCount(arr: Array<number>, price: number) {
-    let newArray = [];
+    const newArray = [];
     for (let item of arr) {
       item = item / price;
       newArray.push(item);
@@ -125,9 +129,10 @@ export class ProductReportsComponent implements OnInit {
     }
   }
 
-  getItemReport(report: Report) {
+  async getItemReport(report: Report) {
     this.DetailLoaded = false;
     this.ItemReport = report;
+    this.ItemReportName = await this.entityStoreService.resolveEntity('products', report.connection_id);
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
@@ -164,7 +169,7 @@ export class ProductReportsComponent implements OnInit {
     this.productList = newArray;
     if (this.selectedCat) {
       this.mainService.getAllBy('products', { cat_id: this.selectedCat }).then(res => {
-        let products_ids = res.docs.map(obj => obj._id);
+        const products_ids = res.docs.map(obj => obj._id);
         this.productList = this.productList.filter(obj => products_ids.includes(obj.connection_id));
       })
     }
@@ -173,7 +178,7 @@ export class ProductReportsComponent implements OnInit {
   getReportsByCategory(cat_id: string) {
     this.selectedCat = cat_id;
     this.mainService.getAllBy('products', { cat_id: cat_id }).then(res => {
-      let products_ids = res.docs.map(obj => obj._id);
+      const products_ids = res.docs.map(obj => obj._id);
       this.productList = this.generalList.filter(obj => products_ids.includes(obj.connection_id));
     })
   }
@@ -182,14 +187,14 @@ export class ProductReportsComponent implements OnInit {
     if (this.selectedCat) {
       this.mainService.getAllBy('products', { cat_id: this.selectedCat }).then(res => {
         res.docs.forEach(element => {
-          this.productList.find(obj => obj.connection_id == element._id).description = element.name;
+          this.productList.find(obj => obj.connection_id === element._id).description = element.name;
         });
         this.printerService.printReport(this.printers[0], 'Ürünler', this.productList);
       });
     } else {
       this.mainService.getAllBy('products', {}).then(res => {
         res.docs.forEach(element => {
-          this.productList.find(obj => obj.connection_id == element._id).description = element.name;
+          this.productList.find(obj => obj.connection_id === element._id).description = element.name;
         });
         this.printerService.printReport(this.printers[0], 'Ürünler', this.productList);
       });
@@ -203,16 +208,22 @@ export class ProductReportsComponent implements OnInit {
     this.mainService.getAllBy('reports', { type: 'Product' }).then(res => {
       this.generalList = res.docs.sort((a, b) => b.count - a.count);
       this.productList = JSON.parse(JSON.stringify(this.generalList));
+      // Resolve product names
+      const productIds = res.docs.map(p => p.connection_id).filter(id => id);
+      this.entityStoreService.resolveEntities('products', productIds).then(resolved => {
+        this.productNames = resolved;
+      });
+
       this.chartList = this.productList.slice(0, 5);
       this.chartList.forEach((obj, index) => {
-        this.mainService.getData('products', obj.connection_id).then(res => {
+        this.mainService.getData('products', obj.connection_id).then(productRes => {
           obj.weekly = this.normalWeekOrder(obj.weekly);
           if (daily) {
             obj.weekly = this.normalWeekOrder(obj.weekly_count);
           }
-          let schema = { data: obj.weekly, label: res.name };
+          const schema = { data: obj.weekly, label: productRes.name };
           this.ChartData.push(schema);
-          if (this.chartList.length - 1 == index) {
+          if (this.chartList.length - 1 === index) {
             this.ChartLoaded = true;
           };
         });
@@ -223,7 +234,8 @@ export class ProductReportsComponent implements OnInit {
       this.categoriesList.sort((a, b) => b.order - a.order);
     })
     this.mainService.getAllBy('logs', {}).then(res => {
-      this.productLogs = res.docs.filter(obj => obj.type >= logType.PRODUCT_CREATED && obj.type <= logType.PRODUCT_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
+      this.productLogs = res.docs.filter(obj =>
+        obj.type >= logType.PRODUCT_CREATED && obj.type <= logType.PRODUCT_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 }

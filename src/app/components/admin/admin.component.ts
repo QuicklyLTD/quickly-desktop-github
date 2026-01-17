@@ -51,9 +51,9 @@ export class AdminComponent implements OnInit {
   }
 
   editDocument(document) {
-    let newDocument = JSON.parse(document);
+    const newDocument = JSON.parse(document);
     let db_name;
-    if (this.selectedDB == 'allData') {
+    if (this.selectedDB === 'allData') {
       db_name = document.db_name;
     } else {
       db_name = this.selectedDB;
@@ -69,7 +69,7 @@ export class AdminComponent implements OnInit {
 
 
   createDocument(document) {
-    let newDocument = JSON.parse(document);
+    const newDocument = JSON.parse(document);
     this.mainService.addData(this.selectedDB, newDocument).then(res => {
       if (res.ok) {
         $('#docModal').modal('hide');
@@ -82,7 +82,7 @@ export class AdminComponent implements OnInit {
   }
 
   getByFilter(key, value) {
-    let filter = new Object();
+    const filter = new Object();
     filter[key] = value;
     if (this.selectedDB) {
       this.mainService.getAllBy(this.selectedDB, filter).then(res => {
@@ -103,7 +103,7 @@ export class AdminComponent implements OnInit {
   resetReports() {
     this.mainService.getAllBy('reports', {}).then(res => {
       console.warn(res.docs.length);
-      let reports = res.docs.filter(obj => obj.type !== 'Activity');
+      const reports = res.docs.filter(obj => obj.type !== 'Activity');
       reports.forEach((element, index) => {
         this.mainService.changeData('reports', element._id, (doc) => {
           doc.amount = 0;
@@ -138,7 +138,7 @@ export class AdminComponent implements OnInit {
     // let username = prompt('username');
     // let password = prompt('password');
 
-    let oldToken = localStorage['AccessToken'];
+    const oldToken = localStorage['AccessToken'];
     this.httpService.post('/store/refresh', null, oldToken).toPromise().then(res => {
         if (res.ok) {
           const token = res.json().token;
@@ -146,7 +146,7 @@ export class AdminComponent implements OnInit {
           alert('İşlem Başarılı');
         }
       }).catch(err => {
-        this.httpService.post('/store/login',{ username:'quickly', password:'asdtd155+1' }).toPromise().then(res => {
+        this.httpService.post('/store/login', { username: 'quickly', password: 'asdtd155+1' }).toPromise().then(res => {
           if (res.ok) {
             const token = res.json().token;
             localStorage.setItem('AccessToken', token);
@@ -160,24 +160,36 @@ export class AdminComponent implements OnInit {
 
   resolveDB() {
     this.mainService.LocalDB[this.selectedDB].allDocs({ include_docs: true, conflicts: true }).then(res => {
-      let test = res.rows.map(obj => { return obj.doc });
+      const test = res.rows.map(obj => { return obj.doc; });
       test.forEach(element => {
         if (element.hasOwnProperty('_conflicts')) {
           console.log(element);
           this.mainService.LocalDB[this.selectedDB].resolveConflicts(element, (a, b) => {
             if (element.hasOwnProperty('timestamp')) {
-              if (a.timestamp > b.timestamp) return a;
-              if (b.timestamp > a.timestamp) return b;
+              if (a.timestamp > b.timestamp) {
+                return a;
+              }
+              if (b.timestamp > a.timestamp) {
+                return b;
+              }
             } else if (element.hasOwnProperty('timestamp')) {
-              if (a.timestamp > b.timestamp) return a;
-              if (b.timestamp > a.timestamp) return b;
+              if (a.timestamp > b.timestamp) {
+                return a;
+              }
+              if (b.timestamp > a.timestamp) {
+                return b;
+              }
             } else if (element.hasOwnProperty('time')) {
-              if (a.time > b.time) return a;
-              if (b.time > a.time) return b;
+              if (a.time > b.time) {
+                return a;
+              }
+              if (b.time > a.time) {
+                return b;
+              }
             }
             return a;
-          }).then(res => {
-            console.log(res);
+          }).then(resolveRes => {
+            console.log(resolveRes);
           }).catch(err => {
             console.log(err);
           })
@@ -207,7 +219,7 @@ export class AdminComponent implements OnInit {
     //     let table = new Table(`S${index}`,'05800961-4aaa-4add-baa8-9f8fbfb3f2fb',4,'',1,Date.now(),[]);
     //     this.mainService.addData('tables',table).then(res => {
     //       console.log(res);
-    //     }); 
+    //     });
     // }
 
 
@@ -380,9 +392,13 @@ export class AdminComponent implements OnInit {
   }
 
   testEndDay() {
-    let token = localStorage.getItem("AccessToken");
-    let restaurantID = JSON.parse(localStorage['RestaurantInfo']).id;
-    this.httpService.post(`v1/management/restaurants/${restaurantID}/report_generator/`, { timestamp: Date.now(), data: { hello: 'test' } }, token).subscribe(res => {
+    const token = localStorage.getItem('AccessToken');
+    const restaurantID = JSON.parse(localStorage['RestaurantInfo']).id;
+    this.httpService.post(
+      `v1/management/restaurants/${restaurantID}/report_generator/`,
+      { timestamp: Date.now(), data: { hello: 'test' } },
+      token
+    ).subscribe(res => {
       console.log(res);
     });
   }

@@ -100,7 +100,7 @@
               <div class="card" [ngClass]="{'bg-white text-dark': check.type == 1, 'bg-info text-white' : check.type == 2 , 'bg-teal text-white' : check.type == 5}">
                 <div class="card-header pr-2 pl-2">
                   <b>
-                    <span class="float-left">{{check.table_id | general:'tables' | async}} <small style="font-weight: bold;">{{check.note}}</small></span>
+                    <span class="float-left">{{tableNames.get(check.table_id) || check.table_id}} <small style="font-weight: bold;">{{check.note}}</small></span>
                     <span class="float-right">{{check.total_price | price }}</span>
                   </b>
                 </div>
@@ -154,10 +154,10 @@
                   </div>
                   <div class="card-footer p-2">
                     <div *ngIf="order.status == 0" class="btn-group btn-group-justify btn-block">
-                      <button type="button" [disabled]="!isOwner(order.check)" (click)="cancelOrder(order)" oneShot class="btn btn-danger ">İptal</button>
-                      <button type="button" [disabled]="!isOwner(order.check)" (click)="acceptOrder(order)" oneShot class="btn btn-success btn-block">Onayla</button>
+                      <button type="button" [disabled]="!isOwner(order.check)" (click)="cancelOrder(order)" appOneShot class="btn btn-danger ">İptal</button>
+                      <button type="button" [disabled]="!isOwner(order.check)" (click)="acceptOrder(order)" appOneShot class="btn btn-success btn-block">Onayla</button>
                     </div>
-                    <button *ngIf="order.status == 1" [disabled]="!isOwner(order.check)" type="button" (click)="approoveOrder(order)" oneShot class="btn btn-success btn-block">Tamamla</button>
+                    <button *ngIf="order.status == 1" [disabled]="!isOwner(order.check)" type="button" (click)="approoveOrder(order)" appOneShot class="btn btn-success btn-block">Tamamla</button>
                     <h4 *ngIf="order.status == 2" class="text-center mb-1 mt-1">Teslim Edildi</h4>
                     <h4 *ngIf="order.status == 3" class="text-center mb-1 mt-1">İptal Edildi</h4>
                   </div>
@@ -236,11 +236,11 @@
                   </div>
                   <div class="card-footer p-2">
                     <div *ngIf="receipt.status == 1" class="btn-group btn-group-justify btn-block">
-                      <button type="button" [disabled]="!isOwner(receipt.check)" (click)="cancelReceipt(receipt)" oneShot class="btn btn-danger ">İptal</button>
-                      <button type="button" [disabled]="!isOwner(receipt.check)" (click)="acceptReceipt(receipt)" oneShot class="btn btn-success btn-block">Onayla</button>
+                      <button type="button" [disabled]="!isOwner(receipt.check)" (click)="cancelReceipt(receipt)" appOneShot class="btn btn-danger ">İptal</button>
+                      <button type="button" [disabled]="!isOwner(receipt.check)" (click)="acceptReceipt(receipt)" appOneShot class="btn btn-success btn-block">Onayla</button>
                     </div>
-                    <button *ngIf="receipt.status == 2 && receipt.method !== 4" [disabled]="!isOwner(receipt.check)" type="button" (click)="approoveReceipt(receipt)" oneShot class="btn btn-success btn-block">Tamamla</button>
-                    <!-- <button *ngIf="receipt.status == 2 " type="button" (click)="approoveReceipt(receipt)" oneShot class="btn btn-success btn-block">Tamamla</button> -->
+                    <button *ngIf="receipt.status == 2 && receipt.method !== 4" [disabled]="!isOwner(receipt.check)" type="button" (click)="approoveReceipt(receipt)" appOneShot class="btn btn-success btn-block">Tamamla</button>
+                    <!-- <button *ngIf="receipt.status == 2 " type="button" (click)="approoveReceipt(receipt)" appOneShot class="btn btn-success btn-block">Tamamla</button> -->
                     <h5 *ngIf="receipt.status == 2 && receipt.method == 4" class="text-center mb-2 mt-2">Mobil Ödeme Bekleniyor</h5>
                     <h4 *ngIf="receipt.status == 3" class="text-center mb-1 mt-1">Ödeme Tamamlandı</h4>
                     <h4 *ngIf="receipt.status == 4" class="text-center mb-1 mt-1">İptal Edildi</h4>

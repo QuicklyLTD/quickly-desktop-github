@@ -223,7 +223,7 @@
                         <td>{{i+1}}</td>
                         <td>{{table.name}}</td>
                         <td><i class="fa fa-user"></i> {{table.capacity}} Kişilik</td>
-                        <td>{{table.floor_id | general:'floors':'name' | async}}</td>
+                        <td>{{floorNames.get(table.floor_id) || table.floor_id}}</td>
                       </tr>
                     </tbody>
                   </table>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
 import { Settings } from '../mocks/settings';
 import { MainService } from './main.service';
 
@@ -28,21 +28,22 @@ export class SettingsService {
     this.mainService.getAllBy('settings', {}).then((res) => {
       this.Settings = res.docs;
 
-      this.AppSettings.next(this.Settings.find((setting) => setting.key == 'AppSettings'));
-      this.AuthInfo.next(this.Settings.find((setting) => setting.key == 'AuthInfo'));
-      this.ActivationStatus.next(this.Settings.find((setting) => setting.key == 'ActivationStatus'));
-      this.AppInformation.next(this.Settings.find((setting) => setting.key == 'AppInformation'));
-      this.RestaurantInfo.next(this.Settings.find((setting) => setting.key == 'RestaurantInfo'));
-      this.Printers.next(this.Settings.find((setting) => setting.key == 'Printers'));
-      this.DateSettings.next(this.Settings.find((setting) => setting.key == 'DateSettings'));
+      this.AppSettings.next(this.Settings.find((setting) => setting.key === 'AppSettings'));
+      this.AuthInfo.next(this.Settings.find((setting) => setting.key === 'AuthInfo'));
+      this.ActivationStatus.next(this.Settings.find((setting) => setting.key === 'ActivationStatus'));
+      this.AppInformation.next(this.Settings.find((setting) => setting.key === 'AppInformation'));
+      this.RestaurantInfo.next(this.Settings.find((setting) => setting.key === 'RestaurantInfo'));
+      this.Printers.next(this.Settings.find((setting) => setting.key === 'Printers'));
+      this.DateSettings.next(this.Settings.find((setting) => setting.key === 'DateSettings'));
 
-      let appType = localStorage.getItem('AppType');
+      const appType = localStorage.getItem('AppType');
       switch (appType) {
         case 'Primary':
-          this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings' && setting.value.type == 0));
+          this.ServerSettings.next(this.Settings.find((setting) => setting.key === 'ServerSettings' && setting.value.type === 0));
           break;
         case 'Secondary':
-          this.ServerSettings.next(this.Settings.find((setting) => setting.key == 'ServerSettings' && setting.value.type == 1));
+          this.ServerSettings.next(this.Settings.find((setting) => setting.key === 'ServerSettings' && setting.value.type === 1));
+          break;
         default:
           break;
       }
@@ -79,7 +80,7 @@ export class SettingsService {
   }
 
   setAppSettings(Key: string, SettingsData) {
-    let AppSettings = new Settings(Key, SettingsData, Key, Date.now());
+    const AppSettings = new Settings(Key, SettingsData, Key, Date.now());
     return this.mainService.getAllBy('settings', { key: Key }).then(res => {
       return this.mainService.updateData('settings', res.docs[0]._id, AppSettings);
     });
@@ -96,7 +97,7 @@ export class SettingsService {
         this.mainService.updateData('settings', res.docs[0]._id, res.docs[0]);
         this.Printers.next(res.docs[0]);
       } else {
-        let printerSettings = new Settings('Printers', [printerData], 'Yazıcılar', Date.now());
+        const printerSettings = new Settings('Printers', [printerData], 'Yazıcılar', Date.now());
         this.mainService.addData('settings', printerSettings);
         this.Printers.next(printerSettings);
       }

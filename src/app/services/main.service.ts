@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import * as PouchDB from 'pouchdb-browser';
-import * as PouchDBFind from 'pouchdb-find';
-import * as PouchDBUpsert from 'pouchdb-upsert';
 import * as PouchDBResolve from 'pouch-resolve-conflicts';
 import * as PouchDBInMemory from 'pouchdb-adapter-memory';
+import * as PouchDB from 'pouchdb-browser';
+import * as PouchDBFind from 'pouchdb-find';
 import * as PouchDBReplicationStream from 'pouchdb-replication-stream';
+import * as PouchDBUpsert from 'pouchdb-upsert';
 
 import { AuthInfo, ServerInfo } from '../mocks/settings';
+import { FileLogService } from './file-log.service';
 
 @Injectable()
 export class MainService {
@@ -20,45 +21,42 @@ export class MainService {
   db_prefix: string;
   ajax_opts: object;
 
-  constructor() {
+  constructor(private fileLogService: FileLogService) {
     PouchDB.plugin(PouchDBFind);
     PouchDB.plugin(PouchDBUpsert);
     PouchDB.plugin(PouchDBResolve);
     PouchDB.plugin(PouchDBInMemory);
     PouchDB.plugin(PouchDBReplicationStream.plugin);
-    
 
-    const db_opts_mem = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
-    const db_opts_hdd = { revs_limit: 3, auto_compaction: true };
+    const db_opts = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
 
     this.LocalDB = {
-      users: new PouchDB('local_users', db_opts_mem),
-      users_group: new PouchDB('local_users_group', db_opts_mem),
-      checks: new PouchDB('local_checks', db_opts_mem),
-      closed_checks: new PouchDB('local_closed_checks', db_opts_mem),
-      credits: new PouchDB('local_credits', db_opts_mem),
-      customers: new PouchDB('local_customers', db_opts_mem),
-      orders: new PouchDB('local_orders', db_opts_mem),
-      receipts: new PouchDB('local_receipts', db_opts_mem),
-      calls: new PouchDB('local_calls', db_opts_mem),
-      cashbox: new PouchDB('local_cashbox', db_opts_mem),
-      categories: new PouchDB('local_categories', db_opts_mem),
-      sub_categories: new PouchDB('local_sub_cats', db_opts_mem),
-      occations: new PouchDB('local_occations', db_opts_mem),
-      products: new PouchDB('local_products', db_opts_mem),
-      recipes: new PouchDB('local_recipes', db_opts_mem),
-      floors: new PouchDB('local_floors', db_opts_mem),
-      tables: new PouchDB('local_tables', db_opts_mem),
-      stocks: new PouchDB('local_stocks', db_opts_mem),
-      stocks_cat: new PouchDB('local_stocks_cat', db_opts_mem),
-      warehouses: new PouchDB('local_warehouses', db_opts_mem),
-      endday: new PouchDB('local_endday', db_opts_mem),
-      reports: new PouchDB('local_reports', db_opts_mem),
-      logs: new PouchDB('local_logs', db_opts_mem),
-      commands: new PouchDB('local_commands', db_opts_mem),
-      comments: new PouchDB('local_comments', db_opts_mem),
-      prints: new PouchDB('local_prints', db_opts_mem),
-      settings: new PouchDB('local_settings', db_opts_hdd),
+      users: new PouchDB('local_users', db_opts),
+      users_group: new PouchDB('local_users_group', db_opts),
+      checks: new PouchDB('local_checks', db_opts),
+      closed_checks: new PouchDB('local_closed_checks', db_opts),
+      credits: new PouchDB('local_credits', db_opts),
+      customers: new PouchDB('local_customers', db_opts),
+      orders: new PouchDB('local_orders', db_opts),
+      receipts: new PouchDB('local_receipts', db_opts),
+      calls: new PouchDB('local_calls', db_opts),
+      cashbox: new PouchDB('local_cashbox', db_opts),
+      categories: new PouchDB('local_categories', db_opts),
+      sub_categories: new PouchDB('local_sub_cats', db_opts),
+      occations: new PouchDB('local_occations', db_opts),
+      products: new PouchDB('local_products', db_opts),
+      recipes: new PouchDB('local_recipes', db_opts),
+      floors: new PouchDB('local_floors', db_opts),
+      tables: new PouchDB('local_tables', db_opts),
+      stocks: new PouchDB('local_stocks', db_opts),
+      stocks_cat: new PouchDB('local_stocks_cat', db_opts),
+      endday: new PouchDB('local_endday', db_opts),
+      reports: new PouchDB('local_reports', db_opts),
+      logs: new PouchDB('local_logs', db_opts),
+      commands: new PouchDB('local_commands', db_opts),
+      comments: new PouchDB('local_comments', db_opts),
+      prints: new PouchDB('local_prints', db_opts),
+      settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
 
@@ -66,7 +64,14 @@ export class MainService {
       if (res.docs.length > 0) {
         this.authInfo = res.docs[0].value;
         this.hostname = 'http://' + this.authInfo.app_remote + ':' + this.authInfo.app_port;
-        this.ajax_opts = { ajax: { headers: { Authorization: 'Basic ' + Buffer.from(this.authInfo.app_id + ':' + this.authInfo.app_token).toString('base64') } } };
+        const authToken = Buffer.from(`${this.authInfo.app_id}:${this.authInfo.app_token}`).toString('base64');
+        console.log('[MainService] RemoteDB auth', {
+          host: this.hostname,
+          db: this.authInfo.app_db,
+          app_id: this.authInfo.app_id,
+          app_token_length: this.authInfo.app_token ? String(this.authInfo.app_token).length : 0
+        });
+        this.ajax_opts = { ajax: { headers: { Authorization: `Basic ${authToken}` } } };
         this.db_prefix = this.authInfo.app_db;
         this.RemoteDB = new PouchDB(this.hostname + this.db_prefix, this.ajax_opts);
       }
@@ -74,25 +79,35 @@ export class MainService {
 
     this.getAllBy('settings', { key: 'ServerSettings' }).then(res => {
       if (res.docs.length > 0) {
-        let appType = localStorage.getItem('AppType');
+        const appType = localStorage.getItem('AppType');
         switch (appType) {
           case 'Primary':
-            this.serverInfo = res.docs.find(obj => obj.key == 'ServerSettings' && obj.value.type == 0).value;
+            this.serverInfo = res.docs.find(obj => obj.key === 'ServerSettings' && obj.value.type === 0).value;
             break;
           case 'Secondary':
-            this.serverInfo = res.docs.find(obj => obj.key == 'ServerSettings' && obj.value.type == 1).value;
+            this.serverInfo = res.docs.find(obj => obj.key === 'ServerSettings' && obj.value.type === 1).value;
+            break;
           default:
             break;
         }
-        if (this.serverInfo.type == 0) {
-          if (this.serverInfo.status == 1) {
+        if (this.serverInfo.type === 0) {
+          if (this.serverInfo.status === 1) {
             this.ServerDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
           }
-        } else if (this.serverInfo.type == 1) {
+        } else if (this.serverInfo.type === 1) {
           this.RemoteDB = new PouchDB(`http://${this.serverInfo.ip_address}:${this.serverInfo.ip_port}/${this.serverInfo.key}/appServer`);
         }
       }
     });
+  }
+
+  /**
+   * Standardized error logging helper
+   * @param context Operation context for better debugging
+   * @param err Error object
+   */
+  private logError(context: string, err: any): void {
+    console.log(`[MainService] ${context}:`, err);
   }
 
   getAllData(db: string): Promise<any> {
@@ -102,12 +117,18 @@ export class MainService {
   getAllBy(db: string, $schema): Promise<any> {
     return this.LocalDB[db].find({
       selector: $schema,
-      limit:10000
+      limit: 10000
     });
   }
 
   getData(db: string, id: string): Promise<any> {
-    return this.LocalDB[db].get(id);
+    return this.LocalDB[db].get(id).catch(err => {
+      this.logError(`getData-${db}`, err);
+      if (err && err.status === 404) {
+        return null;
+      }
+      throw err;
+    });
   }
 
   getBulk(db: string, docs: Array<string>): Promise<any> {
@@ -116,35 +137,36 @@ export class MainService {
 
   addData(db, schema): Promise<any> {
     return this.LocalDB[db].post(schema).then(res => {
-      let doc = Object.assign(schema, { db_name: db, db_seq: 0 });
+      const doc = Object.assign(schema, { db_name: db, db_seq: 0 });
       delete doc._rev;
       delete doc._rev_tree;
       return this.LocalDB['allData'].put(doc).catch(err => {
-        console.log('addData-All', err);
+        this.logError('addData-All', err);
       });
     }).catch(err => {
-      console.log('addData-Local', err);
-    });;
+      this.logError('addData-Local', err);
+      return { ok: false, error: err };
+    });
   }
 
   changeData(db, id, schema: any): Promise<any> {
     this.LocalDB['allData'].upsert(id, schema).catch(err => {
-      console.log('changeData-Local', err);
+      this.logError('changeData-Local', err);
     });
     return this.LocalDB[db].upsert(id, schema).catch(err => {
-      console.log('changeData-All', err);
-    });;
+      this.logError('changeData-All', err);
+    });
   }
 
   updateData(db: string, id, schema) {
     return this.LocalDB[db].get(id).then((doc) => {
-      this.LocalDB['allData'].upsert(id, function (doc) {
-        return Object.assign(doc, schema);
+      this.LocalDB['allData'].upsert(id, function (existingDoc) {
+        return Object.assign(existingDoc, schema);
       }).catch(err => {
-        console.log('updateData-Local', err);
+        this.logError('updateData-Local', err);
       });
       return this.LocalDB[db].put(Object.assign(doc, schema)).catch(err => {
-        console.log('updateData-All', err);
+        this.logError('updateData-All', err);
       });
     });
   }
@@ -152,12 +174,12 @@ export class MainService {
   removeData(db: string, id: string): Promise<any> {
     this.LocalDB['allData'].get(id).then((doc) => {
       this.LocalDB['allData'].remove(doc).catch(err => {
-        console.log('removeData-All', err);
+        this.logError('removeData-All', err);
       });
     });
     return this.LocalDB[db].get(id).then((doc) => {
       return this.LocalDB[db].remove(doc).catch(err => {
-        console.log('removeData-Local', err);
+        this.logError('removeData-Local', err);
       });
     });
   }
@@ -199,7 +221,7 @@ export class MainService {
           this.LocalDB[db_name].destroy().then(res => {
             if (res.ok) {
               console.log(db_name, 'DB destroyed.');
-              if (db.length == index + 1) {
+              if (db.length === index + 1) {
                 resolve({ ok: true });
               }
             } else {
@@ -219,37 +241,34 @@ export class MainService {
   }
 
   initDatabases() {
-    const db_opts_mem = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
-    const db_opts_hdd = { revs_limit: 3, auto_compaction: true };
-
+    const db_opts = { revs_limit: 1, auto_compaction: true, adapter: 'memory' };
     this.LocalDB = {
-      users: new PouchDB('local_users', db_opts_mem),
-      users_group: new PouchDB('local_users_group', db_opts_mem),
-      checks: new PouchDB('local_checks', db_opts_mem),
-      closed_checks: new PouchDB('local_closed_checks', db_opts_mem),
-      credits: new PouchDB('local_credits', db_opts_mem),
-      customers: new PouchDB('local_customers', db_opts_mem),
-      orders: new PouchDB('local_orders', db_opts_mem),
-      receipts: new PouchDB('local_receipts', db_opts_mem),
-      calls: new PouchDB('local_calls', db_opts_mem),
-      cashbox: new PouchDB('local_cashbox', db_opts_mem),
-      categories: new PouchDB('local_categories', db_opts_mem),
-      sub_categories: new PouchDB('local_sub_cats', db_opts_mem),
-      occations: new PouchDB('local_occations', db_opts_mem),
-      products: new PouchDB('local_products', db_opts_mem),
-      recipes: new PouchDB('local_recipes', db_opts_mem),
-      floors: new PouchDB('local_floors', db_opts_mem),
-      tables: new PouchDB('local_tables', db_opts_mem),
-      stocks: new PouchDB('local_stocks', db_opts_mem),
-      stocks_cat: new PouchDB('local_stocks_cat', db_opts_mem),
-      warehouses: new PouchDB('local_warehouses', db_opts_mem),
-      endday: new PouchDB('local_endday', db_opts_mem),
-      reports: new PouchDB('local_reports', db_opts_mem),
-      logs: new PouchDB('local_logs', db_opts_mem),
-      commands: new PouchDB('local_commands', db_opts_mem),
-      comments: new PouchDB('local_comments', db_opts_mem),
-      prints: new PouchDB('local_prints', db_opts_mem),
-      settings: new PouchDB('local_settings', db_opts_hdd),
+      users: new PouchDB('local_users', db_opts),
+      users_group: new PouchDB('local_users_group', db_opts),
+      checks: new PouchDB('local_checks', db_opts),
+      closed_checks: new PouchDB('local_closed_checks', db_opts),
+      credits: new PouchDB('local_credits', db_opts),
+      customers: new PouchDB('local_customers', db_opts),
+      orders: new PouchDB('local_orders', db_opts),
+      receipts: new PouchDB('local_receipts', db_opts),
+      calls: new PouchDB('local_calls', db_opts),
+      cashbox: new PouchDB('local_cashbox', db_opts),
+      categories: new PouchDB('local_categories', db_opts),
+      sub_categories: new PouchDB('local_sub_cats', db_opts),
+      occations: new PouchDB('local_occations', db_opts),
+      products: new PouchDB('local_products', db_opts),
+      recipes: new PouchDB('local_recipes', db_opts),
+      floors: new PouchDB('local_floors', db_opts),
+      tables: new PouchDB('local_tables', db_opts),
+      stocks: new PouchDB('local_stocks', db_opts),
+      stocks_cat: new PouchDB('local_stocks_cat', db_opts),
+      endday: new PouchDB('local_endday', db_opts),
+      reports: new PouchDB('local_reports', db_opts),
+      logs: new PouchDB('local_logs', db_opts),
+      commands: new PouchDB('local_commands', db_opts),
+      comments: new PouchDB('local_comments', db_opts),
+      prints: new PouchDB('local_prints', db_opts),
+      settings: new PouchDB('local_settings', { revs_limit: 3, auto_compaction: true }),
       allData: new PouchDB('local_alldata', { revs_limit: 3, auto_compaction: false })
     };
   }
@@ -258,16 +277,28 @@ export class MainService {
     return this.LocalDB[local_db].changes({ since: 'now', include_docs: true }).on('change', (change) => {
       if (change.deleted) {
         this.LocalDB['allData'].get(change.id).then((doc) => {
-          this.LocalDB['allData'].remove(doc);
+          this.LocalDB['allData'].remove(doc).catch(err => {
+            this.logError('localSyncBeforeRemote-remove', err);
+            throw err;
+          });
+        }).catch(err => {
+          this.logError('localSyncBeforeRemote-get', err);
+          throw err;
         });
       } else {
-        let cData = Object.assign({ db_name: local_db, db_seq: change.seq }, change.doc);
+        const cData = Object.assign({ db_name: local_db, db_seq: change.seq }, change.doc);
         this.LocalDB['allData'].putIfNotExists(cData).then((res: any) => {
           if (!res.updated) {
             this.LocalDB['allData'].upsert(res.id, function () {
               return cData;
+            }).catch(err => {
+              this.logError('localSyncBeforeRemote-upsert', err);
+              throw err;
             });
           }
+        }).catch(err => {
+          this.logError('localSyncBeforeRemote-putIfNotExists', err);
+          throw err;
         });
       }
     });
@@ -278,7 +309,7 @@ export class MainService {
     if (sync.direction === 'pull') {
       changes.forEach((element) => {
         if (!element._deleted) {
-          let db = element.db_name;
+          const db = element.db_name;
           if (element.key !== 'ServerSettings' || element.key !== 'ActivationStatus') {
             delete element._rev;
             delete element._revisions;
@@ -291,10 +322,14 @@ export class MainService {
             });
           }
         } else {
-          for (let db in this.LocalDB) {
-            if (db !== 'allData') {
-              this.LocalDB[db].get(element._id).then((doc) => {
-                if (doc) return this.LocalDB[db].remove(doc);
+          for (const dbName in this.LocalDB) {
+            if (dbName !== 'allData') {
+              this.LocalDB[dbName].get(element._id).then((doc) => {
+                if (doc) {
+                  return this.LocalDB[dbName].remove(doc).catch(err => {
+                    this.logError(`handleChanges-remove-${dbName}`, err);
+                  });
+                }
               }).catch(err => { });
             }
           }
@@ -306,33 +341,37 @@ export class MainService {
   loadAppData() {
     return new Promise((resolve, reject) => {
       this.getAllBy('allData', {}).then(res => {
-        let docs = res.docs;
-        let docsWillPut = docs.filter(obj => obj.db_name !== 'settings');
+        const docs = res.docs;
+        const docsWillPut = docs.filter(obj => obj.db_name !== 'settings');
         docsWillPut.map(obj => {
           delete obj.db_seq;
           delete obj._rev;
           return obj;
         });
-        let promisesAll = [];
+        const promisesAll = [];
         docsWillPut.forEach(element => {
           const db = element.db_name;
           delete element.db_name;
           if (db !== undefined) {
-            let promise = this.LocalDB[db].put(element)
+            if (!this.LocalDB[db]) {
+              this.fileLogService.logToFile('loadAppData: unknown db', { db_name: db, doc_id: element._id });
+              return;
+            }
+            const promise = this.LocalDB[db].put(element);
             promisesAll.push(promise);
           }
         });
-        Promise.all(promisesAll).then(res => {
-          resolve(true)
+        Promise.all(promisesAll).then(results => {
+          resolve(true);
         }).catch(err => {
           console.log(err);
           //// Should Be False Reject
-          resolve(true)
-        })
+          resolve(true);
+        });
       }).catch(err => {
         console.log(err);
         reject(false);
-      })
+      });
     });
   }
 
@@ -341,25 +380,25 @@ export class MainService {
     if (database) {
       selector = { db_name: database };
     } else {
-      selector = {}
+      selector = {};
     }
     return new Promise((resolve, reject) => {
       this.getAllBy('allData', selector).then(res => {
         const docs = res.docs;
         if (docs.length > 0) {
           docs.forEach((element, index) => {
-            let db = element.db_name;
+            const db = element.db_name;
             if (db !== undefined) {
               if (element.key !== 'ServerSettings') {
                 delete element.db_name;
                 delete element.db_seq;
                 delete element._rev;
-                this.LocalDB[db].put(element).then(res => {
-                  if (docs.length == index + 1) {
+                this.LocalDB[db].put(element).then(putRes => {
+                  if (docs.length === index + 1) {
                     resolve(true);
                   }
                 }).catch(err => {
-                  console.log(db, element)
+                  console.log(db, element);
                 });
               }
             }
@@ -372,12 +411,19 @@ export class MainService {
   }
 
   replicateDB(db_configrations) {
-    let db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
-    return db.replicate.to(this.LocalDB['allData'], { batch_size: 500, batches_limit: 50, timeout:60000 });
+    const db = new PouchDB(`http://${db_configrations.ip_address}:${db_configrations.ip_port}/${db_configrations.key}/appServer`);
+    return db.replicate.to(this.LocalDB['allData'], {
+      batch_size: 500,
+      batches_limit: 50,
+      timeout: 60000,
+      selector: { _deleted: { $exists: false } }
+    });
   }
 
   replicateFrom() {
-    return this.RemoteDB.replicate.to(this.LocalDB['allData']);
+    return this.RemoteDB.replicate.to(this.LocalDB['allData'], {
+      selector: { _deleted: { $exists: false } }
+    });
   }
 
   syncToServer() {
@@ -385,7 +431,8 @@ export class MainService {
       live: true, retry: true, heartbeat: 2500, back_off_function: (delay) => {
         delay = 1000;
         return delay;
-      }
+      },
+      pull: { selector: { _deleted: { $exists: false } } }
     })
       .on('change', (sync) => { this.handleChanges(sync) })
     // .on('active', () => { console.log('Server Active') })
@@ -395,7 +442,7 @@ export class MainService {
 
   syncToRemote() {
     let rOpts: PouchDB.Replication.ReplicateOptions = { live: true, retry: true };
-    if (this.serverInfo.type == 1) {
+    if (this.serverInfo.type === 1) {
       rOpts = {
         live: true, retry: true, heartbeat: 2500, back_off_function: (delay) => {
           delay = 1000;
@@ -403,6 +450,7 @@ export class MainService {
         }
       };
     }
+    rOpts['pull'] = { selector: { _deleted: { $exists: false } } };
     return PouchDB.sync(this.LocalDB['allData'], this.RemoteDB, rOpts)
       .on('change', (sync) => { this.handleChanges(sync) })
     // .on('active', () => { console.log('Remote Active') })

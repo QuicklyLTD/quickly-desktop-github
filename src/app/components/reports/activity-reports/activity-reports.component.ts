@@ -11,7 +11,7 @@ export class ActivityReportsComponent implements OnInit {
 
   activityData: Array<object>;
   activityLabels: Array<string>;
-  activityLegend: boolean = true;
+  activityLegend = true;
   sellingActivity: Activity;
 
 

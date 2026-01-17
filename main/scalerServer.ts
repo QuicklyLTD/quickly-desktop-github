@@ -46,28 +46,28 @@ const proc = require('child_process');
 //   event.sender.send('scalerData', data);
 // })
 
-ipcMain.on('startScaler', (event) => {
-  const shell = proc.spawn('cat', ['/dev/ttyS0']);
-  // shell.stdin.write("asdtd155+1" + '\n');
+// ipcMain.on('startScaler', (event) => {
+//   const shell = proc.spawn('cat', ['/dev/ttyS0']);
+//   // shell.stdin.write("asdtd155+1" + '\n');
 
 
-  shell.stdout.on('data', (data) => {
-    event.sender.send('scalerData', data);
-  });
+//   shell.stdout.on('data', (data) => {
+//     event.sender.send('scalerData', data);
+//   });
 
-  shell.stderr.on('data', (data) => {
-    event.sender.send('scalerError', data);
-  });
+//   shell.stderr.on('data', (data) => {
+//     event.sender.send('scalerError', data);
+//   });
 
-  shell.on('error', (data) => {
-    event.sender.send('scalerError', data);
-  });
+//   shell.on('error', (data) => {
+//     event.sender.send('scalerError', data);
+//   });
 
-  shell.on('message', (msg) => {
-    event.sender.send('scalerError', msg);
-  });
+//   shell.on('message', (msg) => {
+//     event.sender.send('scalerError', msg);
+//   });
 
-  shell.on('close', (code) => {
-    event.sender.send('scalerError', code);
-  });
-});
+//   shell.on('close', (code) => {
+//     event.sender.send('scalerError', code);
+//   });
+// });

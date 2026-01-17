@@ -232,7 +232,7 @@
                     <tr *ngFor="let user of users; let i = index;" (click)="updateUser(user._id)">
                       <td>{{ i+1 }}</td>
                       <td>{{ user.name }}</td>
-                      <td>{{ user.role_id | general:'users_group' | async }}</td>
+                      <td>{{groupNames.get(user.role_id) || user.role_id}}</td>
                       <td>{{ user.timestamp | date:'dd/MM/y'}}</td>
                     </tr>
                   </tbody>

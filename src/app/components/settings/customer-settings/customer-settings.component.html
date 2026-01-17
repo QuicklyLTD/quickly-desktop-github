@@ -115,7 +115,7 @@
                           {{i+1}}
                         </td>
                         <td style="text-transform:capitalize;">
-                          {{item.table_id | general: 'customers' | async }}
+                          {{tableNames.get(item.table_id) || item.table_id}}
                           <br>
                           <strong class="text-muted">
                             Açıklama: {{item.note}}
@@ -293,7 +293,7 @@
       <div class="modal-body p-0">
         <div class="card checkDetail">
           <div class="card-header">
-            <b>{{checkDetail?.table_id | general:'customers' | async}}
+            <b>{{tableNames.get(checkDetail?.table_id) || checkDetail?.table_id}}
               <small class="text-muted"> ({{checkDetail?.timestamp | date:'dd/M/y HH:mm'}})</small>
             </b>
             <span class="pull-right text-muted"> Hesap Türü : Cari</span>
@@ -313,7 +313,7 @@
                   <td>{{item.name}}
                     <small *ngIf="item.note !== '' && item.note !== undefined" class="text-muted">({{item.note}})</small>
                   </td>
-                  <td>{{item.owner | general:'users' | async}}</td>
+                  <td>{{userNames.get(item.owner) || item.owner}}</td>
                   <td>{{item.timestamp |date:'HH:mm'}}</td>
                   <td>{{item.price | price}} </td>
                 </tr>

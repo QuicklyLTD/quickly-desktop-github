@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../../mocks/user';
-import { MessageService } from "../../providers/message.service";
-import { AuthService } from "../../services/auth.service";
+import { MessageService } from '../../providers/message.service';
+import { AuthService } from '../../services/auth.service';
 import { MainService } from '../../services/main.service';
 import { SettingsService } from '../../services/settings.service';
 
@@ -19,9 +19,11 @@ export class LoginComponent implements OnInit {
   message: string;
   user: User;
   docs: any;
-  fastSelling: boolean = false;
+  fastSelling = false;
 
-  constructor(private mainService: MainService, private messageService: MessageService, private authService: AuthService, private router: Router, private settingsService: SettingsService) { }
+  constructor(private mainService: MainService, private messageService: MessageService,
+    private authService: AuthService, private router: Router,
+    private settingsService: SettingsService) { }
 
   ngOnInit() {
     this.authService.logout();
@@ -29,7 +31,7 @@ export class LoginComponent implements OnInit {
     this.pinInput = '';
     this.settingsService.AppSettings.subscribe(res => {
       if (res) {
-        if (res.value.takeaway == 'Açık') {
+        if (res.value.takeaway === 'Açık') {
           this.fastSelling = true;
         } else {
           this.fastSelling = false;
@@ -39,13 +41,13 @@ export class LoginComponent implements OnInit {
   }
 
   logIn() {
-    this.message = "İşleniyor";
+    this.message = 'İşleniyor';
     this.mainService.getAllBy('users', { pincode: { $eq: this.pinInput } }).then((result) => {
       this.user = result.docs[0];
       if (this.user) {
         this.authService.login(this.user);
         this.authService.setPermissions();
-        this.messageService.sendMessage("Hoşgeldiniz " + this.user.name);
+        this.messageService.sendMessage('Hoşgeldiniz ' + this.user.name);
         if (this.fastSelling) {
           this.router.navigate(['/selling-screen', 'Fast', 'New']);
         } else {
@@ -53,7 +55,7 @@ export class LoginComponent implements OnInit {
         }
         this.clearDigits();
       } else {
-        this.message = "Hatalı giriş yaptınız.";
+        this.message = 'Hatalı giriş yaptınız.';
         this.clearDigits();
       }
     });
@@ -63,14 +65,14 @@ export class LoginComponent implements OnInit {
     this.pinInput = '';
     setTimeout(() => {
       this.message = '';
-    }, 750)
+    }, 750);
   }
 
   onClick(digit: number) {
     this.message = null;
     this.pinInput = this.pinInput + '' + digit + '';
-    if (this.pinInput.length == 4) {
-      this.pinInput = parseInt(this.pinInput);
+    if (this.pinInput.length === 4) {
+      this.pinInput = parseInt(this.pinInput, 10);
       this.logIn();
     }
   }

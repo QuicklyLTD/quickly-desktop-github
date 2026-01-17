@@ -32,13 +32,12 @@ export class SetupFinished implements CanActivate {
 export class DayStarted implements CanActivate {
     constructor(private settings: SettingsService, private messageService: MessageService, private router: Router) { }
     canActivate() {
-        let Status = JSON.parse(localStorage.getItem('DayStatus'));
-        let isStarted: boolean = Status.started;
-        if (isStarted == false) {
+        const Status = JSON.parse(localStorage.getItem('DayStatus'));
+        const isStarted: boolean = Status.started;
+        if (isStarted === false) {
             this.messageService.sendAlert('Dikkat', 'Lütfen Gün Başlangıcı Yapınız', 'warning');
             this.router.navigate(['/endoftheday']);
         }
         return isStarted;
     }
 }
-

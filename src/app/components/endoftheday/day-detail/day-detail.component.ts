@@ -3,10 +3,11 @@ import { Cashbox } from '../../../mocks/cashbox';
 import { ClosedCheck } from '../../../mocks/check';
 import { BackupData, EndDay } from '../../../mocks/endoftheday';
 import { Report } from '../../../mocks/report';
-import { ElectronService,  } from '../../../providers/electron.service';
+import { ElectronService } from '../../../providers/electron.service';
 import { Log, logType } from '../../../mocks/log';
 import { PrinterService } from '../../../providers/printer.service';
 import { SettingsService } from '../../../services/settings.service';
+import { EntityStoreService } from '../../../services/entity-store.service';
 
 
 @Component({
@@ -15,7 +16,7 @@ import { SettingsService } from '../../../services/settings.service';
   styleUrls: ['./day-detail.component.scss']
 })
 export class DayDetailComponent implements OnInit {
-  @Input('data') detailData: EndDay;
+  @Input() detailData: EndDay;
   @Input('printers') printers: any;
   oldBackupData: Array<BackupData>;
   oldChecks: any;
@@ -43,14 +44,24 @@ export class DayDetailComponent implements OnInit {
   pieColors: Array<any>;
   detailTitle: string;
   detailDay: number;
-  constructor(private electronService: ElectronService, private printerService: PrinterService, private settingsService:SettingsService) {
+  tableNames: Map<string, string> = new Map();
+  userNames: Map<string, string> = new Map();
+  productNames: Map<string, string> = new Map();
+  ownerName: string;
+  ItemReportName: string;
+  constructor(
+    private electronService: ElectronService,
+    private printerService: PrinterService,
+    private settingsService: SettingsService,
+    private entityStoreService: EntityStoreService
+  ) {
 
     this.pieOptions = { responsive: false, legend: { labels: { fontColor: 'rgb(255, 255, 255)' } } };
     this.activityOptions = {
       responsive: false,
       elements: {
         line: {
-          tension: 0.5,
+          tension: 0.5
         }
       },
       legend: { labels: { fontColor: 'rgb(255, 255, 255)' } },
@@ -74,13 +85,13 @@ export class DayDetailComponent implements OnInit {
             lineWidth: 0.4
           }
         }]
-      },
+      }
     };
   }
 
   ngOnInit() {
     // this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
-    console.log(this.detailData,this.printers);
+    console.log(this.detailData, this.printers);
 
     this.detailTitle = 'Genel Detaylar & Grafik';
     this.pieColors = [];
@@ -97,39 +108,41 @@ export class DayDetailComponent implements OnInit {
       switch (section) {
         case 'Checks':
           this.detailTitle = 'Kapatılan Hesap Detayları';
-          if (filter == 'All') {
+          if (filter === 'All') {
             this.checksTable = this.oldChecks.docs.sort((a, b) => a.timestamp - b.timestamp);
-          } else if (filter == 'İptal') {
-            this.checksTable = this.oldChecks.docs.filter(obj => obj.type == 3).sort((a, b) => a.timestamp - b.timestamp);
+          } else if (filter === 'İptal') {
+            this.checksTable = this.oldChecks.docs.filter(obj => obj.type === 3).sort((a, b) => a.timestamp - b.timestamp);
           } else {
             this.checksTable = this.oldChecks.docs.filter(obj => obj.type !== 3).sort((a, b) => a.timestamp - b.timestamp);
-            this.checksTable = this.oldChecks.docs.filter(obj => obj.payment_method == filter).sort((a, b) => a.timestamp - b.timestamp);
+            this.checksTable = this.oldChecks.docs.filter(obj => obj.payment_method === filter).sort((a, b) => a.timestamp - b.timestamp);
           }
           break;
         case 'Cashbox':
           this.detailTitle = 'Kasa Gelir-Gider Detayları';
-          if (filter == 'All') {
+          if (filter === 'All') {
             this.cashboxTable = this.oldCashbox.docs;
-          }
-          else if (filter == 'Gelir') {
-            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type == 'Gelir').sort((a, b) => a.timestamp - b.timestamp);
-          } else if (filter == 'Gider') {
-            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type == 'Gider').sort((a, b) => a.timestamp - b.timestamp);
+          } else if (filter === 'Gelir') {
+            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type === 'Gelir').sort((a, b) => a.timestamp - b.timestamp);
+          } else if (filter === 'Gider') {
+            this.cashboxTable = this.oldCashbox.docs.filter(obj => obj.type === 'Gider').sort((a, b) => a.timestamp - b.timestamp);
           }
           break;
         case 'Products':
           this.detailTitle = 'Güne Ait Ürün Satış Detayları';
-          this.productsTable = this.oldReports.docs.filter(obj => obj.type == 'Product').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          this.productsTable = this.oldReports.docs.filter(obj => obj.type === 'Product')
+            .sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
           this.productsTable = this.productsTable.filter(obj => obj.weekly[this.detailDay] !== 0);
           break;
         case 'Users':
           this.detailTitle = 'Güne Ait Kullanıcı Satış Detayları';
-          this.usersTable = this.oldReports.docs.filter(obj => obj.type == 'User').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          this.usersTable = this.oldReports.docs.filter(obj => obj.type === 'User')
+            .sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
           this.usersTable = this.usersTable.filter(obj => obj.weekly[this.detailDay] !== 0);
           break;
         case 'Tables':
           this.detailTitle = 'Güne Ait Masa Satış Detayları';
-          this.tablesTable = this.oldReports.docs.filter(obj => obj.type == 'Table').sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
+          this.tablesTable = this.oldReports.docs.filter(obj => obj.type === 'Table')
+            .sort((a, b) => b.weekly[this.detailDay] - a.weekly[this.detailDay]);
           this.tablesTable = this.tablesTable.filter(obj => obj.weekly[this.detailDay] !== 0);
           break;
         case 'Logs':
@@ -138,7 +151,7 @@ export class DayDetailComponent implements OnInit {
           break;
         case 'Activity':
           this.detailTitle = 'Güne Ait Aktivite Grafiği';
-          let sellingActivity = this.oldReports.docs.find(obj => obj.type == 'Activity');
+          const sellingActivity = this.oldReports.docs.find(obj => obj.type === 'Activity');
           this.activityData = [{ data: sellingActivity.activity, label: 'Gelir Endeksi' }, { data: sellingActivity.activity_count, label: 'Doluluk Oranı ( % )' }];
           this.activityLabels = sellingActivity.activity_time;
           break;
@@ -151,13 +164,36 @@ export class DayDetailComponent implements OnInit {
     }
   }
 
-  printEndday(){
+  printEndday() {
     this.printerService.printEndDay(this.printers[0], this.detailData);
   }
 
-  showCheckDetail(check) {
+  async showCheckDetail(check) {
     this.checkDetail = check;
     $('#checkDetail').modal('show');
+
+    // Resolve names for this specific check detail
+    if (check.table_id) {
+       this.entityStoreService.resolveEntity('tables', check.table_id).then(name => {
+         this.tableNames = new Map([...this.tableNames, [check.table_id, name]]);
+       });
+    }
+
+    if (check.products) {
+       const userIds = check.products.map(p => p.owner).filter(id => id);
+       const resolvedUsers = await this.entityStoreService.resolveEntities('users', userIds);
+       this.userNames = new Map([...this.userNames, ...resolvedUsers]);
+    }
+
+    if (check.payment_flow) {
+      for (const flow of check.payment_flow) {
+        if (flow.payed_products) {
+          const flowUserIds = flow.payed_products.map(p => p.owner).filter(id => id);
+          const resolvedFlowUsers = await this.entityStoreService.resolveEntities('users', flowUserIds);
+          this.userNames = new Map([...this.userNames, ...resolvedFlowUsers]);
+        }
+      }
+    }
   }
 
   showCashDetail(cash) {
@@ -170,6 +206,14 @@ export class DayDetailComponent implements OnInit {
     this.pieLabels.push('Nakit', 'Kart', 'Kupon', 'İkram');
     this.pieData.push(this.detailData.cash_total, this.detailData.card_total, this.detailData.coupon_total, this.detailData.free_total);
     this.detailDay = new Date(this.detailData.timestamp).getDay();
+
+    // Resolve owner name
+    if (this.detailData.owner) {
+      this.entityStoreService.resolveEntity('users', this.detailData.owner).then(name => {
+        this.ownerName = name;
+      });
+    }
+
     this.electronService.readBackupData(this.detailData.data_file).then((result: Array<BackupData>) => {
       this.oldBackupData = result;
       this.oldChecks = this.oldBackupData[0];
@@ -177,11 +221,27 @@ export class DayDetailComponent implements OnInit {
       this.oldReports = this.oldBackupData[2];
       this.oldLogs = this.oldBackupData[3];
       this.syncStatus = true;
+
+      // Resolve all necessary names from backup data
+      const tableIds = this.oldChecks.docs.map(c => c.table_id).filter(id => id);
+      const productIds = this.oldReports.docs.filter(r => r.type === 'Product').map(r => r.connection_id).filter(id => id);
+      const userIds = this.oldReports.docs.filter(r => r.type === 'User').map(r => r.connection_id).filter(id => id);
+      const reportTableIds = this.oldReports.docs.filter(r => r.type === 'Table').map(r => r.connection_id).filter(id => id);
+
+      this.entityStoreService.resolveEntities('tables', [...tableIds, ...reportTableIds]).then(resolved => {
+        this.tableNames = resolved;
+      });
+      this.entityStoreService.resolveEntities('products', productIds).then(resolved => {
+        this.productNames = resolved;
+      });
+      this.entityStoreService.resolveEntities('users', userIds).then(resolved => {
+        this.userNames = resolved;
+      });
+
     }).catch(err => {
       console.log(err);
       this.oldBackupData = [];
       this.syncStatus = false;
     });
   }
-
 }

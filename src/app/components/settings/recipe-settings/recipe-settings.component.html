@@ -194,11 +194,10 @@
           <tbody>
             <tr *ngFor="let recipe of recipes let i = index;">
               <td>{{i+1}}</td>
-              <td><b>{{recipe.product_id | general:'products' | async}}</b></td>
+              <td><b>{{productNames.get(recipe.product_id) || recipe.product_id}}</b></td>
               <td>
                 <span *ngFor="let ing of recipe.recipe" class="badge badge-success mr-1 p-2">
-                  {{ing.amount}} {{ing.stock_id | general:'stocks':'unit' | async}} {{ing.stock_id | general:'stocks' |
-                  async}}
+                  {{ing.amount}} {{stockUnits.get(ing.stock_id) || ''}} {{stockNames.get(ing.stock_id) || ing.stock_id}}
                 </span>
               </td>
             </tr>

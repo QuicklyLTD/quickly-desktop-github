@@ -1,0 +1,333 @@
+# Sync and Conflict Resolution Sequence Diagrams
+
+## 1. Secondary Setup and Initial Sync
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Setup as SetupComponent
+    participant Sync as SyncService
+    participant Main as MainService
+    participant Primary as Primary Server
+    participant Local as LocalDBs
+    participant All as allData
+
+    User->>Setup: Enter Server Credentials (IP, Port, Key)
+    Setup->>Setup: localStorage.AppType = 'Secondary'
+    Setup->>Sync: serverReplication(serverSettings)
+    
+    Note over Sync,Primary: Phase 1: One-time Replication
+    Sync->>Main: replicateDB(config)
+    Main->>Primary: HTTP GET /appServer/_changes
+    Primary-->>Main: Stream documents (batch 500)
+    Main->>All: put(docs)
+    Sync->>Sync: statusMessage = "X - Senkronize Ediliyor"
+    
+    Note over Sync,All: Phase 2: Sync to LocalDBs
+    Primary-->>Main: Replication complete
+    Sync->>Main: syncToLocal()
+    Main->>All: changes({since: 'now', live: false})
+    All-->>Main: Change feed
+    loop For each document
+        Main->>Local: put(doc)
+    end
+    
+    Note over Setup,All: Phase 3: Finalize
+    Sync->>Main: addData('settings', ServerSettings)
+    Setup->>Setup: relaunchProgram()
+    
+    Note over Main,Local: After Relaunch
+    Main->>Primary: syncToServer() (live, retry)
+    Main->>RemoteDB: syncToRemote() (live, retry)
+```
+
+## 2. Ongoing Bidirectional Sync (Secondary)
+
+```mermaid
+sequenceDiagram
+    participant UI as UI Component
+    participant Local as LocalDB
+    participant All as allData
+    participant Main as MainService
+    participant Primary as Primary ServerDB
+    participant Remote as RemoteDB (Cloud)
+
+    Note over UI,Local: Local CRUD Operation
+    UI->>Main: addData('checks', checkData)
+    Main->>Local: post(checkData)
+    Local-->>Main: {ok: true, id: 'xxx', rev: '1-abc'}
+    Main->>All: put(checkData with db_name)
+    
+    Note over All,Primary: Sync to Primary
+    All->>Main: syncToServer() detects change
+    Main->>Primary: PouchDB.sync() push
+    Primary->>Primary: Validate & Store
+    
+    Note over Primary,All: Pull from Primary
+    Primary-->>Main: Other changes
+    Main->>Main: handleChanges(change)
+    loop For each changed doc
+        Main->>All: put(doc)
+    end
+    
+    Note over All,Local: Update LocalDBs
+    All->>Main: syncToLocal()
+    loop For each relevant doc
+        Main->>Local: put(doc)
+    end
+    
+    Note over UI,Local: UI Update
+    Local->>UI: Component detects change
+    UI->>UI: Refresh view
+```
+
+## 3. Conflict Detection and Resolution
+
+```mermaid
+sequenceDiagram
+    participant Primary as Primary Device
+    participant Secondary as Secondary Device
+    participant ServerDB as Primary ServerDB
+    participant Conflict as ConflictService
+    participant Timer as setInterval (60s)
+
+    Note over Primary,Secondary: Both devices offline, modify same doc
+    Primary->>Primary: update product price: 100 → 110
+    Secondary->>Secondary: update product price: 100 → 120
+    
+    Note over Primary,ServerDB: Reconnect
+    Primary->>ServerDB: push revision 2-aaa (price=110)
+    Secondary->>ServerDB: push revision 2-bbb (price=120)
+    ServerDB->>ServerDB: Detect conflict!
+    ServerDB->>ServerDB: Add _conflicts: ['2-aaa', '2-bbb']
+    
+    Note over Timer,Conflict: Conflict Detection Loop (60s)
+    Timer->>Conflict: Trigger getConflicts()
+    Conflict->>ServerDB: allDocs({conflicts: true})
+    ServerDB-->>Conflict: Docs with _conflicts
+    
+    Conflict->>Conflict: For each conflicted doc:
+    Conflict->>ServerDB: getPreRevision(conflicted_doc)
+    ServerDB-->>Conflict: revision 1-xxx (price=100)
+    
+    Conflict->>Conflict: diffResolver(a, b, older)
+    Note over Conflict: Compare timestamps/revs
+    alt Timestamp-based (non-reports)
+        alt a.timestamp > b.timestamp
+            Conflict->>ServerDB: remove(b)
+            Conflict->>ServerDB: remove(a)
+            Conflict->>ServerDB: put(a without _rev)
+        else b.timestamp > a.timestamp
+            Conflict->>ServerDB: remove(a)
+            Conflict->>ServerDB: remove(b)
+            Conflict->>ServerDB: put(b without _rev)
+        end
+    else Merge (reports DB)
+        Conflict->>Conflict: Calculate diffs from older
+        Conflict->>Conflict: Sum absolute deltas
+        Conflict->>ServerDB: remove(a)
+        Conflict->>ServerDB: remove(b)
+        Conflict->>ServerDB: put(merged_doc)
+    end
+    
+    ServerDB-->>Primary: Sync resolved doc
+    ServerDB-->>Secondary: Sync resolved doc
+```
+
+## 4. Reports Conflict Merge Strategy
+
+```mermaid
+sequenceDiagram
+    participant Conflict as ConflictService
+    participant DocA as Revision A
+    participant DocB as Revision B
+    participant Older as Parent Revision
+    participant ServerDB as ServerDB
+
+    Note over Conflict: Reports DB Conflict Detected
+    Conflict->>ServerDB: getPreRevision(conflicted_doc)
+    ServerDB-->>Conflict: Older doc (parent)
+    
+    Note over Conflict: Calculate Diffs
+    Conflict->>DocA: diffReduce(A, Older)
+    DocA-->>Conflict: [{firsProp: 'total_sales', data: 150}]
+    Conflict->>DocB: diffReduce(B, Older)
+    DocB-->>Conflict: [{firsProp: 'total_sales', data: 200}]
+    
+    Note over Older: Merge Strategy
+    Conflict->>Older: Clone to resolvedDoc
+    Note over Conflict,resolvedDoc: Base: total_sales = 1000
+    
+    Conflict->>Conflict: Apply A diff
+    Note over Conflict,resolvedDoc: 1000 + |1000 - 1150| = 1150
+    
+    Conflict->>Conflict: Apply B diff
+    Note over Conflict,resolvedDoc: 1150 + |1000 - 1200| = 1350
+    
+    Note over Conflict,ServerDB: Store Resolved
+    Conflict->>ServerDB: remove(A)
+    ServerDB-->>Conflict: ok
+    Conflict->>ServerDB: remove(B)
+    ServerDB-->>Conflict: ok
+    Conflict->>ServerDB: put(resolvedDoc)
+    ServerDB-->>Conflict: ok (new rev 3-ccc)
+    
+    Note over ServerDB: Propagate to all devices
+```
+
+## 5. Remote Sync (Primary to Cloud)
+
+```mermaid
+sequenceDiagram
+    participant Primary as Primary Device
+    participant All as allData
+    participant Remote as RemoteDB (Cloud)
+    participant Cloud as QuicklyHQ
+
+    Note over Primary,All: Day Start / Activation
+    Primary->>Primary: syncToRemote()
+    
+    Note over All,Remote: Bidirectional Live Sync
+    All->>Remote: PouchDB.sync({live: true, retry: true})
+    Remote->>All: Pull changes from cloud
+    All->>Remote: Push local changes
+    
+    Note over Remote,Cloud: Cloud Events
+    Remote->>Cloud: Sync day sales
+    Cloud->>Cloud: Aggregate reports
+    Cloud->>Remote: Push settings updates
+    
+    Note over All,Primary: Handle Cloud Changes
+    All->>Primary: handleChanges(pull)
+    Primary->>Primary: syncToLocal('settings')
+    
+    Note over Primary: Update RestaurantInfo, AppSettings
+    Primary->>Primary: Reload on critical changes
+```
+
+## 6. Sync Error Handling and Retry
+
+```mermaid
+sequenceDiagram
+    participant Secondary as Secondary Device
+    participant Primary as Primary Server
+    participant Sync as SyncService
+    participant UI as UI Component
+
+    Note over Secondary,Primary: Network Disconnection
+    Secondary->>Primary: syncToServer() (live)
+    Primary-->>Secondary: Connection timeout
+    
+    Note over Secondary,Sync: Error Handler
+    Sync->>Sync: on('error', err)
+    Sync->>Sync: hasError = true
+    Sync->>UI: electronService.openDevTools()
+    
+    Note over Secondary,Sync: Backoff Retry
+    Secondary->>Secondary: Wait 1000ms (back_off_function)
+    Secondary->>Primary: Reconnect attempt
+    
+    alt Connection Restored
+        Primary-->>Secondary: Sync resumes
+        Sync->>Sync: hasError = false
+    else Still Failing
+        Sync->>Sync: Wait 1000ms again
+        Note over Sync: Retry indefinitely (retry: true)
+    end
+    
+    Note over Secondary,UI: User Notification
+    Sync->>UI: statusMessage = "Senkronize Ediliyor"
+    UI->>UI: Show sync status indicator
+```
+
+## 7. Local Sync (allData to LocalDBs)
+
+```mermaid
+sequenceDiagram
+    participant All as allData (IndexedDB)
+    participant Main as MainService
+    participant Users as LocalDB['users']
+    participant Checks as LocalDB['checks']
+    participant Orders as LocalDB['orders']
+    participant UI as UI Component
+
+    Note over All: Document Added/Modified
+    All->>All: Internal trigger
+    
+    Note over All,Main: Changes Feed
+    Main->>All: changes({since: 'now', live: true})
+    
+    loop For each change
+        All-->>Main: {doc: {...}, db_name: 'users'}
+        
+        Main->>Main: delete doc._rev
+        
+        alt Not deleted
+            Main->>Users: put(doc)
+            Users-->>Main: {ok: true}
+        else Deleted
+            Main->>Users: remove(doc)
+            Users-->>Main: {ok: true}
+        end
+    end
+    
+    Note over Users,UI: UI Update
+    Users->>UI: Component refresh
+    UI->>UI: Display updated data
+```
+
+## 8. Order Listener with Sync Integration
+
+```mermaid
+sequenceDiagram
+    participant Order as OrderListenerService
+    participant Orders as LocalDB['orders']
+    participant Sync as SyncService
+    participant Printer as PrinterService
+
+    Note over Order,Sync: Sync Starting
+    Sync->>Order: setOnSync(true)
+    Order->>Order: onSync = true
+    
+    Note over Orders: New Order Added
+    Orders->>Orders: changes({live: true})
+    Orders-->>Order: change event (new order)
+    
+    Note over Order: Check Sync Status
+    alt onSync === true
+        Order->>Order: Skip printing (during sync)
+    else onSync === false
+        Order->>Order: Process order
+        Order->>Printer: printOrder(printer, table, products)
+    end
+    
+    Note over Order,Sync: Sync Complete
+    Sync->>Order: setOnSync(false)
+    Order->>Order: onSync = false
+    Note over Order: Resume normal order processing
+```
+
+## Key Points
+
+### Sync Architecture
+- **Dual-Write Pattern**: allData (master) ↔ LocalDBs (slaves)
+- **Three-Tier Sync**: Local → Server → Remote
+- **Live Sync**: Continuous with 2500ms heartbeat
+- **Pull-Only**: Reduces write conflicts
+
+### Conflict Resolution
+- **Detection**: 60-second polling on ServerDB
+- **Reports**: Merge by summing absolute deltas
+- **Others**: Timestamp-based, fallback to revision number
+- **Automatic**: No user intervention required
+
+### Error Handling
+- **Retry**: 1000ms backoff, indefinite retries
+- **Debug**: DevTools opens on error
+- **Recovery**: Automatic reconnection
+
+### Performance
+- **Batch Size**: 500 documents
+- **Memory Adapter**: LocalDBs in-memory (fast)
+- **IndexedDB**: allData persistent (10MB limit)
+- **Selector Optimization**: Skip deleted docs

@@ -12,7 +12,7 @@ export class MessageService {
         setTimeout(
             () => {
                 this.subject.next();
-            }, 2000)
+            }, 2000);
     }
 
     getMessage(): Observable<any> {
@@ -23,10 +23,10 @@ export class MessageService {
         swal(header, message, type, {
             buttons: {
                 confirm: {
-                    text: "Tamam",
+                    text: 'Tamam',
                     value: true,
                     visible: true,
-                    className: "btn btn-lg btn-success",
+                    className: 'btn btn-lg btn-success',
                     closeModal: true
                 }
             }
@@ -37,20 +37,20 @@ export class MessageService {
         return swal(message, {
             buttons: {
                 cancel: {
-                    text: "İptal",
+                    text: 'İptal',
                     value: false,
                     visible: true,
-                    className: "btn btn-lg btn-danger",
-                    closeModal: true,
+                    className: 'btn btn-lg btn-danger',
+                    closeModal: true
                 },
                 confirm: {
-                    text: "Tamam",
+                    text: 'Tamam',
                     value: true,
                     visible: true,
-                    className: "btn btn-lg btn-success",
+                    className: 'btn btn-lg btn-success',
                     closeModal: true
                 }
-            },
+            }
         });
     }
 }

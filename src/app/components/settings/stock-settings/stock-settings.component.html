@@ -269,7 +269,7 @@
               <div *ngIf="onUpdate && selectedStock" class="bodyquote mb-0 pr-1 pl-1">
                 <p class="mb-2">
                   <strong [ngClass]="{'text-danger': selectedStock.left_total <= 0}">{{selectedStock.name}}</strong>
-                  <small>({{selectedStock.category | general:'stocks_cat' | async}})</small>
+                  <small>({{stockCatName || selectedStock.category}})</small>
                 </p>
                 <div class="progress">
                   <div [ngClass]="{'bg-danger':selectedStock.warning_limit >= selectedStock.left_total}" class="progress-bar bg-warning progress-bar-striped"

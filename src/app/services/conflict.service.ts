@@ -36,14 +36,14 @@ export class ConflictService {
 
   getPreRevision(conflicted_document: any) {
     return this.mainService.ServerDB.get(conflicted_document._id, { revs: true }).then(res => {
-      let revToGet = `${res._revisions.start - 1}-${res._revisions.ids[1]}`;
+      const revToGet = `${res._revisions.start - 1}-${res._revisions.ids[1]}`;
       return this.mainService.ServerDB.get(res._id, { rev: revToGet });
     });
   }
 
   diffResolver(a: any, b: any, older_document?: any) {
     if (older_document !== undefined) {
-      if (older_document.db_name == 'reports') {
+      if (older_document.db_name === 'reports') {
         const aDiff = this.diffReduce(a, older_document);
         const bDiff = this.diffReduce(b, older_document);
         const resolvedDoc = JSON.parse(JSON.stringify(older_document));
@@ -51,16 +51,16 @@ export class ConflictService {
         const olderBCopy = JSON.parse(JSON.stringify(older_document));
         aDiff.forEach(diff => {
           if (diff.hasOwnProperty('secondProp')) {
-            resolvedDoc[diff.firsProp][diff.secondProp] += Math.abs(olderACopy[diff.firsProp][diff.secondProp] - diff.data)
+            resolvedDoc[diff.firsProp][diff.secondProp] += Math.abs(olderACopy[diff.firsProp][diff.secondProp] - diff.data);
           } else {
-            resolvedDoc[diff.firsProp] += Math.abs(olderACopy[diff.firsProp] - diff.data)
+            resolvedDoc[diff.firsProp] += Math.abs(olderACopy[diff.firsProp] - diff.data);
           }
         });
         bDiff.forEach(diff => {
           if (diff.hasOwnProperty('secondProp')) {
-            resolvedDoc[diff.firsProp][diff.secondProp] += Math.abs(olderBCopy[diff.firsProp][diff.secondProp] - diff.data)
+            resolvedDoc[diff.firsProp][diff.secondProp] += Math.abs(olderBCopy[diff.firsProp][diff.secondProp] - diff.data);
           } else {
-            resolvedDoc[diff.firsProp] += Math.abs(olderBCopy[diff.firsProp] - diff.data)
+            resolvedDoc[diff.firsProp] += Math.abs(olderBCopy[diff.firsProp] - diff.data);
           }
         });
         console.log('OLDER', older_document);
@@ -69,11 +69,11 @@ export class ConflictService {
         console.log('RESOLVED', resolvedDoc);
         this.mainService.ServerDB.remove(a).then((res) => {
           if (res.ok) {
-            this.mainService.ServerDB.remove(b).then((res) => {
-              if (res.ok) {
+            this.mainService.ServerDB.remove(b).then((removeRes) => {
+              if (removeRes.ok) {
                 delete resolvedDoc._rev;
-                this.mainService.ServerDB.put(resolvedDoc).then(res => {
-                  console.log(res);
+                this.mainService.ServerDB.put(resolvedDoc).then(putRes => {
+                  console.log(putRes);
                 });
               }
             });
@@ -81,9 +81,15 @@ export class ConflictService {
         });
       } else {
         console.log('Have OlderDoc Out Of Reports!', a, b);
-        if (a.timestamp > b.timestamp) this.diffRecreate(a, b);
-        if (b.timestamp > a.timestamp) this.diffRecreate(b, a);
-        if (b.timestamp == a.timestamp) this.diffRevision(a, b);
+        if (a.timestamp > b.timestamp) {
+          this.diffRecreate(a, b);
+        }
+        if (b.timestamp > a.timestamp) {
+          this.diffRecreate(b, a);
+        }
+        if (b.timestamp === a.timestamp) {
+          this.diffRevision(a, b);
+        }
       }
     } else {
       console.log('No OlderDoc', a);
@@ -92,21 +98,25 @@ export class ConflictService {
   }
 
   diffRevision(a, b) {
-    let aRev = a._rev.split('-')[0];
-    let bRev = b._rev.split('-')[0];
-    if (aRev > bRev) this.diffRecreate(a, b);
-    if (bRev > aRev) this.diffRecreate(b, a);
+    const aRev = a._rev.split('-')[0];
+    const bRev = b._rev.split('-')[0];
+    if (aRev > bRev) {
+      this.diffRecreate(a, b);
+    }
+    if (bRev > aRev) {
+      this.diffRecreate(b, a);
+    }
   }
 
   diffRecreate(first, second) {
     console.log('Creating Diff', first);
-    this.mainService.ServerDB.remove(first).then((res) => {
-      if (res.ok) {
-        this.mainService.ServerDB.remove(second).then((res) => {
-          if (res.ok) {
+    this.mainService.ServerDB.remove(first).then(res1 => {
+      if (res1.ok) {
+        this.mainService.ServerDB.remove(second).then(res2 => {
+          if (res2.ok) {
             delete first._rev;
-            this.mainService.ServerDB.put(first).then(res => {
-              console.log(res);
+            this.mainService.ServerDB.put(first).then(res3 => {
+              console.log(res3);
             }).catch(err => {
               console.log(err);
               console.log('First Put Error', first);
@@ -124,8 +134,8 @@ export class ConflictService {
   }
 
   diffReduce(reduce_element, older_element) {
-    let objDiff: any = this.deepDiffMapper().map(reduce_element, older_element);
-    let parsedDiff: Array<any> = this.diffParser('updated', objDiff);
+    const objDiff: any = this.deepDiffMapper().map(reduce_element, older_element);
+    const parsedDiff: Array<any> = this.diffParser('updated', objDiff);
     return parsedDiff;
   }
 
@@ -133,25 +143,25 @@ export class ConflictService {
     delete objDiff._id;
     delete objDiff._rev;
     delete objDiff._conflicts;
-    let diffObjArr: Array<object> = [];
-    for (let prop in objDiff) {
+    const diffObjArr: Array<object> = [];
+    for (const prop in objDiff) {
       if (Object.keys(objDiff[prop]).length > 2) {
-        for (let innerProp in objDiff[prop]) {
-          if (objDiff[prop][innerProp].type == diffType) {
-            let diffObj = {
+        for (const innerProp in objDiff[prop]) {
+          if (objDiff[prop][innerProp].type === diffType) {
+            const diffObj = {
               firsProp: prop,
               secondProp: innerProp,
               data: objDiff[prop][innerProp].data
-            }
+            };
             diffObjArr.push(diffObj);
           }
         }
       } else {
-        if (objDiff[prop].type == diffType) {
-          let diffObj = {
+        if (objDiff[prop].type === diffType) {
+          const diffObj = {
             firsProp: prop,
             data: objDiff[prop].data
-          }
+          };
           diffObjArr.push(diffObj);
         }
       }
@@ -167,7 +177,7 @@ export class ConflictService {
       VALUE_UNCHANGED: 'unchanged',
       map: function (obj1, obj2) {
         if (this.isFunction(obj1) || this.isFunction(obj2)) {
-          throw 'Invalid argument. Function given, object expected.';
+          throw new Error('Invalid argument. Function given, object expected.');
         }
         if (this.isValue(obj1) || this.isValue(obj2)) {
           return {
@@ -175,22 +185,22 @@ export class ConflictService {
             data: (obj1 === undefined) ? obj2 : obj1
           };
         }
-        var diff = {};
-        for (var key in obj1) {
-          if (this.isFunction(obj1[key])) {
+        const diff = {};
+        for (const key1 in obj1) {
+          if (this.isFunction(obj1[key1])) {
             continue;
           }
-          var value2 = undefined;
-          if ('undefined' != typeof (obj2[key])) {
-            value2 = obj2[key];
+          let value2 = undefined;
+          if ('undefined' !== typeof (obj2[key1])) {
+            value2 = obj2[key1];
           }
-          diff[key] = this.map(obj1[key], value2);
+          diff[key1] = this.map(obj1[key1], value2);
         }
-        for (var key in obj2) {
-          if (this.isFunction(obj2[key]) || ('undefined' != typeof (diff[key]))) {
+        for (const key2 in obj2) {
+          if (this.isFunction(obj2[key2]) || ('undefined' !== typeof (diff[key2]))) {
             continue;
           }
-          diff[key] = this.map(undefined, obj2[key]);
+          diff[key2] = this.map(undefined, obj2[key2]);
         }
         return diff;
       },
@@ -201,10 +211,10 @@ export class ConflictService {
         if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
           return this.VALUE_UNCHANGED;
         }
-        if ('undefined' == typeof (value1)) {
+        if ('undefined' === typeof (value1)) {
           return this.VALUE_CREATED;
         }
-        if ('undefined' == typeof (value2)) {
+        if ('undefined' === typeof (value2)) {
           return this.VALUE_DELETED;
         }
         return this.VALUE_UPDATED;

@@ -8,7 +8,7 @@
               <div class="col-lg-5">
                 <div class="table-name">
                   <!-- <span *ngIf="check?.type == 1">Masa:</span> -->
-                  <b>{{check?.table_id | general:'tables' | async}}</b>
+                  <b>{{tableName}}</b>
                   <span *ngIf="check.note !== '' && check.note !== null && check.note !== undefined" class="text-warning">
                     ({{check.note}})
                   </span>
@@ -109,7 +109,6 @@
                               </span>
                               <small class="category mt-1 text-white">
                                 {{catName(product.cat_id)}}
-                                <!-- {{product.cat_id | general:'categories':'name'| async}} -->
                               </small>
                             </p>
                           </div>
@@ -178,7 +177,7 @@
                     </div>
                     <div class="product-price">{{item.price | price }} </div>
                     <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
-                      <i class="fa fa-user" aria-hidden="true"></i> {{item.owner | general:'users' | async }}
+                      <i class="fa fa-user" aria-hidden="true"></i> {{userNames.get(item.owner) || ''}}
                       <span class="pull-right">
                         <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
                     </div>
@@ -262,7 +261,7 @@
             </div>
           </div>
           <div class="col-xl-1 col-lg-1 pr-0 pl-1">
-            <button (click)="sendCheck()" [oneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sendButton">
+            <button (click)="sendCheck()" [appOneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sendButton">
               <div>
                 <i class="fa fa-paper-plane fa-5x"></i>
                 <p>Gönder</p>
@@ -496,10 +495,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button *ngIf="onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün
+        <button *ngIf="onProductChange" appOneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün
           Taşı
         </button>
-        <button *ngIf="!onProductChange" oneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa
+        <button *ngIf="!onProductChange" appOneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa
           Değiştir
         </button>
       </div>
@@ -523,7 +522,7 @@
             <div class="input-group">
               <input #specsInput type="text" readonly class="form-control form-control-lg" [ngModel]="numpad" />
               <div class="input-group-append normal">
-                <div #specsUnit class="input-group-text">{{productStock?.stock_id | general:'stocks':'unit' | async}}</div>
+                <div #specsUnit class="input-group-text">{{stockUnit}}</div>
               </div>
               <div class="input-group-append normal">
                 <button type="button" (click)="tareScaler()" class="btn btn-lg btn-danger btn-block">Dara</button>

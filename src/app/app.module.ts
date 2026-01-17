@@ -1,78 +1,83 @@
-import 'zone.js';
 import 'reflect-metadata';
+import 'zone.js';
 //////  Modules
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 //////  Main Pages Components
 import { AppComponent } from './app.component';
 import { ActivationComponent } from './components/activation/activation.component';
-import { SetupComponent } from './components/setup/setup.component';
-import { LoginComponent } from './components/login/login.component';
-import { HomeComponent } from './components/home/home.component';
-import { CashboxComponent } from './components/cashbox/cashbox.component';
-import { ReportsComponent } from './components/reports/reports.component';
-import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
-import { StoreComponent } from './components/store/store.component';
-import { SettingsComponent } from './components/settings/settings.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { CashboxComponent } from './components/cashbox/cashbox.component';
+import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
+import { HomeComponent } from './components/home/home.component';
+import { LoginComponent } from './components/login/login.component';
+import { ReportsComponent } from './components/reports/reports.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { SetupComponent } from './components/setup/setup.component';
+import { StoreComponent } from './components/store/store.component';
 ////// EndDay Child Components
 import { DayDetailComponent } from './components/endoftheday/day-detail/day-detail.component';
 ////// Store Child Components
-import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
+import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
 ////// Settings Child Components
-import { UserSettingsComponent } from './components/settings/user-settings/user-settings.component';
-import { MenuSettingsComponent } from './components/settings/menu-settings/menu-settings.component';
 import { ApplicationSettingsComponent } from './components/settings/application-settings/application-settings.component';
+import { MenuSettingsComponent } from './components/settings/menu-settings/menu-settings.component';
 import { RestaurantSettingsComponent } from './components/settings/restaurant-settings/restaurant-settings.component';
 import { StockSettingsComponent } from './components/settings/stock-settings/stock-settings.component';
+import { UserSettingsComponent } from './components/settings/user-settings/user-settings.component';
 ////// Reports Child Components
-import { StoreReportsComponent } from './components/reports/store-reports/store-reports.component';
 import { ProductReportsComponent } from './components/reports/product-reports/product-reports.component';
-import { TableReportsComponent } from './components/reports/table-reports/table-reports.component';
 import { StockReportsComponent } from './components/reports/stock-reports/stock-reports.component';
+import { StoreReportsComponent } from './components/reports/store-reports/store-reports.component';
+import { TableReportsComponent } from './components/reports/table-reports/table-reports.component';
 import { UserReportsComponent } from './components/reports/user-reports/user-reports.component';
 //////  Servisler
-import { MainService } from './services/main.service';
 import { ApplicationService } from './services/application.service';
-import { SettingsService } from './services/settings.service';
 import { AuthService } from './services/auth.service';
-import { LogService } from './services/log.service';
-import { HttpService } from './services/http.service';
 import { ConflictService } from './services/conflict.service';
+import { ConnectionService } from './services/connection.service';
+import { DayManagementService } from './services/day-management.service';
+import { EntityStoreService } from './services/entity-store.service';
+import { HttpService } from './services/http.service';
+import { LogService } from './services/log.service';
+import { MainService } from './services/main.service';
+import { OrderListenerService } from './services/order-listener.service';
+import { SettingsService } from './services/settings.service';
+import { SyncService } from './services/sync.service';
+import { FileLogService } from './services/file-log.service';
 //////  Providers
-import { KeyboardService } from './providers/keyboard.service';
-import { MessageService } from "./providers/message.service";
-import { PrinterService } from "./providers/printer.service"
-import { ElectronService } from './providers/electron.service';
-import { TerminalService } from './providers/terminal.service';
 import { CallerIDService } from './providers/caller-id.service';
+import { ElectronService } from './providers/electron.service';
+import { KeyboardService } from './providers/keyboard.service';
+import { MessageService } from './providers/message.service';
+import { PrinterService } from './providers/printer.service';
 import { ScalerService } from './providers/scaler.service';
+import { TerminalService } from './providers/terminal.service';
 
 //////  Pipes
-import { GeneralPipe } from './pipes/general.pipe';
 import { TimeAgoPipe } from './pipes/timeago.pipe';
 //////  Helpers
+import { CallerComponent } from './components/helpers/caller/caller.component';
 import { KeyboardComponent } from './components/helpers/keyboard/keyboard.component';
 import { MessageComponent } from './components/helpers/message/message.component';
-import { CallerComponent } from './components/helpers/caller/caller.component';
 //////  Directives
-import { KeyboardDirective } from './directives/keyboard.directive';
-import { ButtonDirective } from './directives/button.directive';
-import { PrinterSettingsComponent } from './components/settings/printer-settings/printer-settings.component';
-import { RecipeSettingsComponent } from './components/settings/recipe-settings/recipe-settings.component';
-import { CustomerSettingsComponent } from './components/settings/customer-settings/customer-settings.component';
-import { PricePipe } from './pipes/price.pipe';
 import { ActivityReportsComponent } from './components/reports/activity-reports/activity-reports.component';
 import { CashboxReportsComponent } from './components/reports/cashbox-reports/cashbox-reports.component';
 import { NotificationsReportsComponent } from './components/reports/notifications-reports/notifications-reports.component';
+import { CustomerSettingsComponent } from './components/settings/customer-settings/customer-settings.component';
+import { PrinterSettingsComponent } from './components/settings/printer-settings/printer-settings.component';
+import { RecipeSettingsComponent } from './components/settings/recipe-settings/recipe-settings.component';
+import { ButtonDirective } from './directives/button.directive';
+import { KeyboardDirective } from './directives/keyboard.directive';
+import { PricePipe } from './pipes/price.pipe';
 
 //////  3rd Party Modules
 import { ChartsModule } from 'ng2-charts';
-import { NgxMaskModule } from 'ngx-mask'
+import { NgxMaskModule } from 'ngx-mask';
 
 // Error Handler Sentry
 // import * as Raven from 'raven-js';
@@ -109,7 +114,6 @@ import { NgxMaskModule } from 'ngx-mask'
     TableReportsComponent,
     StockReportsComponent,
     UserReportsComponent,
-    GeneralPipe,
     TimeAgoPipe,
     PricePipe,
     KeyboardDirective,
@@ -140,15 +144,21 @@ import { NgxMaskModule } from 'ngx-mask'
     ApplicationService,
     SettingsService,
     AuthService,
+    FileLogService,
     LogService,
     MessageService,
     KeyboardService,
     PrinterService,
     TerminalService,
     ConflictService,
+    EntityStoreService,
     CallerIDService,
     ScalerService,
-    HttpService
+    HttpService,
+    SyncService,
+    ConnectionService,
+    DayManagementService,
+    OrderListenerService
   ],
   bootstrap: [AppComponent]
 })

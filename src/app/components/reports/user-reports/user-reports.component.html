@@ -80,7 +80,7 @@
           <tbody>
             <tr *ngFor="let item of usersList; let i = index" (click)="getItemReport(item)">
               <td>{{i+1}}</td>
-              <td>{{item.connection_id | general: 'users' | async}}</td>
+              <td>{{userNames.get(item.connection_id) || item.connection_id}}</td>
               <td>{{item.count}} Adet</td>
               <td>{{item.amount | number:'1.0-2' }} TL</td>
               <td>{{item.timestamp | date: 'd/M/y HH:mm'}}</td>
@@ -128,7 +128,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="modelTitleId">{{ItemReport?.connection_id | general:'users' | async}}</h4>
+        <h4 class="modal-title" id="modelTitleId">{{ItemReportName || ItemReport?.connection_id}}</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

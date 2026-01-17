@@ -8,22 +8,22 @@ export class TerminalService {
 
   printOrders(printers, categories, check, tables) {
     if (printers.length > 0) {
-      let orders = check.products.filter(obj => obj.status == 1);
+      const orders = check.products.filter(obj => obj.status === 1);
       if (orders.length > 0) {
-        let splitPrintArray = [];
+        const splitPrintArray = [];
         orders.forEach((obj, index) => {
-          let catPrinter = categories.filter(cat => cat._id == obj.cat_id)[0].printer || printers[0].name;
-          let contains = splitPrintArray.some(element => element.printer.name == catPrinter);
+          const catPrinter = categories.filter(cat => cat._id === obj.cat_id)[0].printer || printers[0].name;
+          const contains = splitPrintArray.some(element => element.printer.name === catPrinter);
           if (contains) {
-            let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter);
-            splitPrintArray[index].products.push(obj);
+            const sIndex = splitPrintArray.findIndex(p_name => p_name.printer.name === catPrinter);
+            splitPrintArray[sIndex].products.push(obj);
           } else {
-            let thePrinter = printers.filter(obj => obj.name == catPrinter)[0];
-            let splitPrintOrder = { printer: thePrinter, products: [obj] };
+            const thePrinter = printers.filter(p => p.name === catPrinter)[0];
+            const splitPrintOrder = { printer: thePrinter, products: [obj] };
             splitPrintArray.push(splitPrintOrder);
           }
-          if (index == orders.length - 1) {
-            let table_name = tables.filter(obj => obj._id == check.table_id)[0].name;
+          if (index === orders.length - 1) {
+            const table_name = tables.filter(t => t._id === check.table_id)[0].name;
             // if (check.type == 2) {
             //   table_name = 'Hızlı Satış';
             // } else {
@@ -39,15 +39,15 @@ export class TerminalService {
   }
 
   printOrder(device, table, orders) {
-    let ordersArray = [];
+    const ordersArray = [];
     orders.forEach(element => {
-      let contains = ordersArray.some(obj => obj.name == element.name);
+      const contains = ordersArray.some(obj => obj.name === element.name);
       if (contains) {
-        let index = ordersArray.findIndex(obj => obj.name == element.name);
+        const index = ordersArray.findIndex(obj => obj.name === element.name);
         ordersArray[index].price += element.price;
         ordersArray[index].count++;
       } else {
-        let schema = { name: element.name, note: "", price: element.price, count: 1 };
+        const schema = { name: element.name, note: '', price: element.price, count: 1 };
         ordersArray.push(schema);
       }
     });

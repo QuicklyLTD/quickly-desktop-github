@@ -24,8 +24,9 @@
     ],
     "lib": [
       "esnext",
-      "dom",
-    ]
+      "dom"
+    ],
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules"

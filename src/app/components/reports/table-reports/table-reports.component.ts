@@ -3,6 +3,7 @@ import { Log, logType } from '../../../mocks/log';
 import { Report } from '../../../mocks/report';
 import { MainService } from '../../../services/main.service';
 import { Floor } from '../../../mocks/table';
+import { EntityStoreService } from '../../../services/entity-store.service';
 
 @Component({
   selector: 'app-table-reports',
@@ -15,6 +16,7 @@ export class TableReportsComponent implements OnInit {
   selectedCat: string;
   floorsList: Array<Floor>;
   tableLogs: Array<Log>;
+  ItemReportName: string;
 
 
   ChartOptions: any = {
@@ -65,15 +67,15 @@ export class TableReportsComponent implements OnInit {
   };
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
-  ChartLegend: boolean = true;
-  ChartType: string = 'bar';
+  ChartLegend = true;
+  ChartType = 'bar';
   ChartLoaded: boolean;
 
   ItemReport: Report;
   DetailData: Array<any>;
   DetailLoaded: boolean;
 
-  constructor(private mainService: MainService) {
+  constructor(private mainService: MainService, private entityStoreService: EntityStoreService) {
     this.DetailLoaded = false;
     this.DetailData = [];
   }
@@ -83,9 +85,9 @@ export class TableReportsComponent implements OnInit {
   }
 
   normalWeekOrder(array: Array<any>) {
-    var arrayLength = array.length
-    for (var i = 0; i < arrayLength - 1; i++) {
-      var temp = array[i];
+    const arrayLength = array.length;
+    for (let i = 0; i < arrayLength - 1; i++) {
+      const temp = array[i];
       array[i] = array[i + 1];
       array[i + 1] = temp;
     }
@@ -93,7 +95,7 @@ export class TableReportsComponent implements OnInit {
   }
 
   dailyCount(arr: Array<number>, price: number) {
-    let newArray = [];
+    const newArray = [];
     for (let item of arr) {
       item = item / price;
       newArray.push(item);
@@ -114,9 +116,10 @@ export class TableReportsComponent implements OnInit {
     }
   }
 
-  getItemReport(report: Report) {
+  async getItemReport(report: Report) {
     this.DetailLoaded = false;
     this.ItemReport = report;
+    this.ItemReportName = await this.entityStoreService.resolveEntity('tables', report.connection_id);
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
@@ -153,23 +156,24 @@ export class TableReportsComponent implements OnInit {
     this.tablesList = newArray;
     if (this.selectedCat) {
       this.mainService.getAllBy('tables', { floor_id: this.selectedCat }).then(res => {
-        let floors_ids = res.docs.map(obj => obj._id);
+        const floors_ids = res.docs.map(obj => obj._id);
         this.tablesList = this.tablesList.filter(obj => floors_ids.includes(obj.connection_id));
-      })
+      });
     }
   }
 
   getReportsByCategory(cat_id: string) {
     this.selectedCat = cat_id;
     this.mainService.getAllBy('tables', { floor_id: cat_id }).then(res => {
-      let floors_ids = res.docs.map(obj => obj._id);
+      const floors_ids = res.docs.map(obj => obj._id);
       this.tablesList = this.generalList.filter(obj => floors_ids.includes(obj.connection_id));
-    })
+    });
   }
 
   getLogs() {
     this.mainService.getAllBy('logs', {}).then(res => {
-      this.tableLogs = res.docs.filter(obj => obj.type >= logType.TABLE_CREATED && obj.type <= logType.TABLE_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
+      this.tableLogs = res.docs.filter(obj => obj.type >= logType.TABLE_CREATED &&
+        obj.type <= logType.TABLE_CHECKPOINT).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 
@@ -180,9 +184,9 @@ export class TableReportsComponent implements OnInit {
     this.mainService.getAllBy('reports', { type: 'Table' }).then(res => {
       this.generalList = res.docs.sort((a, b) => b.count - a.count);
       this.tablesList = JSON.parse(JSON.stringify(this.generalList));
-      let chartTable = this.tablesList.slice(0, 5);
+      const chartTable = this.tablesList.slice(0, 5);
       chartTable.forEach((obj, index) => {
-        this.mainService.getData('tables', obj.connection_id).then(res => {
+        this.mainService.getData('tables', obj.connection_id).then(tableRes => {
           obj.weekly = this.normalWeekOrder(obj.weekly);
           obj.weekly_count = this.normalWeekOrder(obj.weekly_count);
           let schema;
@@ -192,7 +196,7 @@ export class TableReportsComponent implements OnInit {
             schema = { data: obj.weekly, label: res.name };
           }
           this.ChartData.push(schema);
-          if (chartTable.length - 1 == index) {
+          if (chartTable.length - 1 === index) {
             this.ChartLoaded = true;
           };
         });
@@ -200,7 +204,7 @@ export class TableReportsComponent implements OnInit {
     });
     this.mainService.getAllBy('floors', {}).then(res => {
       this.floorsList = res.docs;
-    })
+    });
   }
 
 }

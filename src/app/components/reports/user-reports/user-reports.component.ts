@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Log, logType } from '../../../mocks/log';
 import { Report } from '../../../mocks/report';
 import { MainService } from '../../../services/main.service';
+import { EntityStoreService } from '../../../services/entity-store.service';
 @Component({
   selector: 'app-user-reports',
   templateUrl: './user-reports.component.html',
@@ -11,6 +12,8 @@ export class UserReportsComponent implements OnInit {
   usersList: Array<Report>;
   userLogs: Array<Log>;
   generalList: Array<Report>;
+  userNames: Map<string, string> = new Map();
+  ItemReportName: string;
 
 
   ChartOptions: any = {
@@ -61,15 +64,15 @@ export class UserReportsComponent implements OnInit {
   };
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
-  ChartLegend: boolean = true;
-  ChartType: string = 'bar';
+  ChartLegend = true;
+  ChartType = 'bar';
   ChartLoaded: boolean;
 
   ItemReport: Report;
   DetailData: Array<any>;
   DetailLoaded: boolean;
 
-  constructor(private mainService: MainService) {
+  constructor(private mainService: MainService, private entityStoreService: EntityStoreService) {
     this.DetailLoaded = false;
     this.DetailData = [];
     this.fillData(false);
@@ -80,9 +83,9 @@ export class UserReportsComponent implements OnInit {
 
 
   normalWeekOrder(array: Array<any>) {
-    var arrayLength = array.length
-    for (var i = 0; i < arrayLength - 1; i++) {
-      var temp = array[i];
+    const arrayLength = array.length;
+    for (let i = 0; i < arrayLength - 1; i++) {
+      const temp = array[i];
       array[i] = array[i + 1];
       array[i + 1] = temp;
     }
@@ -102,10 +105,10 @@ export class UserReportsComponent implements OnInit {
     }
   }
 
-  getItemReport(report: Report) {
+  async getItemReport(report: Report) {
     this.DetailLoaded = false;
     this.ItemReport = report;
-    let detailLabel;
+    this.ItemReportName = await this.entityStoreService.resolveEntity('users', report.connection_id);
     this.mainService.getData('reports', report._id).then(res => {
       res.weekly = this.normalWeekOrder(res.weekly);
       res.weekly_count = this.normalWeekOrder(res.weekly_count);
@@ -141,35 +144,43 @@ export class UserReportsComponent implements OnInit {
     newArray = newArray.sort((a, b) => b.count - a.count);
     this.usersList = newArray;
   }
-  
+
   getLogs() {
     this.mainService.getAllBy('logs', {}).then(res => {
-      this.userLogs = res.docs.filter(obj => obj.type >= logType.USER_CREATED && obj.type <= logType.USER_CHECKPOINT || obj.type == logType.ORDER_CREATED).sort((a, b) => b.timestamp - a.timestamp);
+      this.userLogs = res.docs.filter(obj =>
+        obj.type >= logType.USER_CREATED && obj.type <= logType.USER_CHECKPOINT ||
+        obj.type === logType.ORDER_CREATED).sort((a, b) => b.timestamp - a.timestamp);
     });
   }
 
   fillData(daily) {
     this.mainService.getAllBy('reports', { type: 'User' }).then(res => {
       this.usersList = res.docs;
+
+      // Resolve user names
+      const userIds = res.docs.map(u => u.connection_id).filter(id => id);
+      this.entityStoreService.resolveEntities('users', userIds).then(resolved => {
+        this.userNames = resolved;
+      });
     });
     this.ChartData = [];
     this.ChartLoaded = false;
     this.mainService.getAllBy('reports', { type: 'User' }).then(res => {
       this.generalList = res.docs.sort((a, b) => b.count - a.count);
       this.usersList = JSON.parse(JSON.stringify(this.generalList));
-      let chartTable = this.usersList.slice(0, 5);
+      const chartTable = this.usersList.slice(0, 5);
       chartTable.forEach((obj, index) => {
-        this.mainService.getData('users', obj.connection_id).then(res => {
+        this.entityStoreService.resolveEntity('users', obj.connection_id).then(name => {
           obj.weekly = this.normalWeekOrder(obj.weekly);
           obj.weekly_count = this.normalWeekOrder(obj.weekly_count);
           let schema;
           if (daily) {
-            schema = { data: obj.weekly_count, label: res.name };
+            schema = { data: obj.weekly_count, label: name };
           } else {
-            schema = { data: obj.weekly, label: res.name };
+            schema = { data: obj.weekly, label: name };
           }
           this.ChartData.push(schema);
-          if (chartTable.length - 1 == index) {
+          if (chartTable.length - 1 === index) {
             this.ChartLoaded = true;
           };
         });

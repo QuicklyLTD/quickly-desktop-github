@@ -1,0 +1,60 @@
+# IPC Communication Diagram
+
+```mermaid
+sequenceDiagram
+    participant UI as Angular Components
+    participant Provider as Angular Providers
+    participant IPC as ipcRenderer
+    participant Main as Electron Main Process
+    
+    Note over Main,UI: Application Startup
+    UI->>Provider: AppComponent.ngOnInit()
+    Provider->>IPC: send('appServer', key, port)
+    IPC->>Main: IPC message
+    Main->>Main: appServer.ts: Express server start
+    Main-->>IPC: (async) server listening
+    IPC-->>Provider: (callback)
+    
+    Note over Main,UI: Printing Operations
+    UI->>Provider: PrinterService.printOrder()
+    Provider->>IPC: send('printOrder', device, table, orders)
+    IPC->>Main: IPC message
+    Main->>Main: ipcPrinter.ts: Mock log
+    Main-->>IPC: send('error', msg)
+    IPC-->>Provider: error event
+    Provider-->>UI: Error callback
+    
+    Note over Main,UI: Payment Flow
+    UI->>Provider: PrinterService.printCheck()
+    Provider->>IPC: send('printCheck', device, check, table)
+    IPC->>Main: IPC message
+    Main->>Main: ipcPrinter.ts: Mock log
+    Main-->>IPC: send('error', msg)
+    IPC-->>Provider: error event
+    Provider-->>UI: Error callback
+    
+    Note over Main,UI: End of Day
+    UI->>Provider: PrinterService.printEndDay()
+    Provider->>IPC: send('printEndDay', device, data)
+    IPC->>Main: IPC message
+    Main->>Main: ipcPrinter.ts: Mock log
+    
+    UI->>Provider: EndofthedayComponent.closeDay()
+    Provider->>IPC: send('closeServer')
+    IPC->>Main: IPC message
+    Main->>Main: appServer.ts: server.close()
+    Main-->>IPC: (callback)
+    
+    Note over Main,UI: Disabled Services (Commented)
+    UI->>Provider: CallerIDService.start()
+    Provider->>IPC: send('startCaller')
+    IPC->>Main: IPC message
+    Main-->>IPC: NO HANDLER (commented out)
+    Note over Main: callerServer.ts: All code commented
+    
+    UI->>Provider: ScalerService.start()
+    Provider->>IPC: send('startScaler')
+    IPC->>Main: IPC message
+    Main-->>IPC: NO HANDLER (commented out)
+    Note over Main: scalerServer.ts: All code commented
+```

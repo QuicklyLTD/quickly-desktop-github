@@ -41,8 +41,10 @@ export class EndofthedayComponent implements OnInit {
   token: string;
   restaurantID: string;
 
-  constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService, private messageService: MessageService, private settingsService: SettingsService, private httpService: HttpService, private conflictService: ConflictService) {
-    this.token = localStorage.getItem("AccessToken");
+  constructor(private electronService: ElectronService, private printerService: PrinterService, private mainService: MainService,
+    private messageService: MessageService, private settingsService: SettingsService, private httpService: HttpService,
+    private conflictService: ConflictService) {
+    this.token = localStorage.getItem('AccessToken');
     this.owner = this.settingsService.getUser('id');
     this.permissions = JSON.parse(localStorage.getItem('userPermissions'));
   }
@@ -55,7 +57,8 @@ export class EndofthedayComponent implements OnInit {
       this.isStarted = res.value.started;
       this.day = res.value.day;
       this.dateToReport = res.value.time;
-      this.endDayReport = new EndDay(this.dateToReport, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { male: 0, female: 0 }, '');
+      this.endDayReport = new EndDay(this.dateToReport, this.owner, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        { male: 0, female: 0 }, '');
     })
     this.settingsService.AppSettings.subscribe(res => this.lastDay = res.value.last_day);
     this.settingsService.RestaurantInfo.subscribe(res => this.restaurantID = res.value.id);
@@ -81,7 +84,7 @@ export class EndofthedayComponent implements OnInit {
       return false;
     } else {
       clearInterval(this.conflictService.conflictListener());
-      let dateData = { started: true, day: new Date().getDay(), time: Date.now() };
+      const dateData = { started: true, day: new Date().getDay(), time: Date.now() };
 
       this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
         res.docs.forEach(element => {
@@ -96,9 +99,9 @@ export class EndofthedayComponent implements OnInit {
 
       this.messageService.sendMessage('Gün Başlatıldı. Program Yeniden Başlatılıyor..');
 
-      if (this.day == 1) {
+      if (this.day === 1) {
         this.mainService.getAllBy('reports', {}).then(res => {
-          let reports = res.docs.filter(obj => obj.type !== 'Activity');
+          const reports = res.docs.filter(obj => obj.type !== 'Activity');
           reports.forEach(element => {
             this.mainService.changeData('reports', element._id, (doc) => {
               doc.weekly = [0, 0, 0, 0, 0, 0, 0];
@@ -125,8 +128,8 @@ export class EndofthedayComponent implements OnInit {
   endDay() {
     if (this.isStarted) {
       this.mainService.getAllBy('checks', {}).then((res) => {
-        if (res.docs.length == 0) {
-          $('#endDayModal').modal({backdrop:'static',keyboard:false});
+        if (res.docs.length === 0) {
+          $('#endDayModal').modal({ backdrop: 'static', keyboard: false });
           clearInterval(this.conflictService.conflictListener());
           setTimeout(() => {
             this.stepChecks();
@@ -143,29 +146,37 @@ export class EndofthedayComponent implements OnInit {
 
 
   StoreSalesReport = (checks: Array<ClosedCheck>) => {
-    let SalesReport = { cash: 0, card: 0, coupon: 0, free: 0, canceled: 0, discount: 0, checks: checks.length, customers: { male: 0, female: 0 } };
-    SalesReport.cash = checks.filter(obj => obj.payment_method == 'Nakit').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
-    SalesReport.card = checks.filter(obj => obj.payment_method == 'Kart').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
-    SalesReport.coupon = checks.filter(obj => obj.payment_method == 'Kupon').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
-    SalesReport.free = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.payment_method == 'İkram').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
-    SalesReport.canceled = checks.filter(obj => obj.type == CheckType.CANCELED).map(obj => obj.total_price).reduce((a, b) => a + b, 0);
-    SalesReport.discount = checks.filter(obj => obj.type !== CheckType.CANCELED).map(obj => obj.discount).reduce((a, b) => a + b, 0);
-    SalesReport.customers.male = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.hasOwnProperty('occupation')).map(obj => obj.occupation.male).reduce((a, b) => a + b, 0);
-    SalesReport.customers.female = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.hasOwnProperty('occupation')).map(obj => obj.occupation.female).reduce((a, b) => a + b, 0);
-    const partial = checks.filter(obj => obj.payment_method == 'Parçalı');
+    const SalesReport = {
+      cash: 0, card: 0, coupon: 0, free: 0, canceled: 0, discount: 0, checks: checks.length,
+      customers: { male: 0, female: 0 }
+    };
+    SalesReport.cash = checks.filter(obj => obj.payment_method === 'Nakit').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.card = checks.filter(obj => obj.payment_method === 'Kart').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.coupon = checks.filter(obj => obj.payment_method === 'Kupon').map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.free = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.payment_method === 'İkram')
+      .map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.canceled = checks.filter(obj => obj.type === CheckType.CANCELED)
+      .map(obj => obj.total_price).reduce((a, b) => a + b, 0);
+    SalesReport.discount = checks.filter(obj => obj.type !== CheckType.CANCELED)
+      .map(obj => obj.discount).reduce((a, b) => a + b, 0);
+    SalesReport.customers.male = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.hasOwnProperty('occupation'))
+      .map(obj => obj.occupation.male).reduce((a, b) => a + b, 0);
+    SalesReport.customers.female = checks.filter(obj => obj.type !== CheckType.CANCELED && obj.hasOwnProperty('occupation'))
+      .map(obj => obj.occupation.female).reduce((a, b) => a + b, 0);
+    const partial = checks.filter(obj => obj.payment_method === 'Parçalı');
     partial.forEach(element => {
       SalesReport.discount += element.discount;
       element.payment_flow.forEach(payment => {
-        if (payment.method == 'Nakit') {
+        if (payment.method === 'Nakit') {
           SalesReport.cash += payment.amount;
         }
-        if (payment.method == 'Kart') {
+        if (payment.method === 'Kart') {
           SalesReport.card += payment.amount;
         }
-        if (payment.method == 'Kupon') {
+        if (payment.method === 'Kupon') {
           SalesReport.coupon += payment.amount;
         }
-        if (payment.method == 'İkram') {
+        if (payment.method === 'İkram') {
           SalesReport.free += payment.amount;
         }
       })
@@ -216,20 +227,22 @@ export class EndofthedayComponent implements OnInit {
       const cashboxBackup = new BackupData('cashbox', this.cashbox);
       this.backupData.push(cashboxBackup);
       try {
-        incomes = this.cashbox.filter(obj => obj.type == 'Gelir').map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
+        incomes = this.cashbox.filter(obj => obj.type === 'Gelir')
+          .map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
         this.endDayReport.incomes = incomes;
       } catch (error) {
         this.endDayReport.incomes = 0;
         console.log('Kasa Geliri Yok..');
       }
       try {
-        outcomes = this.cashbox.filter(obj => obj.type == 'Gider').map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
+        outcomes = this.cashbox.filter(obj => obj.type === 'Gider')
+          .map(obj => obj.card + obj.cash + obj.coupon).reduce((a, b) => a + b);
         this.endDayReport.outcomes = outcomes;
       } catch (error) {
         this.endDayReport.outcomes = 0;
         console.log('Kasa Gideri Yok..');
       }
-      this.mainService.removeAll('cashbox', {}).then(res => {
+      this.mainService.removeAll('cashbox', {}).then(resCashbox => {
         this.mainService.removeAll('allData', { db_name: 'cashbox' }).then(() => {
           this.progress = 'Kasa Verileri Temizlendi...';
           this.stepReports();
@@ -244,7 +257,7 @@ export class EndofthedayComponent implements OnInit {
       this.reports = res.docs.filter(obj => obj.type !== 'Activity');
       const reportsBackup = new BackupData('reports', res.docs);
       this.backupData.push(reportsBackup);
-      const activities = res.docs.filter(obj => obj.type == 'Activity');
+      const activities = res.docs.filter(obj => obj.type === 'Activity');
 
       this.mainService.localSyncBeforeRemote('reports').on('complete', () => {
         this.progress = 'Raporlar Temizlendi...';
@@ -260,7 +273,7 @@ export class EndofthedayComponent implements OnInit {
         });
       });
 
-      if (this.day == this.lastDay) {
+      if (this.day === this.lastDay) {
         this.reports.forEach((element) => {
           this.mainService.changeData('reports', element._id, (doc) => {
             doc.weekly = [0, 0, 0, 0, 0, 0, 0];
@@ -326,21 +339,21 @@ export class EndofthedayComponent implements OnInit {
   }
 
   stepFinal() {
-    let finalDate = Date.now();
+    const finalDate = Date.now();
     this.endDayReport.data_file = finalDate.toString();
     this.progress = 'Yerel Süreç Tamamlanıyor...';
     this.mainService.addData('endday', this.endDayReport).then(() => {
       this.electronService.backupData(this.backupData, finalDate);
       this.printerService.printEndDay(this.printers[0], this.endDayReport);
-      let dateData = { started: false, day: this.day, time: Date.now() };
+      const dateData = { started: false, day: this.day, time: Date.now() };
       this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
         if (res.ok) {
           this.fillData();
           this.isStarted = false;
           setTimeout(() => {
             this.mainService.syncToRemote().cancel();
-            if (this.appType.type == 0) {
-              if (this.appType.status == 1) {
+            if (this.appType.type === 0) {
+              if (this.appType.status === 1) {
                 this.electronService.ipcRenderer.send('closeServer');
                 this.mainService.syncToServer().cancel();
               }
@@ -351,7 +364,7 @@ export class EndofthedayComponent implements OnInit {
         }
       });
     }).catch(err => {
-      console.log('Final Step Error: Document Post Error',err);
+      console.log('Final Step Error: Document Post Error', err);
     })
   }
 
@@ -405,12 +418,12 @@ export class EndofthedayComponent implements OnInit {
 
   purgeData(token) {
     this.mainService.getAllBy('allData', {}).then(res => {
-      this.httpService.post(`/store/endday`, { docs: res.docs }, token).subscribe(res => {
-        if (res.ok) {
+      this.httpService.post(`/store/endday`, { docs: res.docs }, token).subscribe(resPost => {
+        if (resPost.ok) {
           this.progress = 'Uzak Sunucu İsteği Onaylandı!';
-          let databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings')
-          this.mainService.destroyDB(databasesArray).then(res => {
-            if (res.ok) {
+          const databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings');
+          this.mainService.destroyDB(databasesArray).then(resDestroy => {
+            if (resDestroy.ok) {
               setTimeout(() => {
                 this.mainService.initDatabases();
                 setTimeout(() => {

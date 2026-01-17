@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ElectronService } from './electron.service';
 import { MessageService } from './message.service';
 import { SettingsService } from '../services/settings.service';
-import * as escpos from 'escpos';
 import { Order } from '../mocks/order';
 import { PrintOut, PrintOutStatus } from '../mocks/print';
 import { MainService } from '../services/main.service';
@@ -13,20 +12,24 @@ export class PrinterService {
   quicklyLogo: string;
   storeInfo: any;
 
-  constructor(private electron: ElectronService, private mainService:MainService, private messageService: MessageService, private settings: SettingsService) {
+  constructor(
+    private electron: ElectronService,
+    private mainService: MainService,
+    private messageService: MessageService,
+    private settings: SettingsService
+  ) {
     this.storeLogo = this.electron.appRealPath + '/data/customer.png';
     this.quicklyLogo = this.electron.appPath + '/assets/quickly.png';
 
     this.electron.ipcRenderer.on('error', (event, message, check, device) => {
       this.messageService.sendMessage(message);
-      let newPrint = new PrintOut('Check',PrintOutStatus.WAITING,check._id,device);
-      this.mainService.addData('prints',newPrint).then(isSended => {
-        console.log('Print Sended!')
+      const newPrint = new PrintOut('Check', PrintOutStatus.WAITING, check._id, device);
+      this.mainService.addData('prints', newPrint).then(isSended => {
+        console.log('Print Sended!');
       }).catch(err => {
         console.log('Hata Yazıcıya Ulaşılamadı');
-      })
+      });
     });
-    
   }
 
   printTest(device) {
@@ -34,15 +37,15 @@ export class PrinterService {
   }
 
   printOrder(device, table, orders, owner) {
-    let ordersArray = [];
+    const ordersArray = [];
     orders.forEach(element => {
-      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
+      const contains = ordersArray.some(obj => obj.name === element.name && obj.note === element.note);
       if (contains) {
-        let index = ordersArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        const index = ordersArray.findIndex(obj => obj.name === element.name && obj.note === element.note);
         ordersArray[index].price += element.price;
         ordersArray[index].count++;
       } else {
-        let schema = { name: element.name, note: element.note, price: element.price, count: 1 };
+        const schema = { name: element.name, note: element.note, price: element.price, count: 1 };
         ordersArray.push(schema);
       }
     });
@@ -50,15 +53,15 @@ export class PrinterService {
   }
 
   printTableOrder(device, table, order: Order) {
-    let ordersArray = [];
+    const ordersArray = [];
     order.items.forEach(element => {
-      let contains = ordersArray.some(obj => obj.name == element.name && obj.note == element.note);
+      const contains = ordersArray.some(obj => obj.name === element.name && obj.note === element.note);
       if (contains) {
-        let index = ordersArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        const index = ordersArray.findIndex(obj => obj.name === element.name && obj.note === element.note);
         ordersArray[index].price += element.price;
         ordersArray[index].count++;
       } else {
-        let schema = { name: element.name, note: element.note, price: element.price, count: 1 };
+        const schema = { name: element.name, note: element.note, price: element.price, count: 1 };
         ordersArray.push(schema);
       }
     });
@@ -66,23 +69,26 @@ export class PrinterService {
   }
 
   printCheck(device, table, check) {
-    let productsArray = [];
-    let payedArray = [];
+    const productsArray = [];
+    const payedArray = [];
     check.products.forEach(element => {
-      let contains = productsArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
+      const contains = productsArray.some(obj => obj.name === element.name && obj.note === element.note && obj.price === element.price);
       if (contains) {
-        let index = productsArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        const index = productsArray.findIndex(obj => obj.name === element.name && obj.note === element.note && obj.price === element.price);
         productsArray[index].total_price += element.price;
         productsArray[index].count++;
       } else {
-        let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
+        const schema = {
+          name: element.name, note: element.note, price: element.price,
+          total_price: element.price, count: 1, status: element.status
+        };
         productsArray.push(schema);
       }
     });
     if (check.payment_flow) {
       let payed = [];
       if (check.payment_flow.length > 1) {
-        let things = check.payment_flow.map(obj => obj.payed_products);
+        const things = check.payment_flow.map(obj => obj.payed_products);
         things.forEach(element => {
           payed = payed.concat(element);
         });
@@ -90,33 +96,39 @@ export class PrinterService {
         payed = check.payment_flow[0].payed_products;
       }
       payed.forEach(element => {
-        let contains = payedArray.some(obj => obj.name == element.name && obj.note == element.note && obj.price == element.price);
+        const contains = payedArray.some(obj => obj.name === element.name && obj.note === element.note && obj.price === element.price);
         if (contains) {
-          let index = payedArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+          const index = payedArray.findIndex(obj => obj.name === element.name && obj.note === element.note && obj.price === element.price);
           payedArray[index].total_price += element.price;
           payedArray[index].count++;
         } else {
-          let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
+          const schema = {
+            name: element.name, note: element.note, price: element.price,
+            total_price: element.price, count: 1, status: element.status
+          };
           payedArray.push(schema);
         }
       });
     }
-    let newCheck = Object.assign({}, check);
+    const newCheck = Object.assign({}, check);
     newCheck.products = productsArray;
     newCheck.payed_products = payedArray;
     this.electron.ipcRenderer.send('printCheck', device, newCheck, table, this.storeLogo, '');
   }
 
   printPayment(device, table, payment) {
-    let productsArray = [];
+    const productsArray = [];
     payment.payed_products.forEach(element => {
-      let contains = productsArray.some(obj => obj.name == element.name && obj.note == element.note);
+      const contains = productsArray.some(obj => obj.name === element.name && obj.note === element.note);
       if (contains) {
-        let index = productsArray.findIndex(obj => obj.name == element.name && obj.note == element.note);
+        const index = productsArray.findIndex(obj => obj.name === element.name && obj.note === element.note);
         productsArray[index].total_price += element.price;
         productsArray[index].count++;
       } else {
-        let schema = { name: element.name, note: element.note, price: element.price, total_price: element.price, count: 1, status: element.status };
+        const schema = {
+          name: element.name, note: element.note, price: element.price,
+          total_price: element.price, count: 1, status: element.status
+        };
         productsArray.push(schema);
       }
     });
@@ -141,18 +153,17 @@ export class PrinterService {
   }
 
   kickCashdraw(device) {
-    console.log('kickMustWork',device)
+    console.log('kickMustWork', device);
     this.electron.ipcRenderer.send('kickCashdraw', device);
   }
 
   getUSBPrinters() {
-    return escpos.USB.findPrinter();
+    console.log('Mock getUSBPrinters called');
+    return [];
   }
 
   getSerialPrinters(path: string) {
-    return escpos.Serial(path, {
-      baudRate: 14400,
-      stopBit: 2
-    });
+    console.log('Mock getSerialPrinters called');
+    return null;
   }
 }

@@ -13,7 +13,6 @@ export class Check {
         public check_no: number,
         public payment_flow?: Array<PaymentStatus>,
         public discountPercent?: number,
-        public freeAmount?: number,
         public _id?: string,
         public _rev?: string
     ) {
@@ -61,8 +60,6 @@ export class CheckProduct {
         public timestamp: number,
         public tax_value: number,
         public barcode: number,
-        public extras?: Array<any>,
-        public timeout?: number,
     ) { }
 }
 
@@ -90,6 +87,6 @@ export function CheckNo() {
     // let currentID = parseInt(localStorage.getItem('CheckNo'));
     // let CheckNo = currentID+1;
     // localStorage.setItem('CheckNo', CheckNo.toString());
-    let CheckNo = Math.floor(Math.random() * Math.floor(500));
-    return CheckNo;
+    const checkNumber = Math.floor(Math.random() * Math.floor(500));
+    return checkNumber;
 }
