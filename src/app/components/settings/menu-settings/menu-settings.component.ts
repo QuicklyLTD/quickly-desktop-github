@@ -1,15 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Printer } from 'app/mocks/settings';
-import { Category, Ingredient, Product, ProductSpecs, Recipe, SubCategory } from '../../../mocks/product';
-import { Report } from '../../../mocks/report';
-import { MessageService } from '../../../providers/message.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Printer } from '../../../models/settings';
+import { Category, Ingredient, Product, ProductSpecs, Recipe, SubCategory } from '../../../models/product';
+import { Report } from '../../../models/report';
+import { MessageService } from '../../../core/providers/message.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
 
 @Component({
   selector: 'app-menu-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './menu-settings.component.html',
   styleUrls: ['./menu-settings.component.scss']
 })
@@ -39,12 +42,12 @@ export class MenuSettingsComponent implements OnInit {
   productSpecs: Array<ProductSpecs>;
   categoryNames: Map<string, string> = new Map();
 
-  @ViewChild('catDetails') catDetails: NgForm;
-  @ViewChild('subCatForm') subCatForm: NgForm;
-  @ViewChild('productForm') productForm: NgForm;
-  @ViewChild('categoryForm') categoryForm: NgForm;
-  @ViewChild('recipesForm') recipesForm: NgForm;
-  @ViewChild('productTypeSelect') productTypeSelect: ElementRef;
+  @ViewChild('catDetails', { static: false }) catDetails: NgForm;
+  @ViewChild('subCatForm', { static: false }) subCatForm: NgForm;
+  @ViewChild('productForm', { static: false }) productForm: NgForm;
+  @ViewChild('categoryForm', { static: false }) categoryForm: NgForm;
+  @ViewChild('recipesForm', { static: false }) recipesForm: NgForm;
+  @ViewChild('productTypeSelect', { static: false }) productTypeSelect: ElementRef;
 
   constructor(private mainService: MainService, private messageService: MessageService,
               private logService: LogService, private entityStoreService: EntityStoreService) {
@@ -92,6 +95,17 @@ export class MenuSettingsComponent implements OnInit {
         this.products = this.products.sort((a, b) => a.price - b.price);
       });
     }
+  }
+
+  getProductsBySubCat(id) {
+    if (!id) {
+      this.getProductsByCategory(this.selectedCat?._id);
+      return;
+    }
+    this.mainService.getAllBy('products', { subcat_id: id }).then(result => {
+      this.products = result.docs;
+      this.products = this.products.sort((a, b) => a.price - b.price);
+    });
   }
 
   addCategory(categoryForm: NgForm) {
@@ -302,6 +316,34 @@ export class MenuSettingsComponent implements OnInit {
     });
   }
 
+  removeProduct() {
+    const id = this.selectedId || this.selectedProduct?._id;
+    if (!id) {
+      return;
+    }
+    const isOk = confirm('Ürünü Silmek Üzeresiniz. Bu işlem geri alınamaz.');
+    if (!isOk) {
+      return;
+    }
+    this.mainService.removeData('products', id).then(() => {
+      this.mainService.getAllBy('reports', { connection_id: id }).then(res => {
+        if (res.docs.length > 0) {
+          this.mainService.removeData('reports', res.docs[0]._id);
+        }
+      });
+      this.mainService.getAllBy('recipes', { product_id: id }).then(res => {
+        if (res.docs.length > 0) {
+          this.mainService.removeData('recipes', res.docs[0]._id);
+        }
+      });
+      this.logService.createLog(logType.PRODUCT_DELETED, id, `${this.selectedProduct?.name || 'Ürün'} Silindi`);
+      this.messageService.sendMessage('Ürün Silindi');
+      this.fillData();
+      this.setDefault();
+      $('#productModal').modal('hide');
+    });
+  }
+
   setProductType(value) {
     this.productType = value;
     if (value === 2) {
@@ -448,7 +490,9 @@ export class MenuSettingsComponent implements OnInit {
       this.stocks = result.docs;
     });
     this.mainService.getAllBy('settings', { key: 'Printers' }).then(res => {
-      this.printers = res.docs[0].value;
+      if (res.docs.length > 0) {
+        this.printers = res.docs[0].value;
+      }
     });
   }
 }

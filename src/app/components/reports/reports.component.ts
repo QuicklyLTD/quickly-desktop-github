@@ -1,10 +1,36 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Activity, Report } from '../../mocks/report';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
+import { Activity, Report } from '../../models/report';
+import { MainService } from '../../core/services/main.service';
+import { SettingsService } from '../../core/services/settings.service';
+import { ChartsModule } from 'ng2-charts';
+import { ChartType } from 'chart.js';
+import { PricePipe } from '../../pipes/price.pipe';
+import { ActivityReportsComponent } from './activity-reports/activity-reports.component';
+import { CashboxReportsComponent } from './cashbox-reports/cashbox-reports.component';
+import { NotificationsReportsComponent } from './notifications-reports/notifications-reports.component';
+import { ProductReportsComponent } from './product-reports/product-reports.component';
+import { StockReportsComponent } from './stock-reports/stock-reports.component';
+import { StoreReportsComponent } from './store-reports/store-reports.component';
+import { TableReportsComponent } from './table-reports/table-reports.component';
+import { UserReportsComponent } from './user-reports/user-reports.component';
 
 @Component({
   selector: 'app-reports',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ChartsModule,
+    PricePipe,
+    ActivityReportsComponent,
+    CashboxReportsComponent,
+    NotificationsReportsComponent,
+    ProductReportsComponent,
+    StockReportsComponent,
+    StoreReportsComponent,
+    TableReportsComponent,
+    UserReportsComponent
+  ],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss'],
   providers: [SettingsService]
@@ -22,7 +48,7 @@ export class ReportsComponent implements OnInit {
 
   ChartOptions: Record<string, any>;
   ChartLegend = true;
-  ChartType = 'bar';
+  ChartType: ChartType = 'bar';
   ChartData: Array<{ data: number[]; label: string }>;
   ChartColors: Array<{ backgroundColor: string }>;
   ChartLoaded: boolean;
@@ -249,6 +275,10 @@ export class ReportsComponent implements OnInit {
     this.pieLabels = [];
     this.ChartLoaded = false;
     this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+      if (!res.docs.length) {
+        this.ChartLoaded = false;
+        return;
+      }
       this.sellingActivity = res.docs[0];
       this.activityData = [
         { data: this.sellingActivity.activity, label: 'Gelir Endeksi' },
@@ -279,6 +309,10 @@ export class ReportsComponent implements OnInit {
 
   dailySalesActivity() {
     this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+      if (!res.docs.length) {
+        this.ChartLoaded = false;
+        return;
+      }
       this.sellingActivity = res.docs[0];
       this.activityData = [
         { data: this.sellingActivity.activity, label: 'Gelir Endeksi' },

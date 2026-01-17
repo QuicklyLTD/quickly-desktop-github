@@ -1,18 +1,21 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Headers, Http, RequestOptions, Response } from '@angular/http';
+import { FormsModule, NgForm } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Activity, Report } from '../../mocks/report';
-import { AuthInfo, Settings } from '../../mocks/settings';
-import { ComponentsAuth, User, UserAuth, UserGroup } from '../../mocks/user';
-import { ElectronService } from '../../providers/electron.service';
-import { MessageService } from '../../providers/message.service';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
-import { SERVER_STATUS, SERVER_TYPES, SETUP_DELAYS } from '../../shared/constants';
+import { Activity, Report } from '../../models/report';
+import { AuthInfo, Settings } from '../../models/settings';
+import { ComponentsAuth, User, UserAuth, UserGroup } from '../../models/user';
+import { ElectronService } from '../../core/services/electron/electron.service';
+import { MessageService } from '../../core/providers/message.service';
+import { MainService } from '../../core/services/main.service';
+import { SettingsService } from '../../core/services/settings.service';
+import { SETUP_DELAYS, SERVER_TYPES, SERVER_STATUS } from '../../shared/constants';
 
 @Component({
   selector: 'app-setup',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss']
 })
@@ -24,14 +27,10 @@ export class SetupComponent implements OnInit {
   statusMessage: string;
   showMessage = false;
   setupStep = 0;
-  headers: Headers;
-  options: RequestOptions;
   baseUrl: string;
 
-  constructor(private mainService: MainService, private settingsService: SettingsService, private http: Http,
+  constructor(private mainService: MainService, private settingsService: SettingsService, private http: HttpClient,
     private electron: ElectronService, private message: MessageService, private router: Router) {
-    this.headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
-    this.options = new RequestOptions({ headers: this.headers });
     this.baseUrl = 'https://hq.quickly.com.tr';
   }
 
@@ -44,7 +43,7 @@ export class SetupComponent implements OnInit {
     }
     this.settingsService.ActivationStatus.subscribe(res => {
       if (res) {
-        this.router.navigate(['']);
+        this.router.navigate(['/login']);
       }
     })
   }
@@ -95,24 +94,24 @@ export class SetupComponent implements OnInit {
 
   makeLogin(loginForm: NgForm) {
     const Form = loginForm.value;
-    this.http.post(this.baseUrl + '/store/login/', { username: Form.username, password: Form.password }, this.options)
-      .subscribe((res: Response) => {
-      localStorage.setItem('AccessToken', res.json().token);
-      this.headers.append('Authorization', res.json().token);
-      this.http.get(this.baseUrl + '/store/list/', new RequestOptions({ headers: this.headers })).subscribe((body: Response) => {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
+    this.http.post(this.baseUrl + '/store/login/', { username: Form.username, password: Form.password }, { headers })
+      .subscribe((res: any) => {
+      localStorage.setItem('AccessToken', res.token);
+      const authHeaders = headers.set('Authorization', res.token);
+      this.http.get(this.baseUrl + '/store/list/', { headers: authHeaders }).subscribe((body: any) => {
         this.message.sendMessage('Giriş Başarılı!');
-        if (body.json().length > 1) {
-          this.stores = body.json();
+        if (body.length > 1) {
+          this.stores = body;
           this.setupStep = 2;
         } else {
-          this.makeAuth(body.json()[0]);
+          this.makeAuth(body[0]);
         }
       }, (err) => {
         this.message.sendMessage('Giriş Başarısız!');
       });
     }, (err) => {
-      let response = err._body
-      response = JSON.parse(response)
+      const response = err.error || {};
       if (response.non_field_errors) {
         this.message.sendMessage(response.non_field_errors)
       } else {
@@ -126,10 +125,7 @@ export class SetupComponent implements OnInit {
     const activationStatus = new Settings('ActivationStatus', true, Data.auth.database_name, Date.now());
     const dateSettings = new Settings('DateSettings', { started: true, day: new Date().getDay(), time: Date.now() },
       'Tarih-Zaman Ayarları', Date.now());
-    
-    
-    
-      const authInfo = new Settings('AuthInfo', new AuthInfo('31.210.51.22', '5984', Data.auth.database_name,
+    const authInfo = new Settings('AuthInfo', new AuthInfo('31.210.51.22', '5984', Data.auth.database_name,
       Data.auth.database_user, Data.auth.database_password), 'Giriş Bilgileri Oluşturuldu', Date.now());
     const restaurantInfo = new Settings('RestaurantInfo', Data, 'Restoran Bilgileri', Date.now());
     const appSettings = new Settings('AppSettings', {
@@ -185,8 +181,14 @@ export class SetupComponent implements OnInit {
       this.mainService.addData('reports', new Activity('Activity', 'Selling', [0], ['GB'], [0]));
       this.message.sendMessage('Program Yeniden Başlatıyor..');
       setTimeout(() => {
-        this.electron.reloadProgram();
-      }, SETUP_DELAYS.RELOAD_AFTER_SETUP)
+        if (this.electron.isElectron) {
+          this.electron.reloadProgram();
+        } else {
+          this.router.navigate(['/login']);
+        }
+      }, SETUP_DELAYS.RELOAD_AFTER_SETUP);
+    }).catch(err => {
+      this.message.sendMessage('Kurulum hatası: ' + err);
     });
   }
 

@@ -1,9 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MainService } from '../../../services/main.service';
-import { Activity } from '../../../mocks/report';
+import { ChartsModule } from 'ng2-charts';
+import { MainService } from '../../../core/services/main.service';
+import { Activity } from '../../../models/report';
 
 @Component({
   selector: 'app-activity-reports',
+  standalone: true,
+  imports: [CommonModule, ChartsModule],
   templateUrl: './activity-reports.component.html',
   styleUrls: ['./activity-reports.component.scss']
 })
@@ -125,6 +129,9 @@ export class ActivityReportsComponent implements OnInit {
 
   dailySalesActivity() {
     this.ChartLoaded = false;
+    if (!this.sellingActivity) {
+      return;
+    }
     this.activityData = [{ data: this.sellingActivity.activity, label: 'Gelir Endeksi' }];
     this.activityLabels = this.sellingActivity.activity_time;
     this.ChartLoaded = true;
@@ -132,6 +139,9 @@ export class ActivityReportsComponent implements OnInit {
 
   dailyCrowdActivity() {
     this.ChartLoaded = false;
+    if (!this.sellingActivity) {
+      return;
+    }
     this.activityData = [{ data: this.sellingActivity.activity_count, label: 'Doluluk Oranı ( % )' }];
     this.activityLabels = this.sellingActivity.activity_time;
     this.ChartLoaded = true;
@@ -139,6 +149,10 @@ export class ActivityReportsComponent implements OnInit {
 
   fillData() {
     this.mainService.getAllBy('reports', { type: 'Activity' }).then(res => {
+      if (!res.docs.length) {
+        this.ChartLoaded = false;
+        return;
+      }
       this.sellingActivity = res.docs[0];
       this.dailySalesActivity();
     });

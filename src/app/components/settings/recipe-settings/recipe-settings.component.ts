@@ -1,10 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Recipe, Ingredient, Product } from '../../../mocks/product';
-import { MainService } from '../../../services/main.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { Recipe, Ingredient, Product } from '../../../models/product';
+import { MainService } from '../../../core/services/main.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
 
 @Component({
   selector: 'app-recipe-settings',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './recipe-settings.component.html',
   styleUrls: ['./recipe-settings.component.scss']
 })

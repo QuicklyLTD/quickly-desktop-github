@@ -1,17 +1,23 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../mocks/check';
-import { Printer, PaymentMethod } from '../../../mocks/settings';
-import { MessageService } from '../../../providers/message.service';
-import { PrinterService } from '../../../providers/printer.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { SettingsService } from '../../../services/settings.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
-import { Customer } from 'app/mocks/customer';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo } from '../../../models/check';
+import { Printer, PaymentMethod } from '../../../models/settings';
+import { MessageService } from '../../../core/providers/message.service';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
+import { Customer } from '../../../models/customer';
+import { ApplicationService } from '../../../core/services/application.service';
+import { PricePipe } from '../../../pipes/price.pipe';
 
 @Component({
   selector: 'app-payment-screen',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, PricePipe],
   templateUrl: './payment-screen.component.html',
   styleUrls: ['./payment-screen.component.scss'],
   providers: [SettingsService]
@@ -21,7 +27,7 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
   id: string;
   check: Check;
   table: string;
-  tableName = ''; // Resolved table name
+  tableName = '';
   userId: string;
   userName: string;
   payedShow: boolean;
@@ -44,18 +50,19 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
   check_type: string;
   askForPrint: boolean;
   onClosing: boolean;
-  permissions: Object;
+  permissions: { discount?: boolean } = {};
   day: number;
   changes: any;
   paymentMethods: Array<PaymentMethod>;
   customers: Array<Customer>;
-  @ViewChild('discountInput') discountInput: ElementRef;
-  @ViewChild('customerInput') customerInput: ElementRef;
-  @ViewChild('creditNote') creditNote: ElementRef;
+  @ViewChild('discountInput', { static: false }) discountInput: ElementRef;
+  @ViewChild('customerInput', { static: false }) customerInput: ElementRef;
+  @ViewChild('creditNote', { static: false }) creditNote: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private settingsService: SettingsService,
     private mainService: MainService, private printerService: PrinterService, private messageService: MessageService,
-    private logService: LogService, private entityStoreService: EntityStoreService) {
+    private logService: LogService, private entityStoreService: EntityStoreService,
+    private applicationService: ApplicationService) {
     this.route.params.subscribe(params => {
       this.id = params['id'];
       this.fillData();
@@ -66,11 +73,19 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
       new PaymentMethod('Kupon', 'İndirim Kuponu veya Yemek Çeki', '#5bc0de', 'fa-bookmark', 3, 1),
       new PaymentMethod('İkram', 'İkram Hesap', '#c9302c', 'fa-handshake-o', 4, 1)
     ];
-    this.permissions = JSON.parse(localStorage['userPermissions']);
+    this.permissions = JSON.parse(localStorage['userPermissions'] || '{}');
     this.settingsService.DateSettings.subscribe(res => {
       this.day = res.value.day;
     });
-    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
+    this.settingsService.getPrinters().subscribe(res => {
+      if (res) {
+        this.printers = res.value;
+      }
+    });
+  }
+
+  get canDiscount(): boolean {
+    return !!this.permissions?.discount;
   }
 
   ngOnInit() {
@@ -85,7 +100,7 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
     this.changes = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', (change) => {
       if (change.id === this.id) {
         if (!change.deleted) {
-          this.mainService.getData('checks', change.id).then(res => {
+          this.mainService.getData('checks', change.id).then(() => {
             this.fillData();
           });
         } else {
@@ -96,7 +111,9 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.changes.cancel();
+    if (this.changes && typeof this.changes.cancel === 'function') {
+      this.changes.cancel();
+    }
     if (this.onClosing) {
       this.productsWillPay.forEach(element => {
         this.check.products.push(element);
@@ -107,9 +124,6 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
   }
 
   payProducts(method: string) {
-    // if(method == 'Nakit'){
-    //   this.printerService.kickCashdraw(this.printers[0])
-    // }
     if (this.discountAmount > 0) {
       this.logService.createLog(logType.DISCOUNT, this.userId,
         `${this.table} Hesabına ${this.discountAmount} TL tutarında indirim yapıldı.`);
@@ -237,6 +251,7 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
         if (this.check.type === 1) {
           this.updateTableReport(this.check, method);
         }
+        this.applicationService.screenLock('reset');
         this.router.navigate(['/store']);
       }
     });
@@ -278,7 +293,6 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
     this.discountInput.nativeElement.value = 0;
     $('#discount').modal('hide');
   }
-
 
   divideWillPay(division: number) {
     this.payedPrice = this.priceWillPay / division;
@@ -453,7 +467,7 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
         report.weekly_count[this.day]++;
         report.monthly_count[new Date().getMonth()]++;
         report.timestamp = Date.now();
-        this.check.payment_flow.forEach((obj, index) => {
+        this.check.payment_flow.forEach((obj) => {
           report.amount += obj.amount;
           report.weekly[this.day] += obj.amount;
           report.monthly[new Date().getMonth()] += obj.amount;
@@ -465,14 +479,17 @@ export class PaymentScreenComponent implements OnInit, OnDestroy {
 
   fillData() {
     this.mainService.getData('checks', this.id).then(res => {
+      if (!res) {
+        this.router.navigate(['/store']);
+        return;
+      }
       this.check = res;
       if (this.check.type === 1) {
         this.check_id = this.check.table_id;
         this.check_type = 'Normal';
         this.tableName = '';
         this.table = this.tableName;
-        // Resolve table name using EntityStoreService
-        this.entityStoreService.resolveEntity('tables', this.check.table_id).then(name => {
+        this.entityStoreService.resolveTableName(this.check.table_id).then(name => {
           this.tableName = name;
           this.table = name;
         });

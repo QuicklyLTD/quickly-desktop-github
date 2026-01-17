@@ -1,14 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Report } from '../../../mocks/report';
-import { Floor, FloorSpecs, Table } from '../../../mocks/table';
-import { MessageService } from '../../../providers/message.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Report } from '../../../models/report';
+import { Floor, FloorSpecs, Table } from '../../../models/table';
+import { MessageService } from '../../../core/providers/message.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
 
 @Component({
   selector: 'app-restaurant-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './restaurant-settings.component.html',
   styleUrls: ['./restaurant-settings.component.scss']
 })
@@ -19,9 +22,9 @@ export class RestaurantSettingsComponent implements OnInit {
   onUpdate: boolean;
   selectedTable: string;
   selectedFloor: string;
-  @ViewChild('areaForm') areaForm: NgForm;
-  @ViewChild('areaDetailForm') areaDetailForm: NgForm;
-  @ViewChild('tableForm') tableForm: NgForm;
+  @ViewChild('areaForm', { static: false }) areaForm: NgForm;
+  @ViewChild('areaDetailForm', { static: false }) areaDetailForm: NgForm;
+  @ViewChild('tableForm', { static: false }) tableForm: NgForm;
   floorNames: Map<string, string> = new Map();
 
   constructor(private mainService: MainService, private messageService: MessageService,
@@ -54,6 +57,10 @@ export class RestaurantSettingsComponent implements OnInit {
         this.tables = this.tables.sort((a, b) => a.name.localeCompare(b.name));
       });
     }
+  }
+
+  getTablesBy(id: string) {
+    this.getTablesByFloor(id);
   }
 
   getFloor(floor: Floor) {
@@ -90,7 +97,10 @@ export class RestaurantSettingsComponent implements OnInit {
     });
   }
 
-  removeFloor() {
+  removeFloor(id?: string) {
+    if (id) {
+      this.selectedFloor = id;
+    }
     const isOk = confirm('Bölümü Silmek Üzeresiniz. Bölüme Dahil Olan Masalarda Silinecektir.');
     if (isOk) {
       this.mainService.removeData('floors', this.selectedFloor).then(() => {
@@ -112,6 +122,23 @@ export class RestaurantSettingsComponent implements OnInit {
           this.fillData();
         });
       });
+    }
+  }
+
+  updateData(type: 'floors' | 'tables', id: string) {
+    if (type === 'floors') {
+      this.selectedFloor = id;
+      this.onUpdate = true;
+      this.mainService.getData('floors', id).then((result: Floor) => {
+        const merged = Object.assign(result, result.conditions);
+        delete (merged as any).conditions;
+        this.areaForm.setValue(merged as any);
+        $('#areaModal').modal('show');
+      });
+      return;
+    }
+    if (type === 'tables') {
+      this.updateTable(id);
     }
   }
 
@@ -155,12 +182,22 @@ export class RestaurantSettingsComponent implements OnInit {
       if ((result as any).moveTable !== undefined) {
         delete (result as any).moveTable;
       }
-      this.tableForm.form.patchValue(result);
+      const controls = this.tableForm?.form?.controls || {};
+      const safeValues: Record<string, any> = {};
+      Object.keys(controls).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(result, key)) {
+          safeValues[key] = (result as any)[key];
+        }
+      });
+      this.tableForm.form.patchValue(safeValues);
       $('#tableModal').modal('show');
     });
   }
 
-  removeTable() {
+  removeTable(id?: string) {
+    if (id) {
+      this.selectedTable = id;
+    }
     const isOk = confirm('Masayı Silmek Üzeresiniz!');
     if (isOk) {
       this.mainService.removeData('tables', this.selectedTable).then((result) => {

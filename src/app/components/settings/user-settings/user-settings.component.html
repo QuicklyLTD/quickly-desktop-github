@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+<ul class="nav nav-tabs nav-justified" data-testid="settings-users-tabs" id="reportTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#groups" role="tab">
       <i class="fa fa-users" aria-hidden="true"></i> Gruplar</a>
@@ -17,7 +17,7 @@
   </li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content" data-testid="settings-users-content">
   <div class="tab-pane active" id="groups" role="tabpanel">
     <div class="card ntb">
       <div class="card-header">
@@ -412,7 +412,7 @@
                   Parola
                 </div>
               </div>
-              <input type="password" maxlength="4" name="pincode" class="form-control form-control-lg" ngModel />
+              <input type="password" maxlength="4" name="pincode" class="form-control form-control-lg" autocomplete="current-password" ngModel />
             </div>
           </div>
         </div>

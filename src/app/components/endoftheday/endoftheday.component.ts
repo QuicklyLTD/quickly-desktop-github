@@ -1,19 +1,24 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Cashbox } from '../../mocks/cashbox';
-import { CheckType, ClosedCheck } from '../../mocks/check';
-import { BackupData, EndDay } from '../../mocks/endoftheday';
-import { Log } from '../../mocks/log';
-import { Report } from '../../mocks/report';
-import { ElectronService } from '../../providers/electron.service';
-import { MessageService } from '../../providers/message.service';
-import { PrinterService } from '../../providers/printer.service';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
-import { ConflictService } from '../../services/conflict.service';
-import { HttpService } from '../../services/http.service';
+import { Cashbox } from '../../models/cashbox';
+import { CheckType, ClosedCheck } from '../../models/check';
+import { BackupData, EndDay } from '../../models/endoftheday';
+import { Log } from '../../models/log';
+import { Report } from '../../models/report';
+import { ElectronService } from '../../core/services/electron/electron.service';
+import { MessageService } from '../../core/providers/message.service';
+import { PrinterService } from '../../core/providers/printer.service';
+import { MainService } from '../../core/services/main.service';
+import { SettingsService } from '../../core/services/settings.service';
+import { ConflictService } from '../../core/services/conflict.service';
+import { HttpService } from '../../core/services/http.service';
+import { PricePipe } from '../../pipes/price.pipe';
+import { DayDetailComponent } from './day-detail/day-detail.component';
 
 @Component({
   selector: 'app-endoftheday',
+  standalone: true,
+  imports: [CommonModule, PricePipe, DayDetailComponent],
   templateUrl: './endoftheday.component.html',
   styleUrls: ['./endoftheday.component.scss'],
   providers: [SettingsService]
@@ -112,8 +117,8 @@ export class EndofthedayComponent implements OnInit {
         });
       }
 
-      this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
-        if (res.ok) {
+      this.settingsService.setAppSettings('DateSettings', dateData).then((res: any) => {
+        if (res?.ok) {
           this.isStarted = true;
           this.messageService.sendAlert('Gün Başlatıldı!', 'Program 5 sn içinde yeniden başlatılacak.', 'success');
           setTimeout(() => {
@@ -346,8 +351,8 @@ export class EndofthedayComponent implements OnInit {
       this.electronService.backupData(this.backupData, finalDate);
       this.printerService.printEndDay(this.printers[0], this.endDayReport);
       const dateData = { started: false, day: this.day, time: Date.now() };
-      this.settingsService.setAppSettings('DateSettings', dateData).then((res) => {
-        if (res.ok) {
+      this.settingsService.setAppSettings('DateSettings', dateData).then((res: any) => {
+        if (res?.ok) {
           this.fillData();
           this.isStarted = false;
           setTimeout(() => {
@@ -370,8 +375,8 @@ export class EndofthedayComponent implements OnInit {
 
 
   uploadBackup(data: Array<BackupData>, timestamp: number) {
-    this.httpService.post('/store/backup', { data: data, timestamp: timestamp }, this.token).subscribe(res => {
-      if (res.ok) {
+    this.httpService.post('/store/backup', { data: data, timestamp: timestamp }, this.token).subscribe((res: any) => {
+      if (res?.ok) {
         this.coverData();
       }
     }, err => {
@@ -400,9 +405,9 @@ export class EndofthedayComponent implements OnInit {
   }
 
   refreshToken() {
-    this.httpService.post('/store/refresh', null, this.token).subscribe(res => {
-      if (res.ok) {
-        const token = res.json().token;
+    this.httpService.post('/store/refresh', null, this.token).subscribe((res: any) => {
+      if (res?.ok) {
+        const token = res.token;
         localStorage.setItem('AccessToken', token);
         this.purgeData(token);
       }
@@ -418,8 +423,8 @@ export class EndofthedayComponent implements OnInit {
 
   purgeData(token) {
     this.mainService.getAllBy('allData', {}).then(res => {
-      this.httpService.post(`/store/endday`, { docs: res.docs }, token).subscribe(resPost => {
-        if (resPost.ok) {
+      this.httpService.post(`/store/endday`, { docs: res.docs }, token).subscribe((resPost: any) => {
+        if (resPost?.ok) {
           this.progress = 'Uzak Sunucu İsteği Onaylandı!';
           const databasesArray = Object.keys(this.mainService.LocalDB).filter(obj => obj !== 'settings');
           this.mainService.destroyDB(databasesArray).then(resDestroy => {

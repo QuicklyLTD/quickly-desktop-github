@@ -1,17 +1,22 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { Cashbox } from '../../../mocks/cashbox';
-import { ClosedCheck } from '../../../mocks/check';
-import { BackupData, EndDay } from '../../../mocks/endoftheday';
-import { Report } from '../../../mocks/report';
-import { ElectronService } from '../../../providers/electron.service';
-import { Log, logType } from '../../../mocks/log';
-import { PrinterService } from '../../../providers/printer.service';
-import { SettingsService } from '../../../services/settings.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { Cashbox } from '../../../models/cashbox';
+import { ClosedCheck } from '../../../models/check';
+import { BackupData, EndDay } from '../../../models/endoftheday';
+import { Report } from '../../../models/report';
+import { ElectronService } from '../../../core/services/electron/electron.service';
+import { Log, logType } from '../../../models/log';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
+import { ChartsModule } from 'ng2-charts';
+import { PricePipe } from '../../../pipes/price.pipe';
 
 
 @Component({
   selector: 'app-day-detail',
+  standalone: true,
+  imports: [CommonModule, ChartsModule, PricePipe],
   templateUrl: './day-detail.component.html',
   styleUrls: ['./day-detail.component.scss']
 })
@@ -36,6 +41,7 @@ export class DayDetailComponent implements OnInit {
   activityData: any;
   activityLabels: any;
   activityOptions: any;
+  activityLegend = true;
   cashDetail: Cashbox;
   syncStatus: boolean;
   pieData: Array<any>;

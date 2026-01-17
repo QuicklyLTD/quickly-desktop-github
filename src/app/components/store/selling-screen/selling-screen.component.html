@@ -1,4 +1,5 @@
-<div class="row">
+<ng-container *ngIf="check">
+<div class="row" data-testid="page-selling">
   <div class="col-xl-12">
     <div class="card full-height">
       <div class="card-header border-bottom-0">
@@ -23,7 +24,7 @@
                   <div class="input-group-prepend normal">
                     <div class="input-group-text humanIcon"><i class="fa fa-search" aria-hidden="true"></i></div>
                   </div>
-                  <input #productName type="text" style="font-size: 17px;" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;" class="form-control form-contol-sm">
+                  <input #productName type="text" data-testid="product-search" style="font-size: 17px;" placeholder="Ürün Adı Giriniz.." (keydown)="filterProducts(productName.value)" (click)="subCatsView = undefined;" class="form-control form-contol-sm">
                 </div>
               </div>
             </div>
@@ -31,17 +32,17 @@
           <div class="col-xl-4 col-lg-5">
             <div class="row">
               <div class="col-lg-4 pr-1 pl-1">
-                <button data-toggle="modal" (click)="onProductChange = false" data-target="#splitTable" [disabled]="tablesView?.length == 0 || check.products.length == 0 || check.status == 0" class="btn btn-danger btn-block btn-sm">
+                <button data-testid="table-move" data-toggle="modal" (click)="openSplitTable(false)" data-target="#splitTable" [disabled]="tablesView?.length == 0 || check.products.length == 0 || check.status == 0" class="btn btn-danger btn-block btn-sm">
                   <strong>Masa Değiştir</strong>
                 </button>
               </div>
               <div class="col-lg-4 pr-1 pl-1">
-                <button data-toggle="modal" data-target="#checkOptions" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">
+                <button data-testid="check-options" data-toggle="modal" data-target="#checkOptions" [disabled]="check.products.length == 0" class="btn btn-danger btn-block btn-sm">
                   <strong>Hesap İşlemleri</strong>
                 </button>
               </div>
               <div class="col-lg-4 pr-1 pl-1">
-                <button data-toggle="modal" data-target="#qrPrintersModal" class="btn btn-secondary text-info border-info btn-block btn-sm " [disabled]="tablesView?.length == 0 || check.type == 2">
+                <button data-testid="qr-print" data-toggle="modal" data-target="#qrPrintersModal" class="btn btn-secondary text-info border-info btn-block btn-sm " [disabled]="tablesView?.length == 0 || check.type == 2">
                   <i class="fa fa-qrcode"></i>
                   <strong>QR Yazdır</strong>
                 </button>
@@ -66,7 +67,7 @@
                 <div class="card inside-height">
                   <div id="categoryHolder" class="card-body pt-0 pb-0 flow">
                     <div class="row">
-                      <div *ngFor="let cat of categories" (click)="getProductsBy(cat._id)" class="col-xl-3 col-lg-4 col-card">
+                      <div *ngFor="let cat of categories" data-testid="category-card" (click)="getProductsBy(cat._id)" class="col-xl-3 col-lg-4 col-card">
                         <div class="card mb-1 mt-1 catCard">
                           <div class="card-body">
                             <h2 class="card-title text-center">{{cat.name}}</h2>
@@ -83,13 +84,13 @@
                     <div class="card-header pt-1 pb-1 pr-1 pl-1">
                       <div class="row ml-0 mr-0">
                         <div class="col-xl-3 col-lg-4 p-0 pr-1 pl-1 mb-0">
-                          <button (click)="selectedCat = undefined" class="btn btn-md btn-danger text-dark btn-block">
+                          <button data-testid="category-back" (click)="selectedCat = undefined" class="btn btn-md btn-danger text-dark btn-block">
                             <b><i class="fa fa-chevron-left" aria-hidden="true"></i> Geri</b>
                           </button>
                         </div>
                         <ng-container *ngIf="subCatsView !== undefined && subCatsView.length > 0">
                           <div *ngFor="let item of subCatsView" class="col p-0 pr-1 pl-1 mb-1">
-                            <button (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning text-dark btn-block">
+                            <button data-testid="subcategory-card" (click)="getProductsBySubCat(item._id)" class="btn btn-md btn-warning text-dark btn-block">
                               <b>{{item.name}}</b>
                             </button>
                           </div>
@@ -99,7 +100,7 @@
                   </div>
                   <div id="productHolder" class="card-body pt-0 pb-0 flow">
                     <div class="row">
-                      <div *ngFor="let product of productsView" (click)="addToCheck(product)" class="col-xl-3 col-lg-4 col-card">
+                      <div *ngFor="let product of productsView" data-testid="product-card" (click)="addToCheck(product)" class="col-xl-3 col-lg-4 col-card">
                         <div class="card mb-1 mt-1 proCard">
                           <div class="card-body">
                             <h2 class="card-title" [ngClass]="{'long-name': product.name.length > 12 }">{{product.name}}</h2>
@@ -167,9 +168,9 @@
                   </div>
                 </div>
               </div>
-              <div id="check-products" class="card-body check-flow p-2 dark-bg">
+              <div id="check-products" data-testid="check-products" class="card-body check-flow p-2 dark-bg">
                 <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
-                  <div [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
+                  <div data-testid="check-product-item" [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
                     <div class="product-name">
                       <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
                       {{item.name}}
@@ -247,13 +248,13 @@
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block mt-2" data-toggle="buttons">
-                  <button *ngIf="this.check.type == 1 || this.check.type == 2" (click)="goPayment()" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
-                  <button *ngIf="this.check.type == 1 || this.check.type == 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
+                  <button *ngIf="$any(check).type == 1 || $any(check).type == 2" data-testid="go-payment" (click)="goPayment()" [disabled]="check.products.length == 0 || $any(check).type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-danger btn-lg btn-block"><strong>Ödeme Al</strong></button>
+                  <button *ngIf="$any(check).type == 1 || $any(check).type == 2" data-testid="close-check" [disabled]="check.products.length == 0 || $any(check).type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
 
-                  <button *ngIf="this.check.type == 1 && check.payment_flow && check.total_price == 0" (click)="endCheck()" [disabled]="check?.payment_flow.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-success"><strong><i style="font-size: 1.5em;" class="fa fa-check-square animated tada slow infinite"></i></strong></button>
+                  <button *ngIf="$any(check).type == 1 && check.payment_flow && check.total_price == 0" (click)="endCheck()" [disabled]="check?.payment_flow.length == 0 || $any(check).type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-success"><strong><i style="font-size: 1.5em;" class="fa fa-check-square animated tada slow infinite"></i></strong></button>
 
-                  <button *ngIf="this.check.type == 5" [routerLink]="['/store']" class="btn btn-secondary btn-lg btn-block"><strong><i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</strong></button>
-                  <button *ngIf="this.check.type == 5 && this.check.status !== 2" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
+                  <button *ngIf="$any(check).type == 5" data-testid="back-to-store" [routerLink]="['/store']" class="btn btn-secondary btn-lg btn-block"><strong><i class="fa fa-backward" aria-hidden="true"></i> Geri Dön</strong></button>
+                  <button *ngIf="$any(check).type == 5 && check.status !== 2" data-testid="close-check" [disabled]="check.products.length == 0 || $any(check).type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#closeCheck"><strong>Kapat</strong></button>
 
                   <!-- <button *ngIf="this.check.type == 7" [disabled]="check.products.length == 0 || check.type == 1 && check.products[0]?.status == 1 || !permissions.payment" class="btn btn-lg btn-primary"><strong>Kapat</strong></button> -->
                 </div>
@@ -261,37 +262,37 @@
             </div>
           </div>
           <div class="col-xl-1 col-lg-1 pr-0 pl-1">
-            <button (click)="sendCheck()" [appOneShot]="check.type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sendButton">
+            <button data-testid="send-order" (click)="sendCheck()" [appOneShot]="$any(check).type == 1" [disabled]="check.products.length == 0 || newOrders.length == 0" class="btn btn-success btn-block sendButton">
               <div>
                 <i class="fa fa-paper-plane fa-5x"></i>
                 <p>Gönder</p>
               </div>
             </button>
-            <button data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1" data-target="#noteModal" class="btn btn-warning btn-block sendButton">
+            <button data-testid="note-product" data-toggle="modal" (click)="getSpecies(selectedProduct)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 1" data-target="#noteModal" class="btn btn-warning btn-block sendButton">
               <div>
                 <i class="fa fa-sticky-note fa-5x"></i>
                 <p>Not Ekle</p>
               </div>
             </button>
-            <button (click)="undoChanges()" [disabled]="newOrders.length == 0" class="btn btn-primary btn-block sendButton">
+            <button data-testid="undo-changes" (click)="undoChanges()" [disabled]="newOrders.length == 0" class="btn btn-primary btn-block sendButton">
               <div>
                 <i class="fa fa-undo fa-5x"></i>
                 <p>Geri Al</p>
               </div>
             </button>
-            <button data-toggle="modal" data-target="#cancelProduct" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2 || !permissions.cancelProduct" class="btn btn-danger btn-block sendButton">
+            <button data-testid="cancel-product" data-toggle="modal" data-target="#cancelProduct" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2 || !permissions.cancelProduct" class="btn btn-danger btn-block sendButton">
               <div>
                 <i class="fa fa-times fa-5x"></i>
                 <p>İptal Et</p>
               </div>
             </button>
-            <button data-toggle="modal" (click)="onProductChange = true" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2" data-target="#splitTable" class="btn btn-info btn-block sendButton">
+            <button data-testid="move-product" data-toggle="modal" (click)="openSplitTable(true)" [disabled]="check.products.length == 0 || selectedProduct == undefined || selectedProduct.status !== 2" data-target="#splitTable" class="btn btn-info btn-block sendButton">
               <div>
                 <i class="fa fa-exchange fa-5x"></i>
                 <p>Ürün Taşı</p>
               </div>
             </button>
-            <button data-toggle="modal" data-target="#printersModal" oneShot [disabled]="check.products.length == 0 || check.status == 0" class="btn dark-bg btn-block sendButton">
+            <button data-testid="print-order" data-toggle="modal" data-target="#printersModal" oneShot [disabled]="check.products.length == 0 || check.status == 0" class="btn dark-bg btn-block sendButton">
               <div>
                 <i style="color:lightgray !important;" class="fa fa-print fa-5x"></i>
                 <p style="color:lightgray !important;">Yazdır</p>
@@ -310,7 +311,7 @@
       <div class="modal-header">
         <h4 class="modal-title" id="modelTitleId">Not Ekle ( {{selectedProduct?.name}} )
         </h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="blurActiveElement()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -449,7 +450,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal" (click)="blurActiveElement()">Kapat</button>
       </div>
     </div>
   </div>
@@ -469,7 +470,7 @@
           <div class="col-lg-10 tFlow pl-1 pr-1">
             <div class="row pr-3 pl-3">
               <div *ngFor="let item of tablesView" class="col-lg-2 pl-1 pr-1 mb-2">
-                <div [ngClass]="{'bg-success': item.status == 2 ,'bg-danger': item.status == 3, 'bg-warning text-dark' : item.status == 1 && item._id !== selectedTable?._id , 'bg-info': item._id == selectedTable?._id}" (click)="selectTable(item)" class="card tableCard">
+                <div data-testid="modal-table-card" [attr.data-table-id]="item._id" [ngClass]="{'bg-success': item.status == 2 ,'bg-danger': item.status == 3, 'bg-warning text-dark' : item.status == 1 && item._id !== selectedTable?._id , 'bg-info': item._id == selectedTable?._id}" (click)="selectTable(item)" class="card tableCard">
                   <div class="card-body p-3">
                     <h4 class="card-title" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{item.name}}</h4>
                     <p class="card-text">
@@ -480,12 +481,12 @@
             </div>
           </div>
           <div class="col-lg-2 pl-2 pr-2 tFlow">
-            <div (click)="tablesView = tables; selectedFloor = undefined" [ngClass]="{'bg-danger text-white':selectedFloor == undefined}" class="card mb-2 dark-bg">
+            <div data-testid="modal-floor-all" (click)="tablesView = tables; selectedFloor = undefined" [ngClass]="{'bg-danger text-white':selectedFloor == undefined}" class="card mb-2 dark-bg">
               <div class="card-body p-2 pt-3">
                 <h2 style="font-size:1.7vw; font-weight:bold;">Tüm Masalar</h2>
               </div>
             </div>
-            <div *ngFor="let floor of floors" [ngClass]="{'bg-danger text-white':selectedFloor == floor._id}" (click)="filterTables(floor._id)" class="card mb-2 dark-bg">
+            <div *ngFor="let floor of floors" [attr.data-testid]="'modal-floor-' + floor._id" [ngClass]="{'bg-danger text-white':selectedFloor == floor._id}" (click)="filterTables(floor._id)" class="card mb-2 dark-bg">
               <div class="card-body p-2 pt-3">
                 <h2 style="font-size:1.7vw; font-weight:bold;">{{floor.name}}</h2>
               </div>
@@ -494,11 +495,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-        <button *ngIf="onProductChange" appOneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün
+        <button type="button" data-testid="modal-close-btn" class="btn btn-secondary btn-lg" data-dismiss="modal" (click)="closeSplitTable()">Kapat</button>
+        <button *ngIf="onProductChange" data-testid="move-product-btn" appOneShot type="button" class="btn btn-danger btn-lg" (click)="splitProduct()" [disabled]="selectedTable == undefined">Ürün
           Taşı
         </button>
-        <button *ngIf="!onProductChange" appOneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa
+        <button *ngIf="!onProductChange" data-testid="change-table-btn" appOneShot type="button" class="btn btn-danger btn-lg" (click)="splitTable()" [disabled]="selectedTable == undefined">Masa
           Değiştir
         </button>
       </div>
@@ -689,7 +690,7 @@
                 <div class="input-group-text"><i class="fa fa-turkish-lira fa-2x" aria-hidden="true"></i></div>
               </div>
               <span class="input-group-append">
-                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= check.total_price || discountInput.value <= 0" (click)="setDiscount((discountInput.value*100)/check.total_price)" type="button">
+                <button class="btn btn-primary btn-lg" [disabled]="+discountInput.value >= check.total_price || +discountInput.value <= 0" (click)="setDiscount((+discountInput.value*100)/check.total_price)" type="button">
                   <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Yap
                 </button>
               </span>
@@ -700,7 +701,7 @@
                 <div class="input-group-text"><i class="fa fa-percent fa-2x" aria-hidden="true"></i></div>
               </div>
               <span class="input-group-append">
-                <button class="btn btn-primary btn-lg" [disabled]="discountInput.value >= check.total_price || discountInput.value <= 0" (click)="setDiscount((discountInput.value*100)/check.total_price)" type="button">
+                <button class="btn btn-primary btn-lg" [disabled]="+discountInput.value >= check.total_price || +discountInput.value <= 0" (click)="setDiscount((+discountInput.value*100)/check.total_price)" type="button">
                   <i class="fa fa-arrow-down" aria-hidden="true"></i> İndirim Yap
                 </button>
               </span>
@@ -722,3 +723,4 @@
     </div>
   </div>
 </div>
+</ng-container>

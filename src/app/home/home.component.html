@@ -1,0 +1,20 @@
+<div class="row pr-2 pl-2 animated fadeIn" data-testid="page-home">
+  <div class="col-lg-4 pr-2 pl-2" *ngFor="let menu of menus; let i = index;">
+    <a routerLink="/{{menu.link}}">
+      <div class="card text-white bg-{{menu.color}} mb-3 mainCard {{menu.link}}" [attr.data-testid]="'home-menu-' + menu.link">
+        <div class="card-body">
+          <p>{{menu.name}}</p>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-lg-4 pr-2 pl-2">
+    <a href="#">
+      <div class="card text-white mb-3 mainCard exit" data-testid="home-exit" (click)="closeProgram()" style="background-color: #333; border-color: #333;">
+        <div class="card-body">
+          <p>Çıkış</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>

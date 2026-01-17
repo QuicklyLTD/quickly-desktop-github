@@ -1,23 +1,23 @@
-<div class="row">
+<div class="row" data-testid="page-store">
   <div class="col-lg-10 pr-0">
-    <div class="card full-height">
-      <div class="card-header pb-0">
+    <div class="card full-height" data-testid="store-view">
+      <div class="card-header pb-0" data-testid="store-tabs">
         <div class="row">
           <div class="col-lg-9 pl-1 pr-1">
             <!-- Masalar  nav-justified -->
             <ul class="nav nav-tabs">
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Masalar'}" (click)="changeSection('Masalar')">
+                <a class="nav-link" data-testid="tab-masalar" [ngClass]="{'active': section == 'Masalar'}" (click)="changeSection('Masalar')">
                   <i class="fa fa-square" aria-hidden="true"></i>
                   Masalar
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Kroki'}" (click)="changeSection('Kroki')">
+                <a class="nav-link" data-testid="tab-kroki" [ngClass]="{'active': section == 'Kroki'}" (click)="changeSection('Kroki')">
                   <i class="fa fa-map" aria-hidden="true"></i> Kroki</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Hesaplar'}" (click)="changeSection('Hesaplar')">
+                <a class="nav-link" data-testid="tab-hesaplar" [ngClass]="{'active': section == 'Hesaplar'}" (click)="changeSection('Hesaplar')">
                   <i class="fa fa-sticky-note" aria-hidden="true"></i>
                   Hesaplar
                   <span *ngIf="checks.length > 0" class="badge bg-danger">{{checks?.length}}</span>
@@ -28,14 +28,14 @@
                   <i class="fa fa-motorcycle" aria-hidden="true"></i> Paket Servis</a>
               </li> -->
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Siparişler'}" (click)="changeSection('Siparişler')">
+                <a class="nav-link" data-testid="tab-siparisler" [ngClass]="{'active': section == 'Siparişler'}" (click)="changeSection('Siparişler')">
                   <i class="fa fa-paper-plane" aria-hidden="true"></i>
                   Siparişler
                   <span *ngIf="waitingOrders > 0" class="badge bg-danger animated flash infinite slow">{{waitingOrders}}</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" [ngClass]="{'active': section == 'Ödemeler'}" (click)="changeSection('Ödemeler')">
+                <a class="nav-link" data-testid="tab-odemeler" [ngClass]="{'active': section == 'Ödemeler'}" (click)="changeSection('Ödemeler')">
                   <i class="fa fa-credit-card-alt" aria-hidden="true"></i>
                   Ödemeler
                   <span *ngIf="waitingReceipts > 0" class="badge bg-danger animated flash infinite slow">{{waitingReceipts}}</span>
@@ -48,7 +48,7 @@
               <div class="input-group-prepend normal">
                 <div class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></div>
               </div>
-              <input #tableName type="text" placeholder="Masa Adı Girin." (click)="tableViews = tables" (keyup)="filterTables(tableName.value)" class="form-control form-contol">
+              <input #tableName type="text" data-testid="table-search" placeholder="Masa Adı Girin." (click)="tableViews = tables" (keyup)="filterTables(tableName.value)" class="form-control form-contol">
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@
       <div *ngIf="section == 'Masalar'" class="card-body pt-0 flow">
         <section id="tables">
           <div class="row">
-            <div *ngFor="let table of tableViews" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
+            <div *ngFor="let table of tableViews" data-testid="table-card" [routerLink]="['/selling-screen','Normal', table._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
               <div [ngClass]="{'bg-success': table.status == 2, 'bg-warning text-dark':table.status == 1, 'bg-danger text-white animated flash slow infinite': table.status == 3, 'bg-indigo text-white animated tada slow infinite': table.status == 4 }" class="card tableCard">
                 <div class="card-body p-2">
                   <h1 [ngClass]="{'long-name mb-3': table.name.length >= 7}" class="card-title mb-2">{{table.name}}</h1>
@@ -76,7 +76,7 @@
             </div>
           </div>
           <div class="row">
-            <div *ngFor="let check of fastChecks" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
+            <div *ngFor="let check of fastChecks" data-testid="fast-check-card" [routerLink]="['/selling-screen','Fast', check._id]" class="col-xl-2 col-lg-2 mt-2 col-card">
               <div class="card bg-info tableCard">
                 <div class="card-body p-3">
                   <h1 class="card-title long-name mb-0">{{check.note}}</h1>
@@ -95,7 +95,7 @@
       <div *ngIf="section == 'Hesaplar'" class="card-body pt-0 flow">
         <section id="checks">
           <div class="row">
-            <div *ngFor="let check of checksView" [routerLink]="['/selling-screen','Normal', check.table_id]" class="col-xl-3 col-lg-4 mt-2 col-card check-card">
+            <div *ngFor="let check of checksView" data-testid="account-check-card" [routerLink]="['/selling-screen','Normal', check.table_id]" class="col-xl-3 col-lg-4 mt-2 col-card check-card">
               <!-- [ngClass]="check.type == 1 ? 'bg-white text-dark' : 'bg-info text-white'" -->
               <div class="card" [ngClass]="{'bg-white text-dark': check.type == 1, 'bg-info text-white' : check.type == 2 , 'bg-teal text-white' : check.type == 5}">
                 <div class="card-header pr-2 pl-2">
@@ -154,10 +154,10 @@
                   </div>
                   <div class="card-footer p-2">
                     <div *ngIf="order.status == 0" class="btn-group btn-group-justify btn-block">
-                      <button type="button" [disabled]="!isOwner(order.check)" (click)="cancelOrder(order)" appOneShot class="btn btn-danger ">İptal</button>
-                      <button type="button" [disabled]="!isOwner(order.check)" (click)="acceptOrder(order)" appOneShot class="btn btn-success btn-block">Onayla</button>
+                      <button type="button" data-testid="order-cancel-btn" [disabled]="!isOwner(order.check)" (click)="cancelOrder(order)" appOneShot class="btn btn-danger ">İptal</button>
+                      <button type="button" data-testid="order-accept-btn" [disabled]="!isOwner(order.check)" (click)="acceptOrder(order)" appOneShot class="btn btn-success btn-block">Onayla</button>
                     </div>
-                    <button *ngIf="order.status == 1" [disabled]="!isOwner(order.check)" type="button" (click)="approoveOrder(order)" appOneShot class="btn btn-success btn-block">Tamamla</button>
+                    <button *ngIf="order.status == 1" data-testid="order-complete-btn" [disabled]="!isOwner(order.check)" type="button" (click)="approoveOrder(order)" appOneShot class="btn btn-success btn-block">Tamamla</button>
                     <h4 *ngIf="order.status == 2" class="text-center mb-1 mt-1">Teslim Edildi</h4>
                     <h4 *ngIf="order.status == 3" class="text-center mb-1 mt-1">İptal Edildi</h4>
                   </div>
@@ -236,10 +236,10 @@
                   </div>
                   <div class="card-footer p-2">
                     <div *ngIf="receipt.status == 1" class="btn-group btn-group-justify btn-block">
-                      <button type="button" [disabled]="!isOwner(receipt.check)" (click)="cancelReceipt(receipt)" appOneShot class="btn btn-danger ">İptal</button>
-                      <button type="button" [disabled]="!isOwner(receipt.check)" (click)="acceptReceipt(receipt)" appOneShot class="btn btn-success btn-block">Onayla</button>
+                      <button type="button" data-testid="receipt-cancel-btn" [disabled]="!isOwner(receipt.check)" (click)="cancelReceipt(receipt)" appOneShot class="btn btn-danger ">İptal</button>
+                      <button type="button" data-testid="receipt-accept-btn" [disabled]="!isOwner(receipt.check)" (click)="acceptReceipt(receipt)" appOneShot class="btn btn-success btn-block">Onayla</button>
                     </div>
-                    <button *ngIf="receipt.status == 2 && receipt.method !== 4" [disabled]="!isOwner(receipt.check)" type="button" (click)="approoveReceipt(receipt)" appOneShot class="btn btn-success btn-block">Tamamla</button>
+                    <button *ngIf="receipt.status == 2 && receipt.method !== 4" data-testid="receipt-complete-btn" [disabled]="!isOwner(receipt.check)" type="button" (click)="approoveReceipt(receipt)" appOneShot class="btn btn-success btn-block">Tamamla</button>
                     <!-- <button *ngIf="receipt.status == 2 " type="button" (click)="approoveReceipt(receipt)" appOneShot class="btn btn-success btn-block">Tamamla</button> -->
                     <h5 *ngIf="receipt.status == 2 && receipt.method == 4" class="text-center mb-2 mt-2">Mobil Ödeme Bekleniyor</h5>
                     <h4 *ngIf="receipt.status == 3" class="text-center mb-1 mt-1">Ödeme Tamamlandı</h4>
@@ -283,17 +283,17 @@
     </div>
   </div>
   <div id="floorHolder" class="col-lg-2">
-    <div [routerLink]="['/selling-screen','Fast', 'New']" class="card mb-2 bg-info text-white">
+    <div data-testid="fast-check-btn" [routerLink]="['/selling-screen','Fast', 'New']" class="card mb-2 bg-info text-white">
       <div class="card-body">
         <h2 class="mt-2"><i class="fa fa-sticky-note" aria-hidden="true"></i> Hızlı Hesap</h2>
       </div>
     </div>
-    <div class="card mb-2" (click)="getTablesBy('All')" [ngClass]="{'bg-danger text-white':selected == ''}">
+    <div data-testid="floor-all-btn" class="card mb-2" (click)="getTablesBy('All')" [ngClass]="{'bg-danger text-white':selected == ''}">
       <div class="card-body">
         <h2 class="mt-2">Tüm Masalar</h2>
       </div>
     </div>
-    <div *ngFor="let floor of floors" (click)="getTablesBy(floor._id)" class="card mb-2" [ngClass]="{'bg-danger text-white':selected == floor._id}">
+    <div *ngFor="let floor of floors" [attr.data-testid]="'floor-btn-' + floor._id" (click)="getTablesBy(floor._id)" class="card mb-2" [ngClass]="{'bg-danger text-white':selected == floor._id}">
       <div class="card-body">
         <h2 class="mt-2">{{floor.name}}</h2>
       </div>

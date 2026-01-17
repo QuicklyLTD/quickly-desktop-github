@@ -1,10 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log';
-import { Stock, StockCategory } from '../../../mocks/stocks';
-import { MainService } from '../../../services/main.service';
+import { Log, logType } from '../../../models/log';
+import { Stock, StockCategory } from '../../../models/stocks';
+import { MainService } from '../../../core/services/main.service';
 
 @Component({
   selector: 'app-stock-reports',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './stock-reports.component.html',
   styleUrls: ['./stock-reports.component.scss']
 })

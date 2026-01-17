@@ -1,14 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Printer } from '../../../mocks/settings';
-import { ElectronService } from '../../../providers/electron.service';
-import { MessageService } from '../../../providers/message.service';
-import { PrinterService } from '../../../providers/printer.service';
-import { SettingsService } from '../../../services/settings.service';
+import { Printer } from '../../../models/settings';
+import { ElectronService } from '../../../core/services/electron/electron.service';
+import { MessageService } from '../../../core/providers/message.service';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { SettingsService } from '../../../core/services/settings.service';
 
 @Component({
   selector: 'app-application-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './application-settings.component.html',
   styleUrls: ['./application-settings.component.scss'],
   providers: [SettingsService]
@@ -24,12 +27,12 @@ export class ApplicationSettingsComponent implements OnInit {
   selectedPrinter: any;
   choosenPrinter: any;
   currentSection: string;
-  @ViewChild('settingsForm') settingsForm: NgForm;
-  @ViewChild('appServerForm') appServerForm: NgForm;
-  @ViewChild('restaurantForm') restaurantForm: NgForm;
-  @ViewChild('printerForm') printerForm: NgForm;
-  @ViewChild('printerDetailForm') printerDetailForm: NgForm;
-  @ViewChild('serverSettingsForm') serverSettingsForm: NgForm;
+  @ViewChild('settingsForm', { static: true }) settingsForm: NgForm;
+  @ViewChild('appServerForm', { static: false }) appServerForm: NgForm;
+  @ViewChild('restaurantForm', { static: false }) restaurantForm: NgForm;
+  @ViewChild('printerForm', { static: false }) printerForm: NgForm;
+  @ViewChild('printerDetailForm', { static: false }) printerDetailForm: NgForm;
+  @ViewChild('serverSettingsForm', { static: true }) serverSettingsForm: NgForm;
 
   constructor(private settings: SettingsService, private router: Router, private printerService: PrinterService,
     private electronService: ElectronService, private message: MessageService) {
@@ -40,22 +43,31 @@ export class ApplicationSettingsComponent implements OnInit {
   ngOnInit() {
     this.currentSection = 'AppSettings';
     this.settings.AppSettings.subscribe(res => {
-      this.appSettings = res.value
+      if (!res || !res.value) {
+        return;
+      }
+      this.appSettings = res.value;
       this.settingsForm.setValue(this.appSettings);
     });
     this.settings.RestaurantInfo.subscribe(res => {
+      if (!res || !res.value) {
+        return;
+      }
       delete res.value.auth;
       delete res.value.remote;
       delete res.value.settings;
-      this.restInfo = res.value
+      this.restInfo = res.value;
       this.restMap = res.value.geolocation;
       this.appLogo = this.restInfo.logo;
       // if (this.restInfo.last_seen) delete this.restInfo.last_seen;
       // this.restaurantForm.setValue(this.restInfo);
     });
     this.settings.ServerSettings.subscribe(res => {
+      if (!res || !res.value) {
+        return;
+      }
       this.serverSettingsForm.setValue(res.value);
-    })
+    });
   }
 
   getSettingsDetail(section: string) {
@@ -199,6 +211,10 @@ export class ApplicationSettingsComponent implements OnInit {
   }
 
   fillData() {
-    this.settings.getPrinters().subscribe(res => this.printers = res.value);
+    this.settings.getPrinters().subscribe(res => {
+      if (res && res.value) {
+        this.printers = res.value;
+      }
+    });
   }
 }

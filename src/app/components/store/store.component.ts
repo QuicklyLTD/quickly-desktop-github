@@ -1,22 +1,28 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
-import { MainService } from '../../services/main.service';
-import { Router } from '@angular/router';
-import { Floor, Table } from '../../mocks/table';
-import { Check, CheckProduct, CheckType, PaymentStatus } from '../../mocks/check';
-import { Order, OrderItem, OrderStatus, OrderType, User } from '../../mocks/order';
-import { Ingredient, Product } from '../../mocks/product';
-import { SettingsService } from '../../services/settings.service';
-import { Stock } from '../../mocks/stocks';
-import { Report } from '../../mocks/report';
-import { DayInfo } from '../../mocks/settings';
-import { logType } from '../../services/log.service';
-import { Receipt, ReceiptMethod, ReceiptStatus, ReceiptType } from '../../mocks/receipt';
-import { EntityStoreService } from '../../services/entity-store.service';
+import { MainService } from '../../core/services/main.service';
+import { Router, RouterModule } from '@angular/router';
+import { Floor, Table } from '../../models/table';
+import { Check, CheckProduct, CheckType, PaymentStatus } from '../../models/check';
+import { Order, OrderItem, OrderStatus, OrderType, User } from '../../models/order';
+import { Ingredient, Product } from '../../models/product';
+import { SettingsService } from '../../core/services/settings.service';
+import { Stock } from '../../models/stocks';
+import { Report } from '../../models/report';
+import { DayInfo } from '../../models/settings';
+import { logType } from '../../core/services/log.service';
+import { Receipt, ReceiptMethod, ReceiptStatus, ReceiptType } from '../../models/receipt';
+import { EntityStoreService } from '../../core/services/entity-store.service';
+import { PricePipe } from '../../pipes/price.pipe';
+import { TimeAgoPipe } from '../../pipes/timeago.pipe';
+import { ButtonDirective } from '../../directives/button.directive';
 
 export interface CountData { product: string; count: number; total: number; };
 
 @Component({
   selector: 'app-store',
+  standalone: true,
+  imports: [CommonModule, RouterModule, PricePipe, TimeAgoPipe, ButtonDirective],
   templateUrl: './store.component.html',
   styleUrls: ['./store.component.scss']
 })
@@ -79,6 +85,7 @@ export class StoreComponent implements OnInit, OnDestroy {
     this.checkChanges = this.mainService.LocalDB['checks'].changes({ since: 'now', live: true }).on('change', () => {
       this.mainService.getAllBy('checks', {}).then((result) => {
         this.checks = result.docs;
+        this.checksView = this.checks;
         this.resolveTableNames();
         if (localStorage.getItem('selectedFloor')) {
           const selectedID = JSON.parse(localStorage['selectedFloor']);

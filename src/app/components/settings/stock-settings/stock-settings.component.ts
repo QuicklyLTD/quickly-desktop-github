@@ -1,13 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Stock, StockCategory } from '../../../mocks/stocks';
-import { MessageService } from '../../../providers/message.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Stock, StockCategory } from '../../../models/stocks';
+import { MessageService } from '../../../core/providers/message.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
 
 @Component({
   selector: 'app-stock-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './stock-settings.component.html',
   styleUrls: ['./stock-settings.component.scss']
 })
@@ -19,10 +22,10 @@ export class StockSettingsComponent implements OnInit {
   onUpdate: boolean;
   units: Array<string>;
   stockCatName: string;
-  @ViewChild('stockCatForm') stockCatForm: NgForm;
-  @ViewChild('stockCatDetailForm') stockCatDetailForm: NgForm;
-  @ViewChild('stockForm') stockForm: NgForm;
-  @ViewChild('stockDetailForm') stockDetailForm: NgForm;
+  @ViewChild('stockCatForm', { static: false }) stockCatForm: NgForm;
+  @ViewChild('stockCatDetailForm', { static: false }) stockCatDetailForm: NgForm;
+  @ViewChild('stockForm', { static: false }) stockForm: NgForm;
+  @ViewChild('stockDetailForm', { static: false }) stockDetailForm: NgForm;
   constructor(
     private mainService: MainService,
     private messageService: MessageService,

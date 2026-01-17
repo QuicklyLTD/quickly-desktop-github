@@ -1,10 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log';
-import { Report } from '../../../mocks/report';
-import { MainService } from '../../../services/main.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { Log, logType } from '../../../models/log';
+import { Report } from '../../../models/report';
+import { MainService } from '../../../core/services/main.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
+import { ChartsModule } from 'ng2-charts';
+import { ChartType } from 'chart.js';
+
 @Component({
   selector: 'app-user-reports',
+  standalone: true,
+  imports: [CommonModule, ChartsModule],
   templateUrl: './user-reports.component.html',
   styleUrls: ['./user-reports.component.scss']
 })
@@ -65,7 +71,7 @@ export class UserReportsComponent implements OnInit {
   ChartData: Array<any>;
   ChartLabels: Array<any> = ['Pzt', 'Sa', 'Ça', 'Pe', 'Cu', 'Cmt', 'Pa'];
   ChartLegend = true;
-  ChartType = 'bar';
+  ChartType: ChartType = 'bar';
   ChartLoaded: boolean;
 
   ItemReport: Report;

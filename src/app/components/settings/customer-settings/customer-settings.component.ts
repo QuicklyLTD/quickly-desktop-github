@@ -1,17 +1,23 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MainService } from '../../../services/main.service';
-import { MessageService } from '../../../providers/message.service';
-import { LogService, logType } from '../../../services/log.service';
-import { NgForm } from '@angular/forms';
-import { Customer } from '../../../mocks/customer';
-import { Report } from '../../../mocks/report';
-import { Check, CheckNo, CheckType } from '../../../mocks/check';
-import { PrinterService } from '../../../providers/printer.service';
-import { SettingsService } from '../../../services/settings.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { MainService } from '../../../core/services/main.service';
+import { MessageService } from '../../../core/providers/message.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Customer } from '../../../models/customer';
+import { Report } from '../../../models/report';
+import { Check, CheckNo, CheckType } from '../../../models/check';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
+import { NgxMaskModule } from 'ngx-mask';
+import { PricePipe } from '../../../pipes/price.pipe';
+import { TimeAgoPipe } from '../../../pipes/timeago.pipe';
 
 @Component({
   selector: 'app-customer-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgxMaskModule, PricePipe, TimeAgoPipe],
   templateUrl: './customer-settings.component.html',
   styleUrls: ['./customer-settings.component.scss']
 })
@@ -19,11 +25,12 @@ export class CustomerSettingsComponent implements OnInit {
   customers: Array<Customer>;
   selectedCustomer: any;
   onUpdate: boolean;
+  selectedCat: any;
 
   credits: Array<Check>;
   creditsView: Array<Check>;
 
-  @ViewChild('customerForm') customerForm: NgForm;
+  @ViewChild('customerForm', { static: false }) customerForm: NgForm;
   checkDetail: Check;
   day: any;
   printers: any;
@@ -39,10 +46,14 @@ export class CustomerSettingsComponent implements OnInit {
   ngOnInit() {
     this.onUpdate = false;
     this.settingsService.DateSettings.subscribe(res => {
-      this.day = res.value.day;
+      if (res && res.value) {
+        this.day = res.value.day;
+      }
     });
     this.settingsService.getPrinters().subscribe(res => {
-      this.printers = res.value;
+      if (res && res.value) {
+        this.printers = res.value;
+      }
     });
     this.fillData();
   }
@@ -50,6 +61,7 @@ export class CustomerSettingsComponent implements OnInit {
   setDefault() {
     this.onUpdate = false;
     this.selectedCustomer = undefined;
+    this.selectedCat = undefined;
     this.customerForm.reset();
   }
 
@@ -230,6 +242,14 @@ export class CustomerSettingsComponent implements OnInit {
     this.mainService.getAllBy('customers', { name: { $regex: regexp } }).then(res => {
       this.customers = res.docs;
     });
+  }
+
+  updateCategory(_form: NgForm) {
+    return false;
+  }
+
+  removeCategory(_id: string) {
+    return false;
   }
 
   fillData() {

@@ -1,23 +1,41 @@
 {
-  "productName": "quickly-desktop",
+  "asar": false,
   "directories": {
-    "app": "dist",
-    "output": "app-builds"
+    "output": "release/"
   },
+  "files": [
+    "**/*",
+    "!**/*.ts",
+    "!*.map",
+    "!package.json",
+    "!package-lock.json"
+  ],
+  "extraResources": [
+    {
+      "from": "dist",
+      "to": "app",
+      "filter": [
+        "**/*"
+      ]
+    }
+  ],
   "win": {
-    "icon": "dist/favicon",
+    "icon": "dist/assets/icons",
     "target": [
       "portable"
     ]
   },
+  "portable": {
+    "splashImage": "dist/assets/icons/electron.bmp"
+  },
   "mac": {
-    "icon": "dist/favicon",
+    "icon": "dist/assets/icons",
     "target": [
       "dmg"
     ]
   },
   "linux": {
-    "icon": "dist",
+    "icon": "dist/assets/icons",
     "target": [
       "AppImage"
     ]

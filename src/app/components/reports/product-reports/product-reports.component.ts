@@ -1,15 +1,21 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Log, logType } from '../../../mocks/log';
-import { Report } from '../../../mocks/report';
-import { Printer } from '../../../mocks/settings';
-import { MainService } from '../../../services/main.service';
-import { SettingsService } from '../../../services/settings.service';
-import { Category } from '../../../mocks/product';
-import { PrinterService } from '../../../providers/printer.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { ChartsModule } from 'ng2-charts';
+import { ChartType } from 'chart.js';
+import { Log, logType } from '../../../models/log';
+import { Report } from '../../../models/report';
+import { Printer } from '../../../models/settings';
+import { MainService } from '../../../core/services/main.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { Category } from '../../../models/product';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
+import { PricePipe } from '../../../pipes/price.pipe';
 
 @Component({
   selector: 'app-product-reports',
+  standalone: true,
+  imports: [CommonModule, ChartsModule, PricePipe],
   templateUrl: './product-reports.component.html',
   styleUrls: ['./product-reports.component.scss'],
   providers: [SettingsService]
@@ -76,7 +82,7 @@ export class ProductReportsComponent implements OnInit {
     },
   };
   ChartLegend = true;
-  ChartType = 'bar';
+  ChartType: ChartType = 'bar';
   ChartLoaded: boolean;
 
   ItemReport: Report;
@@ -201,7 +207,7 @@ export class ProductReportsComponent implements OnInit {
     }
   }
 
-  fillData(daily: boolean) {
+  fillData(daily: boolean = false) {
     this.selectedCat = undefined;
     this.ChartData = [];
     this.ChartLoaded = false;

@@ -1,18 +1,18 @@
-<div class="row animated fadeIn">
+<div class="row animated fadeIn" data-testid="page-login">
     <div id="login-holder" class="container text-center">
         <div id="pincodeHolder">
             <div *ngIf="message" class="alert alert-danger">
                 <h3>{{ message }}</h3>
             </div>
-            <div *ngIf="!message" class="input-group">
-                <input  class="form-control text-center" readonly maxlength="4" type="password" [(ngModel)]="pinInput">
+            <form *ngIf="!message" class="input-group" novalidate>
+                <input class="form-control text-center" data-testid="pin-input" readonly maxlength="4" type="password" autocomplete="current-password" name="pinInput" [ngModelOptions]="{standalone: true}" [(ngModel)]="pinInput">
                 <div class="input-group-append">
-                    <button class="btn btn-large btn-danger" (click)="clearDigits()"> <i class="fa fa-long-arrow-left fa-2x" aria-hidden="true"></i> </button>
+                    <button class="btn btn-large btn-danger" data-testid="pin-clear" (click)="clearDigits()" type="button"> <i class="fa fa-long-arrow-left fa-2x" aria-hidden="true"></i> </button>
                 </div>
-            </div>
+            </form>
         </div>
         <div class="login-buttons-holder mt-3">
-            <button *ngFor="let item of buttons let i = index;" class="btn btn-success btn-lg login-button" href="#" role="button" (click)="onClick(item)">{{item}}
+            <button *ngFor="let item of buttons; let i = index;" class="btn btn-success btn-lg login-button" [attr.data-testid]="'pin-' + item" href="#" role="button" (click)="onClick(item)">{{item}}
          </button>
         </div>
     </div>

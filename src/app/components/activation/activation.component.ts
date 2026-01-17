@@ -1,10 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ElectronService } from '../../providers/electron.service';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
+import { ElectronService } from '../../core/services/electron/electron.service';
+import { MainService } from '../../core/services/main.service';
+import { SettingsService } from '../../core/services/settings.service';
 
 @Component({
   selector: 'app-activation',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './activation.component.html',
   styleUrls: ['./activation.component.scss'],
   providers: [SettingsService, MainService]

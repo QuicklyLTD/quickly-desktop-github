@@ -5,19 +5,17 @@
 /tmp
 /out-tsc
 /app-builds
-/data
-/_replicator/*
-/_users/*
-/pouch__all_dbs__/*
-/appServer
-/old_modules
+/release
+main.js
+src/**/*.js
+!src/karma.conf.js
+*.js.map
 
 # dependencies
-/node_modules
-/documentation
+node_modules
 
 # IDEs and editors
-/.idea
+.idea
 .project
 .classpath
 .c9/
@@ -27,12 +25,13 @@
 
 # IDE - VSCode
 .vscode/*
-!.vscode/settings.json
+.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
 # misc
+/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -40,11 +39,21 @@
 npm-debug.log
 testem.log
 /typings
-package-lock.json
 
 # e2e
 /e2e/*.js
+!/e2e/protractor.conf.js
 /e2e/*.map
+/e2e/tracing
+/e2e/screenshots
+/e2e/test-results
+/playwright-report
+/test-results
+
+# local data
+/data/*.log
+/data/*.dat
+/data/backup/
 
 # System Files
 .DS_Store

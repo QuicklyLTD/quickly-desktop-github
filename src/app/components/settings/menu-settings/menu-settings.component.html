@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+<ul class="nav nav-tabs nav-justified" data-testid="settings-menu-tabs" id="reportTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#menu" role="tab">
       <i class="fa fa-book" aria-hidden="true"></i> Kategoriler</a>
@@ -18,7 +18,7 @@
 </ul>
 
 
-<div class="tab-content">
+<div class="tab-content" data-testid="settings-menu-content">
   <div class="tab-pane active" id="menu" role="tabpanel">
     <div class="card ntb">
       <div class="card-header">
@@ -412,7 +412,7 @@
                   <div class="input-group-prepend">
                     <div class="input-group-text">Kategori</div>
                   </div>
-                  <select (change)="getSubCategories($event.target.value)" name="cat_id" class="form-control form-control-lg"
+                  <select (change)="getSubCategories($any($event.target).value)" name="cat_id" class="form-control form-control-lg"
                     ngModel>
                     <option *ngFor="let cat of categories" value="{{cat._id}}">{{cat.name}}</option>
                   </select>
@@ -430,7 +430,7 @@
                   <div class="input-group-prepend">
                     <div class="input-group-text">Ürün Tipi</div>
                   </div>
-                  <select #productTypeSelect (change)="setProductType($event.target.value)" name="type" class="form-control form-control-lg"
+                  <select #productTypeSelect (change)="setProductType($any($event.target).value)" name="type" class="form-control form-control-lg"
                     ngModel>
                     <option value="1">Otomatik Stok</option>
                     <option value="2">Manuel Stok</option>
@@ -483,7 +483,7 @@
                   <form #recipesForm="ngForm" (ngSubmit)="addRecipe(recipesForm)">
                     <div class="input-group">
                       <select placeholder="Stok Seçiniz..." [disabled]="stocks?.length == 0 || productType == 2 && productRecipe.length > 0 || productType == 2 && oldRecipes.length > 0"
-                        name="stock_id" (change)="onStockChange($event.target.value)" class="form-control form-control-lg"
+                        name="stock_id" (change)="onStockChange($any($event.target).value)" class="form-control form-control-lg"
                         ngModel>
                         <option *ngFor="let stock of stocks" value="{{stock._id}}">{{stock.name}}</option>
                       </select>

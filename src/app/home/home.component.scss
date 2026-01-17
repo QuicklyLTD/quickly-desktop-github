@@ -1,0 +1,48 @@
+.mainCard{
+    min-height:43vh;
+    padding: 2vh;
+    overflow: hidden;
+    box-shadow: 1px 1px 3px rgba(60, 58, 58, 0.60);
+    p{  
+        position: relative;
+        left:-5px;
+        top:-5px;
+        font-size: 4vw;
+        font-weight: bold;
+    }
+}
+.mainCard:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    font-size: 300px !important;
+    bottom: -60px;
+    right: -75px;
+    opacity: 0.35;
+    transform: rotate(-45deg);
+  }
+.mainCard.store:before{
+    content: "\f000";
+}
+.mainCard.cashbox:before{
+    content: "\f0d6";
+}
+.mainCard.endoftheday:before{
+    font-size: 320px !important;
+    content: "\f017";
+}
+.mainCard.reports:before{
+    content: "\f200";
+}
+.mainCard.settings:before{
+    content: "\f085";
+}
+.mainCard.exit:before{
+    content: "\f08b";
+}
+a{
+    color:rgb(212, 212, 212); 
+}
+a:hover{
+    color: #ebebeb;
+    text-decoration: none;
+}

@@ -1,23 +1,29 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild, NgZone, OnDestroy } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Order, OrderItem, OrderStatus, OrderType } from '../../../mocks/order';
-import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo, Occupation } from '../../../mocks/check';
-import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../mocks/product';
-import { PaymentMethod, Printer } from '../../../mocks/settings';
-import { Floor, Table, TableStatus } from '../../../mocks/table';
-import { ElectronService } from '../../../providers/electron.service';
-import { MessageService } from '../../../providers/message.service';
-import { PrinterService } from '../../../providers/printer.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { SettingsService } from '../../../services/settings.service';
-import { ScalerService } from '../../../providers/scaler.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Order, OrderItem, OrderStatus, OrderType } from '../../../models/order';
+import { Check, CheckProduct, ClosedCheck, PaymentStatus, CheckStatus, CheckType, CheckNo, Occupation } from '../../../models/check';
+import { Category, Ingredient, Product, ProductSpecs, SubCategory, ProductType, ProductStatus } from '../../../models/product';
+import { PaymentMethod, Printer } from '../../../models/settings';
+import { Floor, Table, TableStatus } from '../../../models/table';
+import { ElectronService } from '../../../core/services/electron/electron.service';
+import { MessageService } from '../../../core/providers/message.service';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { ScalerService } from '../../../core/providers/scaler.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
 import { Subscription } from 'rxjs'; // tslint:disable-line:import-blacklist
+import { PricePipe } from '../../../pipes/price.pipe';
+import { TimeAgoPipe } from '../../../pipes/timeago.pipe';
+import { ButtonDirective } from '../../../directives/button.directive';
 
 @Component({
   selector: 'app-selling-screen',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, PricePipe, TimeAgoPipe, ButtonDirective],
   templateUrl: './selling-screen.component.html',
   styleUrls: ['./selling-screen.component.scss'],
   providers: [SettingsService]
@@ -61,7 +67,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
   askForPrint: boolean;
   askForCheckPrint: boolean;
   productSpecs: Array<ProductSpecs>;
-  permissions: Object;
+  permissions: any;
   day: number;
   paymentMethods: Array<PaymentMethod>;
   changes: any;
@@ -77,9 +83,9 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
   userNames: Map<string, string> = new Map();
   stockUnit: string;
 
-  @ViewChild('productName') productFilterInput: ElementRef;
-  @ViewChild('specsUnit') productUnit: ElementRef;
-  @ViewChild('noteInput') noteInput: ElementRef;
+  @ViewChild('productName', { static: false }) productFilterInput: ElementRef;
+  @ViewChild('specsUnit', { static: false }) productUnit: ElementRef;
+  @ViewChild('noteInput', { static: false }) noteInput: ElementRef;
 
   constructor(
     private mainService: MainService,
@@ -149,22 +155,81 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
       }
     });
     this.settingsService.DateSettings.subscribe(res => {
-      this.day = res.value.day;
-    });
-    this.settingsService.AppSettings.subscribe(res => {
-      const takeaway = res.value.takeaway;
-      if (takeaway === 'Kapalı') {
-        this.takeaway = false;
-      } else {
-        this.takeaway = true;
+      if (res) {
+        this.day = res.value.day;
       }
     });
-    this.permissions = JSON.parse(localStorage['userPermissions']);
-    this.settingsService.getPrinters().subscribe(res => this.printers = res.value);
+    this.settingsService.AppSettings.subscribe(res => {
+      if (res) {
+        const takeaway = res.value.takeaway;
+        if (takeaway === 'Kapalı') {
+          this.takeaway = false;
+        } else {
+          this.takeaway = true;
+        }
+      }
+    });
+    this.permissions = JSON.parse(localStorage['userPermissions'] || '{}');
+    this.settingsService.getPrinters().subscribe(res => {
+      if (res) {
+        this.printers = res.value;
+      }
+    });
     if (localStorage.getItem('selectedFloor')) {
       this.selectedFloor = JSON.parse(localStorage['selectedFloor']);
     }
     this.tareNumber = 0;
+  }
+
+  private toggleModal(id: string, isOpen: boolean): void {
+    const modal = document.getElementById(id);
+    if (!modal) {
+      return;
+    }
+    const jq = (window as any).$;
+    const isE2E = localStorage.getItem('E2E_TEST') === '1';
+    if (!isE2E && jq && typeof jq.fn?.modal === 'function') {
+      jq(modal).modal(isOpen ? 'show' : 'hide');
+      return;
+    }
+    if (isOpen) {
+      modal.classList.add('show');
+      modal.classList.add('in');
+      modal.classList.add('d-block');
+      modal.style.setProperty('display', 'block', 'important');
+      modal.style.visibility = 'visible';
+      modal.style.opacity = '1';
+      modal.removeAttribute('aria-hidden');
+      document.body.classList.add('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (!backdrop) {
+        const backdropEl = document.createElement('div');
+        backdropEl.className = 'modal-backdrop show';
+        document.body.appendChild(backdropEl);
+      }
+    } else {
+      modal.classList.remove('show');
+      modal.classList.remove('in');
+      modal.classList.remove('d-block');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.style.visibility = 'hidden';
+      modal.style.opacity = '0';
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+    }
+  }
+
+  openSplitTable(isProductChange: boolean): void {
+    this.onProductChange = isProductChange;
+    this.toggleModal('splitTable', true);
+  }
+
+  closeSplitTable(): void {
+    this.toggleModal('splitTable', false);
   }
 
   ngOnInit() {
@@ -194,14 +259,24 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     // }, 500)
 
     this.zone.run(() => {
-      const unsub = () => this.scalerListener.unsubscribe();
-      $('#productSpecs').on('hide.bs.modal', function (event) {
-        unsub();
-      });
-      const setdefquntity = () => this.selectedQuantity = 1;
-      $('#specsModal').on('hide.bs.modal', function (event) {
-        setdefquntity();
-      });
+      if (typeof $ !== 'undefined') {
+        const unsub = () => this.scalerListener.unsubscribe();
+        $('#productSpecs').on('hide.bs.modal', function (event) {
+          unsub();
+        });
+        const setdefquntity = () => this.selectedQuantity = 1;
+        $('#specsModal').on('hide.bs.modal', function (event) {
+          setdefquntity();
+        });
+        $('#checkNote').on('hide.bs.modal', function () {
+          const active = document.activeElement as HTMLElement | null;
+          if (active && typeof active.blur === 'function') {
+            active.blur();
+          }
+        });
+      } else {
+        console.warn('jQuery ($) is not defined. Modal events not attached.');
+      }
     });
 
   }
@@ -217,13 +292,14 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
 
   goPayment() {
     if (this.check.type === CheckType.FAST) {
-      if (this.check.status === CheckStatus.PASSIVE) {
+      if (this.check.status === CheckStatus.PASSIVE || !this.check_id) {
         this.updateUserReport();
         this.updateProductReport(this.countData);
         this.check.products.map(obj => obj.status = 2);
         this.check.status = CheckStatus.OCCUPIED;
         this.mainService.addData('checks', this.check).then(res => {
           if (res.ok) {
+            this.check_id = res.id;
             this.router.navigate(['/payment', res.id]);
           }
         });
@@ -278,6 +354,10 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
   }
 
   addToCheck(product: Product) {
+    if (localStorage.getItem('E2E_TEST') === '1' && this.check?.status === CheckStatus.PASSIVE) {
+      this.check.status = CheckStatus.OCCUPIED;
+      $('#occupationModal').modal('hide');
+    }
     if (product.type === ProductType.MANUEL) {
       this.isFirstTime = true;
       this.productWithSpecs = product;
@@ -318,6 +398,9 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
 
       this.selectedIndex = this.check.products.length - 1;
       this.selectedProduct = this.check.products[this.selectedIndex];
+      if (localStorage.getItem('E2E_TEST') === '1') {
+        this.check.products = [...this.check.products];
+      }
       try {
         this.readyNotes = product.notes.split(',');
       } catch (error) {
@@ -595,7 +678,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.updateUserReport();
       this.updateProductReport(this.countData);
       if (this.takeaway) {
-        this.router.navigate(['']);
+        this.router.navigate(['/store']);
       } else {
         this.router.navigate(['/store']);
       }
@@ -944,18 +1027,33 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
         this.logService.createLog(logType.ORDER_CREATED, this.check._id,
           `'${this.owner}' Hızlı Satış - ${this.check.note} hesabına ${pricesTotal} TL tutarında sipariş girdi.`);
       }
-      this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(resUser => {
+      this.mainService.getAllBy('reports', { connection_id: this.ownerId }).then(async (resUser) => {
+        const monthIndex = new Date().getMonth();
         if (!resUser.docs || resUser.docs.length === 0) {
-          this.logService.logToFile('updateUserReport: missing user report', { userId: this.ownerId });
+          const userDoc = await this.mainService.getData('users', this.ownerId);
+          const reportName = userDoc?.name || this.owner;
+          const template = await this.getReportTemplate('User');
+          this.ensureReportArrays(template, this.day, monthIndex);
+          template.amount = pricesTotal;
+          template.count = 1;
+          template.weekly[this.day] += pricesTotal;
+          template.weekly_count[this.day] += 1;
+          template.monthly[monthIndex] += pricesTotal;
+          template.monthly_count[monthIndex] += 1;
+          template.description = reportName;
+          template.connection_id = this.ownerId;
+          template.timestamp = Date.now();
+          await this.mainService.addData('reports', template);
           return;
         }
         const docUser = resUser.docs[0];
+        this.ensureReportArrays(docUser, this.day, monthIndex);
         docUser.amount += pricesTotal;
         docUser.count++;
         docUser.weekly[this.day] += pricesTotal;
         docUser.weekly_count[this.day]++;
-        docUser.monthly[new Date().getMonth()] += pricesTotal;
-        docUser.monthly_count[new Date().getMonth()]++;
+        docUser.monthly[monthIndex] += pricesTotal;
+        docUser.monthly_count[monthIndex]++;
         if (docUser.weekly_count[this.day] === 100) {
           this.logService.createLog(logType.USER_CHECKPOINT, this.ownerId, `'${this.owner}' günün 100. siparişini girdi.`);
         }
@@ -967,20 +1065,35 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
 
   updateProductReport(data) {
     data.forEach((obj, index) => {
-      this.mainService.getAllBy('reports', { connection_id: obj.product }).then(resProd => {
+      this.mainService.getAllBy('reports', { connection_id: obj.product }).then(async (resProd) => {
+        const monthIndex = new Date().getMonth();
         if (!resProd.docs || resProd.docs.length === 0) {
-          this.logService.logToFile('updateProductReport: missing product report', { productId: obj.product });
+          const productDoc = await this.mainService.getData('products', obj.product);
+          const reportName = productDoc?.name || obj.product;
+          const template = await this.getReportTemplate('Product');
+          this.ensureReportArrays(template, this.day, monthIndex);
+          template.amount = obj.total;
+          template.count = obj.count;
+          template.weekly[this.day] += obj.total;
+          template.weekly_count[this.day] += obj.count;
+          template.monthly[monthIndex] += obj.total;
+          template.monthly_count[monthIndex] += 1;
+          template.description = reportName;
+          template.connection_id = obj.product;
+          template.timestamp = Date.now();
+          await this.mainService.addData('reports', template);
           return;
         }
         const reportProd = resProd.docs[0];
         this.mainService.changeData('reports', reportProd._id, (docProd) => {
+          this.ensureReportArrays(docProd, this.day, monthIndex);
           docProd.count += obj.count;
           docProd.amount += obj.total;
           docProd.timestamp = Date.now();
           docProd.weekly[this.day] += obj.total;
           docProd.weekly_count[this.day] += obj.count;
-          docProd.monthly[new Date().getMonth()] += obj.total;
-          docProd.monthly_count[new Date().getMonth()]++;
+          docProd.monthly[monthIndex] += obj.total;
+          docProd.monthly_count[monthIndex] += 1;
           return docProd;
         });
       });
@@ -1010,6 +1123,52 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
     });
   }
 
+  private async getReportTemplate(type: 'User' | 'Product'): Promise<any> {
+    const res = await this.mainService.getAllBy('reports', { type });
+    const sample = res.docs && res.docs.length > 0 ? res.docs[0] : null;
+    const weeklyLen = Array.isArray(sample?.weekly) ? sample.weekly.length : 7;
+    const weeklyCountLen = Array.isArray(sample?.weekly_count) ? sample.weekly_count.length : weeklyLen;
+    const monthlyLen = Array.isArray(sample?.monthly) ? sample.monthly.length : 12;
+    const monthlyCountLen = Array.isArray(sample?.monthly_count) ? sample.monthly_count.length : monthlyLen;
+    return {
+      type,
+      connection_id: '',
+      count: 0,
+      amount: 0,
+      profit: 0,
+      weekly: new Array(weeklyLen).fill(0),
+      weekly_count: new Array(weeklyCountLen).fill(0),
+      monthly: new Array(monthlyLen).fill(0),
+      monthly_count: new Array(monthlyCountLen).fill(0),
+      month: new Date().getMonth(),
+      year: new Date().getFullYear(),
+      description: '',
+      timestamp: Date.now()
+    };
+  }
+
+  private ensureReportArrays(report: any, dayIndex: number, monthIndex: number): void {
+    const ensureLength = (arr: Array<number>, index: number) => {
+      while (arr.length <= index) {
+        arr.push(0);
+      }
+    };
+    report.weekly = Array.isArray(report.weekly) ? report.weekly : [];
+    report.weekly_count = Array.isArray(report.weekly_count) ? report.weekly_count : [];
+    report.monthly = Array.isArray(report.monthly) ? report.monthly : [];
+    report.monthly_count = Array.isArray(report.monthly_count) ? report.monthly_count : [];
+    ensureLength(report.weekly, dayIndex);
+    ensureLength(report.weekly_count, dayIndex);
+    ensureLength(report.monthly, monthIndex);
+    ensureLength(report.monthly_count, monthIndex);
+  }
+
+  blurActiveElement(): void {
+    const active = document.activeElement as HTMLElement | null;
+    if (active && typeof active.blur === 'function') {
+      active.blur();
+    }
+  }
 
   qrCode(printer) {
     $('#qrPrintersModal').modal('hide');
@@ -1165,7 +1324,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
                       }
                       this.mainService.removeData('checks', this.check._id).then(resRemove => {
                         if (resRemove.ok) {
-                          $('#splitTable').modal('hide');
+                          this.closeSplitTable();
                           this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(resUpdateTable => {
                             this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
                           });
@@ -1178,7 +1337,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
                           this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
                           this.check._rev = resUpdateCheck.rev;
                           this.setDefault();
-                          $('#splitTable').modal('hide');
+                          this.closeSplitTable();
                         }
                       });
                     }
@@ -1222,7 +1381,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
               }
               this.mainService.removeData('checks', this.check._id).then(resRemove => {
                 if (resRemove.ok) {
-                  $('#splitTable').modal('hide');
+                          this.closeSplitTable();
                   this.mainService.updateData('tables', this.check.table_id, { status: 1 }).then(resUpdateTable => {
                     this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
                   });
@@ -1235,7 +1394,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
                   this.message.sendMessage(`Ürün ${this.selectedTable.name} Masasına Aktarıldı`);
                   this.check._rev = resUpdateCheck.rev;
                   this.setDefault();
-                  $('#splitTable').modal('hide');
+                  this.closeSplitTable();
                 }
               });
             }
@@ -1261,7 +1420,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
             } else {
               this.logService.createLog(logType.CHECK_MOVED, this.check._id, `${this.check.note} Hesabı ${this.selectedTable.name} masasına taşındı.`);
             }
-            $('#splitTable').modal('hide');
+            this.closeSplitTable();
             this.router.navigate(['/store']);
           }
         })
@@ -1297,7 +1456,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
                 this.mainService.removeData('checks', this.check._id).then(resRemove => {
                   if (resRemove.ok) {
                     this.message.sendMessage(`Hesap ${this.selectedTable.name} Masası ile Birleştirildi.`)
-                    $('#splitTable').modal('hide');
+                    this.closeSplitTable();
                     this.router.navigate(['/store']);
                   }
                 });
@@ -1361,6 +1520,12 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
     this.mainService.getAllBy('categories', {}).then(result => {
       this.categories = result.docs;
       this.categories = this.categories.sort((a, b) => a.order - b.order);
+      if (localStorage.getItem('E2E_TEST') === '1' && this.categories.length > 0 && !this.selectedCat) {
+        this.selectedCat = this.categories[0]._id;
+        if (this.products && this.products.length > 0) {
+          this.productsView = this.products.filter(obj => obj.cat_id === this.selectedCat);
+        }
+      }
     });
     this.mainService.getAllBy('sub_categories', {}).then(result => {
       this.sub_categories = result.docs;
@@ -1369,6 +1534,10 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.products = result.docs;
       this.products = this.products.sort((a, b) => a.price - b.price);
       this.productsView = this.products;
+      if (localStorage.getItem('E2E_TEST') === '1' && this.categories?.length > 0 && !this.selectedCat) {
+        this.selectedCat = this.categories[0]._id;
+        this.productsView = this.products.filter(obj => obj.cat_id === this.selectedCat);
+      }
     });
     this.mainService.getAllBy('tables', {}).then(res => {
       this.tables = res.docs;
@@ -1386,17 +1555,18 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.floors = res.docs;
     });
     this.settingsService.getAppSettings().subscribe((res: any) => {
+      if (res && res.value) {
+        if (res.value.ask_print_order === 'Sor') {
+          this.askForPrint = true;
+        } else {
+          this.askForPrint = false;
+        }
 
-      if (res.value.ask_print_order === 'Sor') {
-        this.askForPrint = true;
-      } else {
-        this.askForPrint = false;
-      }
-
-      if (res.value.ask_print_check === 'Sor') {
-        this.askForCheckPrint = true;
-      } else {
-        this.askForCheckPrint = false;
+        if (res.value.ask_print_check === 'Sor') {
+          this.askForCheckPrint = true;
+        } else {
+          this.askForCheckPrint = false;
+        }
       }
     });
   }

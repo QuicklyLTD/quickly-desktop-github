@@ -1,14 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Cashbox } from '../../mocks/cashbox';
-import { MessageService } from '../../providers/message.service';
-import { LogService, logType } from '../../services/log.service';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Cashbox } from '../../models/cashbox';
+import { MessageService } from '../../core/providers/message.service';
+import { LogService, logType } from '../../core/services/log.service';
+import { MainService } from '../../core/services/main.service';
+import { SettingsService } from '../../core/services/settings.service';
+import { PricePipe } from '../../pipes/price.pipe';
 
 
 @Component({
   selector: 'app-cashbox',
+  standalone: true,
+  imports: [CommonModule, FormsModule, PricePipe],
   templateUrl: './cashbox.component.html',
   styleUrls: ['./cashbox.component.scss'],
   providers: [SettingsService]
@@ -24,7 +28,7 @@ export class CashboxComponent implements OnInit {
   user: string;
   onUpdate: boolean;
   day: any;
-  @ViewChild('cashboxForm') cashboxForm: NgForm;
+  @ViewChild('cashboxForm', { static: false }) cashboxForm: NgForm;
 
   constructor(
     private mainService: MainService,
@@ -107,7 +111,14 @@ export class CashboxComponent implements OnInit {
         res.id,
         `Kasa '${this.selectedData.description}' adlı ${this.type}'i güncellendi.`
       );
-      this.cashboxForm.setValue(res);
+      const controls = this.cashboxForm?.controls || {};
+      const safeValues: Record<string, any> = {};
+      Object.keys(controls).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(res, key)) {
+          safeValues[key] = res[key];
+        }
+      });
+      this.cashboxForm.setValue(safeValues);
       this.fillData();
       $('#cashboxModal').modal('show');
     });

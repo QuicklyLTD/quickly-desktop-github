@@ -1,90 +1,88 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { ActivationComponent } from './components/activation/activation.component';
-import { AdminComponent } from './components/admin/admin.component';
-import { CashboxComponent } from './components/cashbox/cashbox.component';
-import { EndofthedayComponent } from './components/endoftheday/endoftheday.component';
-import { HomeComponent } from './components/home/home.component';
-import { LoginComponent } from './components/login/login.component';
-import { ReportsComponent } from './components/reports/reports.component';
-import { SettingsComponent } from './components/settings/settings.component';
-import { SetupComponent } from './components/setup/setup.component';
-import { PaymentScreenComponent } from './components/store/payment-screen/payment-screen.component';
-import { SellingScreenComponent } from './components/store/selling-screen/selling-screen.component';
-import { StoreComponent } from './components/store/store.component';
-import { AnonymousCanActivate, CanActivateViaAuthGuard, DayStarted, SetupFinished } from './guards/auth.guard.service';
-import { AuthService } from './services/auth.service';
+import { Routes, RouterModule } from '@angular/router';
+import { AnonymousCanActivate, CanActivateViaAuthGuard, DayStarted } from './guards/auth.guard.service';
 
 const routes: Routes = [
   {
     path: '',
-    component: LoginComponent
+    loadComponent: () =>
+      import('./components/login/login.component').then((m) => m.LoginComponent)
   },
   {
     path: 'home',
-    component: HomeComponent,
+    loadComponent: () =>
+      import('./home/home.component').then((m) => m.HomeComponent),
     canActivate: [AnonymousCanActivate]
   },
   {
     path: 'activation',
-    component: ActivationComponent
+    loadComponent: () =>
+      import('./components/activation/activation.component').then((m) => m.ActivationComponent)
+  },
+  {
+    path: 'setup',
+    loadComponent: () =>
+      import('./components/setup/setup.component').then((m) => m.SetupComponent)
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./components/login/login.component').then((m) => m.LoginComponent)
   },
   {
     path: 'store',
-    component: StoreComponent,
-    canActivate: [CanActivateViaAuthGuard, DayStarted]
+    loadComponent: () =>
+      import('./components/store/store.component').then((m) => m.StoreComponent)
   },
   {
     path: 'cashbox',
-    component: CashboxComponent,
+    loadComponent: () =>
+      import('./components/cashbox/cashbox.component').then((m) => m.CashboxComponent),
     canActivate: [CanActivateViaAuthGuard, DayStarted]
   },
   {
     path: 'reports',
-    component: ReportsComponent,
+    loadComponent: () =>
+      import('./components/reports/reports.component').then((m) => m.ReportsComponent),
     canActivate: [CanActivateViaAuthGuard, DayStarted]
   },
   {
     path: 'endoftheday',
-    component: EndofthedayComponent,
+    loadComponent: () =>
+      import('./components/endoftheday/endoftheday.component').then((m) => m.EndofthedayComponent),
     canActivate: [CanActivateViaAuthGuard]
   },
   {
     path: 'endoftheday_no_guard',
-    component: EndofthedayComponent,
+    loadComponent: () =>
+      import('./components/endoftheday/endoftheday.component').then((m) => m.EndofthedayComponent)
   },
   {
     path: 'settings',
-    component: SettingsComponent,
+    loadComponent: () =>
+      import('./components/settings/settings.component').then((m) => m.SettingsComponent),
     canActivate: [CanActivateViaAuthGuard]
   },
   {
     path: 'admin',
-    component: AdminComponent,
+    loadComponent: () =>
+      import('./components/admin/admin.component').then((m) => m.AdminComponent)
   },
   {
     path: 'selling-screen/:type/:id',
-    component: SellingScreenComponent,
+    loadComponent: () =>
+      import('./components/store/selling-screen/selling-screen.component').then((m) => m.SellingScreenComponent),
     canActivate: [CanActivateViaAuthGuard, DayStarted]
   },
   {
     path: 'payment/:id',
-    component: PaymentScreenComponent,
-  },
-  {
-    path: 'setup',
-    component: SetupComponent
-  },
+    loadComponent: () =>
+      import('./components/store/payment-screen/payment-screen.component').then((m) => m.PaymentScreenComponent)
+  }
 ];
+
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })],
-  exports: [RouterModule],
-  providers: [
-    AuthService,
-    AnonymousCanActivate,
-    CanActivateViaAuthGuard,
-    SetupFinished,
-    DayStarted]
+  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy', useHash: true })],
+  exports: [RouterModule]
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule { }

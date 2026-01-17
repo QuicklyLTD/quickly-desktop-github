@@ -1,14 +1,14 @@
-<div class="row">
+<div class="row" data-testid="page-settings">
   <div id="settings-holder" class="col-lg-2">
     <div class="card">
-      <div class="card-body" [ngClass]="{'bg-danger text-white':selected == 1}" (click)="selected = 1">
+      <div class="card-body" data-testid="settings-nav-users" [ngClass]="{'bg-danger text-white':selected == 1}" (click)="selected = 1">
         <h2>
           <i class="fa fa-users"></i>
           <span>Kullanıcılar</span>
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 2}" (click)="selected = 2">
+    <div class="card" data-testid="settings-nav-products" [ngClass]="{'bg-danger text-white':selected == 2}" (click)="selected = 2">
       <div class="card-body">
         <h2>
           <i class="fa fa-glass"></i>
@@ -16,7 +16,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 3}" (click)="selected = 3">
+    <div class="card" data-testid="settings-nav-tables" [ngClass]="{'bg-danger text-white':selected == 3}" (click)="selected = 3">
       <div class="card-body">
         <h2>
           <i class="fa fa-square"></i>
@@ -24,7 +24,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 4}" (click)="selected = 4">
+    <div class="card" data-testid="settings-nav-stocks" [ngClass]="{'bg-danger text-white':selected == 4}" (click)="selected = 4">
       <div class="card-body">
         <h2>
           <i class="fa fa-truck"></i>
@@ -32,7 +32,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 5}" (click)="selected = 5">
+    <div class="card" data-testid="settings-nav-recipes" [ngClass]="{'bg-danger text-white':selected == 5}" (click)="selected = 5">
       <div class="card-body">
         <h2>
           <i class="fa fa-file"></i>
@@ -40,7 +40,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 6}" (click)="selected = 6">
+    <div class="card" data-testid="settings-nav-customers" [ngClass]="{'bg-danger text-white':selected == 6}" (click)="selected = 6">
       <div class="card-body">
         <h2>
           <i class="fa fa-address-card"></i>
@@ -48,7 +48,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 7}" (click)="selected = 7">
+    <div class="card" data-testid="settings-nav-printers" [ngClass]="{'bg-danger text-white':selected == 7}" (click)="selected = 7">
       <div class="card-body">
         <h2>
           <i class="fa fa-print"></i>
@@ -56,7 +56,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 8}" (click)="selected = 8">
+    <div class="card" data-testid="settings-nav-servers" [ngClass]="{'bg-danger text-white':selected == 8}" (click)="selected = 8">
       <div class="card-body">
         <h2>
           <i class="fa fa-server"></i>
@@ -64,7 +64,7 @@
         </h2>
       </div>
     </div>
-    <div class="card" [ngClass]="{'bg-danger text-white':selected == 9}" (click)="selected = 9">
+    <div class="card" data-testid="settings-nav-app" [ngClass]="{'bg-danger text-white':selected == 9}" (click)="selected = 9">
       <div class="card-body">
         <h2>
           <i class="fa fa-cogs"></i>

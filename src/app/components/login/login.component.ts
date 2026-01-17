@@ -1,24 +1,25 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from '../../mocks/user';
-import { MessageService } from '../../providers/message.service';
-import { AuthService } from '../../services/auth.service';
-import { MainService } from '../../services/main.service';
-import { SettingsService } from '../../services/settings.service';
+import { User } from '../../models/user';
+import { MessageService } from '../../core/providers/message.service';
+import { AuthService } from '../../core/services/auth.service';
+import { MainService } from '../../core/services/main.service';
+import { SettingsService } from '../../core/services/settings.service';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
-  providers: [SettingsService]
+  styleUrls: ['./login.component.scss']
 })
-
 export class LoginComponent implements OnInit {
   buttons: Array<any>;
   pinInput: any;
-  message: string;
+  message: string | null;
   user: User;
-  docs: any;
   fastSelling = false;
 
   constructor(private mainService: MainService, private messageService: MessageService,

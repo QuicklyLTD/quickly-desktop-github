@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" data-testid="page-payment">
   <div class="col-xl-12">
     <div class="card full-height">
       <div class="card-header">
@@ -10,6 +10,7 @@
           </div>
           <div class="col-xl-2 col-lg-3 pr-1">
             <button
+              data-testid="back-to-selling"
               type="button"
               [routerLink]="['/selling-screen', check_type, check_id]"
               class="btn btn-danger btn-sm btn-block"
@@ -31,6 +32,7 @@
                     <div *ngFor="let item of check?.products; let i = index">
                       <div
                         *ngIf="item.status == 2"
+                        data-testid="adisyon-product-item"
                         style="cursor: pointer"
                         (click)="addProductToList(item)"
                         class="check-product text-danger mb-0"
@@ -57,6 +59,7 @@
                       </strong>
                     </p>
                     <button
+                      data-testid="pay-all"
                       (click)="sendAllProducts()"
                       [disabled]="check?.products.length == 0"
                       class="btn btn-lg btn-danger btn-block text-left"
@@ -74,6 +77,7 @@
                   <div class="card-header pr-2">
                     <b>Ödenecek Ürünler</b>
                     <i
+                      data-testid="open-calculator"
                       *ngIf="productsWillPay.length > 0"
                       data-toggle="modal"
                       data-target="#calculator"
@@ -89,6 +93,7 @@
                     >
                       <div
                         *ngIf="item.status == 2"
+                        data-testid="will-pay-product-item"
                         style="cursor: pointer"
                         (click)="addProductToCheck(item)"
                         class="check-product text-danger mb-0"
@@ -117,6 +122,7 @@
                       </strong>
                     </p>
                     <button
+                      data-testid="toggle-payed-btn"
                       (click)="togglePayed()"
                       class="btn btn-lg btn-secondary btn-block text-left"
                     >
@@ -169,7 +175,7 @@
                           <i class="fa fa-arrow-down" aria-hidden="true"></i>
                           İndirim Tutarı
                           <span class="pull-right"
-                            >{{ payment.discount.toFixed(2) | price }}
+                            >{{ (+payment.discount) | price }}
                           </span>
                         </small>
                       </p>
@@ -190,6 +196,7 @@
           </div>
           <div class="col-lg-1 pl-1 pr-0 d-lg-none d-xl-block">
             <button
+              data-testid="quick-amount-100"
               [disabled]="
                 priceWillPay == 0 || (payedPrice > 0 && changePrice >= 0)
               "
@@ -199,6 +206,7 @@
               100
             </button>
             <button
+              data-testid="quick-amount-50"
               [disabled]="
                 priceWillPay == 0 || (payedPrice > 0 && changePrice >= 0)
               "
@@ -208,6 +216,7 @@
               50
             </button>
             <button
+              data-testid="quick-amount-20"
               [disabled]="
                 priceWillPay == 0 || (payedPrice > 0 && changePrice >= 0)
               "
@@ -217,6 +226,7 @@
               20
             </button>
             <button
+              data-testid="quick-amount-10"
               [disabled]="
                 priceWillPay == 0 || (payedPrice > 0 && changePrice >= 0)
               "
@@ -226,6 +236,7 @@
               10
             </button>
             <button
+              data-testid="quick-amount-5"
               [disabled]="
                 priceWillPay == 0 || (payedPrice > 0 && changePrice >= 0)
               "
@@ -240,7 +251,7 @@
               <div class="card-header p-2">
                 <h3 class="mb-1 mt-1 will-pay">
                   <b>Ödenecek Miktar:</b>
-                  <span class="text-white pull-right">
+                  <span data-testid="payment-current-amount" class="text-white pull-right">
                     <strong>{{ currentAmount | price }} </strong>
                   </span>
                 </h3>
@@ -248,26 +259,26 @@
               <div class="card-body dark-bg p-2">
                 <h5 *ngIf="currentAmount > 0" class="mb-0">
                   Ürünlerin Toplamı:
-                  <span class="text-primary pull-right">
+                  <span data-testid="payment-products-total" class="text-primary pull-right">
                     <b>{{ priceWillPay | price }} </b>
                   </span>
                 </h5>
                 <h5 *ngIf="payedPrice > 0" class="mt-0 mb-1">
                   Alınan Miktar:
-                  <span class="text-success pull-right">
+                  <span data-testid="payment-paid-total" class="text-success pull-right">
                     <b>{{ payedPrice | price }} </b>
                   </span>
                 </h5>
                 <h5 *ngIf="discount !== undefined" class="mb-1">
                   İndirim Tutarı:
-                  <span class="text-danger pull-right">
+                  <span data-testid="payment-discount-amount" class="text-danger pull-right">
                     <small>{{ discount.toFixed(2) }} %</small> -
                     <b>{{ discountAmount | price }} </b>
                   </span>
                 </h5>
                 <h5 *ngIf="payedPrice > 0 && changePrice !== 0" class="mb-1">
                   {{ changeMessage }}:
-                  <span class="text-warning pull-right">
+                  <span data-testid="payment-change-amount" class="text-warning pull-right">
                     <b
                       >{{
                         (changePrice < 0 ? changePrice * -1 : changePrice)
@@ -312,7 +323,7 @@
                     <button
                       type="button"
                       [ngClass]="{
-                        'btn-success text-white': key == '✔' && numpad > 0
+                        'btn-success text-white': key == '✔' && (+numpad) > 0
                       }"
                       [disabled]="
                         (key == '✔' && numpad == '') ||
@@ -331,7 +342,7 @@
                 <p class="pr-1 pl-1 mt-1 mb-0">
                   <strong class="text-primary" style="font-size: large"
                     >Hesap Toplamı:
-                    <span class="pull-right"
+                    <span data-testid="payment-total-amount" class="pull-right"
                       >{{
                         check?.discount + check?.total_price + priceWillPay
                           | price
@@ -342,13 +353,14 @@
                 <p class="text-muted pr-1 pl-1 mb-2">
                   <strong
                     >Adisyon No:
-                    <span class="pull-right">#{{ check?.check_no }}</span>
+                    <span data-testid="payment-check-no" class="pull-right">#{{ check?.check_no }}</span>
                   </strong>
                 </p>
                 <div class="btn-group btn-group-justify btn-block">
                   <button
+                    data-testid="open-payment-discount"
                     [disabled]="
-                      productsWillPay.length == 0 || !permissions.discount
+                      productsWillPay.length == 0 || !canDiscount
                     "
                     type="button"
                     data-toggle="modal"
@@ -361,10 +373,11 @@
                     </span>
                   </button>
                   <button
+                    data-testid="payment-other-options"
                     [disabled]="
                       check?.products.length !== 0 ||
                       productsWillPay.length == 0 ||
-                      !permissions.discount
+                      !canDiscount
                     "
                     type="button"
                     data-toggle="modal"
@@ -379,6 +392,7 @@
           </div>
           <div class="col-lg-1 pl-1 pr-0">
             <button
+              [attr.data-testid]="'method-' + method.type"
               *ngFor="let method of paymentMethods"
               [disabled]="
                 currentAmount == 0 ||
@@ -398,18 +412,6 @@
                 <b>{{ method.name }}</b>
               </p>
             </button>
-            <!-- <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kart')" class="btn btn-block sellButton btn-outline-warning">
-              <i class="fa fa-credit-card ml-1"></i>
-              <br> Kart
-            </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('Kupon')" class="btn btn-block sellButton btn-outline-info">
-              <i class="fa fa-bookmark ml-1"></i>
-              <br> Kupon
-            </button>
-            <button [disabled]="currentAmount == 0 || payedPrice == 0 || currentAmount == 0 && productsWillPay.length == 0" (click)="payProducts('İkram')" class="btn btn-block sellButton btn-outline-danger">
-              <i class="fa fa-handshake-o ml-1" aria-hidden="true"></i>
-              <br> İkram
-            </button> -->
           </div>
         </div>
       </div>
@@ -442,6 +444,7 @@
           <div class="col">
             <div class="input-group">
               <input
+                data-testid="payment-discount-input"
                 #discountInput
                 type="number"
                 min="1"
@@ -455,10 +458,11 @@
               </div>
               <span class="input-group-append">
                 <button
+                  data-testid="payment-apply-discount"
                   class="btn btn-primary btn-lg"
-                  [disabled]="discountInput.value >= currentAmount"
+                  [disabled]="+discountInput.value >= currentAmount"
                   (click)="
-                    setDiscount((discountInput.value * 100) / priceWillPay)
+                    setDiscount((+discountInput.value * 100) / priceWillPay)
                   "
                   type="button"
                 >
@@ -472,6 +476,7 @@
         <div class="row mt-4 pr-2 pl-2">
           <div *ngFor="let item of discounts" class="col-lg-4 mb-2 pr-1 pl-1">
             <button
+              data-testid="payment-discount-quick"
               type="button"
               (click)="setDiscount(item)"
               class="btn btn-primary btn-block btn-lg btn-discount"
@@ -518,7 +523,6 @@
         <div class="row">
           <div class="col">
             <div class="input-group">
-              <!-- <input type="number" [value]="priceWillPay" min="1" placeholder="İndirim Tutarı Giriniz" class="form-control form-control-lg"> -->
               <div class="input-group-append normal">
                 <div class="input-group-text">Bölünecek Tutar:</div>
               </div>

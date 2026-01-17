@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs nav-justified" id="reportTab" role="tablist">
+<ul class="nav nav-tabs nav-justified" data-testid="settings-restaurant-tabs" id="reportTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#floor" role="tab">
       <i class="fa fa-sitemap" aria-hidden="true"></i> Bölgeler</a>
@@ -17,7 +17,7 @@
   </li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content" data-testid="settings-restaurant-content">
   <div class="tab-pane active" id="floor" role="tabpanel">
     <div class="card ntb">
       <div class="card-header">
@@ -279,7 +279,7 @@
             <button (click)="removeFloor(floor._id)" class="btn btn-danger">
               <i class="fa fa-remove" aria-hidden="true"></i>
             </button>
-            <button (click)="updateData('floors',floor._id,areaForm)" class="btn btn-warning">
+            <button (click)="updateData('floors',floor._id)" class="btn btn-warning">
               <i class="fa fa-edit" aria-hidden="true"></i>
             </button>
           </div>
@@ -297,7 +297,7 @@
       <div id="productHolder" class="card-body">
         <div class="row">
           <div *ngFor="let table of tables" class="col-lg-4 mb-2 col-card">
-            <div (click)="updateData('tables',table._id,tableForm)" class="card tableCard">
+            <div (click)="updateData('tables',table._id)" class="card tableCard">
               <div class="card-body">
                 <h2 class="card-title">{{table.name}}</h2>
                 <p class="card-text">
@@ -442,7 +442,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
-          <button *ngIf="onUpdate" type="button" (click)="removeTable(id)" class="btn btn-danger btn-lg">Masayı Sil</button>
+          <button *ngIf="onUpdate" type="button" (click)="removeTable(selectedTable)" class="btn btn-danger btn-lg">Masayı Sil</button>
           <button type="button" type="submit" class="btn btn-primary btn-lg">Kaydet</button>
         </div>
       </form>

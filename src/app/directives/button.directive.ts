@@ -1,7 +1,8 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
 @Directive({
-  selector: '[appOneShot]'
+  selector: '[appOneShot]',
+  standalone: true
 })
 export class ButtonDirective {
 

@@ -1,15 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { HttpService } from '../../services/http.service';
-import { MainService } from '../../services/main.service';
-import { Report } from '../../mocks/report';
+import { HttpService } from '../../core/services/http.service';
+import { MainService } from '../../core/services/main.service';
+import { Report } from '../../models/report';
 
 import * as fs from 'fs';
-import { ServerInfo, Settings } from '../../mocks/settings';
-import { Product } from '../../mocks/product';
-import { Table } from '../../mocks/table';
+import { ServerInfo, Settings } from '../../models/settings';
+import { Product } from '../../models/product';
+import { Table } from '../../models/table';
 
 @Component({
   selector: 'app-admin',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
@@ -17,11 +20,11 @@ import { Table } from '../../mocks/table';
 export class AdminComponent implements OnInit {
   databases: Array<string>;
   documents: any;
-  selectedDoc: object;
+  selectedDoc: { _id?: string } | undefined;
   selectedDB: string;
   storeReports: Array<any>;
   onCreate: boolean;
-  @ViewChild('editArea') editArea: ElementRef;
+  @ViewChild('editArea', { static: false }) editArea: ElementRef;
 
   constructor(private mainService: MainService, private httpService: HttpService) {
     this.databases = Object.keys(this.mainService.LocalDB);
@@ -139,16 +142,16 @@ export class AdminComponent implements OnInit {
     // let password = prompt('password');
 
     const oldToken = localStorage['AccessToken'];
-    this.httpService.post('/store/refresh', null, oldToken).toPromise().then(res => {
-        if (res.ok) {
-          const token = res.json().token;
+    this.httpService.post('/store/refresh', null, oldToken).toPromise().then((res: any) => {
+        if (res?.ok) {
+          const token = res.token;
           localStorage.setItem('AccessToken', token);
           alert('İşlem Başarılı');
         }
       }).catch(err => {
-        this.httpService.post('/store/login', { username: 'quickly', password: 'asdtd155+1' }).toPromise().then(res => {
-          if (res.ok) {
-            const token = res.json().token;
+        this.httpService.post('/store/login', { username: 'quickly', password: 'asdtd155+1' }).toPromise().then((res: any) => {
+          if (res?.ok) {
+            const token = res.token;
             localStorage.setItem('AccessToken', token);
             alert('İşlem Başarılı');
           } else {

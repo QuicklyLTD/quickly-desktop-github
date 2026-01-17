@@ -1,14 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Report } from '../../../mocks/report';
-import { ComponentsAuth, User, UserAuth, UserGroup } from '../../../mocks/user';
-import { MessageService } from '../../../providers/message.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Report } from '../../../models/report';
+import { ComponentsAuth, User, UserAuth, UserGroup } from '../../../models/user';
+import { MessageService } from '../../../core/providers/message.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
 
 @Component({
   selector: 'app-user-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './user-settings.component.html',
   styleUrls: ['./user-settings.component.scss']
 })
@@ -19,9 +22,9 @@ export class UserSettingsComponent implements OnInit {
   selectedGroup: string;
   selectedUser: string;
   onUpdate: boolean;
-  @ViewChild('userForm') userForm: NgForm;
-  @ViewChild('groupForm') groupForm: NgForm;
-  @ViewChild('groupDetailForm') groupDetailForm: NgForm;
+  @ViewChild('userForm', { static: false }) userForm: NgForm;
+  @ViewChild('groupForm', { static: false }) groupForm: NgForm;
+  @ViewChild('groupDetailForm', { static: false }) groupDetailForm: NgForm;
   groupNames: Map<string, string> = new Map();
 
   constructor(
@@ -45,11 +48,21 @@ export class UserSettingsComponent implements OnInit {
   getGroup(id) {
     this.selectedGroup = id;
     this.mainService.getData('users_group', id).then(res => {
-      res = Object.assign(res, res.auth.components);
-      delete res.auth.components;
-      res = Object.assign(res, res.auth);
-      delete res.auth;
-      this.groupDetailForm.setValue(res);
+      if (!res) {
+        return;
+      }
+      let flatRes = Object.assign(res, res.auth.components);
+      delete flatRes.auth.components;
+      flatRes = Object.assign(flatRes, flatRes.auth);
+      delete flatRes.auth;
+      const controls = this.groupDetailForm?.form?.controls || {};
+      const safeValues: Record<string, any> = {};
+      Object.keys(controls).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(flatRes, key)) {
+          safeValues[key] = flatRes[key];
+        }
+      });
+      this.groupDetailForm?.form?.patchValue(safeValues);
     });
   }
 
@@ -189,7 +202,14 @@ export class UserSettingsComponent implements OnInit {
     this.selectedUser = id;
     this.mainService.getData('users', id).then(result => {
       delete result.role;
-      this.userForm.setValue(result);
+      const controls = this.userForm?.form?.controls || {};
+      const safeValues: Record<string, any> = {};
+      Object.keys(controls).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(result, key)) {
+          safeValues[key] = result[key];
+        }
+      });
+      this.userForm?.form?.patchValue(safeValues);
       $('#userModal').modal('show');
     });
   }
@@ -217,17 +237,13 @@ export class UserSettingsComponent implements OnInit {
   }
 
   fillData() {
-    this.mainService.getAllBy('users', {}).then(result => {
-      this.users = result.docs;
-
-      // Resolve group names
-      const groupIds = this.users.map(u => u.role_id).filter(id => id);
-      this.entityStoreService.resolveEntities('users_group', groupIds).then(resolved => {
-        this.groupNames = resolved;
-      });
-    });
-    this.mainService.getAllBy('users_group', {}).then(result => {
-      this.groups = result.docs;
+    Promise.all([
+      this.mainService.getAllBy('users', {}),
+      this.mainService.getAllBy('users_group', {})
+    ]).then(([usersRes, groupsRes]) => {
+      this.users = usersRes.docs;
+      this.groups = groupsRes.docs;
+      this.groupNames = new Map(this.groups.map(group => [group._id, group.name]));
     });
   }
 }

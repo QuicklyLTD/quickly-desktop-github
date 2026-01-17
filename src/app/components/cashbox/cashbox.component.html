@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" data-testid="page-cashbox">
   <div class="col-lg-10 pr-0">
     <div class="card full-height">
       <div class="card-header">Kasa Durumu</div>
@@ -57,8 +57,8 @@
     </div>
   </div>
   <div id="sidebarHolder" class="col-lg-2">
-    <button (click)="type = 'Gelir'; setDefault();" data-toggle="modal" data-target="#cashboxModal" class="btn btn-lg btn-success btn-block pt-5 pb-5">Gelir Ekle</button>
-    <button (click)="type = 'Gider'; setDefault();" data-toggle="modal" data-target="#cashboxModal" class="btn btn-lg btn-danger btn-block pt-5 pb-5">Gider Ekle</button>
+    <button data-testid="cashbox-add-income" (click)="type = 'Gelir'; setDefault();" data-toggle="modal" data-target="#cashboxModal" class="btn btn-lg btn-success btn-block pt-5 pb-5">Gelir Ekle</button>
+    <button data-testid="cashbox-add-expense" (click)="type = 'Gider'; setDefault();" data-toggle="modal" data-target="#cashboxModal" class="btn btn-lg btn-danger btn-block pt-5 pb-5">Gider Ekle</button>
   </div>
 </div>
 
@@ -71,7 +71,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form #cashboxForm="ngForm" (ngSubmit)="addData(cashboxForm)">
+      <form #cashboxForm="ngForm" data-testid="cashbox-form" (ngSubmit)="addData(cashboxForm)">
         <div class="modal-body">
           <div *ngIf="onUpdate">
             <input type="hidden" name="_id" ngModel />
@@ -125,7 +125,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Kapat</button>
           <button *ngIf="onUpdate" type="button" (click)="removeData(selectedData._id)" class="btn btn-danger btn-lg" data-dismiss="modal"> <i class="fa fa-times" aria-hidden="true"></i> Kaydı Sil</button>
-          <button type="submit" class="btn btn-primary btn-lg">
+          <button type="submit" data-testid="cashbox-submit" class="btn btn-primary btn-lg">
             <i class="fa fa-check" aria-hidden="true"></i> Kaydet</button>
         </div>
       </form>

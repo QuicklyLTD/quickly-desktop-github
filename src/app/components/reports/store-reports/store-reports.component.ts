@@ -1,16 +1,20 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Check, ClosedCheck, PaymentStatus, CheckType, CheckStatus, CheckNo } from '../../../mocks/check';
-import { Log } from '../../../mocks/log';
-import { MessageService } from '../../../providers/message.service';
-import { PrinterService } from '../../../providers/printer.service';
-import { LogService, logType } from '../../../services/log.service';
-import { MainService } from '../../../services/main.service';
-import { SettingsService } from '../../../services/settings.service';
-import { EntityStoreService } from '../../../services/entity-store.service';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Check, ClosedCheck, PaymentStatus, CheckType, CheckStatus, CheckNo } from '../../../models/check';
+import { Log } from '../../../models/log';
+import { MessageService } from '../../../core/providers/message.service';
+import { PrinterService } from '../../../core/providers/printer.service';
+import { LogService, logType } from '../../../core/services/log.service';
+import { MainService } from '../../../core/services/main.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { EntityStoreService } from '../../../core/services/entity-store.service';
+import { PricePipe } from '../../../pipes/price.pipe';
 
 @Component({
   selector: 'app-store-reports',
+  standalone: true,
+  imports: [CommonModule, FormsModule, PricePipe],
   templateUrl: './store-reports.component.html',
   styleUrls: ['./store-reports.component.scss'],
   providers: [SettingsService]
@@ -32,10 +36,10 @@ export class StoreReportsComponent implements OnInit {
   printers: Array<any>;
   sellingLogs: Array<Log>;
   day: number;
-  permissions: Object;
+  permissions: { cancelCheck?: boolean } = {};
   tableNames: Map<string, string> = new Map();
   userNames: Map<string, string> = new Map();
-  @ViewChild('checkEdit') editForm: NgForm;
+  @ViewChild('checkEdit', { static: false }) editForm: NgForm;
 
   constructor(private mainService: MainService, private printerService: PrinterService,
     private settingsService: SettingsService, private messageService: MessageService,

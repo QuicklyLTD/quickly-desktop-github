@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" data-testid="page-endoftheday">
   <div
     class="col-lg-10 pr-0"
     [ngClass]="{ 'col-lg-12 pr-3': selectedEndDay !== undefined }"
@@ -9,6 +9,7 @@
           <div class="col-lg-9">Gün Sonu</div>
           <div class="col-lg-3 pr-2 pl-0">
             <button
+              data-testid="endday-back"
               *ngIf="selectedEndDay !== undefined"
               (click)="selectedEndDay = undefined"
               class="btn btn-danger btn-sm btn-block"
@@ -52,6 +53,7 @@
           </thead>
           <tbody>
             <tr
+              data-testid="endday-row"
               *ngFor="let item of endDayData; let i = index"
               (click)="getDetail(item)"
             >
@@ -76,6 +78,7 @@
     [hidden]="selectedEndDay !== undefined || appType?.type == '1'"
   >
     <button
+      data-testid="start-day"
       [disabled]="isStarted"
       (click)="startDay()"
       class="btn btn-lg btn-success btn-block pt-5 pb-5"
@@ -83,6 +86,7 @@
       Gün Başı
     </button>
     <button
+      data-testid="end-day"
       [disabled]="!isStarted"
       (click)="endDay()"
       class="btn btn-lg btn-danger btn-block pt-5 pb-5"

@@ -1,4 +1,4 @@
-<div class="card full-height">
+<div class="card full-height" data-testid="page-setup">
   <div class="card-header">
     İlk Kurulum
   </div>
@@ -16,7 +16,7 @@
         </div>
         <div class="row justify-content-md-center mt-3">
           <div class="col-lg-6">
-            <button (click)="setupStep = 1" class="btn btn-outline-primary btn-lg btn-block p-4">
+            <button data-testid="setup-primary" (click)="setupStep = 1" class="btn btn-outline-primary btn-lg btn-block p-4">
               <i class="fa fa-server fa-5x"></i>
               <br> Birincil
               <br>
@@ -24,7 +24,7 @@
             </button>
           </div>
           <div class="col-lg-6">
-            <button (click)="setupStep = 4;" class="btn btn-outline-primary btn-lg btn-block work-type p-4">
+            <button data-testid="setup-secondary" (click)="setupStep = 4;" class="btn btn-outline-primary btn-lg btn-block work-type p-4">
               <i class="fa fa-desktop fa-5x"></i>
               <br> İkincil
               <br>
@@ -38,14 +38,14 @@
           <h5 class="alert-heading font-weight-bold">İşletme Hesabı Bilgileri</h5>
           <p>Quickly Hesabı Kullanıcı Adı ve Şifrenizi giriniz</p>
         </div>
-        <form #loginForm="ngForm" class="mt-3" (ngSubmit)="makeLogin(loginForm)">
+        <form #loginForm="ngForm" class="mt-3" data-testid="setup-login-form" (ngSubmit)="makeLogin(loginForm)">
           <div class="input-group">
             <div class="input-group-prepend">
               <div class="input-group-text">
                 Kullanıcı Adı
               </div>
             </div>
-            <input name="username" type="text" placeholder="Kullanıcı Adı Giriniz.." class="form-control form-control-lg" ngModel />
+            <input name="username" data-testid="setup-username" type="text" placeholder="Kullanıcı Adı Giriniz.." class="form-control form-control-lg" ngModel />
           </div>
           <div class="input-group">
             <div class="input-group-prepend">
@@ -53,10 +53,10 @@
                 Şifre
               </div>
             </div>
-            <input name="password" type="password" placeholder="Şifre Giriniz.." class="form-control form-control-lg" ngModel />
+            <input name="password" data-testid="setup-password" type="password" placeholder="Şifre Giriniz.." class="form-control form-control-lg" autocomplete="current-password" ngModel />
           </div>
           <div class="mt-3">
-            <button type="submit" class="btn btn-danger btn-lg pull-right">Bilgileri Kaydet</button>
+            <button type="submit" data-testid="setup-login-submit" class="btn btn-danger btn-lg pull-right">Bilgileri Kaydet</button>
           </div>
         </form>
       </div>
@@ -71,7 +71,7 @@
         </div> -->
         <div class="row justify-content-md-center storeList">
           <div *ngFor="let store of stores" class="col-xl-4 col-lg-5"  style="min-height: 130px; max-height: 300px; margin-bottom: 5px;">
-            <div (click)="makeAuth(store)" class="card storeCard">
+            <div data-testid="setup-store-card" (click)="makeAuth(store)" class="card storeCard">
               <!-- <div class="card-header">
                 <strong>{{store.name}}</strong>
               </div> -->
@@ -99,14 +99,14 @@
           <p class="mb-0">Yönetici Bilgileri</p>
           <footer class="bodyquote-footer">Lütfen bir Yönetici Adı ve Şifresi giriniz.</footer>
         </div>
-        <form #setupForm="ngForm" class="mt-3" (ngSubmit)="makeAdmin(setupForm)">
+        <form #setupForm="ngForm" class="mt-3" data-testid="setup-admin-form" (ngSubmit)="makeAdmin(setupForm)">
           <div class="input-group">
             <div class="input-group-prepend">
               <div class="input-group-text">
                 Yönetici Adı
               </div>
             </div>
-            <input name="admin_name" placeholder="Yönetici Adı Giriniz.." type="text" class="form-control form-control-lg" ngModel />
+            <input name="admin_name" data-testid="setup-admin-name" placeholder="Yönetici Adı Giriniz.." type="text" class="form-control form-control-lg" ngModel />
           </div>
           <div class="input-group">
             <div class="input-group-prepend">
@@ -114,10 +114,10 @@
                 Yönetici Parolası
               </div>
             </div>
-            <input name="admin_pass" type="password" placeholder="Şifre Giriniz.. ( 4 Haneli Sayı )" maxlength="4" class="form-control form-control-lg" ngModel />
+            <input name="admin_pass" data-testid="setup-admin-pass" type="password" placeholder="Şifre Giriniz.. ( 4 Haneli Sayı )" maxlength="4" class="form-control form-control-lg" autocomplete="new-password" ngModel />
           </div>
           <div class="mt-3">
-            <button type="submit" class="btn btn-danger btn-lg pull-right">Bilgileri Kaydet</button>
+            <button type="submit" data-testid="setup-admin-submit" class="btn btn-danger btn-lg pull-right">Bilgileri Kaydet</button>
           </div>
         </form>
       </div>

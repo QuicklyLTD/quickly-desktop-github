@@ -1,16 +1,22 @@
-declare var nodeModule: NodeModule;
+/* SystemJS module definition */
+declare const nodeModule: NodeModule;
 interface NodeModule {
   id: string;
 }
-declare var window: Window;
 interface Window {
-  process: any;
-  require: any;
+  electron?: {
+    ipcRenderer?: {
+      send: (channel: string, ...args: any[]) => void;
+      on: (channel: string, listener: (...args: any[]) => void) => void;
+      removeListener: (channel: string, listener: (...args: any[]) => void) => void;
+    };
+    fs?: any;
+    os?: any;
+    childProcess?: any;
+    process?: { cwd: () => string };
+    webFrame?: any;
+  };
 }
-declare module 'PouchDB' {
-  namespace PouchDB { }
-  export = PouchDB;
-}
+
 declare var $: any;
-declare var printer: any;
-declare module '*';
+declare var jQuery: any;
