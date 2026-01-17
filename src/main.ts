@@ -1,5 +1,5 @@
 import './app-setup';
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, importProvidersFrom, ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
@@ -21,6 +21,10 @@ if (APP_CONFIG.production) {
   enableProdMode();
 }
 
+class MockElementRef {
+  nativeElement: {};
+}
+
 bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(
@@ -36,7 +40,14 @@ bootstrapApplication(AppComponent, {
           deps: [HttpClient]
         }
       })
-    )
+    ),
+    { provide: ElementRef, useClass: MockElementRef },
+    {
+      provide: Renderer2,
+      useFactory: (rendererFactory: RendererFactory2) =>
+        rendererFactory.createRenderer(null, null),
+      deps: [RendererFactory2]
+    }
   ]
 })
   .catch(err => console.error(err));

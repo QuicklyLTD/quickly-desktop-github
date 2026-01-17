@@ -1,72 +1,60 @@
-import { app, BrowserWindow, screen, ipcMain } from 'electron';
+import {app, BrowserWindow, screen, ipcMain} from 'electron';
+import * as path from 'path';
+import * as fs from 'fs';
 import './ipcPrinter';
 import './callerServer';
 import './scalerServer';
 import './appServer';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as url from 'url';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
-const singleInstanceLock = app.requestSingleInstanceLock();
-if (!singleInstanceLock) {
-  app.quit();
-}
+function loadAppWindow(hash?: string) {
+  if (!win) return;
+  if (serve) {
+    const hashSuffix = hash ? `#${hash.replace(/^#/, '')}` : '';
+    win.loadURL(`http://localhost:4200${hashSuffix}`);
+    return;
+  }
 
-if (serve) {
-  process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
-  app.setPath('userData', `${app.getPath('userData')}-dev`);
+  let indexPath = path.join(__dirname, 'index.html');
+  if (!fs.existsSync(indexPath) && fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+    indexPath = path.join(__dirname, '../dist/index.html');
+  }
+
+  if (hash) {
+    win.loadFile(indexPath, { hash: hash.replace(/^#/, '') });
+  } else {
+    win.loadFile(indexPath);
+  }
 }
 
 function createWindow(): BrowserWindow {
 
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
+  const size = screen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
   win = new BrowserWindow({
     x: 0,
     y: 0,
-    width: 1366,
-    height: 768,
-    frame: true,
-    resizable: true,
+    width: size.width,
+    height: size.height,
     webPreferences: {
-      nodeIntegration: false,
-      allowRunningInsecureContent: false,
-      contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      allowRunningInsecureContent: (serve),
+      contextIsolation: false,  // false if you want to run e2e test with Spectron
     },
   });
-  win.setMenu(null);
-  win.setFullScreen(true);
 
   if (serve) {
     const debug = require('electron-debug');
     debug();
 
     require('electron-reloader')(module);
-    win.loadURL('http://localhost:4200');
-    win.setFullScreen(false);
-    win.webContents.openDevTools();
-  } else {
-    // Path when running electron executable
-    let pathIndex = './index.html';
-
-    if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
-      pathIndex = '../dist/index.html';
-    }
-
-    win.loadURL(url.format({
-      pathname: path.join(__dirname, pathIndex),
-      protocol: 'file:',
-      slashes: true
-    }));
   }
+
+  loadAppWindow();
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -81,7 +69,10 @@ function createWindow(): BrowserWindow {
 
 ipcMain.on('app-reload', () => {
   if (win) {
-    win.reload();
+    const currentUrl = win.webContents.getURL();
+    const hashIndex = currentUrl.indexOf('#');
+    const hash = hashIndex >= 0 ? currentUrl.slice(hashIndex + 1) : '';
+    loadAppWindow(hash);
   }
 });
 
@@ -108,14 +99,6 @@ ipcMain.on('app-fullscreen', (_event, status: boolean) => {
 });
 
 try {
-  app.on('second-instance', () => {
-    if (win) {
-      if (win.isMinimized()) {
-        win.restore();
-      }
-      win.focus();
-    }
-  });
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.

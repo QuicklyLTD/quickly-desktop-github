@@ -421,7 +421,7 @@
       <form #checkNoteForm="ngForm" (ngSubmit)="addCheckNote(checkNoteForm)">
         <div class="modal-body">
           <div class="form-group">
-            <input type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
+            <input #checkNoteInput type="text" placeholder="Notunuz..." name="description" class="form-control form-control-lg" ngModel>
           </div>
         </div>
         <div class="modal-footer">

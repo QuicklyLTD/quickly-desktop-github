@@ -46,14 +46,6 @@ testem.log
 /e2e/*.map
 /e2e/tracing
 /e2e/screenshots
-/e2e/test-results
-/playwright-report
-/test-results
-
-# local data
-/data/*.log
-/data/*.dat
-/data/backup/
 
 # System Files
 .DS_Store

@@ -18,10 +18,15 @@ import { SyncService } from './core/services/sync.service';
 import { OrderListenerService } from './core/services/order-listener.service';
 import { POLLING_INTERVALS, SERVER_TYPES, SERVER_STATUS } from './shared/constants';
 
+// Import components
+import { KeyboardComponent } from './components/helpers/keyboard/keyboard.component';
+import { CallerComponent } from './components/helpers/caller/caller.component';
+import { MessageComponent } from './components/helpers/message/message.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, KeyboardComponent, CallerComponent, MessageComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

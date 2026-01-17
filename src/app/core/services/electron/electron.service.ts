@@ -26,7 +26,8 @@ export class ElectronService {
 
   constructor() {
     if (this.isElectron) {
-      const electronApi = (window as any).electron;
+      const windowAny = window as any;
+      const electronApi = windowAny.electron || windowAny.require?.('electron');
       this.ipcRenderer = electronApi?.ipcRenderer;
       this.webFrame = electronApi?.webFrame;
       this.childProcess = electronApi?.childProcess;
@@ -43,7 +44,8 @@ export class ElectronService {
   }
 
   get isElectron(): boolean {
-    return !!(window && (window as any).electron && (window as any).electron.ipcRenderer);
+    const windowAny = window as any;
+    return !!(windowAny?.electron?.ipcRenderer || windowAny?.require?.('electron')?.ipcRenderer);
   }
 
   // --- Legacy Methods from Quickly ---

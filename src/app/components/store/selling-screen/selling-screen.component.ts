@@ -14,6 +14,7 @@ import { LogService, logType } from '../../../core/services/log.service';
 import { MainService } from '../../../core/services/main.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { ScalerService } from '../../../core/providers/scaler.service';
+import { KeyboardService } from '../../../core/providers/keyboard.service';
 import { EntityStoreService } from '../../../core/services/entity-store.service';
 import { Subscription } from 'rxjs'; // tslint:disable-line:import-blacklist
 import { PricePipe } from '../../../pipes/price.pipe';
@@ -86,6 +87,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
   @ViewChild('productName', { static: false }) productFilterInput: ElementRef;
   @ViewChild('specsUnit', { static: false }) productUnit: ElementRef;
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef;
+  @ViewChild('checkNoteInput', { static: false }) checkNoteInput: ElementRef;
 
   constructor(
     private mainService: MainService,
@@ -98,7 +100,8 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     private scalerService: ScalerService,
     private logService: LogService,
     private zone: NgZone,
-    private entityStoreService: EntityStoreService
+    private entityStoreService: EntityStoreService,
+    private keyboardService: KeyboardService
   ) {
     this.owner = this.settingsService.getUser('name');
     this.ownerRole = this.settingsService.getUser('type');
@@ -268,11 +271,31 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
         $('#specsModal').on('hide.bs.modal', function (event) {
           setdefquntity();
         });
-        $('#checkNote').on('hide.bs.modal', function () {
+        const blurActiveElement = () => {
           const active = document.activeElement as HTMLElement | null;
           if (active && typeof active.blur === 'function') {
             active.blur();
           }
+        };
+        $('#checkNote').on('hide.bs.modal', function () {
+          blurActiveElement();
+        });
+        $('#checkNote').on('hidden.bs.modal', () => {
+          blurActiveElement();
+          this.keyboardService.triggerKeyboard('Close', this.checkNoteInput);
+        });
+        $('#noteModal').on('hide.bs.modal', function () {
+          blurActiveElement();
+        });
+        $('#noteModal').on('hidden.bs.modal', () => {
+          blurActiveElement();
+          this.keyboardService.triggerKeyboard('Close', this.noteInput);
+        });
+        $('#checkNote').on('shown.bs.modal', () => {
+          if (!this.checkNoteInput || !this.checkNoteInput.nativeElement) return;
+          const input = this.checkNoteInput.nativeElement as HTMLElement;
+          input.focus();
+          this.keyboardService.triggerKeyboard('Open', this.checkNoteInput);
         });
       } else {
         console.warn('jQuery ($) is not defined. Modal events not attached.');
