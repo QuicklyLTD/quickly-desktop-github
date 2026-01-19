@@ -169,21 +169,39 @@
                 </div>
               </div>
               <div id="check-products" data-testid="check-products" class="card-body check-flow p-2 dark-bg">
-                <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
-                  <div data-testid="check-product-item" [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
-                    <div class="product-name">
-                      <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
-                      {{item.name}}
-                      <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
-                    </div>
-                    <div class="product-price">{{item.price | price }} </div>
-                    <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
-                      <i class="fa fa-user" aria-hidden="true"></i> {{userNames.get(item.owner) || ''}}
-                      <span class="pull-right">
-                        <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
+                <button (click)="toggleProduct()" class="btn btn-sm btn-info btn-block mb-1">
+                  <i class="fa {{isCollapsedView ? 'fa-list' : 'fa-compress'}}"></i>
+                  <b>{{isCollapsedView ? 'Normal Görünüm' : 'Sıkıştırılmış Görünüm'}}</b>
+                </button>
+                <ng-container *ngIf="!isCollapsedView">
+                  <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
+                    <div data-testid="check-product-item" [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
+                      <div class="product-name">
+                        <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
+                        {{item.name}}
+                        <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
+                      </div>
+                      <div class="product-price">{{item.price | price }} </div>
+                      <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
+                        <i class="fa fa-user" aria-hidden="true"></i> {{userNames.get(item.owner) || ''}}
+                        <span class="pull-right">
+                          <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </ng-container>
+                <ng-container *ngIf="isCollapsedView">
+                  <div *ngFor="let item of checkItems(); let i = index">
+                    <div class="check-product text-danger">
+                      <div class="product-name">
+                        <span class="badge badge-warning text-dark mr-1">{{item.quantity}}</span>
+                        {{item.name}}
+                        <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
+                      </div>
+                      <div class="product-price">{{item.price * item.quantity | price }} </div>
+                    </div>
+                  </div>
+                </ng-container>
               </div>
               <div *ngIf="check.discount > 0" class="card-footer p-1">
                 <button (click)="togglePayed()" class="btn btn-sm btn-secondary btn-block text-left">{{payedTitle}}
@@ -611,6 +629,22 @@
               </p>
             </button>
           </div>
+          <div class="col pr-2 pl-2">
+            <button [disabled]="selectedProduct == undefined" (click)="toggleModal('checkOptions', false); toggleModal('timeoutModal', true)" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
+              <i class="fa fa-clock-o"></i>
+              <p class="mt-1 mb-1">
+                <b>Gecikmeli Yazdır</b>
+              </p>
+            </button>
+          </div>
+          <div class="col pr-2 pl-2">
+            <button [disabled]="selectedProduct == undefined" (click)="toggleModal('checkOptions', false); numpad = selectedProduct?.price.toString(); isFirstTime = true; toggleModal('checkPrice', true)" class="btn btn-secondary text-primary border-primary btn-block btn-lg sellButton">
+              <i class="fa fa-turkish-lira"></i>
+              <p class="mt-1 mb-1">
+                <b>Fiyat Düzenle</b>
+              </p>
+            </button>
+          </div>
           <!-- <div class="col pr-2 pl-2">
             <button data-toggle="modal" [disabled]="!check._id" data-dismiss="modal" (click)="qrCode()" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
               <i class="fa fa-qrcode"></i>
@@ -620,9 +654,150 @@
             </button>
           </div> -->
         </div>
+        <div class="row mt-2">
+          <div class="col pr-2 pl-2">
+            <button (click)="toggleModal('checkOptions', false); toggleModal('kuverModal', true)" class="btn btn-secondary text-success border-success btn-block btn-lg sellButton">
+              <i class="fa fa-users"></i>
+              <p class="mt-1 mb-1">
+                <b>Kuver Ekle</b>
+              </p>
+            </button>
+          </div>
+          <div class="col pr-2 pl-2">
+            <button (click)="toggleModal('checkOptions', false); toggleModal('serviceChargeModal', true)" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
+              <i class="fa fa-percent"></i>
+              <p class="mt-1 mb-1">
+                <b>Servis Ücreti</b>
+              </p>
+            </button>
+          </div>
+          <div class="col pr-2 pl-2">
+            <button (click)="toggleModal('checkOptions', false); toggleModal('userModal', true)" class="btn btn-secondary text-dark border-dark btn-block btn-lg sellButton">
+              <i class="fa fa-user-circle"></i>
+              <p class="mt-1 mb-1">
+                <b>Personel Değiştir</b>
+              </p>
+            </button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">İptal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="timeoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Gecikmeli Yazdır: {{selectedProduct?.name}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toggleModal('timeoutModal', false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div *ngFor="let item of [20,40,60]" class="col-lg-4 col-4 mb-2">
+            <button (click)="setProductTimeout(item)" class="btn btn-info btn-lg btn-block"><b>{{item}} dk</b></button>
+          </div>
+          <div class="col-lg-12">
+            <button (click)="setProductTimeout(0)" class="btn btn-danger btn-lg btn-block"><b>Gecikmeyi İptal Et</b></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="kuverModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Kuver Ekle</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toggleModal('kuverModal', false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]" class="col-lg-3 col-6 mb-2">
+            <button (click)="setKuver(item)" class="btn btn-warning btn-lg btn-block"><b>{{item}}</b></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="serviceChargeModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Servis Ücreti</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toggleModal('serviceChargeModal', false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div *ngFor="let item of [5,10,15,20]" class="col-lg-3 col-6 mb-2">
+            <button (click)="addServiceCharge(item)" class="btn btn-info btn-lg btn-block"><b>%{{item}}</b></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="userModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Personel Değiştir</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toggleModal('userModal', false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">Personel listesi yükleniyor...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="checkPrice" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Fiyat Düzenle: {{selectedProduct?.name}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toggleModal('checkPrice', false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="input-group">
+              <input type="text" readonly class="form-control form-control-lg text-center" [ngModel]="numpad" style="font-size: 30px; font-weight: bold;" />
+              <div class="input-group-append normal">
+                <div class="input-group-text"><i class="fa fa-turkish-lira fa-2x"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div *ngFor="let keys of numboard;" class="row mb-1">
+              <div *ngFor="let key of keys;" class="col-lg-4 pr-1 pl-1 mb-1">
+                <button type="button" (click)="pushKeyForPrice(key)" class="btn dark-bg btn-outline-primary font-weight-bold btn-lg p-3 btn-block numpad">{{key}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal" (click)="toggleModal('checkPrice', false)">Kapat</button>
+        <button type="button" (click)="setProductPrice()" class="btn btn-primary btn-lg"><i class="fa fa-check"></i> Onayla</button>
       </div>
     </div>
   </div>

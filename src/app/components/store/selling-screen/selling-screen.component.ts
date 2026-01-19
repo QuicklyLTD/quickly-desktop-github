@@ -83,6 +83,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
   tableName: string;
   userNames: Map<string, string> = new Map();
   stockUnit: string;
+  isCollapsedView = false;
 
   @ViewChild('productName', { static: false }) productFilterInput: ElementRef;
   @ViewChild('specsUnit', { static: false }) productUnit: ElementRef;
@@ -100,7 +101,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     private scalerService: ScalerService,
     private logService: LogService,
     private zone: NgZone,
-    private entityStoreService: EntityStoreService,
+    public entityStoreService: EntityStoreService,
     private keyboardService: KeyboardService
   ) {
     this.owner = this.settingsService.getUser('name');
@@ -184,7 +185,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     this.tareNumber = 0;
   }
 
-  private toggleModal(id: string, isOpen: boolean): void {
+  public toggleModal(id: string, isOpen: boolean): void {
     const modal = document.getElementById(id);
     if (!modal) {
       return;
@@ -311,6 +312,13 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
         this.mainService.removeData('checks', this.check._id);
       }
     }
+  }
+
+  checkTotal(): number {
+    return this.check.products
+      .filter((obj) => obj.status !== 3)
+      .map((obj) => obj.price)
+      .reduce((a, b) => a + b, 0);
   }
 
   goPayment() {
@@ -801,6 +809,54 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.payedShow = true;
       this.payedTitle = 'Alınan Ödemeleri Gizle';
     }
+  }
+
+  checkItems(): Array<any> {
+    if (this.check.products.length > 0) {
+      const viewArray: Array<any> = [];
+      this.check.products.forEach((item) => {
+        const existingIndex = viewArray.findIndex(
+          (obj) =>
+            obj.name === item.name &&
+            obj.id === item.id &&
+            obj.status === item.status &&
+            obj.note === item.note &&
+            obj.timeout === item.timeout
+        );
+
+        if (existingIndex !== -1) {
+          viewArray[existingIndex].quantity++;
+        } else {
+          const viewItem: any = {
+            id: item.id,
+            name: item.name,
+            note: item.note,
+            quantity: 1,
+            price: item.price,
+            status: item.status,
+          };
+          if (item.timeout) {
+            viewItem.timeout = item.timeout;
+          }
+          viewArray.push(viewItem);
+        }
+      });
+      return viewArray.sort((a, b) => {
+        if (a.status > b.status) {
+          return -1;
+        } else if (a.status < b.status) {
+          return 1;
+        } else {
+          return b.quantity - a.quantity;
+        }
+      });
+    } else {
+      return [];
+    }
+  }
+
+  toggleProduct(): void {
+    this.isCollapsedView = !this.isCollapsedView;
   }
 
   selectProduct(index) {
@@ -1304,6 +1360,83 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
 
   selectTable(id) {
     this.selectedTable = id;
+  }
+
+  setProductTimeout(minutes: number): void {
+    if (this.selectedProduct) {
+      if (minutes === 0) {
+        this.selectedProduct.timeout = undefined;
+      } else {
+        this.selectedProduct.timeout = minutes;
+      }
+      this.mainService.updateData('checks', this.check_id, this.check).then(res => {
+        if (res.updated) {
+          this.check._rev = res.rev;
+        }
+      });
+    }
+    this.toggleModal('timeoutModal', false);
+  }
+
+  setKuver(count: number): void {
+    this.mainService.getAllBy('products', { name: 'Kuver' }).then(res => {
+      if (res.docs.length > 0) {
+        const product = res.docs[0];
+        for (let i = 0; i < count; i++) {
+          this.addToCheck(product);
+        }
+        this.toggleModal('kuverModal', false);
+      }
+    });
+  }
+
+  addServiceCharge(percent: number): void {
+    const serviceCharge = (this.check.total_price * percent) / 100;
+    this.mainService.getAllBy('products', { name: 'Servis Ücreti' }).then(res => {
+      if (res.docs.length > 0) {
+        const product = res.docs[0];
+        product.price = serviceCharge;
+        this.addToCheck(product);
+        this.toggleModal('serviceChargeModal', false);
+      }
+    });
+  }
+
+  changeUser(user: any): void {
+    this.owner = user.name;
+    this.ownerId = user._id;
+    this.check.owner = user.name;
+    if (this.check.status !== CheckStatus.PASSIVE) {
+      this.mainService.changeData('checks', this.check_id, (doc) => {
+        doc.owner = user.name;
+        return doc;
+      });
+    }
+    this.toggleModal('userModal', false);
+  }
+
+  pushKeyForPrice(key: any): void {
+    if (key === '◂') {
+      this.numpad = '';
+    } else {
+      if (this.isFirstTime) {
+        this.numpad = '';
+        this.isFirstTime = false;
+      }
+      this.numpad += key;
+    }
+  }
+
+  setProductPrice(): void {
+    const newPrice = parseFloat(this.numpad);
+    this.selectedProduct.price = newPrice;
+    this.check.total_price = this.checkTotal();
+    if (this.selectedProduct.status === 2) {
+      this.mainService.updateData('checks', this.check_id, this.check).catch((err) => {
+        console.log(err);
+      });
+    }
+    this.toggleModal('checkPrice', false);
   }
 
   splitProduct() {

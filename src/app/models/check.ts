@@ -50,6 +50,8 @@ export class PaymentStatus {
     ) { }
 }
 export class CheckProduct {
+    timeout?: number;
+    extras?: Array<any>;
     constructor(
         public id: string,
         public cat_id: string,

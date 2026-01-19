@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "notifications": [
+    {
+      "id": "b618e1d6-3dcf-45e8-a35f-36fcfeb2ae15",
+      "type": "spec_regeneration_complete",
+      "title": "Spec Generation Complete",
+      "message": "Created 50 features from the project specification.",
+      "createdAt": "2026-01-19T00:50:15.251Z",
+      "read": true,
+      "dismissed": false,
+      "projectPath": "/Users/guvensoft/Desktop/QuicklyLTD"
+    },
+    {
+      "id": "e876c53d-aa88-4b4d-bdf4-70bd17ffbc6a",
+      "type": "feature_verified",
+      "title": "Feature Verified",
+      "message": "\"feature-1768785274516-23ic0rcg6\" has been verified and is complete.",
+      "createdAt": "2026-01-19T01:17:52.111Z",
+      "read": false,
+      "dismissed": false,
+      "featureId": "feature-1768785274516-23ic0rcg6",
+      "projectPath": "/Users/guvensoft/Desktop/QuicklyLTD/quickly-desktop"
+    },
+    {
+      "id": "ec72d57d-0279-4e88-9667-479ff5b51413",
+      "type": "feature_verified",
+      "title": "Feature Verified",
+      "message": "\"feature-1768785306534-pu3atkl2s\" has been verified and is complete.",
+      "createdAt": "2026-01-19T01:18:16.657Z",
+      "read": false,
+      "dismissed": false,
+      "featureId": "feature-1768785306534-pu3atkl2s",
+      "projectPath": "/Users/guvensoft/Desktop/QuicklyLTD/quickly-desktop"
+    },
+    {
+      "id": "5fefe4cd-ba1d-40f2-9479-29b44263610d",
+      "type": "feature_verified",
+      "title": "Feature Verified",
+      "message": "\"feature-1768785312626-69hyj9kz8\" has been verified and is complete.",
+      "createdAt": "2026-01-19T01:19:06.466Z",
+      "read": false,
+      "dismissed": false,
+      "featureId": "feature-1768785312626-69hyj9kz8",
+      "projectPath": "/Users/guvensoft/Desktop/QuicklyLTD/quickly-desktop"
+    }
+  ]
+}
