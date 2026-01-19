@@ -68,26 +68,52 @@ export class OrderListenerService {
                       orderDoc.timestamp === product.timestamp
                     );
                     if (orders.length > 0) {
-                      const splitPrintArray = [];
+                      const splitPrintArray: any[] = [];
                       orders.forEach((obj, index) => {
                         const catPrinter = categories.filter(cat => cat._id === obj.cat_id)[0].printer || printers[0].name;
-                        const contains = splitPrintArray.some(element => element.printer.name === catPrinter);
-                        if (contains) {
-                          const sIndex = splitPrintArray.findIndex(p_name => p_name.printer.name === catPrinter);
-                          splitPrintArray[sIndex].products.push(obj);
-                        } else {
+                        
+                        // Check if product has timeout (delayed printing)
+                        if (obj.timeout) {
                           const thePrinter = printers.filter(p => p.name === catPrinter)[0];
-                          const splitPrintOrder = { printer: thePrinter, products: [obj] };
+                          const splitPrintOrder = { 
+                            printer: thePrinter, 
+                            products: [obj], 
+                            timeout: obj.timeout 
+                          };
                           splitPrintArray.push(splitPrintOrder);
+                        } else {
+                          const contains = splitPrintArray.some(element => element.printer.name === catPrinter);
+                          if (contains) {
+                            const sIndex = splitPrintArray.findIndex(p_name => p_name.printer.name === catPrinter);
+                            splitPrintArray[sIndex].products.push(obj);
+                          } else {
+                            const thePrinter = printers.filter(p => p.name === catPrinter)[0];
+                            const splitPrintOrder = { printer: thePrinter, products: [obj] };
+                            splitPrintArray.push(splitPrintOrder);
+                          }
                         }
                       });
+                      
                       splitPrintArray.forEach(order => {
-                        this.printerService.printOrder(
-                          order.printer,
-                          tableName,
-                          order.products,
-                          orderDoc.user.name + (orderDoc.type === OrderType.INSIDE ? ' (Müşteri)' : '(El Terminali)')
-                        );
+                        if (order.timeout) {
+                          // Delayed printing: wait for timeout minutes
+                          setTimeout(() => {
+                            this.printerService.printOrder(
+                              order.printer,
+                              tableName,
+                              order.products,
+                              orderDoc.user.name + (orderDoc.type === OrderType.INSIDE ? ' (Müşteri)' : '(El Terminali)')
+                            );
+                          }, order.timeout * 60000); // Convert minutes to milliseconds
+                        } else {
+                          // Immediate printing
+                          this.printerService.printOrder(
+                            order.printer,
+                            tableName,
+                            order.products,
+                            orderDoc.user.name + (orderDoc.type === OrderType.INSIDE ? ' (Müşteri)' : '(El Terminali)')
+                          );
+                        }
                       });
                     }
                   });

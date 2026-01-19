@@ -58,6 +58,11 @@ export class AppComponent implements OnInit {
   activationStatus: boolean;
   serverSettings: ServerInfo;
   dayStatus: DayInfo;
+  
+  // Data for order listener
+  categories: any[] = [];
+  products: any[] = [];
+  printers: any[] = [];
 
   get connectionStatus(): boolean {
     return this.connectionService.getConnectionStatus();
@@ -182,10 +187,16 @@ export class AppComponent implements OnInit {
                   if (this.authService.getToken()) {
                     this.dayManagementService.dayCheck(this.dayStatus);
                   }
+                  // Load data for order listener and start listeners
+                  setTimeout(() => {
+                    this.loadProductsData();
+                    this.orderListenerService.startOrderListener();
+                    this.printsListener();
+                  }, 10000);
                 }
               }).catch(err => {
                 console.log(err);
-                this.syncService.loadFromBackup();
+                this.loadFromBackup();
               });
             } else if (this.serverSettings.type === SERVER_TYPES.SECONDARY) {
               this.syncService.serverReplication(this.serverSettings)
@@ -204,6 +215,12 @@ export class AppComponent implements OnInit {
                     if (this.authService.getToken()) {
                       this.dayManagementService.dayCheck(this.dayStatus);
                     }
+                    // Load data for order listener and start listeners
+                    setTimeout(() => {
+                      this.loadProductsData();
+                      this.orderListenerService.startOrderListener();
+                      this.printsListener();
+                    }, 10000);
                   }
                   }).catch(err => {
                     console.log(err);
@@ -226,9 +243,6 @@ export class AppComponent implements OnInit {
         this.setOnSync(false);
         this.router.navigate(['/setup']);
         break;
-    }
-    if (this.serverSettings && this.serverSettings.type === SERVER_TYPES.PRIMARY) {
-      setTimeout(() => this.orderListenerService.startOrderListener(), 10000);
     }
   }
 
@@ -323,6 +337,89 @@ export class AppComponent implements OnInit {
         this.electronService.exitProgram();
       }
     });
+  }
+
+  /**
+   * Load categories and products data for order listener
+   */
+  loadProductsData() {
+    this.mainService.getAllBy('categories', {}).then(cats => {
+      this.categories = cats.docs;
+      console.log('Categories Data Loaded!');
+    });
+    this.mainService.getAllBy('products', {}).then(products => {
+      this.products = products.docs;
+      console.log('Products Data Loaded!');
+    });
+    this.settingsService.getPrinters().subscribe(res => {
+      this.printers = res.value;
+      console.log('Printers Data Loaded!');
+    });
+  }
+
+  /**
+   * Listen for print requests (checks and cancellations)
+   */
+  printsListener() {
+    console.log('Printer Listener Process Started');
+    return this.mainService.LocalDB['prints'].changes({ 
+      since: 'now', 
+      live: true, 
+      include_docs: true 
+    }).on('change', (change: any) => {
+      if (!this.onSync) {
+        if (!change.deleted) {
+          const printObj = change.doc;
+          
+          // Check printing
+          if (printObj.type === 'Check' && printObj.status === 0) { // PrintOutStatus.WAITING
+            this.mainService.getData('checks', printObj.connection).then((check: any) => {
+              this.mainService.getData('tables', check.table_id).then((table: any) => {
+                this.mainService.updateData('prints', printObj._id, { status: 1 }).then(() => { // PrintOutStatus.PRINTED
+                  this.printerService.printCheck(printObj.printer, table.name, check);
+                }).catch(() => {
+                  this.mainService.updateData('prints', printObj._id, { status: 2 }); // PrintOutStatus.ERROR
+                });
+              }).catch(() => {
+                this.mainService.updateData('prints', printObj._id, { status: 2 });
+              });
+            }).catch(() => {
+              this.mainService.updateData('prints', printObj._id, { status: 2 });
+            });
+          }
+          
+          // Cancel printing
+          else if (printObj.type === 'Cancel' && printObj.status === 0) { // PrintOutStatus.WAITING
+            const product = printObj.cancelObj.product;
+            this.mainService.getAllBy('categories', {}).then(cats => {
+              const categories = cats.docs;
+              const catPrinter = categories.filter((cat: any) => cat._id === product.cat_id)[0].printer;
+              const thePrinter = this.printers.filter((obj: any) => obj.name === catPrinter)[0];
+              this.mainService.updateData('prints', printObj._id, { status: 1 }).then(() => {
+                this.printerService.printCancel(
+                  thePrinter, 
+                  printObj.cancelObj.product, 
+                  printObj.cancelObj.reason, 
+                  printObj.cancelObj.table, 
+                  printObj.cancelObj.owner
+                );
+              }).catch(() => {
+                this.mainService.updateData('prints', printObj._id, { status: 2 });
+              });
+            }).catch(() => {
+              this.mainService.updateData('prints', printObj._id, { status: 2 });
+            });
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Load data from backup file (db.dat)
+   */
+  loadFromBackup() {
+    this.syncService.loadFromBackup();
   }
 
   resetTimer() {
