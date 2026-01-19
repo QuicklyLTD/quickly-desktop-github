@@ -27,7 +27,7 @@ import { PrintOut, PrintOutStatus } from './mocks/print';
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.9.5';
+  version = '2.1.0';
   windowStatus: boolean;
   connectionStatus: boolean;
   setupFinished: boolean;
@@ -240,18 +240,30 @@ export class AppComponent implements OnInit {
                     let splitPrintArray = [];
                     orders.forEach((obj, index) => {
                       let catPrinter = categories.filter(cat => cat._id == obj.cat_id)[0].printer || printers[0].name;
-                      let contains = splitPrintArray.some(element => element.printer.name == catPrinter);
-                      if (contains) {
-                        let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter);
-                        splitPrintArray[index].products.push(obj);
-                      } else {
-                        let thePrinter = printers.filter(obj => obj.name == catPrinter)[0];
-                        let splitPrintOrder = { printer: thePrinter, products: [obj] };
+                      if (obj.timeout) {
+                        let thePrinter = printers.filter(pobj => pobj.name == catPrinter)[0];
+                        let splitPrintOrder = { printer: thePrinter, products: [obj], timeout: obj.timeout };
                         splitPrintArray.push(splitPrintOrder);
+                      } else {
+                        let contains = splitPrintArray.some(element => element.printer.name == catPrinter && !element.timeout);
+                        if (contains) {
+                          let index = splitPrintArray.findIndex(p_name => p_name.printer.name == catPrinter && !p_name.timeout);
+                          splitPrintArray[index].products.push(obj);
+                        } else {
+                          let thePrinter = printers.filter(pobj => pobj.name == catPrinter)[0];
+                          let splitPrintOrder = { printer: thePrinter, products: [obj] };
+                          splitPrintArray.push(splitPrintOrder);
+                        }
                       }
                     });
                     splitPrintArray.forEach(order => {
-                      this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + (Order.type == OrderType.INSIDE ? ' (Müşteri)' : '(El Terminali)'));
+                      if (order.timeout) {
+                        setTimeout(() => {
+                          this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + (Order.type == OrderType.INSIDE ? ' (Müşteri)' : ''));
+                        }, order.timeout * 60000);
+                      } else {
+                        this.printerService.printOrder(order.printer, table.name, order.products, Order.user.name + (Order.type == OrderType.INSIDE ? ' (Müşteri)' : ''));
+                      }
                     });
                   };
                 });
@@ -261,7 +273,6 @@ export class AppComponent implements OnInit {
         }
       });
     })
-
   }
 
 
@@ -486,6 +497,67 @@ export class AppComponent implements OnInit {
         this.electronService.exitProgram();
       }
     })
+  }
+
+  async updateProductReport(count_data) {
+    try {
+      const StoreDayInfo = await (await this.mainService.LocalDB['allData'].find({ selector: { key: 'DateSettings' } })).docs[0].value;
+      const Month = new Date(StoreDayInfo.time).getMonth();
+      count_data.forEach(async (obj) => {
+        const ProductReport = await (await this.mainService.LocalDB['allData'].find({ selector: { db_name: 'reports', connection_id: obj.product } })).docs[0];
+        const ProductRecipe = await (await this.mainService.LocalDB['allData'].find({ selector: { db_name: 'recipes', product_id: obj.product } })).docs[0];
+        if (ProductReport) {
+          this.mainService.LocalDB['allData'].upsert(ProductReport._id, (doc) => {
+            doc.count += obj.count;
+            doc.amount += obj.total;
+            doc.timestamp = Date.now();
+            doc.weekly[StoreDayInfo.day] += obj.total;
+            doc.weekly_count[StoreDayInfo.day] += obj.count;
+            doc.monthly[Month] += obj.total;
+            doc.weekly_count[Month] += obj.count;
+            return doc;
+          });
+        }
+        if (ProductRecipe) {
+          ProductRecipe.recipe.forEach((ingredient) => {
+            let downStock = ingredient.amount * obj.count;
+            this.mainService.LocalDB['allData'].upsert(ingredient.stock_id, (doc) => {
+              doc.left_total -= downStock;
+              doc.quantity = doc.left_total / doc.total;
+              if (doc.left_total < doc.warning_limit) {
+                // Warning logic could be added here
+              }
+              return doc;
+            });
+          });
+        }
+      });
+      return true;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  countProductsData(counDataArray, id, price, manuelCount?) {
+    let countObj;
+    if (manuelCount) {
+      countObj = { product: id, count: manuelCount, total: price };
+    } else {
+      countObj = { product: id, count: 1, total: price };
+    }
+    let contains = counDataArray.some((obj) => obj.product === id);
+    if (contains) {
+      let index = counDataArray.findIndex((p_id) => p_id.product == id);
+      if (manuelCount) {
+        counDataArray[index].count += manuelCount;
+      } else {
+        counDataArray[index].count++;
+      }
+      counDataArray[index].total += price;
+    } else {
+      counDataArray.push(countObj);
+    }
+    return counDataArray;
   }
 
   changeWindow() {
