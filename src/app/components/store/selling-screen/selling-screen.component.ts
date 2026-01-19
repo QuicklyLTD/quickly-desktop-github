@@ -83,6 +83,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
   tableName: string;
   userNames: Map<string, string> = new Map();
   stockUnit: string;
+  isCollapsedView = false;
 
   @ViewChild('productName', { static: false }) productFilterInput: ElementRef;
   @ViewChild('specsUnit', { static: false }) productUnit: ElementRef;
@@ -801,6 +802,54 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
       this.payedShow = true;
       this.payedTitle = 'Alınan Ödemeleri Gizle';
     }
+  }
+
+  checkItems(): Array<any> {
+    if (this.check.products.length > 0) {
+      const viewArray: Array<any> = [];
+      this.check.products.forEach((item) => {
+        const existingIndex = viewArray.findIndex(
+          (obj) =>
+            obj.name === item.name &&
+            obj.id === item.id &&
+            obj.status === item.status &&
+            obj.note === item.note &&
+            obj.timeout === item.timeout
+        );
+
+        if (existingIndex !== -1) {
+          viewArray[existingIndex].quantity++;
+        } else {
+          const viewItem: any = {
+            id: item.id,
+            name: item.name,
+            note: item.note,
+            quantity: 1,
+            price: item.price,
+            status: item.status,
+          };
+          if (item.timeout) {
+            viewItem.timeout = item.timeout;
+          }
+          viewArray.push(viewItem);
+        }
+      });
+      return viewArray.sort((a, b) => {
+        if (a.status > b.status) {
+          return -1;
+        } else if (a.status < b.status) {
+          return 1;
+        } else {
+          return b.quantity - a.quantity;
+        }
+      });
+    } else {
+      return [];
+    }
+  }
+
+  toggleProduct(): void {
+    this.isCollapsedView = !this.isCollapsedView;
   }
 
   selectProduct(index) {

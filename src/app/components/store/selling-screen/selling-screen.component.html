@@ -169,21 +169,39 @@
                 </div>
               </div>
               <div id="check-products" data-testid="check-products" class="card-body check-flow p-2 dark-bg">
-                <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
-                  <div data-testid="check-product-item" [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
-                    <div class="product-name">
-                      <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
-                      {{item.name}}
-                      <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
-                    </div>
-                    <div class="product-price">{{item.price | price }} </div>
-                    <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
-                      <i class="fa fa-user" aria-hidden="true"></i> {{userNames.get(item.owner) || ''}}
-                      <span class="pull-right">
-                        <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
+                <button (click)="toggleProduct()" class="btn btn-sm btn-info btn-block mb-1">
+                  <i class="fa {{isCollapsedView ? 'fa-list' : 'fa-compress'}}"></i>
+                  <b>{{isCollapsedView ? 'Normal Görünüm' : 'Sıkıştırılmış Görünüm'}}</b>
+                </button>
+                <ng-container *ngIf="!isCollapsedView">
+                  <div *ngFor="let item of check.products; let i = index" [ngClass]="{'animated slideInLeft':item.status == 1}">
+                    <div data-testid="check-product-item" [ngClass]="{'text-danger': item.status == 2 && selectedIndex != i, 'text-warning':selectedIndex == i}" style="cursor:pointer" (click)="selectProduct(i)" class="check-product">
+                      <div class="product-name">
+                        <i *ngIf="item.status == 3" class="fa fa-times-rectangle text-danger" aria-hidden="true"></i>
+                        {{item.name}}
+                        <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
+                      </div>
+                      <div class="product-price">{{item.price | price }} </div>
+                      <div *ngIf="selectedIndex == i && item.status !== 1" style="font-size: 13px; padding-bottom: 0.25rem;">
+                        <i class="fa fa-user" aria-hidden="true"></i> {{userNames.get(item.owner) || ''}}
+                        <span class="pull-right">
+                          <i class="fa fa-clock-o" aria-hidden="true"></i> {{item.timestamp | date:'HH:mm'}}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </ng-container>
+                <ng-container *ngIf="isCollapsedView">
+                  <div *ngFor="let item of checkItems(); let i = index">
+                    <div class="check-product text-danger">
+                      <div class="product-name">
+                        <span class="badge badge-warning text-dark mr-1">{{item.quantity}}</span>
+                        {{item.name}}
+                        <small *ngIf="item.note !== '' && item.note !== undefined">({{item.note}})</small>
+                      </div>
+                      <div class="product-price">{{item.price * item.quantity | price }} </div>
+                    </div>
+                  </div>
+                </ng-container>
               </div>
               <div *ngIf="check.discount > 0" class="card-footer p-1">
                 <button (click)="togglePayed()" class="btn btn-sm btn-secondary btn-block text-left">{{payedTitle}}
