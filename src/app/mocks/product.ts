@@ -45,6 +45,7 @@ export class Product {
         public notes: string,
         public subcat_id?: string,
         public specifies?: Array<ProductSpecs>,
+        public extras?: Array<ProductExtras>,
         public _id?: string,
         public _rev?: string
     ) { }
@@ -67,6 +68,13 @@ export class ProductSpecs {
     constructor(
         public spec_name: string,
         public spec_price: number
+    ) { }
+}
+
+export class ProductExtras {
+    constructor(
+        public extra_name: string,
+        public extra_price: number
     ) { }
 }
 export class Recipe {

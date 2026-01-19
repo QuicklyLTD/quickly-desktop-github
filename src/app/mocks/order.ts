@@ -21,6 +21,8 @@ export class Order {
         public status: OrderStatus,
         public type: OrderType,
         public timestamp: number,
+        public timeout: number,
+        public edited: boolean,
         public _id?: string,
         public _rev?: string,
     ) { }

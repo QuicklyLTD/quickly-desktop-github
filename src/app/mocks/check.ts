@@ -13,6 +13,7 @@ export class Check {
         public check_no: number,
         public payment_flow?: Array<PaymentStatus>,
         public discountPercent?: number,
+        public freeAmount?: number,
         public _id?: string,
         public _rev?: string
     ) {
@@ -60,6 +61,8 @@ export class CheckProduct {
         public timestamp: number,
         public tax_value: number,
         public barcode: number,
+        public extras?: Array<any>,
+        public timeout?: number,
     ) { }
 }
 
