@@ -34,10 +34,14 @@ export class ApplicationService {
   }
 
   connectionStatus() {
-    if (navigator.onLine) {
-      return true;
+    if (localStorage.getItem('AppType') == 'Primary') {
+      if (navigator.onLine) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      return false
+      return true;
     }
   }
 
