@@ -1,11 +1,11 @@
 {
-  "name": "angular-electron",
-  "description": "Angular Electron sample",
+  "name": "quickly-desktop",
+  "description": "Quickly Desktop - POS System",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Quickly LTD",
+    "email": "info@quickly.com"
   },
-  "version": "11.1.0",
+  "version": "2.1.0",
   "main": "main.js",
   "private": true,
   "dependencies": {

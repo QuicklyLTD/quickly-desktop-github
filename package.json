@@ -1,11 +1,11 @@
 {
-  "name": "angular-electron",
-  "version": "11.1.0",
-  "description": "Angular 14 with Electron 19 (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
+  "name": "quickly-desktop",
+  "version": "2.1.0",
+  "description": "Quickly Desktop - Modern POS System (Angular 14 + Electron 19)",
+  "homepage": "https://github.com/QuicklyLTD/quickly-desktop-github",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Quickly LTD",
+    "email": "info@quickly.com"
   },
   "keywords": [
     "angular",

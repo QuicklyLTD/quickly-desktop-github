@@ -33,7 +33,7 @@ import { MessageComponent } from './components/helpers/message/message.component
 export class AppComponent implements OnInit {
   title = 'Quickly';
   description = 'Quickly';
-  version = '1.9.5';
+  version = '2.1.0';
   windowStatus = false;
   setupFinished = false;
   onSync = false;
