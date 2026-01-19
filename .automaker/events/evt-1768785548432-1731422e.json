@@ -1,0 +1,10 @@
+{
+  "id": "evt-1768785548432-1731422e",
+  "trigger": "feature_success",
+  "timestamp": "2026-01-19T01:19:08.432Z",
+  "projectPath": "/Users/guvensoft/Desktop/QuicklyLTD/quickly-desktop",
+  "projectName": "quickly-desktop",
+  "featureId": "feature-1768785312626-69hyj9kz8",
+  "error": "Feature completed in 130s - auto-verified",
+  "passes": true
+}

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "evt-1768785548432-1731422e",
+      "trigger": "feature_success",
+      "timestamp": "2026-01-19T01:19:08.432Z",
+      "featureId": "feature-1768785312626-69hyj9kz8"
+    },
+    {
+      "id": "evt-1768785499256-3d3648fe",
+      "trigger": "feature_success",
+      "timestamp": "2026-01-19T01:18:19.256Z",
+      "featureId": "feature-1768785306534-pu3atkl2s"
+    },
+    {
+      "id": "evt-1768785473700-f82cf4cc",
+      "trigger": "feature_success",
+      "timestamp": "2026-01-19T01:17:53.700Z",
+      "featureId": "feature-1768785274516-23ic0rcg6"
+    }
+  ]
+}

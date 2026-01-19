@@ -1,0 +1,28 @@
+{
+  "category": "refactor",
+  "description": "Implement InversifyJS or similar DI container for the Electron main process to mirror Angular's DI pattern. Create injectable services for file system, window management, and system integrations.\n\n**Rationale:** The main process typically uses ad-hoc module imports making it hard to test and maintain. DI enables mocking, better testability, and consistent patterns across the entire application stack.",
+  "title": "Add Dependency Injection for Electron Main Process",
+  "status": "in_progress",
+  "id": "feature-1768785274516-23ic0rcg6",
+  "descriptionHistory": [
+    {
+      "description": "Implement InversifyJS or similar DI container for the Electron main process to mirror Angular's DI pattern. Create injectable services for file system, window management, and system integrations.\n\n**Rationale:** The main process typically uses ad-hoc module imports making it hard to test and maintain. DI enables mocking, better testability, and consistent patterns across the entire application stack.",
+      "timestamp": "2026-01-19T01:14:34.517Z",
+      "source": "initial"
+    }
+  ],
+  "skipTests": false,
+  "model": "codex-gpt-5.2-codex",
+  "thinkingLevel": "none",
+  "reasoningEffort": "low",
+  "imagePaths": [],
+  "textFilePaths": [],
+  "priority": 2,
+  "planningMode": "skip",
+  "requirePlanApproval": false,
+  "workMode": "current",
+  "dependencies": [],
+  "branchName": "main",
+  "startedAt": "2026-01-19T01:16:57.810Z",
+  "updatedAt": "2026-01-19T01:16:57.893Z"
+}

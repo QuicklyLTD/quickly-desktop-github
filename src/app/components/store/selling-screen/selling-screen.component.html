@@ -611,6 +611,14 @@
               </p>
             </button>
           </div>
+          <div class="col pr-2 pl-2">
+            <button [disabled]="selectedProduct == undefined" data-toggle="modal" data-dismiss="modal" (click)="toggleModal('timeoutModal', true)" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
+              <i class="fa fa-clock-o"></i>
+              <p class="mt-1 mb-1">
+                <b>Gecikmeli Yazdır</b>
+              </p>
+            </button>
+          </div>
           <!-- <div class="col pr-2 pl-2">
             <button data-toggle="modal" [disabled]="!check._id" data-dismiss="modal" (click)="qrCode()" class="btn btn-secondary text-info border-info btn-block btn-lg sellButton">
               <i class="fa fa-qrcode"></i>
@@ -623,6 +631,29 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">İptal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="timeoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Gecikmeli Yazdır: {{selectedProduct?.name}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toggleModal('timeoutModal', false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div *ngFor="let item of [20,40,60]" class="col-lg-4 col-4 mb-2">
+            <button (click)="setProductTimeout(item)" class="btn btn-info btn-lg btn-block"><b>{{item}} dk</b></button>
+          </div>
+          <div class="col-lg-12">
+            <button (click)="setProductTimeout(0)" class="btn btn-danger btn-lg btn-block"><b>Gecikmeyi İptal Et</b></button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

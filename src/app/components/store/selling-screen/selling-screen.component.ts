@@ -184,7 +184,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     this.tareNumber = 0;
   }
 
-  private toggleModal(id: string, isOpen: boolean): void {
+  public toggleModal(id: string, isOpen: boolean): void {
     const modal = document.getElementById(id);
     if (!modal) {
       return;
@@ -1304,6 +1304,22 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
 
   selectTable(id) {
     this.selectedTable = id;
+  }
+
+  setProductTimeout(minutes: number): void {
+    if (this.selectedProduct) {
+      if (minutes === 0) {
+        this.selectedProduct.timeout = undefined;
+      } else {
+        this.selectedProduct.timeout = minutes;
+      }
+      this.mainService.updateData('checks', this.check_id, this.check).then(res => {
+        if (res.updated) {
+          this.check._rev = res.rev;
+        }
+      });
+    }
+    this.toggleModal('timeoutModal', false);
   }
 
   splitProduct() {
