@@ -15,7 +15,7 @@ ipcMain.once('appServer', (event, token, port) => {
     //     res.header('Access-Control-Allow-Origin', req.header('origin'));
     //     next();
     // });
-    app.use(`/${token}/`, expressPouch(PouchDB.defaults({ adapter: 'memory', revs_limit: 3, auto_compaction: false }), { logPath: './data/log.txt', configPath: './data/config.json' }));
+    app.use(`/${token}/`, expressPouch(PouchDB.defaults({ adapter: 'memory', revs_limit: 10, auto_compaction: false }), { logPath: './data/log.txt', configPath: './data/config.json' }));
     server = app.listen(port);
 });
 

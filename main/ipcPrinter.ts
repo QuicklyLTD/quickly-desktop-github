@@ -127,6 +127,49 @@ ipcMain.on('printOrderInd', (event, device, table, orders, owner) => {
   }
 });
 
+ipcMain.on('printOrderGroupped', (event, device, table, orders, owner) => {
+  let deviceToPrint = findDevice(device);
+  if (deviceToPrint) {
+    const printer = new escpos.Printer(deviceToPrint);
+    let date = new Date();
+    deviceToPrint.open((err) => {
+      if (err) {
+        event.sender.send('error', 'Yazıcıya Ulaşılamıyor');
+      } else {
+        printer
+          .align('lt')
+          .size(2, 2)
+          .text(' ')
+          .text('Masa No: ' + table, '857')
+          .size(1, 1)
+          .text(line)
+          .align('lt');
+        for (let category in orders) {
+          printer.size(2, 2).text('--- ' + category + ' ---', '857');
+          for (let prop in orders[category]) {
+            let text = fitText(orders[category][prop].count + 'x ' + orders[category][prop].name, '', 2);
+            printer.size(2, 2).text(text, '857');
+            if (orders[category][prop].note !== '') {
+              printer.size(1, 1).text('      Not: ' + orders[category][prop].note, '857');
+            }
+          }
+        }
+        if (device.name !== 'Kasa') {
+          printer.beep(2, 3);
+        }
+        printer.size(1, 1).text(line);
+        printer
+          .text(fitText(owner, date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(), 1), '857')
+          .control('LF')
+          .cut(true)
+          .close();
+      }
+    });
+  } else {
+    event.sender.send('error', 'Yazıcı Bulunamadı');
+  }
+});
+
 
 
 ipcMain.on('printQRcode', (event, device, data, table, owner) => {
@@ -200,7 +243,9 @@ ipcMain.on('printCheck', (event, device, check, table, logo, storeInfo) => {
             .image(image, 'd24')
             .control('LF')
             .text('Instagram')
-            .text('@kallavikahvetr')
+            .text('@quicklypos')
+            .text('Telefon')
+            .text('0850 305 66 18')
             .align('lt')
             .control('LF');
           if (check.products.length > 0) {
@@ -309,7 +354,9 @@ ipcMain.on('printPayment', (event, device, payment, table, logo) => {
             .size(1, 1)
             .image(image, 'd24')
             .text('Instagram ')
-            .text('@kallavikahvetr')
+            .text('@quicklypos')
+            .text('Telefon ')
+            .text('0850 305 66 18')
             .align('lt')
             .control('LF')
             .text(fitText('Adet  Ürün', 'Birim   Toplam', 1), '857')
