@@ -101,7 +101,7 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     private scalerService: ScalerService,
     private logService: LogService,
     private zone: NgZone,
-    private entityStoreService: EntityStoreService,
+    public entityStoreService: EntityStoreService,
     private keyboardService: KeyboardService
   ) {
     this.owner = this.settingsService.getUser('name');
@@ -1369,6 +1369,69 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
       });
     }
     this.toggleModal('timeoutModal', false);
+  }
+
+  setKuver(count: number): void {
+    this.mainService.getAllBy('products', { name: 'Kuver' }).then(res => {
+      if (res.docs.length > 0) {
+        const product = res.docs[0];
+        for (let i = 0; i < count; i++) {
+          this.addToCheck(product);
+        }
+        this.toggleModal('kuverModal', false);
+      }
+    });
+  }
+
+  addServiceCharge(percent: number): void {
+    const serviceCharge = (this.check.total_price * percent) / 100;
+    this.mainService.getAllBy('products', { name: 'Servis Ücreti' }).then(res => {
+      if (res.docs.length > 0) {
+        const product = res.docs[0];
+        product.price = serviceCharge;
+        this.addToCheck(product);
+        this.toggleModal('serviceChargeModal', false);
+      }
+    });
+  }
+
+  changeUser(user: any): void {
+    this.owner = user.name;
+    this.ownerId = user._id;
+    this.check.owner = user.name;
+    if (this.check.status !== CheckStatus.PASSIVE) {
+      this.mainService.changeData('checks', this.check_id, (doc) => {
+        doc.owner = user.name;
+        return doc;
+      });
+    }
+    this.toggleModal('userModal', false);
+  }
+
+  pushKeyForPrice(key: any): void {
+    if (key === '◂') {
+      this.numpad = '';
+    } else {
+      if (this.isFirstTime) {
+        this.numpad = '';
+        this.isFirstTime = false;
+      }
+      this.numpad += key;
+    }
+  }
+
+  setProductPrice(): void {
+    const newPrice = parseFloat(this.numpad);
+    this.selectedProduct.price = newPrice;
+    this.check.total_price = this.check.products
+      .filter(p => p.status !== 3)
+      .reduce((sum, p) => sum + p.price, 0);
+    if (this.selectedProduct.status === 2) {
+      this.mainService.updateData('checks', this.check_id, this.check).catch((err) => {
+        console.log(err);
+      });
+    }
+    this.toggleModal('checkPrice', false);
   }
 
   splitProduct() {
