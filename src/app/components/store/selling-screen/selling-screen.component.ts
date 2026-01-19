@@ -314,6 +314,13 @@ export class SellingScreenComponent implements OnInit, OnDestroy {
     }
   }
 
+  checkTotal(): number {
+    return this.check.products
+      .filter((obj) => obj.status !== 3)
+      .map((obj) => obj.price)
+      .reduce((a, b) => a + b, 0);
+  }
+
   goPayment() {
     if (this.check.type === CheckType.FAST) {
       if (this.check.status === CheckStatus.PASSIVE || !this.check_id) {
@@ -1423,9 +1430,7 @@ this.mainService.addData('closed_checks', checkWillClose).then(res => {
   setProductPrice(): void {
     const newPrice = parseFloat(this.numpad);
     this.selectedProduct.price = newPrice;
-    this.check.total_price = this.check.products
-      .filter(p => p.status !== 3)
-      .reduce((sum, p) => sum + p.price, 0);
+    this.check.total_price = this.checkTotal();
     if (this.selectedProduct.status === 2) {
       this.mainService.updateData('checks', this.check_id, this.check).catch((err) => {
         console.log(err);
